@@ -7,14 +7,14 @@
 </h4>
 
 <p align="center">
-  <a href="https://travis-ci.com/gabriel-vasile/mimetype">
-    <img alt="Build Status" src="https://travis-ci.com/gabriel-vasile/mimetype?branch=master">
-  </a>
-  <a href="LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/gabriel-vasile/mimetype.svg">
+  <a href="https://travis-ci.org/gabriel-vasile/mimetype">
+    <img alt="Build Status" src="https://travis-ci.org/gabriel-vasile/mimetype.svg?branch=master">
   </a>
   <a href="https://godoc.org/github.com/gabriel-vasile/mimetype">
     <img alt="Documentation" src="https://godoc.org/github.com/gabriel-vasile/mimetype?status.svg">
+  </a>
+  <a href="LICENSE">
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg">
   </a>
 </p>
 
