@@ -6,6 +6,18 @@
   A library for detecting mime types and extensions based on magic numbers
 </h4>
 
+<p align="center">
+  <a href="https://travis-ci.com/gabriel-vasile/mimetype">
+    <img alt="Build Status" src="https://travis-ci.com/gabriel-vasile/mimetype?branch=master">
+  </a>
+  <a href="LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/gabriel-vasile/mimetype.svg">
+  </a>
+  <a href="https://godoc.org/github.com/gabriel-vasile/mimetype">
+    <img alt="Documentation" src="https://godoc.org/github.com/gabriel-vasile/mimetype?status.svg">
+  </a>
+</p>
+
 ## Installation
 ```bash
 go get github.com/gabriel-vasile/mimetype
@@ -27,5 +39,5 @@ behind this choice is that there are file formats used as containers for other
 file formats. For example, Microsoft office files are just zip archives,
 containing specific metadata files.
 <div align="center">
-  <img alt="Header" src="mimetype.gif" width="88%">
+  <img alt="structure" src="mimetype.gif" width="88%">
 </div>
