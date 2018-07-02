@@ -9,7 +9,7 @@
 ## Installation
 ```bash
 go get github.com/gabriel-vasile/mimetype
-
+```
 
 ## Usage
 The library exposes three functions you can use in order to detect a file type.
