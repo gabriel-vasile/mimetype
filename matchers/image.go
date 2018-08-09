@@ -41,6 +41,7 @@ func Ico(in []byte) bool {
 		in[2] == 0x01 && in[3] == 0x00
 }
 
+// TODO
 func Tiff(in []byte) bool {
 	return false
 }

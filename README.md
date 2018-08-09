@@ -41,3 +41,9 @@ containing specific metadata files.
 <div align="center">
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>
+
+## Contributing
+Contributions to <b>mimetype</b> are welcome. If you find an issue and you consider
+contributing, you can use the [Github issues tracker](https://github.com/gabriel-vasile/mimetype/issues)
+in order to report it, or better yet, open a pull request.
+Code contributions must be test covered, and use the gofmt formatting tool.

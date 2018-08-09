@@ -6,6 +6,7 @@ func Mp3(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("\x49\x44\x33"))
 }
 
+// TODO
 func Flac(in []byte) bool {
 	return false
 }

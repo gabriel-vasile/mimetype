@@ -45,6 +45,7 @@ func Flv(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("\x46\x4C\x56\x01"))
 }
 
+// TODO
 func Mpeg(in []byte) bool {
 	return false
 }

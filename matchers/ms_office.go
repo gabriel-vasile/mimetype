@@ -18,6 +18,7 @@ func Pptx(in []byte) bool {
 	return checkMsOfficex(in, "ppt")
 }
 
+// TODO
 func Doc(in []byte) bool {
 	return false
 }
