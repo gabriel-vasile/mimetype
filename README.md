@@ -5,6 +5,9 @@
 <h4 align="center">
   A library for detecting mime types and extensions based on magic numbers
 </h4>
+<h6 align="center">
+  No bindings, all written in pure go
+</h6>
 
 <p align="center">
   <a href="https://travis-ci.org/gabriel-vasile/mimetype">
