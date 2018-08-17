@@ -15,8 +15,11 @@ const testDataDir = "testdata"
 var files = map[string]Node{
 	"a.pdf":  Pdf,
 	"a.zip":  Zip,
+	"a.xls":  Xls,
 	"a.xlsx": Xlsx,
+	"a.doc":  Doc,
 	"a.docx": Docx,
+	"a.ppt":  Ppt,
 	"a.pptx": Pptx,
 	"a.epub": Epub,
 	"a.7z":   SevenZ,
