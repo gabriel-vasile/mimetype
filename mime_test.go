@@ -41,7 +41,7 @@ var files = map[string]Node{
 }
 
 func TestMatching(t *testing.T) {
-	errStr := "Mime: %s; DetectedMime: %s\nExt: %s; DetectedExt"
+	errStr := "Mime: %s != DetectedMime: %s"
 	for fName, node := range files {
 		fileName := filepath.Join(testDataDir, fName)
 		f, err := os.Open(fileName)
@@ -53,20 +53,20 @@ func TestMatching(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if dMime, dExt := Detect(data); dMime != node.Mime() || dExt != node.Extension() {
-			t.Errorf(errStr, dMime, node.Mime(), dExt, node.Extension())
+		if dMime, _ := Detect(data); dMime != node.Mime() {
+			t.Errorf(errStr, node.Mime(), dMime)
 		}
 
 		f.Seek(0, 0)
-		if dMime, dExt, err := DetectReader(f); dMime != node.Mime() || dExt != node.Extension() {
-			t.Errorf(errStr, dMime, node.Mime(), dExt, node.Extension())
+		if dMime, _, err := DetectReader(f); dMime != node.Mime() {
+			t.Errorf(errStr, node.Mime(), dMime)
 		} else if err != nil {
 			t.Fatal(err)
 		}
 		f.Close()
 
-		if dMime, dExt, err := DetectFile(fileName); dMime != node.Mime() || dExt != node.Extension() {
-			t.Errorf(errStr, dMime, node.Mime(), dExt, node.Extension())
+		if dMime, _, err := DetectFile(fileName); dMime != node.Mime() {
+			t.Errorf(errStr, node.Mime(), dMime)
 		} else if err != nil {
 			t.Fatal(err)
 		}
