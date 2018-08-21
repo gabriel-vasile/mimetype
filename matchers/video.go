@@ -45,15 +45,19 @@ func Flv(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("\x46\x4C\x56\x01"))
 }
 
-// TODO
 func Mpeg(in []byte) bool {
-	return false
+	return len(in) > 3 && bytes.Equal(in[:3], []byte("\x00\x00\x01")) &&
+		in[3] >= 0xB0 && in[3] <= 0xBF
 }
 
 func Quicktime(in []byte) bool {
-	return false
+	return len(in) > 12 &&
+		(bytes.Equal(in[4:12], []byte("ftypqt  ")) ||
+			bytes.Equal(in[4:8], []byte("moov")))
 }
 
 func Avi(in []byte) bool {
-	return false
+	return len(in) > 16 &&
+		bytes.Equal(in[:4], []byte("RIFF")) &&
+		bytes.Equal(in[8:16], []byte("AVI LIST"))
 }
