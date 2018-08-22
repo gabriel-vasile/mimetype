@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // When a matcher passes the check, the children matchers are tried in order to
 // find a more accurate mime type
 var Root = NewNode("application/octet-stream", "", matchers.Dummy,
-	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Flac, Midi, Ape, MusePack,
+	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
 	Wav, Aiff, Mpeg, Quicktime, Mp4, WebM, ThreeGP, Avi, Flv, Ps, Psd, Html, Xml, Txt, Doc, Xls, Ppt)
 var (
 	SevenZ = NewNode("application/x-7z-compressed", "7z", matchers.SevenZ)
