@@ -37,6 +37,13 @@ var files = map[string]Node{
 	"a.mov":  Quicktime,
 	"a.mpeg": Mpeg,
 
+	"a.mp3":  Mp3,
+	"a.wav":  Wav,
+	"a.flac": Flac,
+	"a.midi": Midi,
+	"a.ape":  Ape,
+	"a.aiff": Aiff,
+
 	"a.html": Html,
 	"a.xml":  Xml,
 	"a.txt":  Txt,
