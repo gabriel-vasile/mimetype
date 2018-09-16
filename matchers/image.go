@@ -41,7 +41,7 @@ func Ico(in []byte) bool {
 		in[2] == 0x01 && in[3] == 0x00
 }
 
-// TODO
 func Tiff(in []byte) bool {
-	return false
+	return bytes.Equal(in[:4], []byte{0x49, 0x49, 0x2A, 0x00}) ||
+		bytes.Equal(in[:4], []byte{0x4D, 0x4D, 0x00, 0x2A})
 }
