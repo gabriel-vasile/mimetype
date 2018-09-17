@@ -28,6 +28,7 @@ var files = map[string]Node{
 
 	"a.png": Png,
 	"a.psd": Psd,
+	"a.tif": Tiff,
 
 	"a.mp4":  Mp4,
 	"a.webm": WebM,
