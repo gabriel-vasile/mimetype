@@ -3,5 +3,8 @@ go:
   - "1.9"
   - "1.10"
   - "master"
+before_script:
+  - go tool vet .
 script:
+  - diff -u <(echo -n) <(gofmt -d ./)
   - go test -v
