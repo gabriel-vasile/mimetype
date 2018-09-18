@@ -88,7 +88,7 @@ func TestAppend(t *testing.T) {
 	Foobar := func(input []byte) bool {
 		return bytes.HasPrefix(input, []byte("foobar\n"))
 	}
-	foobarNode := NewNode("foo/bar", "fbExt", Foobar)
+	foobarNode := NewNode("text/foobar", "fbExt", Foobar)
 	fbFile := filepath.Join(testDataDir, "foobar.fb")
 
 	dMime, _, err := DetectFile(fbFile)

@@ -21,22 +21,58 @@
   </a>
 </p>
 
-## Installation
+## Install
 ```bash
 go get github.com/gabriel-vasile/mimetype
 ```
 
-## Usage
+## Use
 The library exposes three functions you can use in order to detect a file type.
+See [Godoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
 ```go
 func Detect(in []byte) (mime, extension string) {...}
 func DetectReader(r io.Reader) (mime, extension string, err error) {...}
 func DetectFile(file string) (mime, extension string, err error) {...}
 ```
-See [Godoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
+
+## Extend
+If, for example, you need to detect the **"text/foobar"** mime, for text files
+containing the string "foobar" as their first line:
+ - create the matching function
+    ```
+	foobar := func(input []byte) bool {
+		return bytes.HasPrefix(input, []byte("foobar\n"))
+	}
+    ```
+ - create the mime type node
+    ```
+    foobarNode := mimetype.NewNode("text/foobar", "fbExt", foobar)
+    ````
+ - append the new node in the tree
+    ```
+    mimetype.Txt.Append(foobarNode)
+    ```
+ - detect
+    ```
+	mime, extension := mimetype.Detect([]byte("foobar\nfoo foo bar"))
+    ```
+See [TestAppend](https://github.com/gabriel-vasile/mimetype/blob/master/mime_test.go) for a working example.
+See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you consider the missing mime type should be included in the library by default.
+
+## Supported mimes
+##### Application
+7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd
+##### Image
+Png, Jpg, Gif, Webp Tiff
+##### Audio
+Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff
+##### Video
+Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv
+##### Text
+Txt, Html, Xml, Php
 
 ## Structure
-<b>mimetype</b> uses an hierarchical structure to keep the matching functions.
+**mimetype** uses an hierarchical structure to keep the matching functions.
 This reduces the number of calls needed for detecting the file type. The reason
 behind this choice is that there are file formats used as containers for other
 file formats. For example, Microsoft office files are just zip archives,
@@ -45,8 +81,8 @@ containing specific metadata files.
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>
 
-## Contributing
-Contributions to <b>mimetype</b> are welcome. If you find an issue and you consider
+## Contribute
+Contributions to **mimetype** are welcome. If you find an issue and you consider
 contributing, you can use the [Github issues tracker](https://github.com/gabriel-vasile/mimetype/issues)
 in order to report it, or better yet, open a pull request.
 Code contributions must be test covered, and use the gofmt formatting tool.
