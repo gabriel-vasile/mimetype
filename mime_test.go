@@ -48,6 +48,7 @@ var files = map[string]Node{
 	"a.html": Html,
 	"a.xml":  Xml,
 	"a.txt":  Txt,
+	"a.php":  Php,
 	"a.ps":   Ps,
 }
 
@@ -101,6 +102,6 @@ func TestAppend(t *testing.T) {
 	}
 }
 
-func TestTreePrint1(_ *testing.T) {
+func TestTreePrint(_ *testing.T) {
 	fmt.Println(Root.Tree())
 }

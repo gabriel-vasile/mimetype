@@ -7,13 +7,13 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // find a more accurate mime type
 var Root = NewNode("application/octet-stream", "", matchers.Dummy,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
-	Wav, Aiff, Mpeg, Quicktime, Mp4, WebM, ThreeGP, Avi, Flv, Ps, Psd, Html, Xml, Txt, Doc, Xls, Ppt)
+	Wav, Aiff, Mpeg, Quicktime, Mp4, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
+	Doc, Xls, Ppt)
+
 var (
 	SevenZ = NewNode("application/x-7z-compressed", "7z", matchers.SevenZ)
 	Zip    = NewNode("application/zip", "zip", matchers.Zip, Xlsx, Docx, Pptx, Epub, Jar)
 	Pdf    = NewNode("application/pdf", "pdf", matchers.Pdf)
-	Txt    = NewNode("text/plain; charset=utf-8", "txt", matchers.Txt)
-	Html   = NewNode("text/html", "html", matchers.Html)
 	Xlsx   = NewNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
 	Docx   = NewNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
 	Pptx   = NewNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
@@ -25,7 +25,12 @@ var (
 	Xls    = NewNode("application/vnd.ms-excel", "xls", matchers.Xls)
 	Ps     = NewNode("application/postscript", "ps", matchers.Ps)
 	Psd    = NewNode("application/x-photoshop", "psd", matchers.Psd)
-	Xml    = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml)
+
+	Txt = NewNode("text/plain; charset=utf-8", "txt", matchers.Txt,
+		Html, Xml, Php)
+	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
+	Xml  = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml)
+	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
 
 	Png  = NewNode("image/png", "png", matchers.Png)
 	Jpg  = NewNode("image/jpeg", "jpg", matchers.Jpg)
