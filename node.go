@@ -11,14 +11,14 @@ type (
 		extension  string
 		matchFunc  matchFunc
 		exhaustive bool
-		children   []Node
+		children   []*Node
 	}
 	matchFunc func([]byte) bool
 )
 
 // NewNode creates a new Node
-func NewNode(mime, extension string, matchFunc matchFunc, children ...Node) Node {
-	return Node{
+func NewNode(mime, extension string, matchFunc matchFunc, children ...*Node) *Node {
+	return &Node{
 		mime:      mime,
 		extension: extension,
 		matchFunc: matchFunc,
@@ -27,19 +27,19 @@ func NewNode(mime, extension string, matchFunc matchFunc, children ...Node) Node
 }
 
 // Mime returns the mime type associated with the node
-func (n Node) Mime() string { return n.mime }
+func (n *Node) Mime() string { return n.mime }
 
 // Extension returns the file extension associated with the node
-func (n Node) Extension() string { return n.extension }
+func (n *Node) Extension() string { return n.extension }
 
 // Append adds a new node to the matchers tree
 // When a node's matching function passes the check, the node's children are
 // also checked in order to find a more accurate mime type for the input
-func (n *Node) Append(cs ...Node) { n.children = append(n.children, cs...) }
+func (n *Node) Append(cs ...*Node) { n.children = append(n.children, cs...) }
 
 // match does a depth-first search on the matchers tree
 // it returns the deepest successful matcher for which all the children fail
-func (n Node) match(in []byte, deepestMatch Node) Node {
+func (n *Node) match(in []byte, deepestMatch *Node) *Node {
 	for _, c := range n.children {
 		if c.matchFunc(in) {
 			return c.match(in, c)
@@ -50,9 +50,9 @@ func (n Node) match(in []byte, deepestMatch Node) Node {
 }
 
 // Tree returns a string representation of the matchers tree
-func (n Node) Tree() string {
-	var printTree func(Node, int) string
-	printTree = func(n Node, level int) string {
+func (n *Node) Tree() string {
+	var printTree func(*Node, int) string
+	printTree = func(n *Node, level int) string {
 		offset := ""
 		i := 0
 		for i < level {

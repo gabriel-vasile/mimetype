@@ -1,18 +1,17 @@
 package mimetype
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/gabriel-vasile/mimetype/matchers"
 )
 
 const testDataDir = "testdata"
 
-var files = map[string]Node{
+var files = map[string]*Node{
 	"a.pdf":  Pdf,
 	"a.zip":  Zip,
 	"a.xls":  Xls,
@@ -86,19 +85,28 @@ func TestMatching(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	fooMime := NewNode("foo/foo", "foo", matchers.Dummy)
-	barMime := NewNode("bar/bar", "bar", matchers.Dummy)
-	foobarFile := []byte("\x11\x12foobar")
+	Foobar := func(input []byte) bool {
+		return bytes.HasPrefix(input, []byte("foobar\n"))
+	}
+	foobarNode := NewNode("foo/bar", "fbExt", Foobar)
+	fbFile := filepath.Join(testDataDir, "foobar.fb")
 
-	if dMime, _ := Detect(foobarFile); dMime == fooMime.Mime() || dMime == barMime.Mime() {
-		t.Fatal(fmt.Errorf("Foo and bar matchers not yet registered"))
+	dMime, _, err := DetectFile(fbFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dMime == foobarNode.Mime() {
+		t.Fatal("Foobar should not get matched")
 	}
 
-	fooMime.Append(barMime)
-	Root.Append(fooMime)
+	Txt.Append(foobarNode)
 
-	if dMime, _ := Detect(foobarFile); dMime != barMime.Mime() {
-		t.Fatal(fmt.Errorf("Bar matcher should trigger successfully"))
+	dMime, _, err = DetectFile(fbFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dMime != foobarNode.Mime() {
+		t.Fatalf("Foobar should get matched")
 	}
 }
 
