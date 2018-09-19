@@ -5,7 +5,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // Root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers are tried in order to
 // find a more accurate mime type
-var Root = NewNode("application/octet-stream", "", matchers.Dummy,
+var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
 	Wav, Aiff, Mpeg, Quicktime, Mp4, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
@@ -27,10 +27,23 @@ var (
 	Psd    = NewNode("application/x-photoshop", "psd", matchers.Psd)
 
 	Txt = NewNode("text/plain; charset=utf-8", "txt", matchers.Txt,
-		Html, Xml, Php)
+		Html, Xml, Php, Js, Lua, Perl, Python)
+	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
+		Svg, X3d, Kml, Collada, Gml, Gpx)
 	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
-	Xml  = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml)
 	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
+
+	Js     = NewNode("application/javascript", "js", matchers.False)
+	Lua    = NewNode("text/x-lua", "lua", matchers.False)
+	Perl   = NewNode("text/x-perl", "pl", matchers.False)
+	Python = NewNode("application/x-python", "py", matchers.False)
+
+	Svg     = NewNode("image/svg+xml", "svg", matchers.False)
+	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
+	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.False)
+	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.False)
+	Gml     = NewNode("application/gml+xml", "gml", matchers.False)
+	Gpx     = NewNode("application/gpx+xml", "gpx", matchers.False)
 
 	Png  = NewNode("image/png", "png", matchers.Png)
 	Jpg  = NewNode("image/jpeg", "jpg", matchers.Jpg)

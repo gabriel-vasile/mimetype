@@ -1,7 +1,10 @@
 package matchers
 
-func Dummy(_ []byte) bool {
+func True(_ []byte) bool {
 	return true
+}
+func False(_ []byte) bool {
+	return false
 }
 
 func trimWS(in []byte) []byte {
