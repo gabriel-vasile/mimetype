@@ -85,11 +85,23 @@ func TestMatching(t *testing.T) {
 	}
 }
 
+func TestFaultyInput(t *testing.T) {
+	inexistent := "inexistent.file"
+	if _, _, err := DetectFile(inexistent); err == nil {
+		t.Errorf("%s should not match successfully", inexistent)
+	}
+
+	f, _ := os.Open(inexistent)
+	if _, _, err := DetectReader(f); err == nil {
+		t.Errorf("%s reader should not match successfully", inexistent)
+	}
+}
+
 func TestAppend(t *testing.T) {
-	Foobar := func(input []byte) bool {
+	foobar := func(input []byte) bool {
 		return bytes.HasPrefix(input, []byte("foobar\n"))
 	}
-	foobarNode := NewNode("text/foobar", "fbExt", Foobar)
+	foobarNode := NewNode("text/foobar", "fbExt", foobar)
 	fbFile := filepath.Join(testDataDir, "foobar.fb")
 
 	dMime, _, err := DetectFile(fbFile)
@@ -97,7 +109,7 @@ func TestAppend(t *testing.T) {
 		t.Fatal(err)
 	}
 	if dMime == foobarNode.Mime() {
-		t.Fatal("Foobar should not get matched")
+		t.Fatal("foobar should not get matched")
 	}
 
 	Txt.Append(foobarNode)
@@ -107,7 +119,7 @@ func TestAppend(t *testing.T) {
 		t.Fatal(err)
 	}
 	if dMime != foobarNode.Mime() {
-		t.Fatalf("Foobar should get matched")
+		t.Fatalf("foobar should get matched")
 	}
 }
 
