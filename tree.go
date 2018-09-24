@@ -7,7 +7,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // find a more accurate mime type
 var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
-	Wav, Aiff, Mpeg, Quicktime, Mp4, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
+	Wav, Aiff, Mpeg, Quicktime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
 
 var (
@@ -25,6 +25,7 @@ var (
 	Xls    = NewNode("application/vnd.ms-excel", "xls", matchers.Xls)
 	Ps     = NewNode("application/postscript", "ps", matchers.Ps)
 	Psd    = NewNode("application/x-photoshop", "psd", matchers.Psd)
+	Ogg    = NewNode("application/ogg", "ogg", matchers.Ogg)
 
 	Txt = NewNode("text/plain; charset=utf-8", "txt", matchers.Txt,
 		Html, Xml, Php, Js, Lua, Perl, Python)
