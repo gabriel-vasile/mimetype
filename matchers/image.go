@@ -17,8 +17,8 @@ func Gif(in []byte) bool {
 
 func Webp(in []byte) bool {
 	return len(in) > 11 &&
-		in[8] == 0x57 && in[9] == 0x45 &&
-		in[10] == 0x42 && in[11] == 0x50
+		bytes.Equal(in[0:4], []byte{0x52, 0x49, 0x46, 0x46}) &&
+		bytes.Equal(in[8:12], []byte{0x57, 0x45, 0x42, 0x50})
 }
 
 func Bmp(in []byte) bool {

@@ -25,9 +25,10 @@ var files = map[string]*Node{
 	"a.jar":  Jar,
 	"a.apk":  Apk,
 
-	"a.png": Png,
-	"a.psd": Psd,
-	"a.tif": Tiff,
+	"a.png":  Png,
+	"a.psd":  Psd,
+	"a.webp": Webp,
+	"a.tif":  Tiff,
 
 	"a.mp4":  Mp4,
 	"a.webm": WebM,
