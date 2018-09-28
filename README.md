@@ -61,7 +61,7 @@ See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you
 
 ## Supported mimes
 ##### Application
-7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd
+7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd, Ogg
 ##### Image
 Png, Jpg, Gif, Webp Tiff
 ##### Audio
