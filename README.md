@@ -69,7 +69,7 @@ Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff
 ##### Video
 Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv
 ##### Text
-Txt, Html, Xml, Php
+Txt, Html, Xml, Php, Json
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the matching functions.

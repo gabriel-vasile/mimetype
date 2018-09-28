@@ -51,6 +51,7 @@ var files = map[string]*Node{
 	"a.txt":  Txt,
 	"a.php":  Php,
 	"a.ps":   Ps,
+	"a.json": Json,
 }
 
 func TestMatching(t *testing.T) {

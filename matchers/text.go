@@ -1,5 +1,7 @@
 package matchers
 
+import "encoding/json"
+
 type (
 	markupSig []byte
 	ciSig     []byte // case insensitive signature
@@ -76,6 +78,10 @@ func Xml(in []byte) bool {
 
 func Php(in []byte) bool {
 	return detect(in, phpSigs)
+}
+
+func Json(in []byte) bool {
+	return json.Valid(in)
 }
 
 func (hSig markupSig) detect(in []byte) bool {

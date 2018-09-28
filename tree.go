@@ -27,10 +27,11 @@ var (
 	Psd    = NewNode("application/x-photoshop", "psd", matchers.Psd)
 	Ogg    = NewNode("application/ogg", "ogg", matchers.Ogg)
 
-	Txt = NewNode("text/plain; charset=utf-8", "txt", matchers.Txt,
-		Html, Xml, Php, Js, Lua, Perl, Python)
+	Txt = NewNode("text/plain", "txt", matchers.Txt,
+		Html, Xml, Php, Js, Lua, Perl, Python, Json)
 	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
 		Svg, X3d, Kml, Collada, Gml, Gpx)
+	Json = NewNode("application/json", "json", matchers.Json)
 	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
 	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
 
