@@ -1,10 +1,6 @@
-// Package matchers holds the matching functions used to find mime types
 package matchers
 
-import (
-	"archive/zip"
-	"bytes"
-)
+import "bytes"
 
 func Zip(in []byte) bool {
 	return len(in) > 3 &&
@@ -27,23 +23,5 @@ func Epub(in []byte) bool {
 }
 
 func Jar(in []byte) bool {
-	reader := bytes.NewReader(in)
-	zipr, err := zip.NewReader(reader, reader.Size())
-	if err != nil {
-		return false
-	}
-
-	return zipHasFile(zipr, "META-INF/MANIFEST.MF")
-}
-
-func Apk(in []byte) bool {
-	reader := bytes.NewReader(in)
-	zipr, err := zip.NewReader(reader, reader.Size())
-	if err != nil {
-		return false
-	}
-
-	return zipHasFile(zipr, "AndroidManifest.xml") &&
-		zipHasFile(zipr, "classes.dex") &&
-		zipHasFile(zipr, "resources.arsc")
+	return bytes.Contains(in, []byte("META-INF/MANIFEST.MF"))
 }

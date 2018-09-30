@@ -4,7 +4,6 @@ package mimetype
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -17,10 +16,12 @@ func Detect(in []byte) (mime, extension string) {
 // DetectReader returns the mime type and extension of the byte slice read
 // from the provided reader
 func DetectReader(r io.Reader) (mime, extension string, err error) {
-	in, err := ioutil.ReadAll(r)
-	if err != nil {
+	in := make([]byte, 520)
+	n, err := r.Read(in)
+	if err != nil && err != io.EOF {
 		return Root.Mime(), Root.Extension(), err
 	}
+	in = in[:n]
 
 	mime, ext := Detect(in)
 	return mime, ext, nil

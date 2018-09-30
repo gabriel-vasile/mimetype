@@ -1,3 +1,4 @@
+// Package matchers holds the matching functions used to find mime types
 package matchers
 
 func True(_ []byte) bool {

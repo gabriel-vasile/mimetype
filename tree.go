@@ -19,7 +19,7 @@ var (
 	Pptx   = NewNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
 	Epub   = NewNode("application/epub+zip", "epub", matchers.Epub)
 	Jar    = NewNode("application/jar", "jar", matchers.Jar, Apk)
-	Apk    = NewNode("application/vnd.android.package-archive", "apk", matchers.Apk)
+	Apk    = NewNode("application/vnd.android.package-archive", "apk", matchers.False)
 	Doc    = NewNode("application/msword", "doc", matchers.Doc)
 	Ppt    = NewNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
 	Xls    = NewNode("application/vnd.ms-excel", "xls", matchers.Xls)

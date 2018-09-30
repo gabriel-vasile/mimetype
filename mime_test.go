@@ -2,7 +2,6 @@ package mimetype
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -23,7 +22,6 @@ var files = map[string]*Node{
 	"a.epub": Epub,
 	"a.7z":   SevenZ,
 	"a.jar":  Jar,
-	"a.apk":  Apk,
 
 	"a.png":  Png,
 	"a.psd":  Psd,
@@ -55,7 +53,7 @@ var files = map[string]*Node{
 }
 
 func TestMatching(t *testing.T) {
-	errStr := "Mime: %s != DetectedMime: %s"
+	errStr := "Mime: %s != DetectedMime: %s; err: %v"
 	for fName, node := range files {
 		fileName := filepath.Join(testDataDir, fName)
 		f, err := os.Open(fileName)
@@ -68,21 +66,17 @@ func TestMatching(t *testing.T) {
 		}
 
 		if dMime, _ := Detect(data); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime)
+			t.Errorf(errStr, node.Mime(), dMime, nil)
 		}
 
 		f.Seek(0, 0)
 		if dMime, _, err := DetectReader(f); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime)
-		} else if err != nil {
-			t.Fatal(err)
+			t.Errorf(errStr, node.Mime(), dMime, err)
 		}
 		f.Close()
 
 		if dMime, _, err := DetectFile(fileName); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime)
-		} else if err != nil {
-			t.Fatal(err)
+			t.Errorf(errStr, node.Mime(), dMime, err)
 		}
 	}
 }
@@ -125,6 +119,6 @@ func TestAppend(t *testing.T) {
 	}
 }
 
-func TestTreePrint(_ *testing.T) {
-	fmt.Println(Root.Tree())
+func TestTreePrint(t *testing.T) {
+	t.Logf("\n%s", Root.Tree())
 }
