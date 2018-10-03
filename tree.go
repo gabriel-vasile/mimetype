@@ -7,7 +7,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // find a more accurate mime type
 var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
-	Wav, Aiff, Mpeg, Quicktime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
+	Wav, Aiff, Mpeg, Au, Quicktime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
 
 var (
@@ -60,6 +60,7 @@ var (
 	MusePack = NewNode("audio/musepack", "mpc", matchers.MusePack)
 	Wav      = NewNode("audio/wav", "wav", matchers.Wav)
 	Aiff     = NewNode("audio/aiff", "aiff", matchers.Aiff)
+	Au       = NewNode("audio/basic", "au", matchers.Au)
 
 	Mp4       = NewNode("video/mp4", "mp4", matchers.Mp4)
 	WebM      = NewNode("video/webm", "webm", matchers.WebM)
