@@ -65,7 +65,7 @@ See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you
 ##### Image
 Png, Jpg, Gif, Webp Tiff
 ##### Audio
-Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff
+Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au
 ##### Video
 Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv
 ##### Text

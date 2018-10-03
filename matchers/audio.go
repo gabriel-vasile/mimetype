@@ -26,11 +26,13 @@ func MusePack(in []byte) bool {
 }
 
 func Wav(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("\x52\x49\x46\x46")) && bytes.Equal(in[8:12], []byte("\x57\x41\x56\x45"))
+	return bytes.Equal(in[:4], []byte("\x52\x49\x46\x46")) &&
+		bytes.Equal(in[8:12], []byte("\x57\x41\x56\x45"))
 }
 
 func Aiff(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("\x46\x4F\x52\x4D")) && bytes.Equal(in[8:12], []byte("\x41\x49\x46\x46"))
+	return bytes.Equal(in[:4], []byte("\x46\x4F\x52\x4D")) &&
+		bytes.Equal(in[8:12], []byte("\x41\x49\x46\x46"))
 }
 
 func Ogg(in []byte) bool {
