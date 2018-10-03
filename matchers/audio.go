@@ -36,3 +36,7 @@ func Aiff(in []byte) bool {
 func Ogg(in []byte) bool {
 	return bytes.Equal(in[:5], []byte("\x4F\x67\x67\x53\x00"))
 }
+
+func Au(in []byte) bool {
+	return bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
+}
