@@ -35,10 +35,10 @@ var (
 	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
 	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
 
-	Js     = NewNode("application/javascript", "js", matchers.False)
-	Lua    = NewNode("text/x-lua", "lua", matchers.False)
-	Perl   = NewNode("text/x-perl", "pl", matchers.False)
-	Python = NewNode("application/x-python", "py", matchers.False)
+	Js     = NewNode("application/javascript", "js", matchers.Js)
+	Lua    = NewNode("text/x-lua", "lua", matchers.Lua)
+	Perl   = NewNode("text/x-perl", "pl", matchers.Perl)
+	Python = NewNode("application/x-python", "py", matchers.Python)
 
 	Svg     = NewNode("image/svg+xml", "svg", matchers.False)
 	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)

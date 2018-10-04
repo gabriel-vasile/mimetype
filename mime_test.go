@@ -51,6 +51,11 @@ var files = map[string]*Node{
 	"a.php":  Php,
 	"a.ps":   Ps,
 	"a.json": Json,
+
+	"a.js":  Js,
+	"a.lua": Lua,
+	"a.pl":  Perl,
+	"a.py":  Python,
 }
 
 func TestMatching(t *testing.T) {
