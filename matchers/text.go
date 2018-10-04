@@ -46,6 +46,30 @@ var (
 		shebangSig("/usr/bin/php"),
 		shebangSig("/usr/bin/env php"),
 	}
+	jsSigs = []sig{
+		ciSig("#!/bin/node"),
+		ciSig("#!/usr/bin/node"),
+		ciSig("#!/bin/nodejs"),
+		ciSig("#!/usr/bin/nodejs"),
+		ciSig("#!/usr/bin/env node"),
+		ciSig("#!/usr/bin/env nodejs"),
+	}
+	luaSigs = []sig{
+		ciSig("#!/usr/bin/lua"),
+		ciSig("#!/usr/local/bin/lua"),
+		ciSig("#!/usr/bin/env lua"),
+	}
+	perlSigs = []sig{
+		ciSig("# !/usr/bin/perl"),
+		ciSig("# !/usr/bin/env perl"),
+		ciSig("# !/usr/bin/env perl"),
+	}
+	pythonSigs = []sig{
+		ciSig("#!/usr/bin/python"),
+		ciSig("#!/usr/local/bin/python"),
+		ciSig("#!/usr/bin/env python"),
+		ciSig("#!/usr/bin/env python"),
+	}
 )
 
 func Txt(in []byte) bool {
@@ -87,7 +111,21 @@ func Php(in []byte) bool {
 func Json(in []byte) bool {
 	return json.Valid(in)
 }
+func Js(in []byte) bool {
+	return detect(in, jsSigs)
+}
 
+func Lua(in []byte) bool {
+	return detect(in, luaSigs)
+}
+
+func Perl(in []byte) bool {
+	return detect(in, perlSigs)
+}
+
+func Python(in []byte) bool {
+	return detect(in, pythonSigs)
+}
 func (hSig markupSig) detect(in []byte) bool {
 	if len(in) < len(hSig)+1 {
 		return false
