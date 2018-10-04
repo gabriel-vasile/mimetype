@@ -1,11 +1,15 @@
 package matchers
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+)
 
 type (
-	markupSig []byte
-	ciSig     []byte // case insensitive signature
-	sig       interface {
+	markupSig  []byte
+	ciSig      []byte // case insensitive signature
+	shebangSig []byte
+	sig        interface {
 		detect([]byte) bool
 	}
 )
@@ -38,14 +42,14 @@ var (
 		ciSig("<?\n"),
 		ciSig("<?\r"),
 		ciSig("<? "),
-		ciSig("#!/USR/LOCAL/BIN/PHP"),
-		ciSig("#!/USR/BIN/PHP"),
-		ciSig("#!/USR/BIN/ENV PHP"),
+		shebangSig("/usr/local/bin/php"),
+		shebangSig("/usr/bin/php"),
+		shebangSig("/usr/bin/env php"),
 	}
 )
 
 func Txt(in []byte) bool {
-	in = trimWS(in)
+	in = trimLWS(in)
 	for _, b := range in {
 		if b <= 0x08 ||
 			b == 0x0B ||
@@ -122,4 +126,22 @@ func (tSig ciSig) detect(in []byte) bool {
 	}
 
 	return true
+}
+
+// a valid shebang starts with the "#!" characters
+// followed by any number of spaces
+// followed by the path to the interpreter and optionally, the args for the interpreter
+func (sSig shebangSig) detect(in []byte) bool {
+	in = firstLine(in)
+
+	if len(in) < len(sSig)+2 {
+		return false
+	}
+	if in[0] != '#' || in[1] != '!' {
+		return false
+	}
+
+	in = trimLWS(trimRWS(in[2:]))
+
+	return bytes.Equal(in, sSig)
 }
