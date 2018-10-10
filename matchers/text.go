@@ -159,7 +159,7 @@ func (hSig markupSig) detect(in []byte) bool {
 	}
 
 	if match == false {
-		indice := getIndiceBreakLine(in)
+		indice := getIndexBreakLine(in)
 		for i, b := range hSig {
 			if indice+i >= len(in) {
 				return false
@@ -198,7 +198,7 @@ func (tSig ciSig) detect(in []byte) bool {
 	return true
 }
 
-func getIndiceBreakLine(in []byte) int {
+func getIndexBreakLine(in []byte) int {
 	for i, b := range in {
 		if b == '\n' {
 			return i + 1
