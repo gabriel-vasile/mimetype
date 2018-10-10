@@ -40,8 +40,8 @@ var (
 	Perl   = NewNode("text/x-perl", "pl", matchers.Perl)
 	Python = NewNode("application/x-python", "py", matchers.Python)
 
-	Svg     = NewNode("image/svg+xml", "svg", matchers.False)
-	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
+	Svg     = NewNode("image/svg+xml", "svg", matchers.Svg)
+	X3d     = NewNode("model/x3d+xml", "x3d", matchers.X3d)
 	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.False)
 	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.False)
 	Gml     = NewNode("application/gml+xml", "gml", matchers.False)
