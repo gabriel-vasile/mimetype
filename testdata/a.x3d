@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<X3D profile='Core' version='3.3'  xmlns:xsd='http://www.w3.org/2001/XMLSchema-instance' xsd:noNamespaceSchemaLocation =' http://www.web3d.org/specifications/x3d-3.3.xsd '>
+<Scene>
+<!-- Minimalist X3D file, can also delete DOCTYPE and this comment. -->
+</Scene>
+</X3D>

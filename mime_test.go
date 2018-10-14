@@ -57,6 +57,9 @@ var files = map[string]*Node{
 	"a.lua": Lua,
 	"a.pl":  Perl,
 	"a.py":  Python,
+
+	"a.svg": Svg,
+	"a.x3d": X3d,
 }
 
 func TestMatching(t *testing.T) {

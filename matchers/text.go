@@ -37,6 +37,12 @@ var (
 	xmlSigs = []sig{
 		markupSig("<?XML"),
 	}
+	svgSigs = []sig{
+		markupSig("<SVG "),
+	}
+	x3dSigs = []sig{
+		markupSig("<X3D "),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -104,6 +110,14 @@ func Xml(in []byte) bool {
 	return detect(in, xmlSigs)
 }
 
+func Svg(in []byte) bool {
+	return detect(in, svgSigs)
+}
+
+func X3d(in []byte) bool {
+	return detect(in, x3dSigs)
+}
+
 func Php(in []byte) bool {
 	return detect(in, phpSigs)
 }
@@ -131,13 +145,32 @@ func (hSig markupSig) detect(in []byte) bool {
 		return false
 	}
 
+	match := true
+
 	for i, b := range hSig {
 		db := in[i]
 		if 'A' <= b && b <= 'Z' {
 			db &= 0xDF
 		}
 		if b != db {
-			return false
+			match = false
+			break
+		}
+	}
+
+	if match == false {
+		indice := getIndexBreakLine(in)
+		for i, b := range hSig {
+			if indice+i >= len(in) {
+				return false
+			}
+			db := in[indice+i]
+			if 'A' <= b && b <= 'Z' {
+				db &= 0xDF
+			}
+			if b != db {
+				return false
+			}
 		}
 	}
 	// Next byte must be space or right angle bracket.
@@ -162,8 +195,16 @@ func (tSig ciSig) detect(in []byte) bool {
 			return false
 		}
 	}
-
 	return true
+}
+
+func getIndexBreakLine(in []byte) int {
+	for i, b := range in {
+		if b == '\n' {
+			return i + 1
+		}
+	}
+	return 0
 }
 
 // a valid shebang starts with the "#!" characters

@@ -45,7 +45,6 @@ func (n *Node) match(in []byte, deepestMatch *Node) *Node {
 			return c.match(in, c)
 		}
 	}
-
 	return deepestMatch
 }
 
