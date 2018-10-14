@@ -28,12 +28,13 @@ var (
 	Ogg    = NewNode("application/ogg", "ogg", matchers.Ogg)
 
 	Txt = NewNode("text/plain", "txt", matchers.Txt,
-		Html, Xml, Php, Js, Lua, Perl, Python, Json)
+		Html, Xml, Php, Js, Lua, Perl, Python, Json, Rtf)
 	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
 		Svg, X3d, Kml, Collada, Gml, Gpx)
 	Json = NewNode("application/json", "json", matchers.Json)
 	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
 	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
+	Rtf  = NewNode("text/rtf", "rtf", matchers.Rtf)
 
 	Js     = NewNode("application/javascript", "js", matchers.Js)
 	Lua    = NewNode("text/x-lua", "lua", matchers.Lua)

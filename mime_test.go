@@ -51,6 +51,7 @@ var files = map[string]*Node{
 	"a.php":  Php,
 	"a.ps":   Ps,
 	"a.json": Json,
+	"a.rtf":  Rtf,
 
 	"a.js":  Js,
 	"a.lua": Lua,
