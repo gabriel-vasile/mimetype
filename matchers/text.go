@@ -183,3 +183,7 @@ func (sSig shebangSig) detect(in []byte) bool {
 
 	return bytes.Equal(in, sSig)
 }
+
+func Rtf(in []byte) bool {
+	return bytes.Equal(in[:6], []byte("\x7b\x5c\x72\x74\x66\x31"))
+}
