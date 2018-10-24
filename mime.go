@@ -4,6 +4,7 @@ package mimetype
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -24,6 +25,16 @@ func DetectReader(r io.Reader) (mime, extension string, err error) {
 	in = in[:n]
 
 	mime, ext := Detect(in)
+
+	if err == nil { //file size is more than 520 bytes
+		if rootNode, isPresent := FullDataNodesMap[mime]; isPresent {
+			if remainingData, err := ioutil.ReadAll(r); err == nil {
+				allData := append(in, remainingData...) //apend the data to previous 520 bytes to form complete file content
+				n := Root.match(allData, rootNode)
+				mime, ext = n.Mime(), n.Extension()
+			}
+		}
+	}
 	return mime, ext, nil
 }
 

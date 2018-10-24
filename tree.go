@@ -1,6 +1,12 @@
 package mimetype
 
-import "github.com/gabriel-vasile/mimetype/matchers"
+import (
+	"github.com/gabriel-vasile/mimetype/matchers"
+)
+
+func init() {
+	initFullDataNodesMap()
+}
 
 // Root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers are tried in order to
@@ -71,3 +77,22 @@ var (
 	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)
 	Flv       = NewNode("video/x-flv", "flv", matchers.Flv)
 )
+
+var FullDataNodesMap map[string]*Node
+
+func initFullDataNodesMap() {
+	AddNodeNeedingFullData(Txt, Json)
+}
+
+func AddNodeNeedingFullData(root *Node, child ...*Node) {
+	if FullDataNodesMap == nil {
+		FullDataNodesMap = make(map[string]*Node, 0)
+	}
+	if rootNode, ok := FullDataNodesMap[root.Mime()]; ok {
+		rootNode.Append(child...)
+		FullDataNodesMap[rootNode.Mime()] = rootNode
+	} else {
+		tmpNode := NewNode(root.Mime(), root.Extension(), root.matchFunc, child...)
+		FullDataNodesMap[tmpNode.Mime()] = tmpNode
+	}
+}

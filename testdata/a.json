@@ -1,24 +1,39 @@
 {
-  "firstName": "John",
-  "lastName": "Smith",
-  "age": 25,
-  "address": {
-    "streetAddress": "21 2nd Street",
-    "city": "New York",
-    "state": "NY",
-    "postalCode": "10021"
-  },
-  "phoneNumber": [
-    {
-      "type": "home",
-      "number": "212 555-1234"
-    },
-    {
-      "type": "fax",
-      "number": "646 555-4567"
-    }
-  ],
-  "gender": {
-    "type": "male"
-  }
+	"AllowIP": [
+		"127.0.0.1"
+	],
+	"AllowRawReadingFromPath": [
+		"c:/j(/|/.*)?$",
+		"./.*"
+	],
+	"ArgsLoggingExclude": [],
+	"Binding": "0.0.0.0:53638",
+	"DebugLevel": "debug",
+	"DebugLevel1": "error",
+	"EnableAuthentication": true,
+	"EnableIPAcl": false,
+	"LogMaxAge": 10,
+	"LogMaxBackups": 3,
+	"LogMaxSize": 5,
+	"RawReadingFilesEnabled": false,
+	"RawReadingMaxKbytes": 4096,
+	"SQL": {
+		"BackupCount": 5,
+		"BackupDir": "backups",
+		"BackupPeriod": 1,
+		"Queries": [
+			{
+				"Name": "migrations",
+				"Query": "SELECT * FROM ALALA;"
+			}
+		]
+	},
+	"SvcDescription": "testing environment",
+	"SvcDisplayName": "testing",
+	"SvcNameSuffix": "",
+	"TemplateData": {},
+	"WorkerPool": {
+		"Max": 5,
+		"Timeout": 5
+	}
 }
