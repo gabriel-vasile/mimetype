@@ -83,7 +83,4 @@ containing specific metadata files.
 </div>
 
 ## Contribute
-Contributions to **mimetype** are welcome. If you find an issue and you consider
-contributing, you can use the [Github issues tracker](https://github.com/gabriel-vasile/mimetype/issues)
-in order to report it, or better yet, open a pull request.
-Code contributions must be test covered, and use the gofmt formatting tool.
+See [CONTRIBUTING.md](CONTRIBUTING.md)
