@@ -42,3 +42,7 @@ func Ogg(in []byte) bool {
 func Au(in []byte) bool {
 	return bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
 }
+
+func Amr(in []byte) bool {
+	return bytes.Equal(in[:5], []byte("\x23\x21\x41\x4D\x52"))
+}

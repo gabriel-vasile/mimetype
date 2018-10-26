@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // When a matcher passes the check, the children matchers are tried in order to
 // find a more accurate mime type
 var Root = NewNode("application/octet-stream", "", matchers.True,
-	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack,
+	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack, Amr,
 	Wav, Aiff, Mpeg, Au, Quicktime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
 
@@ -62,6 +62,7 @@ var (
 	Wav      = NewNode("audio/wav", "wav", matchers.Wav)
 	Aiff     = NewNode("audio/aiff", "aiff", matchers.Aiff)
 	Au       = NewNode("audio/basic", "au", matchers.Au)
+	Amr      = NewNode("audio/amr", "amr", matchers.Amr)
 
 	Mp4       = NewNode("video/mp4", "mp4", matchers.Mp4)
 	WebM      = NewNode("video/webm", "webm", matchers.WebM)
