@@ -8,7 +8,7 @@ import (
 type (
 	markupSig  []byte
 	ciSig      []byte // case insensitive signature
-	shebangSig []byte
+	shebangSig []byte // matches !# followed by the signature
 	sig        interface {
 		detect([]byte) bool
 	}
@@ -72,6 +72,7 @@ var (
 	}
 )
 
+// Txt matches a text file.
 func Txt(in []byte) bool {
 	in = trimLWS(in)
 	for _, b := range in {
@@ -96,41 +97,53 @@ func detect(in []byte, sigs []sig) bool {
 	return false
 }
 
+// Html matches a Hypertext Markup Language file.
 func Html(in []byte) bool {
 	return detect(in, htmlSigs)
 }
 
+// Xml matches an Extensible Markup Language file.
 func Xml(in []byte) bool {
 	return detect(in, xmlSigs)
 }
 
+// Php matches a PHP: Hypertext Preprocessor file.
 func Php(in []byte) bool {
 	return detect(in, phpSigs)
 }
 
+// Json matches a JavaScript Object Notation file.
 func Json(in []byte) bool {
 	return json.Valid(in)
 }
+
+// Js matches a Javascript file.
 func Js(in []byte) bool {
 	return detect(in, jsSigs)
 }
 
+// Lua matches a Lua programming language file.
 func Lua(in []byte) bool {
 	return detect(in, luaSigs)
 }
 
+// Perl matches a Perl programming language file.
 func Perl(in []byte) bool {
 	return detect(in, perlSigs)
 }
 
+// Python matches a Python programming language file.
 func Python(in []byte) bool {
 	return detect(in, pythonSigs)
 }
+
+// Implement sig interface.
 func (hSig markupSig) detect(in []byte) bool {
 	if len(in) < len(hSig)+1 {
 		return false
 	}
 
+	// perform case insensitive check
 	for i, b := range hSig {
 		db := in[i]
 		if 'A' <= b && b <= 'Z' {
@@ -148,11 +161,13 @@ func (hSig markupSig) detect(in []byte) bool {
 	return true
 }
 
+// Implement sig interface.
 func (tSig ciSig) detect(in []byte) bool {
 	if len(in) < len(tSig)+1 {
 		return false
 	}
 
+	// perform case insensitive check
 	for i, b := range tSig {
 		db := in[i]
 		if 'A' <= b && b <= 'Z' {
@@ -184,6 +199,7 @@ func (sSig shebangSig) detect(in []byte) bool {
 	return bytes.Equal(in, sSig)
 }
 
+// Rtf matches a Rich Text Format file.
 func Rtf(in []byte) bool {
 	return bytes.Equal(in[:6], []byte("\x7b\x5c\x72\x74\x66\x31"))
 }

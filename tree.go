@@ -4,10 +4,10 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 
 // Root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers are tried in order to
-// find a more accurate mime type
+// find a more accurate mime type.
 var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack, Amr,
-	Wav, Aiff, Mpeg, Au, Quicktime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
+	Wav, Aiff, Mpeg, Au, QuickTime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
 
 var (
@@ -67,7 +67,7 @@ var (
 	Mp4       = NewNode("video/mp4", "mp4", matchers.Mp4)
 	WebM      = NewNode("video/webm", "webm", matchers.WebM)
 	Mpeg      = NewNode("video/mpeg", "mpeg", matchers.Mpeg)
-	Quicktime = NewNode("video/quicktime", "mov", matchers.Quicktime)
+	QuickTime = NewNode("video/quicktime", "mov", matchers.QuickTime)
 	ThreeGP   = NewNode("video/3gp", "3gp", matchers.ThreeGP)
 	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)
 	Flv       = NewNode("video/x-flv", "flv", matchers.Flv)

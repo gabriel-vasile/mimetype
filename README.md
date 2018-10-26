@@ -61,11 +61,12 @@ See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you
 
 ## Supported mimes
 ##### Application
-7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd, Ogg, JavaScript, Python, Lua, Perl
+7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd, Ogg,
+JavaScript, Python, Lua, Perl
 ##### Image
 Png, Jpg, Gif, Webp Tiff
 ##### Audio
-Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au
+Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr
 ##### Video
 Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv
 ##### Text

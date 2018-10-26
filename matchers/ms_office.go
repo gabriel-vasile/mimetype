@@ -6,18 +6,22 @@ import (
 	"strings"
 )
 
+// Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(in []byte) bool {
 	return bytes.Contains(in, []byte("xl/"))
 }
 
+// Docx matches a Microsoft Office 2007 file.
 func Docx(in []byte) bool {
 	return bytes.Contains(in, []byte("word/"))
 }
 
+// Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(in []byte) bool {
 	return bytes.Contains(in, []byte("ppt/"))
 }
 
+// Doc matches a Microsoft Office 97-2003 file.
 func Doc(in []byte) bool {
 	if len(in) < 516 {
 		return false
@@ -29,6 +33,7 @@ func Doc(in []byte) bool {
 	return head == "D0CF11E0A1B11AE1" && offset512 == "ECA5C100"
 }
 
+// Ppt  matches a Microsoft PowerPoint 97-2003 file.
 func Ppt(in []byte) bool {
 	if len(in) < 520 {
 		return false
@@ -47,6 +52,7 @@ func Ppt(in []byte) bool {
 	return false
 }
 
+// Xls  matches a Microsoft Excel 97-2003 file.
 func Xls(in []byte) bool {
 	if len(in) < 520 {
 		return false
