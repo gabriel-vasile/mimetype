@@ -35,7 +35,44 @@ func Mp4(in []byte) bool {
 
 // WebM matches a WebM file.
 func WebM(in []byte) bool {
-	return bytes.HasPrefix(in, []byte("\x1A\x45\xDF\xA3"))
+	return isMatroskaFileTypeMatched(in, "webm")
+}
+
+// Mkv matches a mkv file
+func Mkv(in []byte) bool {
+	return isMatroskaFileTypeMatched(in, "matroska")
+}
+
+// isMatroskaFileTypeMatched is used for webm and mkv file
+// matching. It checks for .Eß£ sequence. If the sequence
+// is found, then it means it is Matroska media container, including WebM.
+// Then it verifies which of the filetype it is representing by matching the
+// file specific string.
+func isMatroskaFileTypeMatched(in []byte, flType string) bool {
+	if bytes.HasPrefix(in, []byte("\x1A\x45\xDF\xA3")) {
+		return isFileTypeNamePresent(in, flType)
+	}
+	return false
+}
+
+// isFileTypeNamePresent accepts the matroska input data stream and searches
+// for the given file type in the stream. If match is found ,
+// output is true otherwise false.
+// The logic of search is : find first instance of \x42\x82 and then
+// search for given string after one byte of above instance.
+func isFileTypeNamePresent(in []byte, flType string) bool {
+	var ind int
+	if len(in) >= 4096 { //restricting length to 4096
+		ind = bytes.Index(in[0:4096], []byte("\x42\x82"))
+	} else {
+		ind = bytes.Index(in, []byte("\x42\x82"))
+	}
+	if ind > 0 {
+		//filetype name will be present exactly
+		//one byte after the match of the two bytes "\x42\x82"
+		return bytes.HasPrefix(in[ind+3:], []byte(flType))
+	}
+	return false
 }
 
 // ThreeGP matches a Third Generation Partnership Project file.

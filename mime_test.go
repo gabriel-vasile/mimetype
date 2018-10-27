@@ -35,6 +35,7 @@ var files = map[string]*Node{
 	"a.avi":  Avi,
 	"a.mov":  QuickTime,
 	"a.mpeg": Mpeg,
+	"a.mkv":  Mkv,
 
 	"a.mp3":  Mp3,
 	"a.wav":  Wav,

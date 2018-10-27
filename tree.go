@@ -7,7 +7,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // find a more accurate mime type.
 var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Png, Jpg, Gif, Webp, Tiff, Mp3, Flac, Midi, Ape, MusePack, Amr,
-	Wav, Aiff, Mpeg, Au, QuickTime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Ps, Psd, Txt,
+	Wav, Aiff, Mpeg, Au, QuickTime, Mp4, Ogg, WebM, ThreeGP, Avi, Flv, Mkv, Ps, Psd, Txt,
 	Doc, Xls, Ppt)
 
 // The list of nodes appended to the Root node
@@ -72,4 +72,5 @@ var (
 	ThreeGP   = NewNode("video/3gp", "3gp", matchers.ThreeGP)
 	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)
 	Flv       = NewNode("video/x-flv", "flv", matchers.Flv)
+	Mkv       = NewNode("video/x-matroska", "mkv", matchers.Mkv)
 )
