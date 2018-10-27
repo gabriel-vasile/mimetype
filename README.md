@@ -68,7 +68,7 @@ Png, Jpg, Gif, Webp Tiff
 ##### Audio
 Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr
 ##### Video
-Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv
+Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv, Mkv
 ##### Text
 Txt, Html, Xml, Php, Json
 
