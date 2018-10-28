@@ -1,3 +1,3 @@
-#!/bin/node	
+#!/bin/node
 function main(){
 }
