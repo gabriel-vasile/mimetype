@@ -39,21 +39,21 @@ func DetectFile(file string) (mime, extension string, err error) {...}
 If, for example, you need to detect the **"text/foobar"** mime, for text files
 containing the string "foobar" as their first line:
  - create the matching function
-    ```
+    ```go
 	foobar := func(input []byte) bool {
 		return bytes.HasPrefix(input, []byte("foobar\n"))
 	}
     ```
  - create the mime type node
-    ```
+    ```go
     foobarNode := mimetype.NewNode("text/foobar", "fbExt", foobar)
     ````
  - append the new node in the tree
-    ```
+    ```go
     mimetype.Txt.Append(foobarNode)
     ```
  - detect
-    ```
+    ```go
 	mime, extension := mimetype.Detect([]byte("foobar\nfoo foo bar"))
     ```
 See [TestAppend](https://github.com/gabriel-vasile/mimetype/blob/master/mime_test.go) for a working example.
