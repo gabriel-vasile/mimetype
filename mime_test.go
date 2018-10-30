@@ -46,6 +46,7 @@ var files = map[string]*Node{
 	"a.au":   Au,
 	"a.ogg":  Ogg,
 	"a.amr":  Amr,
+	"a.mpc":  MusePack,
 
 	"a.html": Html,
 	"a.xml":  Xml,
