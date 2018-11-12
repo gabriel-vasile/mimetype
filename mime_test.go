@@ -27,6 +27,8 @@ var files = map[string]*Node{
 	"a.psd":  Psd,
 	"a.webp": Webp,
 	"a.tif":  Tiff,
+	"a.ico":  Ico,
+	"a.bmp":  Bmp,
 
 	"a.mp4":  Mp4,
 	"a.webm": WebM,
