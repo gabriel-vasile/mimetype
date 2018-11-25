@@ -10,11 +10,12 @@ var Root = NewNode("application/octet-stream", "", matchers.True,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
 	Mpeg, QuickTime, Mp4, WebM, ThreeGP, Avi, Flv, Mkv,
-	Txt,
+	Txt, Gzip,
 )
 
 // The list of nodes appended to the Root node
 var (
+	Gzip   = NewNode("application/gzip", "gz", matchers.Gzip)
 	SevenZ = NewNode("application/x-7z-compressed", "7z", matchers.SevenZ)
 	Zip    = NewNode("application/zip", "zip", matchers.Zip, Xlsx, Docx, Pptx, Epub, Jar)
 	Pdf    = NewNode("application/pdf", "pdf", matchers.Pdf)
