@@ -30,7 +30,7 @@ func Jar(in []byte) bool {
 	return bytes.Contains(in, []byte("META-INF/MANIFEST.MF"))
 }
 
-//Gzip matched gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer
+// Gzip matched gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer
 func Gzip(in []byte) bool {
 	return bytes.Equal(in[:2], []byte{0x1f, 0x8b})
 }
