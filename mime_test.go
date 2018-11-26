@@ -108,7 +108,7 @@ func TestFaultyInput(t *testing.T) {
 
 func TestAppend(t *testing.T) {
 	foobar := func(input []byte) bool {
-		return bytes.HasPrefix(input, []byte("foobar\n"))
+		return (bytes.HasSuffix(input, []byte("foo foo bar")) && bytes.HasPrefix(input, []byte("foobar")))
 	}
 	foobarNode := NewNode("text/foobar", "fbExt", foobar)
 	fbFile := filepath.Join(testDataDir, "foobar.fb")
