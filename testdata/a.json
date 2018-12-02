@@ -2,6 +2,7 @@
   "firstName": "John",
   "lastName": "Smith",
   "age": 25,
+  "height": 1.73,
   "address": {
     "streetAddress": "21 2nd Street",
     "city": "New York",

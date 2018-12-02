@@ -2,7 +2,8 @@ package matchers
 
 import (
 	"bytes"
-	"encoding/json"
+
+	"github.com/gabriel-vasile/mimetype/matchers/json"
 )
 
 type (
@@ -114,7 +115,12 @@ func Php(in []byte) bool {
 
 // Json matches a JavaScript Object Notation file.
 func Json(in []byte) bool {
-	return json.Valid(in)
+	parsed, err := json.Scan(in)
+	if len(in) < ReadLimit {
+		return err == nil
+	}
+
+	return parsed == len(in)
 }
 
 // Js matches a Javascript file.

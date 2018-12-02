@@ -5,6 +5,8 @@ package mimetype
 import (
 	"io"
 	"os"
+
+	"github.com/gabriel-vasile/mimetype/matchers"
 )
 
 // Detect returns the mime type and extension of the provided byte slice.
@@ -16,7 +18,7 @@ func Detect(in []byte) (mime, extension string) {
 // DetectReader returns the mime type and extension of the byte slice read
 // from the provided reader.
 func DetectReader(r io.Reader) (mime, extension string, err error) {
-	in := make([]byte, 520)
+	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
 	if err != nil && err != io.EOF {
 		return Root.Mime(), Root.Extension(), err
