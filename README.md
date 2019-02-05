@@ -62,7 +62,7 @@ See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you
 ## Supported mimes
 ##### Application
 7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd, Ogg,
-JavaScript, Python, Lua, Perl
+JavaScript, Python, Lua, Perl, Tcl
 ##### Image
 Png, Jpg, Gif, Webp Tiff
 ##### Audio
@@ -71,6 +71,8 @@ Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr
 Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv, Mkv
 ##### Text
 Txt, Html, Xml, Php, Json
+##### Binary
+Class, Swf
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the matching functions.

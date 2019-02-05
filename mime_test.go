@@ -11,6 +11,7 @@ import (
 const testDataDir = "testdata"
 
 var files = map[string]*Node{
+	// archives
 	"a.pdf":  Pdf,
 	"a.zip":  Zip,
 	"a.xls":  Xls,
@@ -22,7 +23,9 @@ var files = map[string]*Node{
 	"a.epub": Epub,
 	"a.7z":   SevenZ,
 	"a.jar":  Jar,
+	"a.gz":   Gzip,
 
+	// images
 	"a.png":  Png,
 	"a.psd":  Psd,
 	"a.webp": Webp,
@@ -30,6 +33,7 @@ var files = map[string]*Node{
 	"a.ico":  Ico,
 	"a.bmp":  Bmp,
 
+	// video
 	"a.mp4":  Mp4,
 	"a.webm": WebM,
 	"a.3gp":  ThreeGP,
@@ -39,6 +43,7 @@ var files = map[string]*Node{
 	"a.mpeg": Mpeg,
 	"a.mkv":  Mkv,
 
+	// audio
 	"a.mp3":  Mp3,
 	"a.wav":  Wav,
 	"a.flac": Flac,
@@ -50,6 +55,7 @@ var files = map[string]*Node{
 	"a.amr":  Amr,
 	"a.mpc":  MusePack,
 
+	// source code
 	"a.html": Html,
 	"a.xml":  Xml,
 	"a.txt":  Txt,
@@ -57,12 +63,15 @@ var files = map[string]*Node{
 	"a.ps":   Ps,
 	"a.json": Json,
 	"a.rtf":  Rtf,
+	"a.js":   Js,
+	"a.lua":  Lua,
+	"a.pl":   Perl,
+	"a.py":   Python,
+	"a.tcl":  Tcl,
 
-	"a.js":  Js,
-	"a.lua": Lua,
-	"a.pl":  Perl,
-	"a.py":  Python,
-	"a.gz":  Gzip,
+	// binary
+	"a.class": Class,
+	"a.swf":   Swf,
 }
 
 func TestMatching(t *testing.T) {

@@ -10,7 +10,7 @@ var Root = NewNode("application/octet-stream", "", matchers.True,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
 	Mpeg, QuickTime, Mp4, WebM, ThreeGP, Avi, Flv, Mkv,
-	Txt, Gzip,
+	Txt, Gzip, Class, Swf,
 )
 
 // The list of nodes appended to the Root node
@@ -33,7 +33,7 @@ var (
 	Ogg    = NewNode("application/ogg", "ogg", matchers.Ogg)
 
 	Txt = NewNode("text/plain", "txt", matchers.Txt,
-		Html, Xml, Php, Js, Lua, Perl, Python, Json, Rtf)
+		Html, Xml, Php, Js, Lua, Perl, Python, Json, Rtf, Tcl)
 	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
 		Svg, X3d, Kml, Collada, Gml, Gpx)
 	Json = NewNode("application/json", "json", matchers.Json)
@@ -45,6 +45,7 @@ var (
 	Lua    = NewNode("text/x-lua", "lua", matchers.Lua)
 	Perl   = NewNode("text/x-perl", "pl", matchers.Perl)
 	Python = NewNode("application/x-python", "py", matchers.Python)
+	Tcl    = NewNode("text/x-tcl", "tcl", matchers.Tcl)
 
 	Svg     = NewNode("image/svg+xml", "svg", matchers.False)
 	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
@@ -79,4 +80,7 @@ var (
 	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)
 	Flv       = NewNode("video/x-flv", "flv", matchers.Flv)
 	Mkv       = NewNode("video/x-matroska", "mkv", matchers.Mkv)
+
+	Class = NewNode("application/x-java-applet; charset=binary", "class", matchers.Class)
+	Swf   = NewNode("application/x-shockwave-flash", "swf", matchers.Swf)
 )

@@ -63,13 +63,22 @@ var (
 	perlSigs = []sig{
 		shebangSig("/usr/bin/perl"),
 		shebangSig("/usr/bin/env perl"),
-		shebangSig("/usr/bin/env perl"),
 	}
 	pythonSigs = []sig{
 		shebangSig("/usr/bin/python"),
 		shebangSig("/usr/local/bin/python"),
 		shebangSig("/usr/bin/env python"),
-		shebangSig("/usr/bin/env python"),
+	}
+	tclSigs = []sig{
+		shebangSig("/usr/bin/tcl"),
+		shebangSig("/usr/local/bin/tcl"),
+		shebangSig("/usr/bin/env tcl"),
+		shebangSig("/usr/bin/tclsh"),
+		shebangSig("/usr/local/bin/tclsh"),
+		shebangSig("/usr/bin/env tclsh"),
+		shebangSig("/usr/bin/wish"),
+		shebangSig("/usr/local/bin/wish"),
+		shebangSig("/usr/bin/env wish"),
 	}
 )
 
@@ -141,6 +150,11 @@ func Perl(in []byte) bool {
 // Python matches a Python programming language file.
 func Python(in []byte) bool {
 	return detect(in, pythonSigs)
+}
+
+// Tcl matches a Tcl programming language file.
+func Tcl(in []byte) bool {
+	return detect(in, tclSigs)
 }
 
 // Implement sig interface.
