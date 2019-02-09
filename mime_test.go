@@ -58,6 +58,7 @@ var files = map[string]*Node{
 	// source code
 	"a.html": Html,
 	"a.xml":  Xml,
+	"a.svg":  Svg,
 	"a.txt":  Txt,
 	"a.php":  Php,
 	"a.ps":   Ps,

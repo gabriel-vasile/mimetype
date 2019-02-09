@@ -223,3 +223,7 @@ func (sSig shebangSig) detect(in []byte) bool {
 func Rtf(in []byte) bool {
 	return bytes.Equal(in[:6], []byte("\x7b\x5c\x72\x74\x66\x31"))
 }
+
+func Svg(in []byte) bool {
+	return bytes.Contains(in, []byte("<svg"))
+}

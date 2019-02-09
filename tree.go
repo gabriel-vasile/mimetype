@@ -47,7 +47,7 @@ var (
 	Python = NewNode("application/x-python", "py", matchers.Python)
 	Tcl    = NewNode("text/x-tcl", "tcl", matchers.Tcl)
 
-	Svg     = NewNode("image/svg+xml", "svg", matchers.False)
+	Svg     = NewNode("image/svg+xml", "svg", matchers.Svg)
 	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
 	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.False)
 	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.False)
