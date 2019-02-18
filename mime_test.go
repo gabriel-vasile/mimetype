@@ -73,6 +73,7 @@ var files = map[string]*Node{
 	// binary
 	"a.class": Class,
 	"a.swf":   Swf,
+	"a.crx":   Crx,
 }
 
 func TestMatching(t *testing.T) {

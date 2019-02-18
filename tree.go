@@ -10,7 +10,7 @@ var Root = NewNode("application/octet-stream", "", matchers.True,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
 	Mpeg, QuickTime, Mp4, WebM, ThreeGP, Avi, Flv, Mkv,
-	Txt, Gzip, Class, Swf,
+	Txt, Gzip, Class, Swf, Crx,
 )
 
 // The list of nodes appended to the Root node
@@ -83,4 +83,5 @@ var (
 
 	Class = NewNode("application/x-java-applet; charset=binary", "class", matchers.Class)
 	Swf   = NewNode("application/x-shockwave-flash", "swf", matchers.Swf)
+	Crx   = NewNode("application/x-chrome-extension", "crx", matchers.Crx)
 )

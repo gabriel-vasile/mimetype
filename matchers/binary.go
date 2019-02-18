@@ -1,6 +1,8 @@
 package matchers
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // Class matches an java class file.
 func Class(in []byte) bool {
@@ -12,4 +14,8 @@ func Swf(in []byte) bool {
 	return bytes.Equal(in[:3], []byte("CWS")) ||
 		bytes.Equal(in[:3], []byte("FWS")) ||
 		bytes.Equal(in[:3], []byte("ZWS"))
+}
+
+func Crx(in []byte) bool {
+	return bytes.Equal(in[:4], []byte("Cr24"))
 }
