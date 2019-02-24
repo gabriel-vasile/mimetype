@@ -34,6 +34,11 @@ func Detect(in []byte) (mime, extension string) {...}
 func DetectReader(r io.Reader) (mime, extension string, err error) {...}
 func DetectFile(file string) (mime, extension string, err error) {...}
 ```
+When detecting from a `ReadSeeker` interface, such as `os.File`, make sure
+to reset the offset of the reader to the beginning if needed:
+```go
+_, err = file.Seek(io.SeekStart, 0)
+```
 
 ## Extend
 If, for example, you need to detect the **"text/foobar"** mime, for text files

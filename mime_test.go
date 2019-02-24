@@ -2,6 +2,7 @@ package mimetype
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -93,7 +94,10 @@ func TestMatching(t *testing.T) {
 			t.Errorf(errStr, node.Mime(), dMime, nil)
 		}
 
-		f.Seek(0, 0)
+		if _, err := f.Seek(io.SeekStart, 0); err != nil {
+			t.Errorf(errStr, node.Mime(), Root.Mime(), err)
+		}
+
 		if dMime, _, err := DetectReader(f); dMime != node.Mime() {
 			t.Errorf(errStr, node.Mime(), dMime, err)
 		}
