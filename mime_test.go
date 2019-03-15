@@ -60,6 +60,7 @@ var files = map[string]*Node{
 	"a.html": Html,
 	"a.xml":  Xml,
 	"a.svg":  Svg,
+	"a1.svg": Svg,
 	"a.txt":  Txt,
 	"a.php":  Php,
 	"a.ps":   Ps,
@@ -78,7 +79,7 @@ var files = map[string]*Node{
 }
 
 func TestMatching(t *testing.T) {
-	errStr := "Mime: %s != DetectedMime: %s; err: %v"
+	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
 	for fName, node := range files {
 		fileName := filepath.Join(testDataDir, fName)
 		f, err := os.Open(fileName)
@@ -91,20 +92,20 @@ func TestMatching(t *testing.T) {
 		}
 
 		if dMime, _ := Detect(data); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime, nil)
+			t.Errorf(errStr, fName, node.Mime(), dMime, nil)
 		}
 
 		if _, err := f.Seek(io.SeekStart, 0); err != nil {
-			t.Errorf(errStr, node.Mime(), Root.Mime(), err)
+			t.Errorf(errStr, fName, node.Mime(), Root.Mime(), err)
 		}
 
 		if dMime, _, err := DetectReader(f); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime, err)
+			t.Errorf(errStr, fName, node.Mime(), dMime, err)
 		}
 		f.Close()
 
 		if dMime, _, err := DetectFile(fileName); dMime != node.Mime() {
-			t.Errorf(errStr, node.Mime(), dMime, err)
+			t.Errorf(errStr, fName, node.Mime(), dMime, err)
 		}
 	}
 }
