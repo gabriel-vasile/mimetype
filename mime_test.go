@@ -36,6 +36,7 @@ var files = map[string]*Node{
 
 	// video
 	"a.mp4":  Mp4,
+	"b.mp4":  Mp4,
 	"a.webm": WebM,
 	"a.3gp":  ThreeGP,
 	"a.flv":  Flv,
@@ -60,7 +61,7 @@ var files = map[string]*Node{
 	"a.html": Html,
 	"a.xml":  Xml,
 	"a.svg":  Svg,
-	"a1.svg": Svg,
+	"b.svg":  Svg,
 	"a.txt":  Txt,
 	"a.php":  Php,
 	"a.ps":   Ps,

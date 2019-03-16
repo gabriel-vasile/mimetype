@@ -2,30 +2,23 @@ package matchers
 
 import (
 	"bytes"
-	"encoding/binary"
 )
 
 // Mp4 matches an MP4 file.
+// See http://www.ftyps.com for more ftyps and mimetypes
 func Mp4(in []byte) bool {
-	if len(in) < 12 {
+	if !bytes.Equal(in[4:8], []byte("ftyp")) {
 		return false
+	}
+	ftyps := []string{
+		"avc1", "dash", "iso2", "iso3", "iso4", "iso5", "iso6", "isom", "mmp4",
+		"mp41", "mp42", "mp4v", "mp71", "MSNV", "NDAS", "NDSC", "NSDC", "NSDH",
+		"NDSM", "NDSP", "NDSS", "NDXC", "NDXH", "NDXM", "NDXP", "NDXS", "F4V ",
+		"F4P ",
 	}
 
-	mp4ftype := []byte("ftyp")
-	mp4 := []byte("mp4")
-	boxSize := int(binary.BigEndian.Uint32(in[:4]))
-	if boxSize%4 != 0 || len(in) < boxSize {
-		return false
-	}
-	if !bytes.Equal(in[4:8], mp4ftype) {
-		return false
-	}
-	for st := 8; st < boxSize; st += 4 {
-		if st == 12 {
-			// minor version number
-			continue
-		}
-		if bytes.Equal(in[st:st+3], mp4) {
+	for _, ftyp := range ftyps {
+		if bytes.Equal(in[8:12], []byte(ftyp)) {
 			return true
 		}
 	}
