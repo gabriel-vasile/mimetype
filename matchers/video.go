@@ -4,28 +4,6 @@ import (
 	"bytes"
 )
 
-// Mp4 matches an MP4 file.
-// See http://www.ftyps.com for more ftyps and mimetypes
-func Mp4(in []byte) bool {
-	if !bytes.Equal(in[4:8], []byte("ftyp")) {
-		return false
-	}
-	ftyps := []string{
-		"avc1", "dash", "iso2", "iso3", "iso4", "iso5", "iso6", "isom", "mmp4",
-		"mp41", "mp42", "mp4v", "mp71", "MSNV", "NDAS", "NDSC", "NSDC", "NSDH",
-		"NDSM", "NDSP", "NDSS", "NDXC", "NDXH", "NDXM", "NDXP", "NDXS", "F4V ",
-		"F4P ",
-	}
-
-	for _, ftyp := range ftyps {
-		if bytes.Equal(in[8:12], []byte(ftyp)) {
-			return true
-		}
-	}
-
-	return false
-}
-
 // WebM matches a WebM file.
 func WebM(in []byte) bool {
 	return isMatroskaFileTypeMatched(in, "webm")
@@ -65,12 +43,6 @@ func isFileTypeNamePresent(in []byte, flType string) bool {
 		return bytes.HasPrefix(in[ind+3:], []byte(flType))
 	}
 	return false
-}
-
-// ThreeGP matches a Third Generation Partnership Project file.
-func ThreeGP(in []byte) bool {
-	return len(in) > 11 &&
-		bytes.HasPrefix(in[4:], []byte("\x66\x74\x79\x70\x33\x67\x70"))
 }
 
 // Flv matches a Flash video file.

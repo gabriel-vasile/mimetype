@@ -24,7 +24,7 @@ func Ape(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("\x4D\x41\x43\x20\x96\x0F\x00\x00\x34\x00\x00\x00\x18\x00\x00\x00\x90\xE3"))
 }
 
-// Musepack matches a Musepack file.
+// MusePack matches a Musepack file.
 func MusePack(in []byte) bool {
 	return bytes.Equal(in[:4], []byte("MPCK"))
 }

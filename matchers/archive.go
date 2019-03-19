@@ -34,3 +34,8 @@ func Jar(in []byte) bool {
 func Gzip(in []byte) bool {
 	return bytes.Equal(in[:2], []byte{0x1f, 0x8b})
 }
+
+// Crx matches a Chrome extension file: a zip archive prepended by "Cr24"
+func Crx(in []byte) bool {
+	return bytes.Equal(in[:4], []byte("Cr24"))
+}

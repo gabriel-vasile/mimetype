@@ -39,6 +39,7 @@ var files = map[string]*Node{
 	"b.mp4":  Mp4,
 	"a.webm": WebM,
 	"a.3gp":  ThreeGP,
+	"a.3g2":  ThreeG2,
 	"a.flv":  Flv,
 	"a.avi":  Avi,
 	"a.mov":  QuickTime,

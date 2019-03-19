@@ -15,7 +15,3 @@ func Swf(in []byte) bool {
 		bytes.Equal(in[:3], []byte("FWS")) ||
 		bytes.Equal(in[:3], []byte("ZWS"))
 }
-
-func Crx(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("Cr24"))
-}

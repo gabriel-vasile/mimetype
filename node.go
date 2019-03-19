@@ -7,11 +7,10 @@ type (
 	// It holds the mime type, the extension and the function to check whether
 	// a byte slice has the mime type
 	Node struct {
-		mime       string
-		extension  string
-		matchFunc  matchFunc
-		exhaustive bool
-		children   []*Node
+		mime      string
+		extension string
+		matchFunc matchFunc
+		children  []*Node
 	}
 	matchFunc func([]byte) bool
 )
