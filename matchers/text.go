@@ -143,7 +143,7 @@ func Rtf(in []byte) bool {
 	return bytes.Equal(in[:6], []byte("{\\rtf1"))
 }
 
-// SVG matches a SVG file.
+// Svg matches a SVG file.
 func Svg(in []byte) bool {
 	return bytes.Contains(in, []byte("<svg"))
 }

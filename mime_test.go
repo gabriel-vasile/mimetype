@@ -124,6 +124,9 @@ func TestFaultyInput(t *testing.T) {
 	}
 }
 
+// `foobar` func matches inputs starting with the string "foobar"
+// `foobarNode` is the node holding the mimetype and extension to be returned
+// when the `foobar` func returns true for an input
 func TestAppend(t *testing.T) {
 	foobar := func(input []byte) bool {
 		return bytes.HasPrefix(input, []byte("foobar"))
@@ -135,12 +138,16 @@ func TestAppend(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// even though we tried detecting, at this point the function `foobar`
+	// is not yet called because it is not appended in the tree
 	if dMime == foobarNode.Mime() {
 		t.Fatal("foobar should not get matched")
 	}
 
+	// our new node must be appended in the tree
 	Txt.Append(foobarNode)
 
+	// the next line calls our `foobar` func which returns true for our test file
 	dMime, _, err = DetectFile(fbFile)
 	if err != nil {
 		t.Fatal(err)

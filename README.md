@@ -16,6 +16,12 @@
   <a href="https://godoc.org/github.com/gabriel-vasile/mimetype">
     <img alt="Documentation" src="https://godoc.org/github.com/gabriel-vasile/mimetype?status.svg">
   </a>
+  <a href="https://goreportcard.com/report/github.com/gabriel-vasile/mimetype">
+    <img alt="Go report card" src="https://goreportcard.com/badge/github.com/gabriel-vasile/mimetype">
+  </a>
+  <a href="https://coveralls.io/github/gabriel-vasile/mimetype?branch=master">
+    <img alt="Go report card" src="https://coveralls.io/repos/github/gabriel-vasile/mimetype/badge.svg?branch=master">
+  </a>
   <a href="LICENSE">
     <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg">
   </a>
@@ -42,11 +48,11 @@ _, err = file.Seek(io.SeekStart, 0)
 
 ## Extend
 If, for example, you need to detect the **"text/foobar"** mime, for text files
-containing the string "foobar" as their first line:
+containing the string "foobar" at the start of their first line:
  - create the matching function
     ```go
 	foobar := func(input []byte) bool {
-		return bytes.HasPrefix(input, []byte("foobar\n"))
+		return bytes.HasPrefix(input, []byte("foobar"))
 	}
     ```
  - create the mime type node
@@ -73,7 +79,7 @@ Png, Jpg, Gif, Webp Tiff
 ##### Audio
 Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr
 ##### Video
-Mp4, WebM, Mpeg, Quicktime, ThreeGP, Avi, Flv, Mkv
+Mp4, WebM, Mpeg, Quicktime, 3gp, 3g2, Avi, Flv, Mkv
 ##### Text
 Txt, Html, Xml, Php, Json
 ##### Binary
