@@ -11,6 +11,9 @@ import (
 
 // Detect returns the mime type and extension of the provided byte slice.
 func Detect(in []byte) (mime, extension string) {
+	if len(in) == 0 {
+		return "inode/x-empty", ""
+	}
 	n := Root.match(in, Root)
 	return n.Mime(), n.Extension()
 }

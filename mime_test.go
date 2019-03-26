@@ -124,6 +124,12 @@ func TestFaultyInput(t *testing.T) {
 	}
 }
 
+func TestEmptyInput(t *testing.T) {
+	if m, _ := Detect([]byte{}); m != "inode/x-empty" {
+		t.Errorf("failed to detect empty file")
+	}
+}
+
 // `foobar` func matches inputs starting with the string "foobar"
 // `foobarNode` is the node holding the mimetype and extension to be returned
 // when the `foobar` func returns true for an input
