@@ -140,7 +140,7 @@ func Tcl(in []byte) bool {
 
 // Rtf matches a Rich Text Format file.
 func Rtf(in []byte) bool {
-	return bytes.Equal(in[:6], []byte("{\\rtf1"))
+	return len(in) > 6 && bytes.Equal(in[:6], []byte("{\\rtf1"))
 }
 
 // Svg matches a SVG file.

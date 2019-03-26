@@ -26,32 +26,34 @@ func Ape(in []byte) bool {
 
 // MusePack matches a Musepack file.
 func MusePack(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("MPCK"))
+	return len(in) > 4 && bytes.Equal(in[:4], []byte("MPCK"))
 }
 
 // Wav matches a Waveform Audio File Format file.
 func Wav(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("\x52\x49\x46\x46")) &&
+	return len(in) > 12 &&
+		bytes.Equal(in[:4], []byte("\x52\x49\x46\x46")) &&
 		bytes.Equal(in[8:12], []byte("\x57\x41\x56\x45"))
 }
 
 // Aiff matches Audio Interchange File Format file.
 func Aiff(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("\x46\x4F\x52\x4D")) &&
+	return len(in) > 12 &&
+		bytes.Equal(in[:4], []byte("\x46\x4F\x52\x4D")) &&
 		bytes.Equal(in[8:12], []byte("\x41\x49\x46\x46"))
 }
 
 // Ogg matches an Ogg file.
 func Ogg(in []byte) bool {
-	return bytes.Equal(in[:5], []byte("\x4F\x67\x67\x53\x00"))
+	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x4F\x67\x67\x53\x00"))
 }
 
 // Au matches a Sun Microsystems au file.
 func Au(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
+	return len(in) > 4 && bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
 }
 
 // Amr matches an Adaptive Multi-Rate file.
 func Amr(in []byte) bool {
-	return bytes.Equal(in[:5], []byte("\x23\x21\x41\x4D\x52"))
+	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x23\x21\x41\x4D\x52"))
 }

@@ -12,7 +12,8 @@ func Zip(in []byte) bool {
 
 // SevenZ matches a 7z archive.
 func SevenZ(in []byte) bool {
-	return bytes.Equal(in[:6], []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
+	return len(in) > 6 &&
+		bytes.Equal(in[:6], []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 }
 
 // Epub matches an EPUB file.
@@ -20,9 +21,8 @@ func Epub(in []byte) bool {
 	if len(in) < 58 {
 		return false
 	}
-	in = in[30:58]
 
-	return bytes.Equal(in, []byte("mimetypeapplication/epub+zip"))
+	return bytes.Equal(in[30:58], []byte("mimetypeapplication/epub+zip"))
 }
 
 // Jar matches a Java archive file.
@@ -32,10 +32,10 @@ func Jar(in []byte) bool {
 
 // Gzip matched gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer
 func Gzip(in []byte) bool {
-	return bytes.Equal(in[:2], []byte{0x1f, 0x8b})
+	return len(in) > 2 && bytes.Equal(in[:2], []byte{0x1f, 0x8b})
 }
 
 // Crx matches a Chrome extension file: a zip archive prepended by "Cr24"
 func Crx(in []byte) bool {
-	return bytes.Equal(in[:4], []byte("Cr24"))
+	return len(in) > 4 && bytes.Equal(in[:4], []byte("Cr24"))
 }
