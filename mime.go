@@ -1,5 +1,5 @@
-// Package mimetype uses magic number signatures to detect the mime type and
-// extension of a file.
+// Package mimetype uses magic number signatures
+// to detect the mime type and extension of a file.
 package mimetype
 
 import (
@@ -18,8 +18,8 @@ func Detect(in []byte) (mime, extension string) {
 	return n.Mime(), n.Extension()
 }
 
-// DetectReader returns the mime type and extension of the byte slice read
-// from the provided reader.
+// DetectReader returns the mime type and extension
+// of the byte slice read from the provided reader.
 func DetectReader(r io.Reader) (mime, extension string, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)

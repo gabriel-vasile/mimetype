@@ -3,8 +3,8 @@ package mimetype
 import "github.com/gabriel-vasile/mimetype/matchers"
 
 // Root is a matcher which passes for any slice of bytes.
-// When a matcher passes the check, the children matchers are tried in order to
-// find a more accurate mime type.
+// When a matcher passes the check, the children matchers
+// are tried in order to find a more accurate mime type.
 var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,

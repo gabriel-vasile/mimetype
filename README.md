@@ -67,8 +67,8 @@ containing the string "foobar" at the start of their first line:
     ```go
 	mime, extension := mimetype.Detect([]byte("foobar\nfoo foo bar"))
     ```
-See [TestAppend](https://github.com/gabriel-vasile/mimetype/blob/master/mime_test.go) for a working example.
-See [Contribute](https://github.com/gabriel-vasile/mimetype#contributing) if you consider the missing mime type should be included in the library by default.
+See [TestAppend](mime_test.go) for a working example.
+See [Contributing](CONTRIBUTING.md) if you consider the missing mime type should be included in the library by default.
 
 ## Supported mimes
 ##### Application
@@ -95,5 +95,5 @@ containing specific metadata files.
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>
 
-## Contribute
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).

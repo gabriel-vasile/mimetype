@@ -4,8 +4,8 @@ import "fmt"
 
 type (
 	// Node represents a node in the matchers tree structure.
-	// It holds the mime type, the extension and the function to check whether
-	// a byte slice has the mime type
+	// It holds the mime type, the extension and the function
+	// to check whether a byte slice has the mime type
 	Node struct {
 		mime      string
 		extension string

@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/gabriel-vasile/mimetype/matchers"
 )
 
 const testDataDir = "testdata"
@@ -28,6 +30,7 @@ var files = map[string]*Node{
 
 	// images
 	"a.png":  Png,
+	"a.jpg":  Jpg,
 	"a.psd":  Psd,
 	"a.webp": Webp,
 	"a.tif":  Tiff,
@@ -165,4 +168,25 @@ func TestAppend(t *testing.T) {
 
 func TestTreePrint(t *testing.T) {
 	t.Logf("\n%s", Root.Tree())
+}
+
+func BenchmarkMatchDetect(b *testing.B) {
+	files := []string{"a.png", "a.jpg", "a.pdf", "a.zip", "a.docx", "a.doc"}
+	data, fLen := [][matchers.ReadLimit]byte{}, len(files)
+	for _, f := range files {
+		d := [matchers.ReadLimit]byte{}
+
+		file, err := os.Open(filepath.Join(testDataDir, f))
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		io.ReadFull(file, d[:])
+		data = append(data, d)
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Detect(data[n%fLen][:])
+	}
 }
