@@ -81,6 +81,10 @@ var files = map[string]*Node{
 	"a.class": Class,
 	"a.swf":   Swf,
 	"a.crx":   Crx,
+
+	// fonts
+	"a.woff":  Woff,
+	"a.woff2": Woff2,
 }
 
 func TestMatching(t *testing.T) {

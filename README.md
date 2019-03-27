@@ -84,6 +84,8 @@ Mp4, WebM, Mpeg, Quicktime, 3gp, 3g2, Avi, Flv, Mkv
 Txt, Html, Xml, Php, Json
 ##### Binary
 Class, Swf
+##### Font
+Woff, Woff2
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the matching functions.
