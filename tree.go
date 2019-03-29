@@ -9,7 +9,7 @@ var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
-	Mpeg, QuickTime, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv,
+	Mpeg, QuickTime, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv, AMp4, M4a,
 	Txt, Gzip, Class, Swf, Crx, Woff, Woff2,
 )
 
@@ -71,6 +71,8 @@ var (
 	Aiff     = NewNode("audio/aiff", "aiff", matchers.Aiff)
 	Au       = NewNode("audio/basic", "au", matchers.Au)
 	Amr      = NewNode("audio/amr", "amr", matchers.Amr)
+	AMp4     = NewNode("audio/mp4", "mp4", matchers.AMp4)
+	M4a      = NewNode("audio/x-m4a", "m4a", matchers.M4a)
 
 	Mp4       = NewNode("video/mp4", "mp4", matchers.Mp4)
 	WebM      = NewNode("video/webm", "webm", matchers.WebM)

@@ -60,6 +60,8 @@ var files = map[string]*Node{
 	"a.ogg":  Ogg,
 	"a.amr":  Amr,
 	"a.mpc":  MusePack,
+	"a.m4a":  M4a,
+	"a.m4b":  AMp4,
 
 	// source code
 	"a.html": Html,

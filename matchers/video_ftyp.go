@@ -18,12 +18,33 @@ var (
 	threeG2Sigs = []sig{
 		ftypSig("3g2a"), ftypSig("3g2b"), ftypSig("3g2c"), ftypSig("KDDI"),
 	}
+	amp4Sigs = []sig{
+		// audio for Adobe Flash Player 9+
+		ftypSig("F4A "), ftypSig("F4B "),
+		// Apple iTunes AAC-LC (.M4A) Audio
+		ftypSig("M4B "), ftypSig("M4P "),
+		// MPEG-4 (.MP4) for SonyPSP
+		ftypSig("MSNV"),
+		// Nero Digital AAC Audio
+		ftypSig("NDAS"),
+	}
+	m4aSigs = []sig{ftypSig("M4A ")}
 	// TODO: add support for remaining video formats at ftyps.com
 )
 
 // Mp4 matches an MP4 file.
 func Mp4(in []byte) bool {
 	return detect(in, mp4Sigs)
+}
+
+// AMp4 matches an audio MP4 file.
+func AMp4(in []byte) bool {
+	return detect(in, amp4Sigs)
+}
+
+// M4a matches an audio M4A file.
+func M4a(in []byte) bool {
+	return detect(in, m4aSigs)
 }
 
 // ThreeGP matches a 3GPP file.
