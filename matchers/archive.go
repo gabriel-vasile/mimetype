@@ -30,12 +30,12 @@ func Jar(in []byte) bool {
 	return bytes.Contains(in, []byte("META-INF/MANIFEST.MF"))
 }
 
-// Gzip matched gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer
+// Gzip matched gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
 func Gzip(in []byte) bool {
 	return len(in) > 2 && bytes.Equal(in[:2], []byte{0x1f, 0x8b})
 }
 
-// Crx matches a Chrome extension file: a zip archive prepended by "Cr24"
+// Crx matches a Chrome extension file: a zip archive prepended by "Cr24".
 func Crx(in []byte) bool {
 	return len(in) > 4 && bytes.Equal(in[:4], []byte("Cr24"))
 }

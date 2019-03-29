@@ -2,7 +2,7 @@
 package matchers
 
 // ReadLimit is the maximum number of bytes read
-// from the input when detecting a reader
+// from the input when detecting a reader.
 const ReadLimit = 520
 
 // True is a dummy matching function used to match any input.
@@ -33,7 +33,6 @@ func trimRWS(in []byte) []byte {
 	return in[:lastNonWS+1]
 }
 
-// firstLine returns the
 func firstLine(in []byte) []byte {
 	lineEnd := 0
 	for ; lineEnd < len(in) && in[lineEnd] != '\n'; lineEnd++ {

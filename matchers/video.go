@@ -9,7 +9,7 @@ func WebM(in []byte) bool {
 	return isMatroskaFileTypeMatched(in, "webm")
 }
 
-// Mkv matches a mkv file
+// Mkv matches a mkv file.
 func Mkv(in []byte) bool {
 	return isMatroskaFileTypeMatched(in, "matroska")
 }
