@@ -72,12 +72,14 @@ See [Contributing](CONTRIBUTING.md) if you consider the missing mime type should
 
 ## Supported mimes
 ##### Application
-7Z, Zip, Pdf, Xlsx, Docx, Pptx, Epub, Jar, Apk, Doc, Ppt, Xls, Ps, Psd, Ogg,
+Pdf, Xlsx, Docx, Pptx, Epub, Doc, Ppt, Xls, Ps, Psd, Ogg,
 JavaScript, Python, Lua, Perl, Tcl
+##### Archive
+7Z, Zip, Jar, Apk, Tar
 ##### Image
 Png, Jpg, Gif, Webp Tiff
 ##### Audio
-Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr
+Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr, M4a, Mp4
 ##### Video
 Mp4, WebM, Mpeg, Quicktime, 3gp, 3g2, Avi, Flv, Mkv
 ##### Text

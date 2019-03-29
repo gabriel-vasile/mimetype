@@ -17,6 +17,7 @@ var files = map[string]*Node{
 	// archives
 	"a.pdf":  Pdf,
 	"a.zip":  Zip,
+	"a.tar":  Tar,
 	"a.xls":  Xls,
 	"a.xlsx": Xlsx,
 	"a.doc":  Doc,

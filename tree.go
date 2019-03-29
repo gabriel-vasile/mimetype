@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var Root = NewNode("application/octet-stream", "", matchers.True,
-	SevenZ, Zip, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
+	SevenZ, Zip, Tar, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
 	Mpeg, QuickTime, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv, AMp4, M4a,
@@ -18,6 +18,7 @@ var (
 	Gzip   = NewNode("application/gzip", "gz", matchers.Gzip)
 	SevenZ = NewNode("application/x-7z-compressed", "7z", matchers.SevenZ)
 	Zip    = NewNode("application/zip", "zip", matchers.Zip, Xlsx, Docx, Pptx, Epub, Jar)
+	Tar    = NewNode("application/x-tar", "tar", matchers.Tar)
 	Pdf    = NewNode("application/pdf", "pdf", matchers.Pdf)
 	Xlsx   = NewNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
 	Docx   = NewNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)

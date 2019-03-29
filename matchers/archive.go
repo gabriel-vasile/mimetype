@@ -39,3 +39,9 @@ func Gzip(in []byte) bool {
 func Crx(in []byte) bool {
 	return len(in) > 4 && bytes.Equal(in[:4], []byte("Cr24"))
 }
+
+// Tar matches a (t)ape (ar)chive file.
+func Tar(in []byte) bool {
+	return len(in) > 262 &&
+		bytes.Equal(in[257:262], []byte("ustar"))
+}
