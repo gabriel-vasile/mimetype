@@ -71,3 +71,12 @@ func (n *Node) Tree() string {
 
 	return printTree(n, 0)
 }
+
+func (n *Node) flatten() (out []*Node) {
+	out = append(out, n)
+	for _, c := range n.children {
+		out = append(out, c.flatten()...)
+	}
+
+	return out
+}

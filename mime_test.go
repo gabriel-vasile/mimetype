@@ -2,6 +2,7 @@ package mimetype
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -173,8 +174,34 @@ func TestAppend(t *testing.T) {
 	}
 }
 
-func TestTreePrint(t *testing.T) {
-	t.Logf("\n%s", Root.Tree())
+func TestGenerateSupportedMimesFile(t *testing.T) {
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.WriteString(`## Supported MIME types
+
+Extension | MIME type
+--------- | --------
+`); err != nil {
+		t.Fatal(err)
+	}
+	for _, n := range Root.flatten() {
+		ext := n.Extension()
+		if ext == "" {
+			ext = "n/a"
+		}
+		str := fmt.Sprintf("**%s** | %s\n", ext, n.Mime())
+		if _, err := f.WriteString(str); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := f.WriteString("\nThis is file automatically generated when running tests.\n"); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func BenchmarkMatchDetect(b *testing.B) {

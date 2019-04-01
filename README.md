@@ -70,24 +70,7 @@ containing the string "foobar" at the start of their first line:
 See [TestAppend](mime_test.go) for a working example.
 See [Contributing](CONTRIBUTING.md) if you consider the missing mime type should be included in the library by default.
 
-## Supported mimes
-##### Application
-Pdf, Xlsx, Docx, Pptx, Epub, Doc, Ppt, Xls, Ps, Psd, Ogg,
-JavaScript, Python, Lua, Perl, Tcl
-##### Archive
-7Z, Zip, Jar, Apk, Tar
-##### Image
-Png, Jpg, Gif, Webp Tiff
-##### Audio
-Mp3, Flac, Midi, Ape, MusePack, Wav, Aiff, Au, Amr, M4a, Mp4
-##### Video
-Mp4, WebM, Mpeg, Quicktime, 3gp, 3g2, Avi, Flv, Mkv
-##### Text
-Txt, Html, Xml, Php, Json
-##### Binary
-Class, Swf
-##### Font
-Woff, Woff2
+## [Supported mimes](supported_mimes.md)
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the matching functions.
