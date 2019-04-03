@@ -85,6 +85,7 @@ var files = map[string]*Node{
 	"a.class": Class,
 	"a.swf":   Swf,
 	"a.crx":   Crx,
+	"a.wasm":  Wasm,
 
 	// fonts
 	"a.woff":  Woff,

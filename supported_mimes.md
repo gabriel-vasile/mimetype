@@ -70,5 +70,6 @@ Extension | MIME type
 **crx** | application/x-chrome-extension
 **woff** | font/woff
 **woff2** | font/woff2
+**wasm** | application/wasm
 
 This is file automatically generated when running tests.
