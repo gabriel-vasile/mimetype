@@ -29,6 +29,25 @@ var (
 	xmlSigs = []sig{
 		markupSig("<?XML"),
 	}
+	kmlSigs = []sig{
+		newXmlSig("kml", `xmlns="http://www.opengis.net/kml/2.2"`),
+		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.0"`),
+		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.1"`),
+		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.2"`),
+	}
+	colladaSigs = []sig{
+		newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`),
+	}
+	gmlSigs = []sig{
+		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.2"`),
+		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.3/exr"`),
+	}
+	gpxSigs = []sig{
+		newXmlSig("gpx", `xmlns="http://www.topografix.com/GPX/1/1"`),
+	}
+	tcxSigs = []sig{
+		newXmlSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -146,4 +165,29 @@ func Rtf(in []byte) bool {
 // Svg matches a SVG file.
 func Svg(in []byte) bool {
 	return bytes.Contains(in, []byte("<svg"))
+}
+
+// Kml matches a Keyhole Markup Language file.
+func Kml(in []byte) bool {
+	return detect(in, kmlSigs)
+}
+
+// Collada matches a COLLAborative Design Activity file.
+func Collada(in []byte) bool {
+	return detect(in, colladaSigs)
+}
+
+// Gml matches a Geography Markup Language file.
+func Gml(in []byte) bool {
+	return detect(in, gmlSigs)
+}
+
+// Gpx matches a GPS Exchange Format file.
+func Gpx(in []byte) bool {
+	return detect(in, gpxSigs)
+}
+
+// Tcx matches a Training Center XML file.
+func Tcx(in []byte) bool {
+	return detect(in, tcxSigs)
 }

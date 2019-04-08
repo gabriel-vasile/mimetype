@@ -36,7 +36,7 @@ var (
 	Txt = NewNode("text/plain", "txt", matchers.Txt,
 		Html, Svg, Xml, Php, Js, Lua, Perl, Python, Json, Rtf, Tcl)
 	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
-		X3d, Kml, Collada, Gml, Gpx)
+		X3d, Kml, Collada, Gml, Gpx, Tcx)
 	Json = NewNode("application/json", "json", matchers.Json)
 	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
 	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
@@ -50,10 +50,11 @@ var (
 
 	Svg     = NewNode("image/svg+xml", "svg", matchers.Svg)
 	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
-	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.False)
-	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.False)
-	Gml     = NewNode("application/gml+xml", "gml", matchers.False)
-	Gpx     = NewNode("application/gpx+xml", "gpx", matchers.False)
+	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.Kml)
+	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.Collada)
+	Gml     = NewNode("application/gml+xml", "gml", matchers.Gml)
+	Gpx     = NewNode("application/gpx+xml", "gpx", matchers.Gpx)
+	Tcx     = NewNode("application/vnd.garmin.tcx+xml", "tcx", matchers.Tcx)
 
 	Png  = NewNode("image/png", "png", matchers.Png)
 	Jpg  = NewNode("image/jpeg", "jpg", matchers.Jpg)

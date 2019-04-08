@@ -1,16 +1,34 @@
 package matchers
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
 type (
 	markupSig  []byte
 	ciSig      []byte // case insensitive signature
 	shebangSig []byte // matches !# followed by the signature
 	ftypSig    []byte // matches audio/video files. www.ftyps.com
-	sig        interface {
+	xmlSig     struct {
+		// the local name of the root tag
+		localName []byte
+		// the namespace of the XML document
+		xmlns []byte
+	}
+	sig interface {
 		detect([]byte) bool
 	}
 )
+
+func newXmlSig(localName, xmlns string) xmlSig {
+	ret := xmlSig{xmlns: []byte(xmlns)}
+	if localName != "" {
+		ret.localName = []byte(fmt.Sprintf("<%s", localName))
+	}
+
+	return ret
+}
 
 // Implement sig interface.
 func (hSig markupSig) detect(in []byte) bool {
@@ -79,6 +97,21 @@ func (fSig ftypSig) detect(in []byte) bool {
 	return len(in) > 12 &&
 		bytes.Equal(in[4:8], []byte("ftyp")) &&
 		bytes.Equal(in[8:12], fSig)
+}
+
+func (xSig xmlSig) detect(in []byte) bool {
+	l := 512
+	if len(in) < l {
+		l = len(in)
+	}
+	in = in[:l]
+
+	if len(xSig.localName) == 0 {
+		return bytes.Index(in, xSig.xmlns) > 0
+	}
+
+	localNameIndex := bytes.Index(in, xSig.localName)
+	return 0 < localNameIndex && localNameIndex < bytes.Index(in, xSig.xmlns)
 }
 
 func detect(in []byte, sigs []sig) bool {
