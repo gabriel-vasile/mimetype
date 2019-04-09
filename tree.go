@@ -9,7 +9,7 @@ var Root = NewNode("application/octet-stream", "", matchers.True,
 	SevenZ, Zip, Tar, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
 	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
 	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
-	Mpeg, QuickTime, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv, AMp4, M4a,
+	Mpeg, QuickTime, Mqv, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv, AMp4, M4a,
 	Txt, Gzip, Class, Swf, Crx, Woff, Woff2, Wasm,
 )
 
@@ -80,6 +80,7 @@ var (
 	WebM      = NewNode("video/webm", "webm", matchers.WebM)
 	Mpeg      = NewNode("video/mpeg", "mpeg", matchers.Mpeg)
 	QuickTime = NewNode("video/quicktime", "mov", matchers.QuickTime)
+	Mqv       = NewNode("video/quicktime", "mqv", matchers.Mqv)
 	ThreeGP   = NewNode("video/3gpp", "3gp", matchers.ThreeGP)
 	ThreeG2   = NewNode("video/3gpp2", "3g2", matchers.ThreeG2)
 	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)

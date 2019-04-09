@@ -56,13 +56,6 @@ func Mpeg(in []byte) bool {
 		in[3] >= 0xB0 && in[3] <= 0xBF
 }
 
-// QuickTime matches a QuickTime File Format file.
-func QuickTime(in []byte) bool {
-	return len(in) > 12 &&
-		(bytes.Equal(in[4:12], []byte("ftypqt  ")) ||
-			bytes.Equal(in[4:8], []byte("moov")))
-}
-
 // Avi matches an Audio Video Interleaved file.
 func Avi(in []byte) bool {
 	return len(in) > 16 &&

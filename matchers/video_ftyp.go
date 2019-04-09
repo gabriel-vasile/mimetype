@@ -28,6 +28,8 @@ var (
 		// Nero Digital AAC Audio
 		ftypSig("NDAS"),
 	}
+	qtSigs  = []sig{ftypSig("qt  "), ftypSig("moov")}
+	mqvSigs = []sig{ftypSig("mqt ")}
 	m4aSigs = []sig{ftypSig("M4A ")}
 	// TODO: add support for remaining video formats at ftyps.com
 )
@@ -35,16 +37,6 @@ var (
 // Mp4 matches an MP4 file.
 func Mp4(in []byte) bool {
 	return detect(in, mp4Sigs)
-}
-
-// AMp4 matches an audio MP4 file.
-func AMp4(in []byte) bool {
-	return detect(in, amp4Sigs)
-}
-
-// M4a matches an audio M4A file.
-func M4a(in []byte) bool {
-	return detect(in, m4aSigs)
 }
 
 // ThreeGP matches a 3GPP file.
@@ -55,4 +47,24 @@ func ThreeGP(in []byte) bool {
 // ThreeG2 matches a 3GPP2 file.
 func ThreeG2(in []byte) bool {
 	return detect(in, threeG2Sigs)
+}
+
+// AMp4 matches an audio MP4 file.
+func AMp4(in []byte) bool {
+	return detect(in, amp4Sigs)
+}
+
+// QuickTime matches a QuickTime File Format file.
+func QuickTime(in []byte) bool {
+	return detect(in, qtSigs)
+}
+
+// Mqv matches a Sony / Mobile QuickTime  file.
+func Mqv(in []byte) bool {
+	return detect(in, mqvSigs)
+}
+
+// M4a matches an audio M4A file.
+func M4a(in []byte) bool {
+	return detect(in, m4aSigs)
 }

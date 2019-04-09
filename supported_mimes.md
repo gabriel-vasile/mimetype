@@ -38,6 +38,7 @@ Extension | MIME type
 **au** | audio/basic
 **mpeg** | video/mpeg
 **mov** | video/quicktime
+**mqv** | video/quicktime
 **mp4** | video/mp4
 **webm** | video/webm
 **3gp** | video/3gpp
