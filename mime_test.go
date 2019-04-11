@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gabriel-vasile/mimetype/matchers"
+	"github.com/gabriel-vasile/mimetype/internal/matchers"
 )
 
 const testDataDir = "testdata"

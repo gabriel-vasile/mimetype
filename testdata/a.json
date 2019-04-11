@@ -1,10 +1,14 @@
 {
   "firstName": "John",
   "lastName": "Smith",
-  "age": 25,
+  "age": -25,
+  "limit": 1e2,
+  "width": 12,
   "height": 1.73,
+  "good": true,
+  "bad": false,
   "address": {
-    "streetAddress": "21 2nd Street",
+    "streetAddress": "21\t\u0009 \u1234 2nd Street",
     "city": "New York",
     "state": "NY",
     "postalCode": "10021"

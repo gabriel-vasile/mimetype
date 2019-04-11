@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/gabriel-vasile/mimetype/matchers"
+	"github.com/gabriel-vasile/mimetype/internal/matchers"
 )
 
 // Detect returns the MIME type and extension of the provided byte slice.

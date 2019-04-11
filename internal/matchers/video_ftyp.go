@@ -31,7 +31,7 @@ var (
 	qtSigs  = []sig{ftypSig("qt  "), ftypSig("moov")}
 	mqvSigs = []sig{ftypSig("mqt ")}
 	m4aSigs = []sig{ftypSig("M4A ")}
-	// TODO: add support for remaining video formats at ftyps.com
+	// TODO: add support for remaining video formats at ftyps.com.
 )
 
 // Mp4 matches an MP4 file.
