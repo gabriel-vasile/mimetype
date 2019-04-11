@@ -48,6 +48,9 @@ var (
 	tcxSigs = []sig{
 		newXmlSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`),
 	}
+	x3dSigs = []sig{
+		newXmlSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -190,4 +193,9 @@ func Gpx(in []byte) bool {
 // Tcx matches a Training Center XML file.
 func Tcx(in []byte) bool {
 	return detect(in, tcxSigs)
+}
+
+// X3d matches an Extensible 3D Graphics file.
+func X3d(in []byte) bool {
+	return detect(in, x3dSigs)
 }

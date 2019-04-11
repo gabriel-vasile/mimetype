@@ -1,7 +1,6 @@
 package mimetype
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,90 +13,91 @@ import (
 
 const testDataDir = "testdata"
 
-var files = map[string]*Node{
+var files = map[string]*node{
 	// archives
-	"a.pdf":  Pdf,
-	"a.zip":  Zip,
-	"a.tar":  Tar,
-	"a.xls":  Xls,
-	"a.xlsx": Xlsx,
-	"a.doc":  Doc,
-	"a.docx": Docx,
-	"a.ppt":  Ppt,
-	"a.pptx": Pptx,
-	"a.epub": Epub,
-	"a.7z":   SevenZ,
-	"a.jar":  Jar,
-	"a.gz":   Gzip,
+	"a.pdf":  pdf,
+	"a.zip":  zip,
+	"a.tar":  tar,
+	"a.xls":  xls,
+	"a.xlsx": xlsx,
+	"a.doc":  doc,
+	"a.docx": docx,
+	"a.ppt":  ppt,
+	"a.pptx": pptx,
+	"a.epub": epub,
+	"a.7z":   sevenZ,
+	"a.jar":  jar,
+	"a.gz":   gzip,
 
 	// images
-	"a.png":  Png,
-	"a.jpg":  Jpg,
-	"a.psd":  Psd,
-	"a.webp": Webp,
-	"a.tif":  Tiff,
-	"a.ico":  Ico,
-	"a.bmp":  Bmp,
+	"a.png":  png,
+	"a.jpg":  jpg,
+	"a.psd":  psd,
+	"a.webp": webp,
+	"a.tif":  tiff,
+	"a.ico":  ico,
+	"a.bmp":  bmp,
 
 	// video
-	"a.mp4":  Mp4,
-	"b.mp4":  Mp4,
-	"a.webm": WebM,
-	"a.3gp":  ThreeGP,
-	"a.3g2":  ThreeG2,
-	"a.flv":  Flv,
-	"a.avi":  Avi,
-	"a.mov":  QuickTime,
-	"a.mqv":  Mqv,
-	"a.mpeg": Mpeg,
-	"a.mkv":  Mkv,
+	"a.mp4":  mp4,
+	"b.mp4":  mp4,
+	"a.webm": webM,
+	"a.3gp":  threeGP,
+	"a.3g2":  threeG2,
+	"a.flv":  flv,
+	"a.avi":  avi,
+	"a.mov":  quickTime,
+	"a.mqv":  mqv,
+	"a.mpeg": mpeg,
+	"a.mkv":  mkv,
 
 	// audio
-	"a.mp3":  Mp3,
-	"a.wav":  Wav,
-	"a.flac": Flac,
-	"a.midi": Midi,
-	"a.ape":  Ape,
-	"a.aiff": Aiff,
-	"a.au":   Au,
-	"a.ogg":  Ogg,
-	"a.amr":  Amr,
-	"a.mpc":  MusePack,
-	"a.m4a":  M4a,
-	"a.m4b":  AMp4,
+	"a.mp3":  mp3,
+	"a.wav":  wav,
+	"a.flac": flac,
+	"a.midi": midi,
+	"a.ape":  ape,
+	"a.aiff": aiff,
+	"a.au":   au,
+	"a.ogg":  ogg,
+	"a.amr":  amr,
+	"a.mpc":  musePack,
+	"a.m4a":  m4a,
+	"a.m4b":  aMp4,
 
 	// source code
-	"a.html": Html,
-	"a.svg":  Svg,
-	"b.svg":  Svg,
-	"a.txt":  Txt,
-	"a.php":  Php,
-	"a.ps":   Ps,
-	"a.json": Json,
-	"a.rtf":  Rtf,
-	"a.js":   Js,
-	"a.lua":  Lua,
-	"a.pl":   Perl,
-	"a.py":   Python,
-	"a.tcl":  Tcl,
+	"a.html": html,
+	"a.svg":  svg,
+	"b.svg":  svg,
+	"a.txt":  txt,
+	"a.php":  php,
+	"a.ps":   ps,
+	"a.json": json,
+	"a.rtf":  rtf,
+	"a.js":   js,
+	"a.lua":  lua,
+	"a.pl":   perl,
+	"a.py":   python,
+	"a.tcl":  tcl,
 
 	// binary
-	"a.class": Class,
-	"a.swf":   Swf,
-	"a.crx":   Crx,
-	"a.wasm":  Wasm,
+	"a.class": class,
+	"a.swf":   swf,
+	"a.crx":   crx,
+	"a.wasm":  wasm,
 
 	// fonts
-	"a.woff":  Woff,
-	"a.woff2": Woff2,
+	"a.woff":  woff,
+	"a.woff2": woff2,
 
 	// XML and subtypes of XML
-	"a.xml": Xml,
-	"a.kml": Kml,
-	"a.dae": Collada,
-	"a.gml": Gml,
-	"a.gpx": Gpx,
-	"a.tcx": Tcx,
+	"a.xml": xml,
+	"a.kml": kml,
+	"a.dae": collada,
+	"a.gml": gml,
+	"a.gpx": gpx,
+	"a.tcx": tcx,
+	"a.x3d": x3d,
 }
 
 func TestMatching(t *testing.T) {
@@ -113,21 +113,21 @@ func TestMatching(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if dMime, _ := Detect(data); dMime != node.Mime() {
-			t.Errorf(errStr, fName, node.Mime(), dMime, nil)
+		if dMime, _ := Detect(data); dMime != node.mime {
+			t.Errorf(errStr, fName, node.mime, dMime, nil)
 		}
 
-		if _, err := f.Seek(io.SeekStart, 0); err != nil {
-			t.Errorf(errStr, fName, node.Mime(), Root.Mime(), err)
+		if _, err := f.Seek(0, io.SeekStart); err != nil {
+			t.Errorf(errStr, fName, node.mime, root.mime, err)
 		}
 
-		if dMime, _, err := DetectReader(f); dMime != node.Mime() {
-			t.Errorf(errStr, fName, node.Mime(), dMime, err)
+		if dMime, _, err := DetectReader(f); dMime != node.mime {
+			t.Errorf(errStr, fName, node.mime, dMime, err)
 		}
 		f.Close()
 
-		if dMime, _, err := DetectFile(fileName); dMime != node.Mime() {
-			t.Errorf(errStr, fName, node.Mime(), dMime, err)
+		if dMime, _, err := DetectFile(fileName); dMime != node.mime {
+			t.Errorf(errStr, fName, node.mime, dMime, err)
 		}
 	}
 }
@@ -150,64 +150,33 @@ func TestEmptyInput(t *testing.T) {
 	}
 }
 
-// `foobar` func matches inputs starting with the string "foobar"
-// `foobarNode` is the node holding the mimetype and extension to be returned
-// when the `foobar` func returns true for an input
-func TestAppend(t *testing.T) {
-	foobar := func(input []byte) bool {
-		return bytes.HasPrefix(input, []byte("foobar"))
-	}
-	foobarNode := NewNode("text/foobar", "fbExt", foobar)
-	fbFile := filepath.Join(testDataDir, "foobar.fb")
-
-	dMime, _, err := DetectFile(fbFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// even though we tried detecting, at this point the function `foobar`
-	// is not yet called because it is not appended in the tree
-	if dMime == foobarNode.Mime() {
-		t.Fatal("foobar should not get matched")
-	}
-
-	// our new node must be appended in the tree
-	Txt.Append(foobarNode)
-
-	// the next line calls our `foobar` func which returns true for our test file
-	dMime, _, err = DetectFile(fbFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if dMime != foobarNode.Mime() {
-		t.Fatalf("foobar should get matched")
-	}
-}
-
 func TestGenerateSupportedMimesFile(t *testing.T) {
 	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := f.WriteString(`## Supported MIME types
+	defer f.Close()
+
+	nodes := root.flatten()
+	header := fmt.Sprintf(`## %d Supported MIME types
 This file is automatically generated when running tests. Do not edit manually.
 
 Extension | MIME type
 --------- | --------
-`); err != nil {
+`, len(nodes))
+
+	if _, err := f.WriteString(header); err != nil {
 		t.Fatal(err)
 	}
-	for _, n := range Root.flatten() {
-		ext := n.Extension()
+	for _, n := range nodes {
+		ext := n.extension
 		if ext == "" {
 			ext = "n/a"
 		}
-		str := fmt.Sprintf("**%s** | %s\n", ext, n.Mime())
+		str := fmt.Sprintf("**%s** | %s\n", ext, n.mime)
 		if _, err := f.WriteString(str); err != nil {
 			t.Fatal(err)
 		}
-	}
-	if err := f.Close(); err != nil {
-		t.Fatal(err)
 	}
 }
 

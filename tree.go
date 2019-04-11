@@ -2,97 +2,95 @@ package mimetype
 
 import "github.com/gabriel-vasile/mimetype/matchers"
 
-// Root is a matcher which passes for any slice of bytes.
+// root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
-var Root = NewNode("application/octet-stream", "", matchers.True,
-	SevenZ, Zip, Tar, Pdf, Doc, Xls, Ppt, Ps, Psd, Ogg,
-	Png, Jpg, Gif, Webp, Tiff, Bmp, Ico,
-	Mp3, Flac, Midi, Ape, MusePack, Amr, Wav, Aiff, Au,
-	Mpeg, QuickTime, Mqv, Mp4, WebM, ThreeGP, ThreeG2, Avi, Flv, Mkv, AMp4, M4a,
-	Txt, Gzip, Class, Swf, Crx, Woff, Woff2, Wasm,
+var root = newNode("application/octet-stream", "", matchers.True,
+	sevenZ, zip, tar, pdf, doc, xls, ppt, ps, psd, ogg, png, jpg, gif, webp,
+	tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg,
+	quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv, mkv, aMp4, m4a, txt,
+	gzip, class, swf, crx, woff, woff2, wasm,
 )
 
-// The list of nodes appended to the Root node
+// The list of nodes appended to the root node
 var (
-	Gzip   = NewNode("application/gzip", "gz", matchers.Gzip)
-	SevenZ = NewNode("application/x-7z-compressed", "7z", matchers.SevenZ)
-	Zip    = NewNode("application/zip", "zip", matchers.Zip, Xlsx, Docx, Pptx, Epub, Jar)
-	Tar    = NewNode("application/x-tar", "tar", matchers.Tar)
-	Pdf    = NewNode("application/pdf", "pdf", matchers.Pdf)
-	Xlsx   = NewNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
-	Docx   = NewNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
-	Pptx   = NewNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
-	Epub   = NewNode("application/epub+zip", "epub", matchers.Epub)
-	Jar    = NewNode("application/jar", "jar", matchers.Jar, Apk)
-	Apk    = NewNode("application/vnd.android.package-archive", "apk", matchers.False)
-	Doc    = NewNode("application/msword", "doc", matchers.Doc)
-	Ppt    = NewNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
-	Xls    = NewNode("application/vnd.ms-excel", "xls", matchers.Xls)
-	Ps     = NewNode("application/postscript", "ps", matchers.Ps)
-	Psd    = NewNode("application/x-photoshop", "psd", matchers.Psd)
-	Ogg    = NewNode("application/ogg", "ogg", matchers.Ogg)
+	gzip   = newNode("application/gzip", "gz", matchers.Gzip)
+	sevenZ = newNode("application/x-7z-compressed", "7z", matchers.SevenZ)
+	zip    = newNode("application/zip", "zip", matchers.Zip, xlsx, docx, pptx, epub, jar)
+	tar    = newNode("application/x-tar", "tar", matchers.Tar)
+	pdf    = newNode("application/pdf", "pdf", matchers.Pdf)
+	xlsx   = newNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
+	docx   = newNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
+	pptx   = newNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
+	epub   = newNode("application/epub+zip", "epub", matchers.Epub)
+	jar    = newNode("application/jar", "jar", matchers.Jar)
+	doc    = newNode("application/msword", "doc", matchers.Doc)
+	ppt    = newNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
+	xls    = newNode("application/vnd.ms-excel", "xls", matchers.Xls)
+	ps     = newNode("application/postscript", "ps", matchers.Ps)
+	psd    = newNode("application/x-photoshop", "psd", matchers.Psd)
+	ogg    = newNode("application/ogg", "ogg", matchers.Ogg)
 
-	Txt = NewNode("text/plain", "txt", matchers.Txt,
-		Html, Svg, Xml, Php, Js, Lua, Perl, Python, Json, Rtf, Tcl)
-	Xml = NewNode("text/xml; charset=utf-8", "xml", matchers.Xml,
-		X3d, Kml, Collada, Gml, Gpx, Tcx)
-	Json = NewNode("application/json", "json", matchers.Json)
-	Html = NewNode("text/html; charset=utf-8", "html", matchers.Html)
-	Php  = NewNode("text/x-php; charset=utf-8", "php", matchers.Php)
-	Rtf  = NewNode("text/rtf", "rtf", matchers.Rtf)
+	txt = newNode("text/plain", "txt", matchers.Txt,
+		html, svg, xml, php, js, lua, perl, python, json, rtf, tcl)
+	xml = newNode("text/xml; charset=utf-8", "xml", matchers.Xml,
+		x3d, kml, collada, gml, gpx, tcx)
+	json = newNode("application/json", "json", matchers.Json)
+	html = newNode("text/html; charset=utf-8", "html", matchers.Html)
+	php  = newNode("text/x-php; charset=utf-8", "php", matchers.Php)
+	rtf  = newNode("text/rtf", "rtf", matchers.Rtf)
 
-	Js     = NewNode("application/javascript", "js", matchers.Js)
-	Lua    = NewNode("text/x-lua", "lua", matchers.Lua)
-	Perl   = NewNode("text/x-perl", "pl", matchers.Perl)
-	Python = NewNode("application/x-python", "py", matchers.Python)
-	Tcl    = NewNode("text/x-tcl", "tcl", matchers.Tcl)
+	js     = newNode("application/javascript", "js", matchers.Js)
+	lua    = newNode("text/x-lua", "lua", matchers.Lua)
+	perl   = newNode("text/x-perl", "pl", matchers.Perl)
+	python = newNode("application/x-python", "py", matchers.Python)
+	tcl    = newNode("text/x-tcl", "tcl", matchers.Tcl)
 
-	Svg     = NewNode("image/svg+xml", "svg", matchers.Svg)
-	X3d     = NewNode("model/x3d+xml", "x3d", matchers.False)
-	Kml     = NewNode("application/vnd.google-earth.kml+xml", "kml", matchers.Kml)
-	Collada = NewNode("model/vnd.collada+xml", "dae", matchers.Collada)
-	Gml     = NewNode("application/gml+xml", "gml", matchers.Gml)
-	Gpx     = NewNode("application/gpx+xml", "gpx", matchers.Gpx)
-	Tcx     = NewNode("application/vnd.garmin.tcx+xml", "tcx", matchers.Tcx)
+	svg     = newNode("image/svg+xml", "svg", matchers.Svg)
+	x3d     = newNode("model/x3d+xml", "x3d", matchers.X3d)
+	kml     = newNode("application/vnd.google-earth.kml+xml", "kml", matchers.Kml)
+	collada = newNode("model/vnd.collada+xml", "dae", matchers.Collada)
+	gml     = newNode("application/gml+xml", "gml", matchers.Gml)
+	gpx     = newNode("application/gpx+xml", "gpx", matchers.Gpx)
+	tcx     = newNode("application/vnd.garmin.tcx+xml", "tcx", matchers.Tcx)
 
-	Png  = NewNode("image/png", "png", matchers.Png)
-	Jpg  = NewNode("image/jpeg", "jpg", matchers.Jpg)
-	Gif  = NewNode("image/gif", "gif", matchers.Gif)
-	Webp = NewNode("image/webp", "webp", matchers.Webp)
-	Tiff = NewNode("image/tiff", "tiff", matchers.Tiff)
-	Bmp  = NewNode("image/bmp", "bmp", matchers.Bmp)
-	Ico  = NewNode("image/x-icon", "ico", matchers.Ico)
+	png  = newNode("image/png", "png", matchers.Png)
+	jpg  = newNode("image/jpeg", "jpg", matchers.Jpg)
+	gif  = newNode("image/gif", "gif", matchers.Gif)
+	webp = newNode("image/webp", "webp", matchers.Webp)
+	tiff = newNode("image/tiff", "tiff", matchers.Tiff)
+	bmp  = newNode("image/bmp", "bmp", matchers.Bmp)
+	ico  = newNode("image/x-icon", "ico", matchers.Ico)
 
-	Mp3      = NewNode("audio/mpeg", "mp3", matchers.Mp3)
-	Flac     = NewNode("audio/flac", "flac", matchers.Flac)
-	Midi     = NewNode("audio/midi", "midi", matchers.Midi)
-	Ape      = NewNode("audio/ape", "ape", matchers.Ape)
-	MusePack = NewNode("audio/musepack", "mpc", matchers.MusePack)
-	Wav      = NewNode("audio/wav", "wav", matchers.Wav)
-	Aiff     = NewNode("audio/aiff", "aiff", matchers.Aiff)
-	Au       = NewNode("audio/basic", "au", matchers.Au)
-	Amr      = NewNode("audio/amr", "amr", matchers.Amr)
-	AMp4     = NewNode("audio/mp4", "mp4", matchers.AMp4)
-	M4a      = NewNode("audio/x-m4a", "m4a", matchers.M4a)
+	mp3      = newNode("audio/mpeg", "mp3", matchers.Mp3)
+	flac     = newNode("audio/flac", "flac", matchers.Flac)
+	midi     = newNode("audio/midi", "midi", matchers.Midi)
+	ape      = newNode("audio/ape", "ape", matchers.Ape)
+	musePack = newNode("audio/musepack", "mpc", matchers.MusePack)
+	wav      = newNode("audio/wav", "wav", matchers.Wav)
+	aiff     = newNode("audio/aiff", "aiff", matchers.Aiff)
+	au       = newNode("audio/basic", "au", matchers.Au)
+	amr      = newNode("audio/amr", "amr", matchers.Amr)
+	aMp4     = newNode("audio/mp4", "mp4", matchers.AMp4)
+	m4a      = newNode("audio/x-m4a", "m4a", matchers.M4a)
 
-	Mp4       = NewNode("video/mp4", "mp4", matchers.Mp4)
-	WebM      = NewNode("video/webm", "webm", matchers.WebM)
-	Mpeg      = NewNode("video/mpeg", "mpeg", matchers.Mpeg)
-	QuickTime = NewNode("video/quicktime", "mov", matchers.QuickTime)
-	Mqv       = NewNode("video/quicktime", "mqv", matchers.Mqv)
-	ThreeGP   = NewNode("video/3gpp", "3gp", matchers.ThreeGP)
-	ThreeG2   = NewNode("video/3gpp2", "3g2", matchers.ThreeG2)
-	Avi       = NewNode("video/x-msvideo", "avi", matchers.Avi)
-	Flv       = NewNode("video/x-flv", "flv", matchers.Flv)
-	Mkv       = NewNode("video/x-matroska", "mkv", matchers.Mkv)
+	mp4       = newNode("video/mp4", "mp4", matchers.Mp4)
+	webM      = newNode("video/webm", "webm", matchers.WebM)
+	mpeg      = newNode("video/mpeg", "mpeg", matchers.Mpeg)
+	quickTime = newNode("video/quicktime", "mov", matchers.QuickTime)
+	mqv       = newNode("video/quicktime", "mqv", matchers.Mqv)
+	threeGP   = newNode("video/3gpp", "3gp", matchers.ThreeGP)
+	threeG2   = newNode("video/3gpp2", "3g2", matchers.ThreeG2)
+	avi       = newNode("video/x-msvideo", "avi", matchers.Avi)
+	flv       = newNode("video/x-flv", "flv", matchers.Flv)
+	mkv       = newNode("video/x-matroska", "mkv", matchers.Mkv)
 
-	Class = NewNode("application/x-java-applet; charset=binary", "class", matchers.Class)
-	Swf   = NewNode("application/x-shockwave-flash", "swf", matchers.Swf)
-	Crx   = NewNode("application/x-chrome-extension", "crx", matchers.Crx)
+	class = newNode("application/x-java-applet; charset=binary", "class", matchers.Class)
+	swf   = newNode("application/x-shockwave-flash", "swf", matchers.Swf)
+	crx   = newNode("application/x-chrome-extension", "crx", matchers.Crx)
 
-	Woff  = NewNode("font/woff", "woff", matchers.Woff)
-	Woff2 = NewNode("font/woff2", "woff2", matchers.Woff2)
+	woff  = newNode("font/woff", "woff", matchers.Woff)
+	woff2 = newNode("font/woff2", "woff2", matchers.Woff2)
 
-	Wasm = NewNode("application/wasm", "wasm", matchers.Wasm)
+	wasm = newNode("application/wasm", "wasm", matchers.Wasm)
 )

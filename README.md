@@ -3,7 +3,7 @@
 </h1>
 
 <h4 align="center">
-  A package for detecting mime types and extensions based on magic numbers
+  A package for detecting MIME types and extensions based on magic numbers
 </h4>
 <h6 align="center">
   No bindings, all written in pure go
@@ -43,34 +43,12 @@ func DetectFile(file string) (mime, extension string, err error) {...}
 When detecting from a `ReadSeeker` interface, such as `os.File`, make sure
 to reset the offset of the reader to the beginning if needed:
 ```go
-_, err = file.Seek(io.SeekStart, 0)
+_, err = file.Seek(0, io.SeekStart)
 ```
 
-## Extend
-If, for example, you need to detect the **"text/foobar"** mime, for text files
-containing the string "foobar" at the start of their first line:
- - create the matching function
-    ```go
-	foobar := func(input []byte) bool {
-		return bytes.HasPrefix(input, []byte("foobar"))
-	}
-    ```
- - create the mime type node
-    ```go
-    foobarNode := mimetype.NewNode("text/foobar", "fbExt", foobar)
-    ````
- - append the new node in the tree
-    ```go
-    mimetype.Txt.Append(foobarNode)
-    ```
- - detect
-    ```go
-	mime, extension := mimetype.Detect([]byte("foobar\nfoo foo bar"))
-    ```
-See [TestAppend](mime_test.go) for a working example.
-See [Contributing](CONTRIBUTING.md) if you consider the missing mime type should be included in the library by default.
-
-## [Supported mimes](supported_mimes.md)
+## Supported MIME types
+See [supported mimes](supported_mimes.md) for the list of detected MIME types.
+If support is needed for a specific file format, please open an [issue](https://github.com/gabriel-vasile/mimetype/issues/new/choose).
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the matching functions.

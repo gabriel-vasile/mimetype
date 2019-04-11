@@ -28,9 +28,7 @@ func Webp(in []byte) bool {
 
 // Bmp matches a bitmap image file.
 func Bmp(in []byte) bool {
-	return len(in) > 1 &&
-		in[0] == 0x42 &&
-		in[1] == 0x4D
+	return len(in) > 1 && in[0] == 0x42 && in[1] == 0x4D
 }
 
 // Ps matches a PostScript file.

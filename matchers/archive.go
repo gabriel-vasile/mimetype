@@ -18,11 +18,7 @@ func SevenZ(in []byte) bool {
 
 // Epub matches an EPUB file.
 func Epub(in []byte) bool {
-	if len(in) < 58 {
-		return false
-	}
-
-	return bytes.Equal(in[30:58], []byte("mimetypeapplication/epub+zip"))
+	return len(in) > 58 && bytes.Equal(in[30:58], []byte("mimetypeapplication/epub+zip"))
 }
 
 // Jar matches a Java archive file.
@@ -42,6 +38,5 @@ func Crx(in []byte) bool {
 
 // Tar matches a (t)ape (ar)chive file.
 func Tar(in []byte) bool {
-	return len(in) > 262 &&
-		bytes.Equal(in[257:262], []byte("ustar"))
+	return len(in) > 262 && bytes.Equal(in[257:262], []byte("ustar"))
 }

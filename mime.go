@@ -1,5 +1,5 @@
 // Package mimetype uses magic number signatures
-// to detect the mime type and extension of a file.
+// to detect the MIME type and extension of a file.
 package mimetype
 
 import (
@@ -9,34 +9,34 @@ import (
 	"github.com/gabriel-vasile/mimetype/matchers"
 )
 
-// Detect returns the mime type and extension of the provided byte slice.
+// Detect returns the MIME type and extension of the provided byte slice.
 func Detect(in []byte) (mime, extension string) {
 	if len(in) == 0 {
 		return "inode/x-empty", ""
 	}
-	n := Root.match(in, Root)
-	return n.Mime(), n.Extension()
+	n := root.match(in, root)
+	return n.mime, n.extension
 }
 
-// DetectReader returns the mime type and extension
+// DetectReader returns the MIME type and extension
 // of the byte slice read from the provided reader.
 func DetectReader(r io.Reader) (mime, extension string, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
 	if err != nil && err != io.EOF {
-		return Root.Mime(), Root.Extension(), err
+		return root.mime, root.extension, err
 	}
 	in = in[:n]
 
-	mime, ext := Detect(in)
-	return mime, ext, nil
+	mime, extension = Detect(in)
+	return mime, extension, nil
 }
 
-// DetectFile returns the mime type and extension of the provided file.
+// DetectFile returns the MIME type and extension of the provided file.
 func DetectFile(file string) (mime, extension string, err error) {
 	f, err := os.Open(file)
 	if err != nil {
-		return Root.Mime(), Root.Extension(), err
+		return root.mime, root.extension, err
 	}
 	defer f.Close()
 
