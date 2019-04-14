@@ -35,10 +35,11 @@ var (
 		html, svg, xml, php, js, lua, perl, python, json, rtf, tcl)
 	xml = newNode("text/xml; charset=utf-8", "xml", matchers.Xml,
 		x3d, kml, collada, gml, gpx, tcx)
-	json = newNode("application/json", "json", matchers.Json)
-	html = newNode("text/html; charset=utf-8", "html", matchers.Html)
-	php  = newNode("text/x-php; charset=utf-8", "php", matchers.Php)
-	rtf  = newNode("text/rtf", "rtf", matchers.Rtf)
+	json    = newNode("application/json", "json", matchers.Json, geoJson)
+	geoJson = newNode("application/geo+json", "geojson", matchers.GeoJson)
+	html    = newNode("text/html; charset=utf-8", "html", matchers.Html)
+	php     = newNode("text/x-php; charset=utf-8", "php", matchers.Php)
+	rtf     = newNode("text/rtf", "rtf", matchers.Rtf)
 
 	js     = newNode("application/javascript", "js", matchers.Js)
 	lua    = newNode("text/x-lua", "lua", matchers.Lua)

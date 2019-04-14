@@ -135,6 +135,52 @@ func Json(in []byte) bool {
 	return parsed == len(in)
 }
 
+// GeoJson matches a RFC 7946 GeoJSON file.
+//
+// BUG(gabriel-vasile): The "type" key should be searched for in the root object.
+func GeoJson(in []byte) bool {
+	in = trimLWS(in)
+	// geojson is always an object
+	if in[0] != '{' {
+		return false
+	}
+
+	s := []byte(`"type"`)
+	si := bytes.Index(in, s)
+	sl := len(s)
+
+	if si == -1 {
+		return false
+	}
+
+	// skip the "type" part
+	in = in[si+sl:]
+	// skip any whitespace before the colon
+	in = trimLWS(in)
+	// skip any whitesapce after the colon
+	// not checking if char is colon because json matcher already did check
+	in = trimLWS(in[1:])
+
+	geoJsonTypes := [][]byte{
+		[]byte(`"Feature"`),
+		[]byte(`"FeatureCollection"`),
+		[]byte(`"Point"`),
+		[]byte(`"LineString"`),
+		[]byte(`"Polygon"`),
+		[]byte(`"MultiPoint"`),
+		[]byte(`"MultiLineString"`),
+		[]byte(`"MultiPolygon"`),
+		[]byte(`"GeometryCollection"`),
+	}
+	for _, t := range geoJsonTypes {
+		if bytes.HasPrefix(in, t) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Js matches a Javascript file.
 func Js(in []byte) bool {
 	return detect(in, jsSigs)
