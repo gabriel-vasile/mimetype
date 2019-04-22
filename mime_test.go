@@ -100,6 +100,10 @@ var files = map[string]*node{
 	"a.gpx": gpx,
 	"a.tcx": tcx,
 	"a.x3d": x3d,
+
+	"a.shp": shp,
+	"a.shx": shx,
+	"a.dbf": dbf,
 }
 
 func TestMatching(t *testing.T) {
