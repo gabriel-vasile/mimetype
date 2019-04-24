@@ -75,6 +75,8 @@ var files = map[string]*node{
 	"a.json":    json,
 	"a.geojson": geoJson,
 	"b.geojson": geoJson,
+	"a.csv":     csv,
+	"a.tsv":     tsv,
 	"a.rtf":     rtf,
 	"a.js":      js,
 	"a.lua":     lua,

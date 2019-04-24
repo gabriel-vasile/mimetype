@@ -32,10 +32,12 @@ var (
 	ogg    = newNode("application/ogg", "ogg", matchers.Ogg)
 
 	txt = newNode("text/plain", "txt", matchers.Txt,
-		html, svg, xml, php, js, lua, perl, python, json, rtf, tcl)
+		html, svg, xml, php, js, lua, perl, python, json, rtf, tcl, csv, tsv)
 	xml = newNode("text/xml; charset=utf-8", "xml", matchers.Xml,
 		x3d, kml, collada, gml, gpx, tcx)
 	json    = newNode("application/json", "json", matchers.Json, geoJson)
+	csv     = newNode("text/csv", "csv", matchers.Csv)
+	tsv     = newNode("text/tab-separated-values", "tsv", matchers.Tsv)
 	geoJson = newNode("application/geo+json", "geojson", matchers.GeoJson)
 	html    = newNode("text/html; charset=utf-8", "html", matchers.Html)
 	php     = newNode("text/x-php; charset=utf-8", "php", matchers.Php)
