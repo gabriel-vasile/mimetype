@@ -43,3 +43,8 @@ func Dbf(in []byte) bool {
 
 	return false
 }
+
+// Exe matches a Windows/DOS executable file.
+func Exe(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x4D, 0x5A})
+}

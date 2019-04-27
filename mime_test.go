@@ -28,6 +28,9 @@ var files = map[string]*node{
 	"a.7z":   sevenZ,
 	"a.jar":  jar,
 	"a.gz":   gzip,
+	"a.fits": fits,
+	"a.xar":  xar,
+	"a.bz2":  bz2,
 
 	// images
 	"a.png":  png,
@@ -50,6 +53,7 @@ var files = map[string]*node{
 	"a.mqv":  mqv,
 	"a.mpeg": mpeg,
 	"a.mkv":  mkv,
+	"a.asf":  asf,
 
 	// audio
 	"a.mp3":  mp3,
@@ -89,6 +93,7 @@ var files = map[string]*node{
 	"a.swf":   swf,
 	"a.crx":   crx,
 	"a.wasm":  wasm,
+	"a.exe":   exe,
 
 	// fonts
 	"a.woff":  woff,

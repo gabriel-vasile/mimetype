@@ -62,3 +62,9 @@ func Avi(in []byte) bool {
 		bytes.Equal(in[:4], []byte("RIFF")) &&
 		bytes.Equal(in[8:16], []byte("AVI LIST"))
 }
+
+// Asf matches an Advanced Systems Format file.
+func Asf(in []byte) bool {
+	return len(in) > 16 && bytes.Equal(in[:16], []byte{0x30, 0x26, 0xB2, 0x75,
+		0x8E, 0x66, 0xCF, 0x11, 0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C})
+}

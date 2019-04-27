@@ -6,10 +6,10 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var root = newNode("application/octet-stream", "", matchers.True,
-	sevenZ, zip, tar, pdf, doc, xls, ppt, ps, psd, ogg, png, jpg, gif, webp,
-	tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg,
-	quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv, mkv, aMp4, m4a, txt,
-	gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,
+	sevenZ, zip, pdf, doc, xls, ppt, ps, psd, ogg, png, jpg, gif, webp, exe,
+	tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
+	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
+	mkv, asf, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,
 )
 
 // The list of nodes appended to the root node
@@ -18,6 +18,8 @@ var (
 	sevenZ = newNode("application/x-7z-compressed", "7z", matchers.SevenZ)
 	zip    = newNode("application/zip", "zip", matchers.Zip, xlsx, docx, pptx, epub, jar)
 	tar    = newNode("application/x-tar", "tar", matchers.Tar)
+	xar    = newNode("application/x-xar", "xar", matchers.Xar)
+	bz2    = newNode("application/x-bzip2", "bz2", matchers.Bz2)
 	pdf    = newNode("application/pdf", "pdf", matchers.Pdf)
 	xlsx   = newNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
 	docx   = newNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
@@ -29,6 +31,7 @@ var (
 	xls    = newNode("application/vnd.ms-excel", "xls", matchers.Xls)
 	ps     = newNode("application/postscript", "ps", matchers.Ps)
 	psd    = newNode("application/x-photoshop", "psd", matchers.Psd)
+	fits   = newNode("application/fits", "fits", matchers.Fits)
 	ogg    = newNode("application/ogg", "ogg", matchers.Ogg)
 
 	txt = newNode("text/plain", "txt", matchers.Txt,
@@ -87,6 +90,7 @@ var (
 	avi       = newNode("video/x-msvideo", "avi", matchers.Avi)
 	flv       = newNode("video/x-flv", "flv", matchers.Flv)
 	mkv       = newNode("video/x-matroska", "mkv", matchers.Mkv)
+	asf       = newNode("video/x-ms-asf", "asf", matchers.Asf)
 
 	class = newNode("application/x-java-applet; charset=binary", "class", matchers.Class)
 	swf   = newNode("application/x-shockwave-flash", "swf", matchers.Swf)
@@ -99,4 +103,5 @@ var (
 	shp  = newNode("application/octet-stream", "shp", matchers.Shp)
 	shx  = newNode("application/octet-stream", "shx", matchers.Shx, shp)
 	dbf  = newNode("application/x-dbf", "dbf", matchers.Dbf)
+	exe  = newNode("application/vnd.microsoft.portable-executable", "exe", matchers.Exe)
 )
