@@ -94,6 +94,10 @@ var files = map[string]*node{
 	"a.crx":   crx,
 	"a.wasm":  wasm,
 	"a.exe":   exe,
+	"a.a":     ar,
+	"ln":      elfExe,
+	"a.so":    elfLib,
+	"a.o":     elfObj,
 
 	// fonts
 	"a.woff":  woff,

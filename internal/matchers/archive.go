@@ -57,3 +57,8 @@ func Xar(in []byte) bool {
 func Bz2(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x42, 0x5A, 0x68})
 }
+
+// Ar matches an ar (Unix) archive file.
+func Ar(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
+}

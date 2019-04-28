@@ -48,3 +48,32 @@ func Dbf(in []byte) bool {
 func Exe(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x4D, 0x5A})
 }
+
+// Elf matches an Executable and Linkable Format file.
+func Elf(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x7F, 0x45, 0x4C, 0x46})
+}
+
+// ElfObj matches an object file.
+func ElfObj(in []byte) bool {
+	return len(in) > 17 && ((in[16] == 0x01 && in[17] == 0x00) ||
+		(in[16] == 0x00 && in[17] == 0x01))
+}
+
+// ElfExe matches an executable file.
+func ElfExe(in []byte) bool {
+	return len(in) > 17 && ((in[16] == 0x02 && in[17] == 0x00) ||
+		(in[16] == 0x00 && in[17] == 0x02))
+}
+
+// ElfLib matches a shared library file.
+func ElfLib(in []byte) bool {
+	return len(in) > 17 && ((in[16] == 0x03 && in[17] == 0x00) ||
+		(in[16] == 0x00 && in[17] == 0x03))
+}
+
+// ElfDump matches a core dump file.
+func ElfDump(in []byte) bool {
+	return len(in) > 17 && ((in[16] == 0x04 && in[17] == 0x00) ||
+		(in[16] == 0x00 && in[17] == 0x04))
+}
