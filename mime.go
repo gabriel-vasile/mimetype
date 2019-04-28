@@ -10,6 +10,9 @@ import (
 )
 
 // Detect returns the MIME type and extension of the provided byte slice.
+//
+// mime is always a valid MIME type, with application/octet-stream as fallback.
+// extension is empty string if detected file format does not have an extension.
 func Detect(in []byte) (mime, extension string) {
 	if len(in) == 0 {
 		return "inode/x-empty", ""
@@ -20,6 +23,10 @@ func Detect(in []byte) (mime, extension string) {
 
 // DetectReader returns the MIME type and extension
 // of the byte slice read from the provided reader.
+//
+// mime is always a valid MIME type, with application/octet-stream as fallback.
+// extension is empty string if detection failed with an error or
+// detected file format does not have an extension.
 func DetectReader(r io.Reader) (mime, extension string, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
@@ -33,6 +40,10 @@ func DetectReader(r io.Reader) (mime, extension string, err error) {
 }
 
 // DetectFile returns the MIME type and extension of the provided file.
+//
+// mime is always a valid MIME type, with application/octet-stream as fallback.
+// extension is empty string if detection failed with an error or
+// detected file format does not have an extension.
 func DetectFile(file string) (mime, extension string, err error) {
 	f, err := os.Open(file)
 	if err != nil {
