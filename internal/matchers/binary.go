@@ -77,3 +77,9 @@ func ElfDump(in []byte) bool {
 	return len(in) > 17 && ((in[16] == 0x04 && in[17] == 0x00) ||
 		(in[16] == 0x00 && in[17] == 0x04))
 }
+
+// Dcm matches a DICOM medical format file.
+func Dcm(in []byte) bool {
+	return len(in) > 131 &&
+		bytes.Equal(in[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
+}

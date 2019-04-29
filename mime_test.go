@@ -98,6 +98,7 @@ var files = map[string]*node{
 	"ln":      elfExe,
 	"a.so":    elfLib,
 	"a.o":     elfObj,
+	"a.dcm":   dcm,
 
 	// fonts
 	"a.woff":  woff,
