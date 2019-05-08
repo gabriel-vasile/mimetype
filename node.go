@@ -7,13 +7,12 @@ type (
 	node struct {
 		mime      string
 		extension string
-		matchFunc matchFunc
+		matchFunc func([]byte) bool
 		children  []*node
 	}
-	matchFunc func([]byte) bool
 )
 
-func newNode(mime, extension string, matchFunc matchFunc, children ...*node) *node {
+func newNode(mime, extension string, matchFunc func([]byte) bool, children ...*node) *node {
 	return &node{
 		mime:      mime,
 		extension: extension,

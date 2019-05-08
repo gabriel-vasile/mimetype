@@ -3,15 +3,15 @@ package matchers
 
 // ReadLimit is the maximum number of bytes read
 // from the input when detecting a reader.
-const ReadLimit = 520
+const ReadLimit = 2048
 
 // True is a dummy matching function used to match any input.
-func True(_ []byte) bool {
+func True([]byte) bool {
 	return true
 }
 
 // False is a dummy matching function used to never match input.
-func False(_ []byte) bool {
+func False([]byte) bool {
 	return false
 }
 
