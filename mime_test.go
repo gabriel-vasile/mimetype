@@ -41,6 +41,8 @@ var files = map[string]*node{
 	"fits.fits":   fits,
 	"xar.xar":     xar,
 	"bz2.bz2":     bz2,
+	"a.a":         ar,
+	"deb.deb":     deb,
 
 	// images
 	"png.png":   png,
@@ -105,7 +107,6 @@ var files = map[string]*node{
 	"crx.crx":     crx,
 	"wasm.wasm":   wasm,
 	"exe.exe":     exe,
-	"a.a":         ar,
 	"ln":          elfExe,
 	"so.so":       elfLib,
 	"o.o":         elfObj,
