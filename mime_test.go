@@ -97,6 +97,7 @@ var files = map[string]*node{
 	"pl.pl":             perl,
 	"py.py":             python,
 	"tcl.tcl":           tcl,
+	"vCard.vCard":       vCard,
 
 	// binary
 	"class.class": class,

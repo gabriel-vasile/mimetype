@@ -51,6 +51,9 @@ var (
 	x3dSigs = []sig{
 		newXmlSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`),
 	}
+	vCardSigs = []sig{
+		ciSig("BEGIN:VCARD\n"),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -244,4 +247,9 @@ func Tcx(in []byte) bool {
 // X3d matches an Extensible 3D Graphics file.
 func X3d(in []byte) bool {
 	return detect(in, x3dSigs)
+}
+
+// VCard matches a Virtual Contact File.
+func VCard(in []byte) bool {
+	return detect(in, vCardSigs)
 }
