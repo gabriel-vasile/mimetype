@@ -17,3 +17,11 @@ func DjVu(in []byte) bool {
 	}
 	return bytes.HasPrefix(in[12:], []byte("DJVM")) || bytes.HasPrefix(in[12:], []byte("DJVU")) || bytes.HasPrefix(in[12:], []byte("DJVI")) || bytes.HasPrefix(in[12:], []byte("THUM"))
 }
+
+// Mobi matches a Mobi file
+func Mobi(in []byte) bool {
+	if len(in) < 68 {
+		return false
+	}
+	return bytes.Equal(in[60:68], []byte("BOOKMOBI"))
+}
