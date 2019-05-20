@@ -43,6 +43,7 @@ var files = map[string]*node{
 	"bz2.bz2":     bz2,
 	"a.a":         ar,
 	"deb.deb":     deb,
+	"rar.rar":     rar,
 
 	// images
 	"png.png":   png,
