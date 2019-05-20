@@ -25,3 +25,8 @@ func Mobi(in []byte) bool {
 	}
 	return bytes.Equal(in[60:68], []byte("BOOKMOBI"))
 }
+
+// Lit matches a Microsoft Lit file
+func Lit(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("ITOLITLS"))
+}
