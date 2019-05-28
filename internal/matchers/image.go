@@ -54,3 +54,8 @@ func Tiff(in []byte) bool {
 		(bytes.Equal(in[:4], []byte{0x49, 0x49, 0x2A, 0x00}) ||
 			bytes.Equal(in[:4], []byte{0x4D, 0x4D, 0x00, 0x2A}))
 }
+
+// Bpg matches a Better Portable Graphics file.
+func Bpg(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x42, 0x50, 0x47, 0xFB})
+}

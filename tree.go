@@ -10,35 +10,32 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,
-	dcm, rar, djvu, mobi, lit,
+	dcm, rar, djvu, mobi, lit, bpg, sqlite3,
 )
 
 // The list of nodes appended to the root node
 var (
-	gzip   = newNode("application/gzip", "gz", matchers.Gzip)
-	sevenZ = newNode("application/x-7z-compressed", "7z", matchers.SevenZ)
-	zip    = newNode("application/zip", "zip", matchers.Zip,
-		xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf)
-	tar  = newNode("application/x-tar", "tar", matchers.Tar)
-	xar  = newNode("application/x-xar", "xar", matchers.Xar)
-	bz2  = newNode("application/x-bzip2", "bz2", matchers.Bz2)
-	pdf  = newNode("application/pdf", "pdf", matchers.Pdf)
-	xlsx = newNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
-	docx = newNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
-	pptx = newNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
-	epub = newNode("application/epub+zip", "epub", matchers.Epub)
-	jar  = newNode("application/jar", "jar", matchers.Jar)
-	doc  = newNode("application/msword", "doc", matchers.Doc)
-	ppt  = newNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
-	xls  = newNode("application/vnd.ms-excel", "xls", matchers.Xls)
-	ps   = newNode("application/postscript", "ps", matchers.Ps)
-	psd  = newNode("application/x-photoshop", "psd", matchers.Psd)
-	fits = newNode("application/fits", "fits", matchers.Fits)
-	ogg  = newNode("application/ogg", "ogg", matchers.Ogg)
-	txt  = newNode("text/plain", "txt", matchers.Txt,
-		html, svg, xml, php, js, lua, perl, python, json, rtf, tcl, csv, tsv, vCard)
-	xml = newNode("text/xml; charset=utf-8", "xml", matchers.Xml,
-		x3d, kml, collada, gml, gpx, tcx)
+	gzip      = newNode("application/gzip", "gz", matchers.Gzip)
+	sevenZ    = newNode("application/x-7z-compressed", "7z", matchers.SevenZ)
+	zip       = newNode("application/zip", "zip", matchers.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf)
+	tar       = newNode("application/x-tar", "tar", matchers.Tar)
+	xar       = newNode("application/x-xar", "xar", matchers.Xar)
+	bz2       = newNode("application/x-bzip2", "bz2", matchers.Bz2)
+	pdf       = newNode("application/pdf", "pdf", matchers.Pdf)
+	xlsx      = newNode("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx", matchers.Xlsx)
+	docx      = newNode("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx", matchers.Docx)
+	pptx      = newNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
+	epub      = newNode("application/epub+zip", "epub", matchers.Epub)
+	jar       = newNode("application/jar", "jar", matchers.Jar)
+	doc       = newNode("application/msword", "doc", matchers.Doc)
+	ppt       = newNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
+	xls       = newNode("application/vnd.ms-excel", "xls", matchers.Xls)
+	ps        = newNode("application/postscript", "ps", matchers.Ps)
+	psd       = newNode("application/x-photoshop", "psd", matchers.Psd)
+	fits      = newNode("application/fits", "fits", matchers.Fits)
+	ogg       = newNode("application/ogg", "ogg", matchers.Ogg)
+	txt       = newNode("text/plain", "txt", matchers.Txt, html, svg, xml, php, js, lua, perl, python, json, rtf, tcl, csv, tsv, vCard)
+	xml       = newNode("text/xml; charset=utf-8", "xml", matchers.Xml, x3d, kml, collada, gml, gpx, tcx)
 	json      = newNode("application/json", "json", matchers.Json, geoJson)
 	csv       = newNode("text/csv", "csv", matchers.Csv)
 	tsv       = newNode("text/tab-separated-values", "tsv", matchers.Tsv)
@@ -61,6 +58,7 @@ var (
 	tcx       = newNode("application/vnd.garmin.tcx+xml", "tcx", matchers.Tcx)
 	png       = newNode("image/png", "png", matchers.Png)
 	jpg       = newNode("image/jpeg", "jpg", matchers.Jpg)
+	bpg       = newNode("image/bpg", "bpg", matchers.Bpg)
 	gif       = newNode("image/gif", "gif", matchers.Gif)
 	webp      = newNode("image/webp", "webp", matchers.Webp)
 	tiff      = newNode("image/tiff", "tiff", matchers.Tiff)
@@ -119,4 +117,5 @@ var (
 	djvu      = newNode("image/vnd.djvu", "djvu", matchers.DjVu)
 	mobi      = newNode("application/x-mobipocket-ebook", "mobi", matchers.Mobi)
 	lit       = newNode("application/x-ms-reader", "lit", matchers.Lit)
+	sqlite3   = newNode("application/x-sqlite3", "sqlite", matchers.Sqlite)
 )

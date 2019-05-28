@@ -56,6 +56,7 @@ var files = map[string]*node{
 	"tif.tif":   tiff,
 	"ico.ico":   ico,
 	"bmp.bmp":   bmp,
+	"bpg.bpg":   bpg,
 
 	// video
 	"mp4.mp4":   mp4,
@@ -132,6 +133,8 @@ var files = map[string]*node{
 	"shp.shp": shp,
 	"shx.shx": shx,
 	"dbf.dbf": dbf,
+
+	"sqlite3.sqlite3": sqlite3,
 }
 
 func TestMatching(t *testing.T) {
@@ -215,7 +218,7 @@ Extension | MIME type
 }
 
 func BenchmarkMatchDetect(b *testing.B) {
-	files := []string{"a.png", "a.jpg", "a.pdf", "a.zip", "a.docx", "a.doc"}
+	files := []string{"png.png", "jpg.jpg", "pdf.pdf", "zip.zip", "docx.docx", "doc.doc"}
 	data, fLen := [][matchers.ReadLimit]byte{}, len(files)
 	for _, f := range files {
 		d := [matchers.ReadLimit]byte{}
