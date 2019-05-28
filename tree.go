@@ -10,7 +10,7 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,
-	dcm, rar, djvu, mobi, lit, bpg, sqlite3,
+	dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
 )
 
 // The list of nodes appended to the root node
@@ -118,4 +118,5 @@ var (
 	mobi      = newNode("application/x-mobipocket-ebook", "mobi", matchers.Mobi)
 	lit       = newNode("application/x-ms-reader", "lit", matchers.Lit)
 	sqlite3   = newNode("application/x-sqlite3", "sqlite", matchers.Sqlite)
+	dwg       = newNode("image/vnd.dwg", "dwg", matchers.Dwg)
 )
