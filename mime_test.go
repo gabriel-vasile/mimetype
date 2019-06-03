@@ -21,6 +21,7 @@ var files = map[string]*node{
 	"xls.xls":     xls,
 	"xlsx.xlsx":   xlsx,
 	"doc.doc":     doc,
+	"doc.1.doc":   doc,
 	"docx.docx":   docx,
 	"docx.1.docx": docx,
 	"ppt.ppt":     ppt,
