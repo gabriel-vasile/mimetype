@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var root = newNode("application/octet-stream", "", matchers.True,
-	sevenZ, zip, pdf, doc, xls, ppt, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
+	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,

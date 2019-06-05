@@ -21,9 +21,9 @@ Extension | MIME type
 **otg** | application/vnd.oasis.opendocument.graphics-template
 **odf** | application/vnd.oasis.opendocument.formula
 **pdf** | application/pdf
-**doc** | application/msword
 **xls** | application/vnd.ms-excel
 **ppt** | application/vnd.ms-powerpoint
+**doc** | application/msword
 **ps** | application/postscript
 **psd** | application/x-photoshop
 **ogg** | application/ogg

@@ -23,14 +23,7 @@ func Pptx(in []byte) bool {
 
 // Doc matches a Microsoft Office 97-2003 file.
 func Doc(in []byte) bool {
-	if len(in) < 516 {
-		return false
-	}
-
-	head := fmt.Sprintf("%X", in[:8])
-	offset512 := fmt.Sprintf("%X", in[512:516])
-
-	return head == "D0CF11E0A1B11AE1" && offset512 == "ECA5C100"
+	return bytes.HasPrefix(in, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
 // Ppt  matches a Microsoft PowerPoint 97-2003 file.
