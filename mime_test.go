@@ -190,6 +190,12 @@ func TestEmptyInput(t *testing.T) {
 	}
 }
 
+func TestBadBdfInput(t *testing.T) {
+	if m, _, _ := DetectFile("testdata/bad.dbf"); m != "application/octet-stream" {
+		t.Errorf("failed to detect bad DBF file")
+	}
+}
+
 func TestGenerateSupportedMimesFile(t *testing.T) {
 	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
