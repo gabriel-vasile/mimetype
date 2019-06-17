@@ -134,10 +134,20 @@ var files = map[string]*node{
 	"shp.shp": shp,
 	"shx.shx": shx,
 	"dbf.dbf": dbf,
+	// "dbf_broken.dbf": dbf, two-bytes-length file makes Dbf matcher crash
 
 	"sqlite3.sqlite3": sqlite3,
 	"dwg.dwg":         dwg,
 	"dwg.1.dwg":       dwg,
+}
+
+func TestBrokenDbf(t *testing.T) {
+	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
+	fName := "dbf_broken.dbf" // two-bytes-length file with contents: 0x01 0xA9
+	fileName := filepath.Join(testDataDir, fName)
+	if dMime, _, err := DetectFile(fileName); dMime != "application/octet-stream" {
+		t.Errorf(errStr, fName, "application/octet-stream", dMime, err)
+	}
 }
 
 func TestMatching(t *testing.T) {

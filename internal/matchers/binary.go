@@ -26,7 +26,7 @@ func Wasm(in []byte) bool {
 // https://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
 func Dbf(in []byte) bool {
 	// 3rd and 4th bytes contain the last update month and day of month
-	if !(0 < in[2] && in[2] < 13 && 0 < in[3] && in[3] < 32) {
+	if len(in) >= 4 && !(0 < in[2] && in[2] < 13 && 0 < in[3] && in[3] < 32) {
 		return false
 	}
 
