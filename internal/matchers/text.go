@@ -35,6 +35,9 @@ var (
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.1"`),
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.2"`),
 	}
+	xliffSigs = []sig{
+		newXmlSig("xliff", `urn:oasis:names:tc:xliff:document:1.2`),
+	}
 	colladaSigs = []sig{
 		newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`),
 	}
@@ -222,6 +225,11 @@ func Svg(in []byte) bool {
 // Kml matches a Keyhole Markup Language file.
 func Kml(in []byte) bool {
 	return detect(in, kmlSigs)
+}
+
+// Xliff matches a XML Localization Interchange File Format file.
+func Xliff(in []byte) bool {
+	return detect(in, xliffSigs)
 }
 
 // Collada matches a COLLAborative Design Activity file.

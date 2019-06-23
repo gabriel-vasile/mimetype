@@ -125,6 +125,7 @@ var files = map[string]*node{
 	// XML and subtypes of XML
 	"xml.xml": xml,
 	"kml.kml": kml,
+	"xlf.xlf": xliff,
 	"dae.dae": collada,
 	"gml.gml": gml,
 	"gpx.gpx": gpx,
