@@ -109,6 +109,9 @@ func (xSig xmlSig) detect(in []byte) bool {
 	if len(xSig.localName) == 0 {
 		return bytes.Index(in, xSig.xmlns) > 0
 	}
+	if len(xSig.xmlns) == 0 {
+		return bytes.Index(in, xSig.localName) > 0
+	}
 
 	localNameIndex := bytes.Index(in, xSig.localName)
 	return localNameIndex != -1 && localNameIndex < bytes.Index(in, xSig.xmlns)

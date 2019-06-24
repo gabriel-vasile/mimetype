@@ -29,6 +29,12 @@ var (
 	xmlSigs = []sig{
 		markupSig("<?XML"),
 	}
+	rssSigs = []sig{
+		newXmlSig("rss", ""),
+	}
+	atomSigs = []sig{
+		newXmlSig("feed", `xmlns="http://www.w3.org/2005/Atom"`),
+	}
 	kmlSigs = []sig{
 		newXmlSig("kml", `xmlns="http://www.opengis.net/kml/2.2"`),
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.0"`),
@@ -36,7 +42,7 @@ var (
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.2"`),
 	}
 	xliffSigs = []sig{
-		newXmlSig("xliff", `urn:oasis:names:tc:xliff:document:1.2`),
+		newXmlSig("xliff", `xmlns="urn:oasis:names:tc:xliff:document:1.2"`),
 	}
 	colladaSigs = []sig{
 		newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`),
@@ -53,6 +59,12 @@ var (
 	}
 	x3dSigs = []sig{
 		newXmlSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`),
+	}
+	amfSigs = []sig{
+		newXmlSig("amf", ""),
+	}
+	threemfSigs = []sig{
+		newXmlSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`),
 	}
 	vCardSigs = []sig{
 		ciSig("BEGIN:VCARD\n"),
@@ -222,6 +234,16 @@ func Svg(in []byte) bool {
 	return bytes.Contains(in, []byte("<svg"))
 }
 
+// Rss matches a Rich Site Summary file.
+func Rss(in []byte) bool {
+	return detect(in, rssSigs)
+}
+
+// Atom matches an Atom Syndication Format file.
+func Atom(in []byte) bool {
+	return detect(in, atomSigs)
+}
+
 // Kml matches a Keyhole Markup Language file.
 func Kml(in []byte) bool {
 	return detect(in, kmlSigs)
@@ -250,6 +272,16 @@ func Gpx(in []byte) bool {
 // Tcx matches a Training Center XML file.
 func Tcx(in []byte) bool {
 	return detect(in, tcxSigs)
+}
+
+// Amf matches an Additive Manufacturing XML file.
+func Amf(in []byte) bool {
+	return detect(in, amfSigs)
+}
+
+// Threemf matches a 3D Manufacturing Format file.
+func Threemf(in []byte) bool {
+	return detect(in, threemfSigs)
 }
 
 // X3d matches an Extensible 3D Graphics file.
