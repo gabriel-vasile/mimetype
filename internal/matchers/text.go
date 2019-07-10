@@ -48,6 +48,7 @@ var (
 		newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`),
 	}
 	gmlSigs = []sig{
+		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml"`),
 		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.2"`),
 		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.3/exr"`),
 	}
