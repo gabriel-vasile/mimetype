@@ -9,8 +9,8 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
-	mkv, asf, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm, shx, dbf,
-	dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
+	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm,
+	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
 )
 
 // The list of nodes appended to the root node
@@ -78,6 +78,8 @@ var (
 	aiff      = newNode("audio/aiff", "aiff", matchers.Aiff)
 	au        = newNode("audio/basic", "au", matchers.Au)
 	amr       = newNode("audio/amr", "amr", matchers.Amr)
+	aac       = newNode("audio/aac", "aac", matchers.Aac)
+	voc       = newNode("audio/x-unknown", "voc", matchers.Voc)
 	aMp4      = newNode("audio/mp4", "mp4", matchers.AMp4)
 	m4a       = newNode("audio/x-m4a", "m4a", matchers.M4a)
 	mp4       = newNode("video/mp4", "mp4", matchers.Mp4)

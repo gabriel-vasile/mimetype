@@ -84,6 +84,8 @@ var files = map[string]*node{
 	"ogg.ogg":   ogg,
 	"amr.amr":   amr,
 	"mpc.mpc":   musePack,
+	"aac.aac":   aac,
+	"voc.voc":   voc,
 	"m4a.m4a":   m4a,
 	"m4b.m4b":   aMp4,
 

@@ -57,3 +57,13 @@ func Au(in []byte) bool {
 func Amr(in []byte) bool {
 	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x23\x21\x41\x4D\x52"))
 }
+
+// Aac matches an Advanced Audio Coding file.
+func Aac(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0xFF, 0xF1}) || bytes.HasPrefix(in, []byte{0xFF, 0xF9})
+}
+
+// Voc matches a Creative Voice file.
+func Voc(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("Creative Voice File"))
+}
