@@ -233,6 +233,12 @@ Extension | MIME type
 	}
 }
 
+func TestIndexOutOfRange(t *testing.T) {
+	for _, n := range root.flatten() {
+		_ = n.matchFunc(nil)
+	}
+}
+
 func BenchmarkMatchDetect(b *testing.B) {
 	files := []string{"png.png", "jpg.jpg", "pdf.pdf", "zip.zip", "docx.docx", "doc.doc"}
 	data, fLen := [][matchers.ReadLimit]byte{}, len(files)

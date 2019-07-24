@@ -26,7 +26,7 @@ func Ape(in []byte) bool {
 
 // MusePack matches a Musepack file.
 func MusePack(in []byte) bool {
-	return len(in) > 4 && bytes.Equal(in[:4], []byte("MPCK"))
+	return bytes.HasPrefix(in, []byte("MPCK"))
 }
 
 // Wav matches a Waveform Audio File Format file.

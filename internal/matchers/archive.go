@@ -33,7 +33,7 @@ func Gzip(in []byte) bool {
 
 // Crx matches a Chrome extension file: a zip archive prepended by "Cr24".
 func Crx(in []byte) bool {
-	return len(in) > 4 && bytes.Equal(in[:4], []byte("Cr24"))
+	return bytes.HasPrefix(in, []byte("Cr24"))
 }
 
 // Tar matches a (t)ape (ar)chive file.

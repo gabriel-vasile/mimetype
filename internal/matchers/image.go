@@ -4,13 +4,12 @@ import "bytes"
 
 // Png matches a Portable Network Graphics file.
 func Png(in []byte) bool {
-	return len(in) > 8 &&
-		bytes.Equal(in[:8], []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
+	return bytes.HasPrefix(in, []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
 }
 
 // Jpg matches a Joint Photographic Experts Group file.
 func Jpg(in []byte) bool {
-	return len(in) > 3 && bytes.Equal(in[:3], []byte{0xFF, 0xD8, 0xFF})
+	return bytes.HasPrefix(in, []byte{0xFF, 0xD8, 0xFF})
 }
 
 // Gif matches a Graphics Interchange Format file.
@@ -50,9 +49,8 @@ func Ico(in []byte) bool {
 
 // Tiff matches a Tagged Image File Format file.
 func Tiff(in []byte) bool {
-	return len(in) > 4 &&
-		(bytes.Equal(in[:4], []byte{0x49, 0x49, 0x2A, 0x00}) ||
-			bytes.Equal(in[:4], []byte{0x4D, 0x4D, 0x00, 0x2A}))
+	return bytes.HasPrefix(in, []byte{0x49, 0x49, 0x2A, 0x00}) ||
+		bytes.HasPrefix(in, []byte{0x4D, 0x4D, 0x00, 0x2A})
 }
 
 // Bpg matches a Better Portable Graphics file.
@@ -62,7 +60,7 @@ func Bpg(in []byte) bool {
 
 // Dwg matches a CAD drawing file.
 func Dwg(in []byte) bool {
-	if in[0] != 0x41 || in[1] != 0x43 || len(in) < 6 {
+	if len(in) < 6 || in[0] != 0x41 || in[1] != 0x43 {
 		return false
 	}
 	dwgVersions := [][]byte{

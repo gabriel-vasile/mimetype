@@ -158,6 +158,9 @@ func Json(in []byte) bool {
 //
 // BUG(gabriel-vasile): The "type" key should be searched for in the root object.
 func GeoJson(in []byte) bool {
+	if len(in) == 0 {
+		return false
+	}
 	in = trimLWS(in)
 	// geojson is always an object
 	if in[0] != '{' {
@@ -227,7 +230,7 @@ func Tcl(in []byte) bool {
 
 // Rtf matches a Rich Text Format file.
 func Rtf(in []byte) bool {
-	return len(in) > 6 && bytes.Equal(in[:6], []byte("{\\rtf1"))
+	return bytes.HasPrefix(in, []byte("{\\rtf1"))
 }
 
 // Svg matches a SVG file.
