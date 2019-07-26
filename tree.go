@@ -9,8 +9,8 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
-	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, wasm,
-	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
+	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
+	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
 )
 
 // The list of nodes appended to the root node
@@ -98,6 +98,8 @@ var (
 	crx       = newNode("application/x-chrome-extension", "crx", matchers.Crx)
 	woff      = newNode("font/woff", "woff", matchers.Woff)
 	woff2     = newNode("font/woff2", "woff2", matchers.Woff2)
+	otf       = newNode("font/otf", "otf", matchers.Otf)
+	eot       = newNode("application/vnd.ms-fontobject", "eot", matchers.Eot)
 	wasm      = newNode("application/wasm", "wasm", matchers.Wasm)
 	shp       = newNode("application/octet-stream", "shp", matchers.Shp)
 	shx       = newNode("application/octet-stream", "shx", matchers.Shx, shp)

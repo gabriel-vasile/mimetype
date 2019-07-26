@@ -123,6 +123,8 @@ var files = map[string]*node{
 	// fonts
 	"woff.woff":   woff,
 	"woff2.woff2": woff2,
+	"otf.otf":     otf,
+	"eot.eot":     eot,
 
 	// XML and subtypes of XML
 	"xml.xml":   xml,
