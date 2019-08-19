@@ -175,6 +175,11 @@ func GeoJson(in []byte) bool {
 		return false
 	}
 
+	// if the "type" string is the suffix of the input
+	// there is no need to search for the value of the key
+	if si+sl == len(in) {
+		return false
+	}
 	// skip the "type" part
 	in = in[si+sl:]
 	// skip any whitespace before the colon
