@@ -16,6 +16,9 @@ You can use the file sharing site of your choice, just ensure the file will not 
 **Returned mime type**
 ...
 
+**Version of the library you are using**
+the semver version or the hash of the commit
+
 **Output of `go version`**
 ...
 
