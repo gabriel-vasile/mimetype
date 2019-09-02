@@ -99,6 +99,7 @@ var files = map[string]*node{
 	"json.json":         json,
 	"geojson.geojson":   geoJson,
 	"geojson.1.geojson": geoJson,
+	"ndjson.ndjson":     ndJson,
 	"csv.csv":           csv,
 	"tsv.tsv":           tsv,
 	"rtf.rtf":           rtf,
