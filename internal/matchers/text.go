@@ -208,6 +208,49 @@ func GeoJson(in []byte) bool {
 	return false
 }
 
+// NdJson matches a Newline delimited JSON file
+func NdJson(in []byte) bool {
+	// Seperator with carriage return and new line `\r\n`
+	srn := []byte{0x0D, 0x0A}
+
+	// Seperator with only new line `\n`
+	sn := []byte{0x0A}
+
+	// total bytes scanned
+	parsed := 0
+
+	// Split by `srn`
+	for rni, insrn := range bytes.Split(in, srn) {
+		// seperator byte count should be added only after the first split
+		if rni != 0 {
+			// Add two as `\r\n` is used for split
+			parsed += 2
+		}
+		// Return false if there is a carriage return `\r`
+		if bytes.Contains(insrn, []byte{0x0D}) {
+			return false
+		}
+		// Split again by `sn`
+		for ni, insn := range bytes.Split(insrn, sn) {
+			// seperator byte count should be added only after the first split
+			if ni != 0 {
+				// Add one as `\n` is used for split
+				parsed += 1
+			}
+			// Empty line is valid
+			if len(insn) == 0 {
+				continue
+			}
+			p, err := json.Scan(insn)
+			parsed += p
+			if parsed < ReadLimit && err != nil {
+				return false
+			}
+		}
+	}
+	return parsed == len(in)
+}
+
 // Js matches a Javascript file.
 func Js(in []byte) bool {
 	return detect(in, jsSigs)
