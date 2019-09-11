@@ -32,6 +32,7 @@ Extension | MIME type
 **gif** | image/gif
 **webp** | image/webp
 **exe** | application/vnd.microsoft.portable-executable
+**msi** | application/x-ole-storage
 **n/a** | application/x-elf
 **n/a** | application/x-object
 **n/a** | application/x-executable

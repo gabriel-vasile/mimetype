@@ -6,11 +6,11 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var root = newNode("application/octet-stream", "", matchers.True,
-	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
-	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
-	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
-	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
-	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
+	sevenZ, zip, pdf, xls, msi, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe,
+	elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack,
+	amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi,
+	flv, mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2,
+	otf, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
 )
 
 // The list of nodes appended to the root node
@@ -28,6 +28,7 @@ var (
 	epub      = newNode("application/epub+zip", "epub", matchers.Epub)
 	jar       = newNode("application/jar", "jar", matchers.Jar)
 	doc       = newNode("application/msword", "doc", matchers.Doc)
+	msi       = newNode("application/x-ole-storage", "msi", matchers.Msi)
 	ppt       = newNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
 	xls       = newNode("application/vnd.ms-excel", "xls", matchers.Xls)
 	ps        = newNode("application/postscript", "ps", matchers.Ps)
