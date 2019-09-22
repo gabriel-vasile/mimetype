@@ -111,6 +111,7 @@ func Nes(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
 
+//MachO32 matches a 32 bit macho binary file.
 func MachO32(buf []byte) bool {
 	if len(buf) < 4 {
 		return false
@@ -129,6 +130,7 @@ func MachO32(buf []byte) bool {
 	}
 }
 
+//MachO32 matches a 64 bit macho binary file.
 func MachO64(buf []byte) bool {
 	if len(buf) < 4 {
 		return false
