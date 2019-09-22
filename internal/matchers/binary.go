@@ -2,6 +2,8 @@ package matchers
 
 import (
 	"bytes"
+	"debug/macho"
+	"encoding/binary"
 )
 
 // Java bytecode and Mach-O binaries share the same magic number
@@ -107,4 +109,40 @@ func Dcm(in []byte) bool {
 // Nintendo Entertainment system ROM file
 func Nes(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x4E, 0x45, 0x53, 0x1A})
+}
+
+func MachO32(buf []byte) bool {
+	if len(buf) < 4 {
+		return false
+	}
+
+	be := binary.BigEndian.Uint32(buf)
+	le := binary.LittleEndian.Uint32(buf)
+
+	switch macho.Magic32 {
+	case be:
+		return true
+	case le:
+		return true
+	default:
+		return false
+	}
+}
+
+func MachO64(buf []byte) bool {
+	if len(buf) < 4 {
+		return false
+	}
+
+	be := binary.BigEndian.Uint32(buf)
+	le := binary.LittleEndian.Uint32(buf)
+
+	switch macho.Magic64 {
+	case be:
+		return true
+	case le:
+		return true
+	default:
+		return false
+	}
 }

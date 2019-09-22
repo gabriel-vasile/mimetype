@@ -130,6 +130,8 @@ var files = map[string]*node{
 	"o.o":         elfObj,
 	"dcm.dcm":     dcm,
 	"mach.o":      macho,
+	"sample32":    macho32,
+	"sample64":    macho64,
 
 	// fonts
 	"woff.woff":   woff,

@@ -127,3 +127,4 @@ Extension | MIME type
 **dwg** | image/vnd.dwg
 **nes** | application/vnd.nintendo.snes.rom
 **macho** | application/x-mach-binary
+**n/a** | application/x-mach-binary
