@@ -130,7 +130,7 @@ func MachO32(buf []byte) bool {
 	}
 }
 
-//MachO32 matches a 64 bit macho binary file.
+// MachO64 matches a 64 bit macho binary file.
 func MachO64(buf []byte) bool {
 	if len(buf) < 4 {
 		return false
