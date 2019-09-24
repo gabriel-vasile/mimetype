@@ -70,6 +70,9 @@ var (
 	vCardSigs = []sig{
 		ciSig("BEGIN:VCARD\n"),
 	}
+	iCalSigs = []sig{
+		ciSig("BEGIN:VCALENDAR\n"),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -344,4 +347,9 @@ func X3d(in []byte) bool {
 // VCard matches a Virtual Contact File.
 func VCard(in []byte) bool {
 	return detect(in, vCardSigs)
+}
+
+// ICalendar matches a iCalendar file.
+func ICalendar(in []byte) bool {
+	return detect(in, iCalSigs)
 }
