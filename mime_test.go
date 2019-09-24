@@ -109,6 +109,7 @@ var files = map[string]*node{
 	"py.py":             python,
 	"tcl.tcl":           tcl,
 	"vCard.vCard":       vCard,
+	"ics.ics":           iCalendar,
 
 	// binary
 	"class.class": class,
