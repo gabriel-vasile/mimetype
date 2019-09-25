@@ -69,9 +69,11 @@ var (
 	}
 	vCardSigs = []sig{
 		ciSig("BEGIN:VCARD\n"),
+		ciSig("BEGIN:VCARD\r\n"),
 	}
 	iCalSigs = []sig{
 		ciSig("BEGIN:VCALENDAR\n"),
+		ciSig("BEGIN:VCALENDAR\r\n"),
 	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
