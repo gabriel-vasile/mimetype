@@ -43,11 +43,6 @@ func Aiff(in []byte) bool {
 		bytes.Equal(in[8:12], []byte("\x41\x49\x46\x46"))
 }
 
-// Ogg matches an Ogg file.
-func Ogg(in []byte) bool {
-	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x4F\x67\x67\x53\x00"))
-}
-
 // Au matches a Sun Microsystems au file.
 func Au(in []byte) bool {
 	return len(in) > 4 && bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
