@@ -76,3 +76,8 @@ func Rar(in []byte) bool {
 	}
 	return len(in) > 8 && (bytes.Equal(in[6:8], []byte{0x01, 0x00}) || in[6] == 0x00)
 }
+
+// Warc matches a Web ARChive file
+func Warc(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("WARC/"))
+}
