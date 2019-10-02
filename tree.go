@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var root = newNode("application/octet-stream", "", matchers.True,
-	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, gif, webp, exe, elf,
+	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp, exe, elf,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
@@ -67,6 +67,9 @@ var (
 	threemf   = newNode("application/vnd.ms-package.3dmanufacturing-3dmodel+xml", "3mf", matchers.Threemf)
 	png       = newNode("image/png", "png", matchers.Png)
 	jpg       = newNode("image/jpeg", "jpg", matchers.Jpg)
+	jp2       = newNode("image/jp2", "jp2", matchers.Jp2)
+	jpx       = newNode("image/jpx", "jpf", matchers.Jpx)
+	jpm       = newNode("image/jpm", "jpm", matchers.Jpm)
 	bpg       = newNode("image/bpg", "bpg", matchers.Bpg)
 	gif       = newNode("image/gif", "gif", matchers.Gif)
 	webp      = newNode("image/webp", "webp", matchers.Webp)

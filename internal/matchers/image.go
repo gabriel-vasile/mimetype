@@ -12,6 +12,32 @@ func Jpg(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xFF, 0xD8, 0xFF})
 }
 
+// isJpeg2k matches a generic JPEG2000 file.
+func isJpeg2k(in []byte) bool {
+	if len(in) < 24 {
+		return false
+	}
+
+	signature := in[4:8]
+	return bytes.Equal(signature, []byte{0x6A, 0x50, 0x20, 0x20}) ||
+		bytes.Equal(signature, []byte{0x6A, 0x50, 0x32, 0x20})
+}
+
+// Jp2 matches a JPEG 2000 Image file (ISO 15444-1)
+func Jp2(in []byte) bool {
+	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x32, 0x20})
+}
+
+// Jpx matches a JPEG 2000 Image file (ISO 15444-2)
+func Jpx(in []byte) bool {
+	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x78, 0x20})
+}
+
+// Jpm matches a JPEG 2000 Image file (ISO 15444-6)
+func Jpm(in []byte) bool {
+	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x6D, 0x20})
+}
+
 // Gif matches a Graphics Interchange Format file.
 func Gif(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("GIF87a")) ||
