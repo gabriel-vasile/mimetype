@@ -48,6 +48,7 @@ var files = map[string]*node{
 	"djvu.djvu":   djvu,
 	"mobi.mobi":   mobi,
 	"lit.lit":     lit,
+	"warc.warc":   warc,
 
 	// images
 	"png.png":   png,
