@@ -53,6 +53,9 @@ var files = map[string]*node{
 	// images
 	"png.png":   png,
 	"jpg.jpg":   jpg,
+	"jp2.jp2":   jp2,
+	"jpf.jpf":   jpx,
+	"jpm.jpm":   jpm,
 	"psd.psd":   psd,
 	"webp.webp": webp,
 	"tif.tif":   tiff,
