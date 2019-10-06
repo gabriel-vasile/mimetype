@@ -163,10 +163,10 @@ func Json(in []byte) bool {
 //
 // BUG(gabriel-vasile): The "type" key should be searched for in the root object.
 func GeoJson(in []byte) bool {
+	in = trimLWS(in)
 	if len(in) == 0 {
 		return false
 	}
-	in = trimLWS(in)
 	// geojson is always an object
 	if in[0] != '{' {
 		return false
