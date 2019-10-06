@@ -23,17 +23,17 @@ func isJpeg2k(in []byte) bool {
 		bytes.Equal(signature, []byte{0x6A, 0x50, 0x32, 0x20})
 }
 
-// Jp2 matches a JPEG 2000 Image file (ISO 15444-1)
+// Jp2 matches a JPEG 2000 Image file (ISO 15444-1).
 func Jp2(in []byte) bool {
 	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x32, 0x20})
 }
 
-// Jpx matches a JPEG 2000 Image file (ISO 15444-2)
+// Jpx matches a JPEG 2000 Image file (ISO 15444-2).
 func Jpx(in []byte) bool {
 	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x78, 0x20})
 }
 
-// Jpm matches a JPEG 2000 Image file (ISO 15444-6)
+// Jpm matches a JPEG 2000 Image file (ISO 15444-6).
 func Jpm(in []byte) bool {
 	return isJpeg2k(in) && bytes.Equal(in[20:24], []byte{0x6a, 0x70, 0x6D, 0x20})
 }

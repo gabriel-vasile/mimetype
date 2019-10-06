@@ -213,7 +213,7 @@ func GeoJson(in []byte) bool {
 	return false
 }
 
-// NdJson matches a Newline delimited JSON file
+// NdJson matches a Newline delimited JSON file.
 func NdJson(in []byte) bool {
 	// Separator with carriage return and new line `\r\n`
 	srn := []byte{0x0D, 0x0A}

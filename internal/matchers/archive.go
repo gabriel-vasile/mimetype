@@ -63,13 +63,13 @@ func Ar(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
 }
 
-// Deb matches a Debian package file
+// Deb matches a Debian package file.
 func Deb(in []byte) bool {
 	return len(in) > 8 && bytes.HasPrefix(in[8:], []byte{0x64, 0x65, 0x62, 0x69,
 		0x61, 0x6E, 0x2D, 0x62, 0x69, 0x6E, 0x61, 0x72, 0x79})
 }
 
-// Rar matches a RAR archive file
+// Rar matches a RAR archive file.
 func Rar(in []byte) bool {
 	if !bytes.HasPrefix(in, []byte{0x52, 0x61, 0x72, 0x21, 0x1A, 0x07}) {
 		return false
@@ -77,7 +77,7 @@ func Rar(in []byte) bool {
 	return len(in) > 8 && (bytes.Equal(in[6:8], []byte{0x01, 0x00}) || in[6] == 0x00)
 }
 
-// Warc matches a Web ARChive file
+// Warc matches a Web ARChive file.
 func Warc(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("WARC/"))
 }
