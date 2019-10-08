@@ -10,7 +10,7 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
-	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg,
+	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, macho,
 )
 
 // The list of nodes appended to the root node
@@ -136,4 +136,5 @@ var (
 	sqlite3   = newNode("application/x-sqlite3", "sqlite", matchers.Sqlite)
 	dwg       = newNode("image/vnd.dwg", "dwg", matchers.Dwg)
 	warc      = newNode("application/warc", "warc", matchers.Warc)
+	macho     = newNode("application/x-mach-binary", "macho", matchers.MachO)
 )

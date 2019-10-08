@@ -4,9 +4,26 @@ import (
 	"bytes"
 )
 
-// Class matches an java class file.
-func Class(in []byte) bool {
+// Java bytecode and Mach-O binaries share the same magic number
+// More info here https://github.com/threatstack/libmagic/blob/master/magic/Magdir/cafebabe
+func classOrMachO(in []byte) bool {
+	// There should be at least 8 bytes for both of them because the only way to
+	// quickly distinguish them is by comparing byte at position 7
+	if len(in) < 8 {
+		return false
+	}
+
 	return bytes.HasPrefix(in, []byte{0xCA, 0xFE, 0xBA, 0xBE})
+}
+
+// Class matches a java class file.
+func Class(in []byte) bool {
+	return classOrMachO(in) && in[7] > 30
+}
+
+// MachO matches Mach-O binaries format
+func MachO(in []byte) bool {
+	return classOrMachO(in) && in[7] < 20
 }
 
 // Swf matches an Adobe Flash swf file.
