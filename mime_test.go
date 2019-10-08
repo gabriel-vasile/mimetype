@@ -157,6 +157,7 @@ var files = map[string]*node{
 	"sqlite3.sqlite3": sqlite3,
 	"dwg.dwg":         dwg,
 	"dwg.1.dwg":       dwg,
+	"nes.nes":         nes,
 }
 
 func TestMatching(t *testing.T) {

@@ -86,3 +86,8 @@ func Dcm(in []byte) bool {
 	return len(in) > 131 &&
 		bytes.Equal(in[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
 }
+
+// Nintendo Entertainment system ROM file
+func Nes(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x4E, 0x45, 0x53, 0x1A})
+}
