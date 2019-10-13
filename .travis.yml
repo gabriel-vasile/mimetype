@@ -2,6 +2,7 @@ language: go
 go:
   - "1.9"
   - "1.10"
+  - "master"
 before_install:
   - go get github.com/mattn/goveralls
   - go get github.com/client9/misspell/cmd/misspell
