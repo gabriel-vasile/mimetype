@@ -136,11 +136,19 @@ func Txt(in []byte) bool {
 
 // Html matches a Hypertext Markup Language file.
 func Html(in []byte) bool {
+	in = trimLWS(in)
+	if len(in) == 0 {
+		return false
+	}
 	return detect(in, htmlSigs)
 }
 
 // Xml matches an Extensible Markup Language file.
 func Xml(in []byte) bool {
+	in = trimLWS(in)
+	if len(in) == 0 {
+		return false
+	}
 	return detect(in, xmlSigs)
 }
 
