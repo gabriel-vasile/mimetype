@@ -32,7 +32,7 @@ func MusePack(in []byte) bool {
 // Wav matches a Waveform Audio File Format file.
 func Wav(in []byte) bool {
 	return len(in) > 12 &&
-		bytes.Equal(in[:4], []byte("\x52\x49\x46\x46")) &&
+		bytes.Equal(in[:4], []byte("RIFF")) &&
 		bytes.Equal(in[8:12], []byte("\x57\x41\x56\x45"))
 }
 

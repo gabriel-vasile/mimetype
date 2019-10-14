@@ -47,7 +47,7 @@ func Gif(in []byte) bool {
 // Webp matches a WebP file.
 func Webp(in []byte) bool {
 	return len(in) > 12 &&
-		bytes.Equal(in[0:4], []byte{0x52, 0x49, 0x46, 0x46}) &&
+		bytes.Equal(in[0:4], []byte("RIFF")) &&
 		bytes.Equal(in[8:12], []byte{0x57, 0x45, 0x42, 0x50})
 }
 
