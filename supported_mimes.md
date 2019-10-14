@@ -25,7 +25,7 @@ Extension | MIME type
 **ppt** | application/vnd.ms-powerpoint
 **doc** | application/msword
 **ps** | application/postscript
-**psd** | application/x-photoshop
+**psd** | image/vnd.adobe.photoshop
 **ogg** | application/ogg
 **oga** | audio/ogg
 **ogv** | video/ogg
