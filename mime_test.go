@@ -94,6 +94,7 @@ var files = map[string]*node{
 	"voc.voc":     voc,
 	"m4a.m4a":     m4a,
 	"m4b.m4b":     aMp4,
+	"qcp.qcp":     qcp,
 
 	// source code
 	"html.html":         html,

@@ -62,3 +62,10 @@ func Aac(in []byte) bool {
 func Voc(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("Creative Voice File"))
 }
+
+// Qcp matches a Qualcomm Pure Voice file.
+func Qcp(in []byte) bool {
+	return len(in) > 12 &&
+		bytes.Equal(in[:4], []byte("RIFF")) &&
+		bytes.Equal(in[8:12], []byte("QLCM"))
+}

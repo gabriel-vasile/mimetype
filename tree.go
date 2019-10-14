@@ -11,6 +11,7 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
 	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho,
+	qcp,
 )
 
 // The list of nodes appended to the root node
@@ -138,4 +139,5 @@ var (
 	warc      = newNode("application/warc", "warc", matchers.Warc)
 	nes       = newNode("application/vnd.nintendo.snes.rom", "nes", matchers.Nes)
 	macho     = newNode("application/x-mach-binary", "macho", matchers.MachO)
+	qcp       = newNode("audio/qcelp", "qcp", matchers.Qcp)
 )
