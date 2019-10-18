@@ -98,6 +98,7 @@ var files = map[string]*node{
 
 	// source code
 	"html.html":         html,
+	"html.withbr.html":  html,
 	"svg.svg":           svg,
 	"svg.1.svg":         svg,
 	"txt.txt":           txt,
@@ -139,18 +140,18 @@ var files = map[string]*node{
 	"eot.eot":     eot,
 
 	// XML and subtypes of XML
-	"xml.xml":   xml,
-	"kml.kml":   kml,
-	"xlf.xlf":   xliff,
-	"dae.dae":   collada,
-	"gml.gml":   gml,
-	"gpx.gpx":   gpx,
-	"tcx.tcx":   tcx,
-	"x3d.x3d":   x3d,
-	"amf.amf":   amf,
-	"3mf.3mf":   threemf,
-	"rss.rss":   rss,
-	"atom.atom": atom,
+	"xml.withbr.xml": xml,
+	"kml.kml":        kml,
+	"xlf.xlf":        xliff,
+	"dae.dae":        collada,
+	"gml.gml":        gml,
+	"gpx.gpx":        gpx,
+	"tcx.tcx":        tcx,
+	"x3d.x3d":        x3d,
+	"amf.amf":        amf,
+	"3mf.3mf":        threemf,
+	"rss.rss":        rss,
+	"atom.atom":      atom,
 
 	"shp.shp": shp,
 	"shx.shx": shx,
