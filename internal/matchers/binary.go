@@ -2,11 +2,13 @@ package matchers
 
 import (
 	"bytes"
+	"debug/macho"
+	"encoding/binary"
 )
 
 // Java bytecode and Mach-O binaries share the same magic number
 // More info here https://github.com/threatstack/libmagic/blob/master/magic/Magdir/cafebabe
-func classOrMachO(in []byte) bool {
+func classOrMachOFat(in []byte) bool {
 	// There should be at least 8 bytes for both of them because the only way to
 	// quickly distinguish them is by comparing byte at position 7
 	if len(in) < 8 {
@@ -18,12 +20,23 @@ func classOrMachO(in []byte) bool {
 
 // Class matches a java class file.
 func Class(in []byte) bool {
-	return classOrMachO(in) && in[7] > 30
+	return classOrMachOFat(in) && in[7] > 30
 }
 
 // MachO matches Mach-O binaries format
 func MachO(in []byte) bool {
-	return classOrMachO(in) && in[7] < 20
+	if classOrMachOFat(in) && in[7] < 20 {
+		return true
+	}
+
+	if len(in) < 4 {
+		return false
+	}
+
+	be := binary.BigEndian.Uint32(in)
+	le := binary.LittleEndian.Uint32(in)
+
+	return be == macho.Magic32 || le == macho.Magic32 || be == macho.Magic64 || le == macho.Magic64
 }
 
 // Swf matches an Adobe Flash swf file.
