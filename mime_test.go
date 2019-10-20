@@ -60,6 +60,7 @@ var files = map[string]*node{
 	"webp.webp": webp,
 	"tif.tif":   tiff,
 	"ico.ico":   ico,
+	"icns.icns": icns,
 	"bmp.bmp":   bmp,
 	"bpg.bpg":   bpg,
 
