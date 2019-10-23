@@ -11,7 +11,7 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
 	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho,
-	qcp,
+	qcp, icns,
 )
 
 // The list of nodes appended to the root node
@@ -76,6 +76,7 @@ var (
 	tiff      = newNode("image/tiff", "tiff", matchers.Tiff)
 	bmp       = newNode("image/bmp", "bmp", matchers.Bmp)
 	ico       = newNode("image/x-icon", "ico", matchers.Ico)
+	icns      = newNode("image/x-icns", "icns", matchers.Icns)
 	psd       = newNode("image/vnd.adobe.photoshop", "psd", matchers.Psd)
 	mp3       = newNode("audio/mpeg", "mp3", matchers.Mp3)
 	flac      = newNode("audio/flac", "flac", matchers.Flac)

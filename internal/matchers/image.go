@@ -73,6 +73,11 @@ func Ico(in []byte) bool {
 		in[2] == 0x01 && in[3] == 0x00
 }
 
+// Icns matches an ICNS (Apple Icon Image format) file.
+func Icns(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("icns"))
+}
+
 // Tiff matches a Tagged Image File Format file.
 func Tiff(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x49, 0x49, 0x2A, 0x00}) ||
