@@ -2,11 +2,36 @@ package matchers
 
 import (
 	"bytes"
+	"encoding/binary"
 )
 
 // Mp3 matches an mp3 file.
 func Mp3(in []byte) bool {
-	return bytes.HasPrefix(in, []byte("\x49\x44\x33"))
+
+	if len(in) < 3 {
+		return false
+	}
+
+	if bytes.HasPrefix(in, []byte("ID3")) {
+		// MP3s with an ID3v2 tag will start with "ID3"
+		// ID3v1 tags, however appear at the end of the file.
+		return true
+	}
+
+	// Match MP3 files without tags
+	switch binary.BigEndian.Uint16(in[:2]) & 0xFFFE {
+	case 0xFFFA:
+		// MPEG ADTS, layer III, v1
+		return true
+	case 0xFFF2:
+		// MPEG ADTS, layer III, v2
+		return true
+	case 0xFFE2:
+		// MPEG ADTS, layer III, v2.5
+		return true
+	}
+
+	return false
 }
 
 // Flac matches a Free Lossless Audio Codec file.
