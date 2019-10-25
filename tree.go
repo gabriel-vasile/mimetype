@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate mime type.
 var root = newNode("application/octet-stream", "", matchers.True,
-	sevenZ, zip, pdf, xls, ppt, doc, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp, exe, elf,
+	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp, exe, elf,
 	ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape, musePack, amr,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
@@ -28,6 +28,7 @@ var (
 	pptx      = newNode("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx", matchers.Pptx)
 	epub      = newNode("application/epub+zip", "epub", matchers.Epub)
 	jar       = newNode("application/jar", "jar", matchers.Jar)
+	ole       = newNode("application/x-ole-storage", "", matchers.Ole, xls, ppt, doc)
 	doc       = newNode("application/msword", "doc", matchers.Doc)
 	ppt       = newNode("application/vnd.ms-powerpoint", "ppt", matchers.Ppt)
 	xls       = newNode("application/vnd.ms-excel", "xls", matchers.Xls)

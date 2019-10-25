@@ -2,8 +2,6 @@ package matchers
 
 import (
 	"bytes"
-	"fmt"
-	"strings"
 )
 
 // Xlsx matches a Microsoft Excel 2007 file.
@@ -21,9 +19,22 @@ func Pptx(in []byte) bool {
 	return bytes.Contains(in, []byte("ppt/"))
 }
 
-// Doc matches a Microsoft Office 97-2003 file.
-func Doc(in []byte) bool {
+// Ole matches an Open Linking and Embedding file.
+//
+// https://en.wikipedia.org/wiki/Object_Linking_and_Embedding
+func Ole(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
+}
+
+// Doc matches a Microsoft Office 97-2003 file.
+//
+// BUG(gabriel-vasile): Doc should look for subheaders like Ppt and Xls does.
+//
+// Ole is a container for Doc, Ppt, and Xls.
+// Right now, when an Ole file is detected, it is considered to be a Doc file
+// if the checks for Ppt and Xls failed.
+func Doc(in []byte) bool {
+	return true
 }
 
 // Ppt  matches a Microsoft PowerPoint 97-2003 file.
@@ -31,43 +42,47 @@ func Ppt(in []byte) bool {
 	if len(in) < 520 {
 		return false
 	}
-
-	if fmt.Sprintf("%X", in[:8]) == "D0CF11E0A1B11AE1" {
-		offset512 := fmt.Sprintf("%X", in[512:516])
-		if offset512 == "A0461DF0" || offset512 == "006E1EF0" || offset512 == "0F00E803" {
-			return true
-		}
-		if offset512 == "FDFFFFFF" && fmt.Sprintf("%x", in[518:520]) == "0000" {
+	pptSubHeaders := [][]byte{
+		{0xA0, 0x46, 0x1D, 0xF0},
+		{0x00, 0x6E, 0x1E, 0xF0},
+		{0x0F, 0x00, 0xE8, 0x03},
+	}
+	for _, h := range pptSubHeaders {
+		if bytes.HasPrefix(in[512:], h) {
 			return true
 		}
 	}
 
-	return false
+	if bytes.HasPrefix(in[512:], []byte{0xFD, 0xFF, 0xFF, 0xFF}) &&
+		in[518] == 0x00 && in[519] == 0x00 {
+		return true
+	}
+
+	return bytes.Contains(in, []byte("MS PowerPoint 97")) ||
+		bytes.Contains(in, []byte("P\x00o\x00w\x00e\x00r\x00P\x00o\x00i\x00n\x00t\x00 D\x00o\x00c\x00u\x00m\x00e\x00n\x00t"))
 }
 
 // Xls  matches a Microsoft Excel 97-2003 file.
 func Xls(in []byte) bool {
-	if len(in) < 520 {
+	if len(in) <= 512 {
 		return false
 	}
 
-	if fmt.Sprintf("%X", in[:8]) == "D0CF11E0A1B11AE1" {
-		offset512 := fmt.Sprintf("%X", in[512:520])
-		subheaders := []string{
-			"0908100000060500",
-			"FDFFFFFF10",
-			"FDFFFFFF1F",
-			"FDFFFFFF22",
-			"FDFFFFFF23",
-			"FDFFFFFF28",
-			"FDFFFFFF29",
-		}
-		for _, h := range subheaders {
-			if strings.HasPrefix(offset512, h) {
-				return true
-			}
+	xlsSubHeaders := [][]byte{
+		[]byte{0x09, 0x08, 0x10, 0x00, 0x00, 0x06, 0x05, 0x00},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x10},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x1F},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x22},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x23},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x28},
+		[]byte{0xFD, 0xFF, 0xFF, 0xFF, 0x29},
+	}
+	for _, h := range xlsSubHeaders {
+		if bytes.HasPrefix(in[512:], h) {
+			return true
 		}
 	}
 
-	return false
+	return bytes.Contains(in, []byte("Microsoft Excel")) ||
+		bytes.Contains(in, []byte("W\x00o\x00r\x00k\x00b\x00o\x00o\x00k"))
 }
