@@ -168,6 +168,8 @@ var files = map[string]*node{
 	"dwg.dwg":         dwg,
 	"dwg.1.dwg":       dwg,
 	"nes.nes":         nes,
+	"mdb.mdb":         mdb,
+	"accdb.accdb":     accdb,
 }
 
 func TestMatching(t *testing.T) {
