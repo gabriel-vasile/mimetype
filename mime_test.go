@@ -26,6 +26,7 @@ var files = map[string]*node{
 	"docx.1.docx": docx,
 	"ppt.ppt":     ppt,
 	"pptx.pptx":   pptx,
+	"pub.pub":     pub,
 	"odt.odt":     odt,
 	"ott.ott":     ott,
 	"ods.ods":     ods,
