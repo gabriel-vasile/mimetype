@@ -138,6 +138,7 @@ var files = map[string]*node{
 	"mach.o":      macho,
 	"sample32":    macho,
 	"sample64":    macho,
+	"mrc.mrc":     mrc,
 
 	// fonts
 	"woff.woff":   woff,

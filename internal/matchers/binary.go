@@ -121,3 +121,30 @@ func Dcm(in []byte) bool {
 func Nes(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
+
+// Marc matches a MARC21 (MAchine-Readable Cataloging) file.
+func Marc(in []byte) bool {
+	// File is at least 24 bytes ("leader" field size)
+	if len(in) < 24 {
+		return false
+	}
+
+	// Fixed bytes at offset 20
+	if !bytes.Equal(in[20:24], []byte("4500")) {
+		return false
+	}
+
+	// First 5 bytes are ASCII digits
+	for i := 0; i < 5; i++ {
+		if in[i] < '0' || in[i] > '9' {
+			return false
+		}
+	}
+
+	// Field terminator is present
+	if !bytes.Contains(in, []byte{0x1E}) {
+		return false
+	}
+
+	return true
+}
