@@ -2,6 +2,7 @@ package matchers
 
 import (
 	"bytes"
+	"encoding/binary"
 )
 
 // Xlsx matches a Microsoft Excel 2007 file.
@@ -30,9 +31,9 @@ func Ole(in []byte) bool {
 //
 // BUG(gabriel-vasile): Doc should look for subheaders like Ppt and Xls does.
 //
-// Ole is a container for Doc, Ppt, and Xls.
+// Ole is a container for Doc, Ppt, Pub and Xls.
 // Right now, when an Ole file is detected, it is considered to be a Doc file
-// if the checks for Ppt and Xls failed.
+// if the checks for Ppt, Pub and Xls failed.
 func Doc(in []byte) bool {
 	return true
 }
@@ -85,4 +86,31 @@ func Xls(in []byte) bool {
 
 	return bytes.Contains(in, []byte("Microsoft Excel")) ||
 		bytes.Contains(in, []byte("W\x00o\x00r\x00k\x00b\x00o\x00o\x00k"))
+}
+
+// Pub matches a Microsoft Publisher file.
+func Pub(in []byte) bool {
+	return matchOleClsid(in, []byte{0x01, 0x12, 0x02, 0x0, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46})
+}
+
+// Helper to match by a specific CLSID of a compound file
+//
+// http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
+func matchOleClsid(in []byte, clsid []byte) bool {
+	if len(in) <= 512 {
+		return false
+	}
+
+	// SecID of first sector of the directory stream
+	firstSecID := int(binary.LittleEndian.Uint32(in[48:52]))
+
+	// Expected offset of CLSID for root storage object
+	clsidOffset := 512*(1+firstSecID) + 80
+
+	if len(in) <= clsidOffset+16 {
+		return false
+	}
+
+	return bytes.HasPrefix(in[clsidOffset:], clsid)
 }
