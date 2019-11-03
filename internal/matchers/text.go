@@ -248,7 +248,7 @@ func NdJson(in []byte) bool {
 			// separator byte count should be added only after the first split
 			if ni != 0 {
 				// Add one as `\n` is used for split
-				parsed += 1
+				parsed++
 			}
 			// Empty line is valid
 			if len(insn) == 0 {

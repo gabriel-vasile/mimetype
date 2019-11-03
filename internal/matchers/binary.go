@@ -6,7 +6,7 @@ import (
 	"encoding/binary"
 )
 
-// Java bytecode and Mach-O binaries share the same magic number
+// Java bytecode and Mach-O binaries share the same magic number.
 // More info here https://github.com/threatstack/libmagic/blob/master/magic/Magdir/cafebabe
 func classOrMachOFat(in []byte) bool {
 	// There should be at least 8 bytes for both of them because the only way to
@@ -23,7 +23,7 @@ func Class(in []byte) bool {
 	return classOrMachOFat(in) && in[7] > 30
 }
 
-// MachO matches Mach-O binaries format
+// MachO matches Mach-O binaries format.
 func MachO(in []byte) bool {
 	if classOrMachOFat(in) && in[7] < 20 {
 		return true
@@ -117,7 +117,7 @@ func Dcm(in []byte) bool {
 		bytes.Equal(in[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
 }
 
-// Nintendo Entertainment system ROM file
+// Nes matches a Nintendo Entertainment system ROM file.
 func Nes(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
