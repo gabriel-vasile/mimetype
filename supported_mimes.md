@@ -131,10 +131,10 @@ Extension | MIME type
 **macho** | application/x-mach-binary
 **qcp** | audio/qcelp
 **icns** | image/x-icns
-**.heic** | image/heic
-**.heic** | image/heic-sequence
-**.heif** | image/heif
-**.heif** | image/heif-sequence
+**heic** | image/heic
+**heic** | image/heic-sequence
+**heif** | image/heif
+**heif** | image/heif-sequence
 **mrc** | application/marc
 **mdb** | application/x-msaccess
 **accdb** | application/x-msaccess
