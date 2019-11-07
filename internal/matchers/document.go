@@ -9,10 +9,10 @@ func Pdf(in []byte) bool {
 
 // DjVu matches a DjVu file.
 func DjVu(in []byte) bool {
-	if !bytes.HasPrefix(in, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
+	if len(in) < 12 {
 		return false
 	}
-	if len(in) < 15 {
+	if !bytes.HasPrefix(in, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
 		return false
 	}
 	return bytes.HasPrefix(in[12:], []byte("DJVM")) ||
@@ -23,10 +23,7 @@ func DjVu(in []byte) bool {
 
 // Mobi matches a Mobi file.
 func Mobi(in []byte) bool {
-	if len(in) < 68 {
-		return false
-	}
-	return bytes.Equal(in[60:68], []byte("BOOKMOBI"))
+	return len(in) > 67 && bytes.Equal(in[60:68], []byte("BOOKMOBI"))
 }
 
 // Lit matches a Microsoft Lit file.

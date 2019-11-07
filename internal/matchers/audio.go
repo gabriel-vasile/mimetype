@@ -7,7 +7,6 @@ import (
 
 // Mp3 matches an mp3 file.
 func Mp3(in []byte) bool {
-
 	if len(in) < 3 {
 		return false
 	}
@@ -70,12 +69,12 @@ func Aiff(in []byte) bool {
 
 // Au matches a Sun Microsystems au file.
 func Au(in []byte) bool {
-	return len(in) > 4 && bytes.Equal(in[:4], []byte("\x2E\x73\x6E\x64"))
+	return bytes.HasPrefix(in, []byte("\x2E\x73\x6E\x64"))
 }
 
 // Amr matches an Adaptive Multi-Rate file.
 func Amr(in []byte) bool {
-	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x23\x21\x41\x4D\x52"))
+	return bytes.HasPrefix(in, []byte("\x23\x21\x41\x4D\x52"))
 }
 
 // Aac matches an Advanced Audio Coding file.

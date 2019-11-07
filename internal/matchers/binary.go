@@ -142,9 +142,5 @@ func Marc(in []byte) bool {
 	}
 
 	// Field terminator is present
-	if !bytes.Contains(in, []byte{0x1E}) {
-		return false
-	}
-
-	return true
+	return bytes.Contains(in, []byte{0x1E})
 }

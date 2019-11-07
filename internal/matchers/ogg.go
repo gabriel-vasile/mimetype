@@ -23,12 +23,11 @@ https://github.com/file/file/blob/master/magic/Magdir/vorbis
 
 // Ogg matches an Ogg file.
 func Ogg(in []byte) bool {
-	return len(in) > 5 && bytes.Equal(in[:5], []byte("\x4F\x67\x67\x53\x00"))
+	return bytes.HasPrefix(in, []byte("\x4F\x67\x67\x53\x00"))
 }
 
 // OggAudio matches an audio ogg file.
 func OggAudio(in []byte) bool {
-
 	return len(in) >= 37 && (bytes.HasPrefix(in[28:], []byte("\x7fFLAC")) ||
 		bytes.HasPrefix(in[28:], []byte("\x01vorbis")) ||
 		bytes.HasPrefix(in[28:], []byte("OpusHead")) ||
@@ -37,7 +36,6 @@ func OggAudio(in []byte) bool {
 
 // OggVideo matches a video ogg file.
 func OggVideo(in []byte) bool {
-
 	return len(in) >= 37 && (bytes.HasPrefix(in[28:], []byte("\x80theora")) ||
 		bytes.HasPrefix(in[28:], []byte("fishead\x00")) ||
 		bytes.HasPrefix(in[28:], []byte("\x01video\x00\x00\x00"))) // OGM video

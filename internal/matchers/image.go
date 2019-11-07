@@ -68,9 +68,7 @@ func Psd(in []byte) bool {
 
 // Ico matches an ICO file.
 func Ico(in []byte) bool {
-	return len(in) > 3 &&
-		in[0] == 0x00 && in[1] == 0x00 &&
-		in[2] == 0x01 && in[3] == 0x00
+	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0x01, 0x00})
 }
 
 // Icns matches an ICNS (Apple Icon Image format) file.
@@ -123,7 +121,6 @@ func Dwg(in []byte) bool {
 
 // Heic matches a High Efficiency Image Coding (HEIC) file.
 func Heic(in []byte) bool {
-
 	if len(in) <= 12 {
 		return false
 	}
@@ -134,7 +131,6 @@ func Heic(in []byte) bool {
 
 // HeicSequence matches a High Efficiency Image Coding (HEIC) file sequence.
 func HeicSequence(in []byte) bool {
-
 	if len(in) <= 12 {
 		return false
 	}
@@ -145,7 +141,6 @@ func HeicSequence(in []byte) bool {
 
 // Heif matches a High Efficiency Image File Format (HEIF) file.
 func Heif(in []byte) bool {
-
 	if len(in) <= 12 {
 		return false
 	}
@@ -158,7 +153,6 @@ func Heif(in []byte) bool {
 
 // HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
 func HeifSequence(in []byte) bool {
-
 	if len(in) <= 12 {
 		return false
 	}
