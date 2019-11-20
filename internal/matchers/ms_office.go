@@ -6,14 +6,14 @@ import (
 	"regexp"
 )
 
+var msoXMLreg = regexp.MustCompile("\\[Content_Types\\]\\.xml|_rels/\\.rels|docProps")
+
 // msoXML walks through the first 4 zip local file headers and returns whether
 // any of the headers contain a file whose name starts with sig.
 func msoXML(in, sig []byte) bool {
 	pkSig := []byte("PK\003\004")
-	msoXMLreg := "\\[Content_Types\\]\\.xml|_rels/\\.rels|docProps"
 
-	s := string(in[:min(len(in), 8000)])
-	if ok, _ := regexp.MatchString(msoXMLreg, s); !ok {
+	if !msoXMLreg.Match(in[:min(len(in), 8000)]) {
 		return false
 	}
 
