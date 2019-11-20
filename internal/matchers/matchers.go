@@ -3,7 +3,7 @@ package matchers
 
 // ReadLimit is the maximum number of bytes read
 // from the input when detecting a reader.
-const ReadLimit = 2048
+const ReadLimit = 3072
 
 // True is a dummy matching function used to match any input.
 func True([]byte) bool {
@@ -38,4 +38,11 @@ func firstLine(in []byte) []byte {
 
 func isWS(b byte) bool {
 	return b == '\t' || b == '\n' || b == '\x0c' || b == '\r' || b == ' '
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
