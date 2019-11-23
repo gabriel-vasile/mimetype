@@ -50,6 +50,7 @@ var files = map[string]*node{
 	"mobi.mobi":   mobi,
 	"lit.lit":     lit,
 	"warc.warc":   warc,
+	"zst.zst":     zstd,
 
 	// images
 	"png.png":          png,
