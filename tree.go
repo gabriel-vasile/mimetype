@@ -11,7 +11,7 @@ var root = newNode("application/octet-stream", "", matchers.True,
 	wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP, threeG2, avi, flv,
 	mkv, asf, aac, voc, aMp4, m4a, txt, gzip, class, swf, crx, woff, woff2, otf,
 	eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho,
-	qcp, icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb,
+	qcp, icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd,
 )
 
 // The list of nodes appended to the root node
@@ -150,4 +150,5 @@ var (
 	mrc       = newNode("application/marc", "mrc", matchers.Marc)
 	mdb       = newNode("application/x-msaccess", "mdb", matchers.MsAccessMdb)
 	accdb     = newNode("application/x-msaccess", "accdb", matchers.MsAccessAce)
+	zstd      = newNode("application/zstd", "zst", matchers.Zstd)
 )
