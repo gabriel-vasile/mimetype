@@ -88,6 +88,6 @@ func Warc(in []byte) bool {
 // Zstd matches a Zstandard archive file.
 func Zstd(in []byte) bool {
 	return len(in) >= 4 &&
-		(0x22 <= in[0] && in[0] <= 0x28 || in[0] == 0x1E) && // Different Zstandard versions
+		(0x22 <= in[0] && in[0] <= 0x28 || in[0] == 0x1E) && // Different Zstandard versions.
 		bytes.HasPrefix(in[1:], []byte{0xB5, 0x2F, 0xFD})
 }
