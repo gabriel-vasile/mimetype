@@ -3,21 +3,54 @@ package matchers
 import (
 	"bytes"
 	"encoding/binary"
+	"regexp"
 )
+
+var msoXMLreg = regexp.MustCompile("\\[Content_Types\\]\\.xml|_rels/\\.rels|docProps")
+
+// msoXML walks through the first 4 zip local file headers and returns whether
+// any of the headers contain a file whose name starts with sig.
+func msoXML(in, sig []byte) bool {
+	pkSig := []byte("PK\003\004")
+
+	if !msoXMLreg.Match(in[:min(len(in), 8000)]) {
+		return false
+	}
+
+	// 30 is the offset where the file name is located in each zip header
+	lastCheckedIndex := 0
+	check := func(in, sig []byte, offset int) bool {
+		return len(in) > offset && bytes.HasPrefix(in[offset:], sig)
+	}
+
+	for i := 0; i < 4; i++ {
+		in = in[lastCheckedIndex:]
+		pkIndex := bytes.Index(in, pkSig)
+		if pkIndex == -1 {
+			return false
+		}
+		if check(in, sig, pkIndex+30) {
+			return true
+		}
+		lastCheckedIndex = pkIndex + 30
+	}
+
+	return false
+}
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(in []byte) bool {
-	return bytes.Contains(in, []byte("xl/"))
+	return msoXML(in, []byte("xl/"))
 }
 
 // Docx matches a Microsoft Office 2007 file.
 func Docx(in []byte) bool {
-	return bytes.Contains(in, []byte("word/"))
+	return msoXML(in, []byte("word/"))
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(in []byte) bool {
-	return bytes.Contains(in, []byte("ppt/"))
+	return msoXML(in, []byte("ppt/"))
 }
 
 // Ole matches an Open Linking and Embedding file.
