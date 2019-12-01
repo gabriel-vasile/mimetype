@@ -2,11 +2,12 @@ package mimetype
 
 type (
 	// node represents a vertex in the matchers tree structure.
-	// It holds the mime type, the extension and the function
-	// to check whether a byte slice has the mime type.
+	// It holds the MIME type, the extension and the function
+	// to check whether a byte slice has the MIME type.
 	node struct {
 		mime      string
 		extension string
+		aliases   []string
 		matchFunc func([]byte) bool
 		children  []*node
 	}
@@ -19,6 +20,11 @@ func newNode(mime, extension string, matchFunc func([]byte) bool, children ...*n
 		matchFunc: matchFunc,
 		children:  children,
 	}
+}
+
+func (n *node) alias(aliases ...string) *node {
+	n.aliases = aliases
+	return n
 }
 
 // match does a depth-first search on the matchers tree.

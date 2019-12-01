@@ -33,13 +33,25 @@ go get github.com/gabriel-vasile/mimetype
 ```
 
 ## Use
-The library exposes three functions you can use in order to detect a file type.
-See [Godoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
+See [GoDoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
+The library exposes three functions you can use in order to find a file type.
 ```go
-func Detect(in []byte) (mime, extension string) {...}
-func DetectReader(r io.Reader) (mime, extension string, err error) {...}
-func DetectFile(file string) (mime, extension string, err error) {...}
+func Detect(in []byte) (mime, extension string)
+func DetectReader(r io.Reader) (mime, extension string, err error)
+func DetectFile(file string) (mime, extension string, err error)
 ```
+
+If you need to check input against a certain list of MIME types, use `Match`:
+```go
+func Match(in []byte, expectedMimes ...string) (match bool, err error)
+func MatchReader(r io.Reader, expectedMimes ...string) (match bool, err error)
+func MatchFile(file string, expectedMimes ...string) (match bool, err error)
+```
+Unlike `Detect`, which returns a single MIME type, `Match` searches against all
+the aliases of the MIME type detected from the input. For example, provided `in` is a
+zip archive, both `Match(in, "application/zip")` and `Match(in, "application/x-zip-compressed")`
+will return a positive result.
+
 When detecting from a `ReadSeeker` interface, such as `os.File`, make sure
 to reset the offset of the reader to the beginning if needed:
 ```go
