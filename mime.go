@@ -71,7 +71,7 @@ func Match(in []byte, expectedMimes ...string) (match bool, err error) {
 	}
 
 	n := root.match(in, root)
-	// This parsing is needed because some detected MIME types contain paramters.
+	// This parsing is needed because some detected MIME types contain parameters.
 	found, _, err := mime.ParseMediaType(n.mime)
 	if err != nil {
 		return false, err
