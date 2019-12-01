@@ -289,7 +289,7 @@ func TestAliasesParameters(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	matches, err := MatchFile("testdata/zip.zip", "application/x-zip; charset=utf-8")
+	matches, err := MatchesFile("testdata/zip.zip", "application/x-zip; charset=utf-8")
 	if err != nil {
 		t.Fatal(err)
 	}

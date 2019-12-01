@@ -55,14 +55,14 @@ func DetectFile(file string) (mime, extension string, err error) {
 	return DetectReader(f)
 }
 
-// Match returns whether the MIME type detected from the slice, or any of its
+// Matches returns whether the MIME type detected from the slice, or any of its
 // aliases, is the same as any of the expected MIME types.
 //
 // MIME type equality test is done on the "type/subtype" sections, ignores any
 // optional MIME parameters, ignores any leading and trailing whitespace,
 // and is case insensitive.
 // Any error returned is related to the parsing of the expected MIME type.
-func Match(in []byte, expectedMimes ...string) (match bool, err error) {
+func Matches(in []byte, expectedMimes ...string) (match bool, err error) {
 	for i := 0; i < len(expectedMimes); i++ {
 		expectedMimes[i], _, err = mime.ParseMediaType(expectedMimes[i])
 		if err != nil {
@@ -91,13 +91,13 @@ func Match(in []byte, expectedMimes ...string) (match bool, err error) {
 	return false, nil
 }
 
-// Match returns whether the MIME type detected from the reader, or any of its
+// MatchesReader returns whether the MIME type detected from the reader, or any of its
 // aliases, is the same as any of the expected MIME types.
 //
 // MIME type equality test is done on the "type/subtype" sections, ignores any
 // optional MIME parameters, ignores any leading and trailing whitespace,
 // and is case insensitive.
-func MatchReader(r io.Reader, expectedMimes ...string) (match bool, err error) {
+func MatchesReader(r io.Reader, expectedMimes ...string) (match bool, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
 	if err != nil && err != io.EOF {
@@ -105,21 +105,21 @@ func MatchReader(r io.Reader, expectedMimes ...string) (match bool, err error) {
 	}
 	in = in[:n]
 
-	return Match(in, expectedMimes...)
+	return Matches(in, expectedMimes...)
 }
 
-// Match returns whether the MIME type detected from the file, or any of its
+// MatchesFile returns whether the MIME type detected from the file, or any of its
 // aliases, is the same as any of the expected MIME types.
 //
 // MIME type equality test is done on the "type/subtype" sections, ignores any
 // optional MIME parameters, ignores any leading and trailing whitespace,
 // and is case insensitive.
-func MatchFile(file string, expectedMimes ...string) (match bool, err error) {
+func MatchesFile(file string, expectedMimes ...string) (match bool, err error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return false, err
 	}
 	defer f.Close()
 
-	return MatchReader(f, expectedMimes...)
+	return MatchesReader(f, expectedMimes...)
 }

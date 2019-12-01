@@ -41,15 +41,15 @@ func DetectReader(r io.Reader) (mime, extension string, err error){}
 func DetectFile(file string) (mime, extension string, err error){}
 ```
 
-If you need to check input against a certain list of MIME types, use `Match`:
+If you need to check input against a certain list of MIME types, use `Matches`:
 ```go
-func Match(in []byte, expectedMimes ...string) (match bool, err error){}
-func MatchReader(r io.Reader, expectedMimes ...string) (match bool, err error){}
-func MatchFile(file string, expectedMimes ...string) (match bool, err error){}
+func Matches(in []byte, expectedMimes ...string) (match bool, err error){}
+func MatchesReader(r io.Reader, expectedMimes ...string) (match bool, err error){}
+func MatchesFile(file string, expectedMimes ...string) (match bool, err error){}
 ```
-Unlike `Detect`, which returns a single MIME type, `Match` searches against all
+Unlike `Detect`, which returns a single MIME type, `Matches` searches against all
 the aliases of the MIME type detected from the input. For example, provided `in` is a
-zip archive, both `Match(in, "application/zip")` and `Match(in, "application/x-zip-compressed")`
+zip archive, both `Matches(in, "application/zip")` and `Matches(in, "application/x-zip-compressed")`
 will return a positive result.
 
 When detecting from a `ReadSeeker` interface, such as `os.File`, make sure
@@ -63,11 +63,12 @@ See [supported mimes](supported_mimes.md) for the list of detected MIME types.
 If support is needed for a specific file format, please open an [issue](https://github.com/gabriel-vasile/mimetype/issues/new/choose).
 
 ## Structure
-**mimetype** uses an hierarchical structure to keep the matching functions.
+**mimetype** uses an hierarchical structure to keep the MIME type detection logic.
 This reduces the number of calls needed for detecting the file type. The reason
 behind this choice is that there are file formats used as containers for other
 file formats. For example, Microsoft office files are just zip archives,
-containing specific metadata files.
+containing specific metadata files. Once a file a file has been identified as a
+zip, there is no need to check if it is a text file.
 <div align="center">
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>
