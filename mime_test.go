@@ -13,7 +13,7 @@ import (
 
 const testDataDir = "testdata"
 
-var files = map[string]*node{
+var files = map[string]*MIME{
 	// archives
 	"pdf.pdf":     pdf,
 	"zip.zip":     zip,
@@ -187,45 +187,45 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if dMime, _ := Detect(data); dMime != node.mime {
-			t.Errorf(errStr, fName, node.mime, dMime, nil)
+		if mime := Detect(data); mime.String() != node.mime {
+			t.Errorf(errStr, fName, node.mime, mime.String(), nil)
 		}
 
 		if _, err := f.Seek(0, io.SeekStart); err != nil {
 			t.Errorf(errStr, fName, node.mime, root.mime, err)
 		}
 
-		if dMime, _, err := DetectReader(f); dMime != node.mime {
-			t.Errorf(errStr, fName, node.mime, dMime, err)
+		if mime, err := DetectReader(f); mime.String() != node.mime {
+			t.Errorf(errStr, fName, node.mime, mime.String(), err)
 		}
 		f.Close()
 
-		if dMime, _, err := DetectFile(fileName); dMime != node.mime {
-			t.Errorf(errStr, fName, node.mime, dMime, err)
+		if mime, err := DetectFile(fileName); mime.String() != node.mime {
+			t.Errorf(errStr, fName, node.mime, mime.String(), err)
 		}
 	}
 }
 
 func TestFaultyInput(t *testing.T) {
 	inexistent := "inexistent.file"
-	if _, _, err := DetectFile(inexistent); err == nil {
+	if _, err := DetectFile(inexistent); err == nil {
 		t.Errorf("%s should not match successfully", inexistent)
 	}
 
 	f, _ := os.Open(inexistent)
-	if _, _, err := DetectReader(f); err == nil {
+	if _, err := DetectReader(f); err == nil {
 		t.Errorf("%s reader should not match successfully", inexistent)
 	}
 }
 
 func TestEmptyInput(t *testing.T) {
-	if m, _ := Detect([]byte{}); m != "inode/x-empty" {
+	if mime := Detect([]byte{}); mime.String() != "inode/x-empty" {
 		t.Errorf("failed to detect empty file")
 	}
 }
 
 func TestBadBdfInput(t *testing.T) {
-	if m, _, _ := DetectFile("testdata/bad.dbf"); m != "application/octet-stream" {
+	if mime, _ := DetectFile("testdata/bad.dbf"); mime.String() != "application/octet-stream" {
 		t.Errorf("failed to detect bad DBF file")
 	}
 }
@@ -272,28 +272,29 @@ func TestIndexOutOfRange(t *testing.T) {
 }
 
 // MIME type equality ignores any optional MIME parameters, so, in order to not
-// parse each alias when testing for equality, we must ensure they are registered
-// with no parameters.
-func TestAliasesParameters(t *testing.T) {
+// parse each alias when testing for equality, we must ensure they are
+// registered with no parameters.
+func TestMIMEFormat(t *testing.T) {
 	for _, n := range root.flatten() {
+		// All extensions must be dot prefixed so they are compatible
+		// with the stdlib mime package.
+		if n.Extension() != "" && !strings.HasPrefix(n.Extension(), ".") {
+			t.Fatalf("")
+		}
+		// All MIMEs must be correctly formatted.
+		_, _, err := mime.ParseMediaType(n.String())
+		if err != nil {
+			t.Fatalf("error parsing node MIME: %s", err)
+		}
+		// Aliases must have no optional MIME parameters.
 		for _, a := range n.aliases {
 			parsed, params, err := mime.ParseMediaType(a)
 			if err != nil {
-				t.Fatalf("error parsing node alias: %s", err)
+				t.Fatalf("error parsing node alias MIME: %s", err)
 			}
 			if parsed != a || len(params) > 0 {
-				t.Fatalf("node alias should have no optional params; alias: %s, params: %v", a, params)
+				t.Fatalf("node alias MIME should have no optional params; alias: %s, params: %v", a, params)
 			}
 		}
-	}
-}
-
-func TestMatch(t *testing.T) {
-	matches, err := MatchesFile("testdata/zip.zip", "application/x-zip; charset=utf-8")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !matches {
-		t.Errorf("zip file should match application/x-zip")
 	}
 }
