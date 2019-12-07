@@ -77,7 +77,7 @@ Extension | MIME type | Aliases
 **.voc** | audio/x-unknown | -
 **.mp4** | audio/mp4 | audio/x-m4a, audio/x-mp4a
 **.m4a** | audio/x-m4a | -
-**.txt** | text/plain | -
+**.txt** | text/plain; charset=utf-8 | -
 **.html** | text/html; charset=utf-8 | -
 **.svg** | image/svg+xml | -
 **.xml** | text/xml; charset=utf-8 | -

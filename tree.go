@@ -45,7 +45,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", matchers.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", matchers.OggVideo)
-	txt      = newMIME("text/plain", ".txt", matchers.Txt, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
+	txt      = newMIME("text/plain; charset=utf-8", ".txt", matchers.Txt, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
 	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
