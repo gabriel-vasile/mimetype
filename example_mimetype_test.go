@@ -8,6 +8,22 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 )
 
+// To find the MIME type of some bytes/reader/file, perform a detect on the input.
+func Example_detect() {
+	file := "testdata/pdf.pdf"
+	reader, _ := os.Open(file)
+	data, _ := ioutil.ReadFile(file)
+
+	dmime := mimetype.Detect(data)
+	rmime, rerr := mimetype.DetectReader(reader)
+	fmime, ferr := mimetype.DetectFile(file)
+	fmt.Println(dmime, rmime, fmime)
+	fmt.Println(rerr, ferr)
+
+	// Output: application/pdf application/pdf application/pdf
+	// <nil> <nil>
+}
+
 // To check if some bytes/reader/file has a specific MIME type, first perform
 // a detect on the input and then test against the MIME.
 func Example_check() {
