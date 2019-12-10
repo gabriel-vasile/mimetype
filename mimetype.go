@@ -15,6 +15,7 @@ import (
 )
 
 // Detect returns the MIME type found from the provided byte slice.
+//
 // Failure to identify the format results in application/octet-stream
 // being returned.
 func Detect(in []byte) (mime *MIME) {
@@ -26,8 +27,10 @@ func Detect(in []byte) (mime *MIME) {
 }
 
 // DetectReader returns the MIME type of the provided reader.
+//
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
+// Any error returned is related to the reading from the input reader.
 func DetectReader(r io.Reader) (mime *MIME, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
@@ -40,8 +43,10 @@ func DetectReader(r io.Reader) (mime *MIME, err error) {
 }
 
 // DetectFile returns the MIME type of the provided file.
+//
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
+// Any error returned is related to the opening and reading from the input file.
 func DetectFile(file string) (mime *MIME, err error) {
 	f, err := os.Open(file)
 	if err != nil {

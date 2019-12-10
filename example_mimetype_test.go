@@ -17,6 +17,7 @@ func Example_detect() {
 	dmime := mimetype.Detect(data)
 	rmime, rerr := mimetype.DetectReader(reader)
 	fmime, ferr := mimetype.DetectFile(file)
+
 	fmt.Println(dmime, rmime, fmime)
 	fmt.Println(rerr, ferr)
 
@@ -25,7 +26,8 @@ func Example_detect() {
 }
 
 // To check if some bytes/reader/file has a specific MIME type, first perform
-// a detect on the input and then test against the MIME.
+// a detect on the input and then test against the MIME. `Is` also works with
+// MIME aliases.
 func Example_check() {
 	mime, err := mimetype.DetectFile("testdata/zip.zip")
 	// application/x-zip is an alias of application/zip,
@@ -39,8 +41,8 @@ func Example_check() {
 // a detect on the input and then navigate the parents until the base MIME type
 // is found.
 func Example_parent() {
-	// text/html is a subclass of text/plain.
-	// mime is text/html.
+	// Ex: if you are interested in text/plain and all of its subtypes:
+	// text/html, text/xml, text/csv, etc.
 	mime, err := mimetype.DetectFile("testdata/html.html")
 
 	isText := false
@@ -50,6 +52,7 @@ func Example_parent() {
 		}
 	}
 
+	// isText is true, even if the detected MIME was text/html.
 	fmt.Println(isText, err)
 
 	// Output: true <nil>
@@ -59,7 +62,7 @@ func ExampleDetect() {
 	data, err := ioutil.ReadFile("testdata/zip.zip")
 	mime := mimetype.Detect(data)
 
-	fmt.Println(mime.String(), err)
+	fmt.Println(mime, err)
 
 	// Output: application/zip <nil>
 }
@@ -68,7 +71,7 @@ func ExampleDetectReader() {
 	data, oerr := os.Open("testdata/zip.zip")
 	mime, merr := mimetype.DetectReader(data)
 
-	fmt.Println(mime.String(), oerr, merr)
+	fmt.Println(mime, oerr, merr)
 
 	// Output: application/zip <nil> <nil>
 }
@@ -76,7 +79,7 @@ func ExampleDetectReader() {
 func ExampleDetectFile() {
 	mime, err := mimetype.DetectFile("testdata/zip.zip")
 
-	fmt.Println(mime.String(), err)
+	fmt.Println(mime, err)
 
 	// Output: application/zip <nil>
 }

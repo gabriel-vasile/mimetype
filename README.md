@@ -32,31 +32,17 @@
 go get github.com/gabriel-vasile/mimetype
 ```
 
-## Use
-See [GoDoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
-The library exposes three functions you can use in order to find a file type.
-```go
-func Detect(in []byte) (mime, extension string){}
-func DetectReader(r io.Reader) (mime, extension string, err error){}
-func DetectFile(file string) (mime, extension string, err error){}
-```
+## Usage
+There is quick [examples](EXAMPLES.md) and
+[GoDoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
 
-If you need to check input against a certain list of MIME types, use `Matches`:
-```go
-func Matches(in []byte, expectedMimes ...string) (match bool, err error){}
-func MatchesReader(r io.Reader, expectedMimes ...string) (match bool, err error){}
-func MatchesFile(file string, expectedMimes ...string) (match bool, err error){}
-```
-Unlike `Detect`, which returns a single MIME type, `Matches` searches against all
-the aliases of the MIME type detected from the input. For example, provided `in` is a
-zip archive, both `Matches(in, "application/zip")` and `Matches(in, "application/x-zip-compressed")`
-will return a positive result.
-
-When detecting from a `ReadSeeker` interface, such as `os.File`, make sure
-to reset the offset of the reader to the beginning if needed:
-```go
-_, err = file.Seek(0, io.SeekStart)
-```
+## Upgrade from v0.3.x to v1.x
+In v1.x the detect functions no longer return the MIME type and extension as
+strings. Instead they return a [MIME](https://godoc.org/github.com/gabriel-vasile/mimetype#MIME)
+struct. To get the string value of the MIME and the extension, call the
+`String()` and the `Extension()` methods.
+In order to play better with the stdlib `mime` package, v1.x extensions
+include the leading dot, as in ".html".
 
 ## Supported MIME types
 See [supported mimes](supported_mimes.md) for the list of detected MIME types.
@@ -66,9 +52,10 @@ If support is needed for a specific file format, please open an [issue](https://
 **mimetype** uses an hierarchical structure to keep the MIME type detection logic.
 This reduces the number of calls needed for detecting the file type. The reason
 behind this choice is that there are file formats used as containers for other
-file formats. For example, Microsoft office files are just zip archives,
+file formats. For example, Microsoft Office files are just zip archives,
 containing specific metadata files. Once a file a file has been identified as a
-zip, there is no need to check if it is a text file.
+zip, there is no need to check if it is a text file, but it is worth checking if
+it is an Microsoft Office file.
 <div align="center">
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>
