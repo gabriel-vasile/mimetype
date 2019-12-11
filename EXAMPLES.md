@@ -1,7 +1,7 @@
 ## Examples
-[Detect MIME type](#detect)
-[Check against MIME type](#check)
-[Check base MIME type](#check-parent)
+ - [Detect MIME type](#detect)
+ - [Check against MIME type](#check)
+ - [Check base MIME type](#check-parent)
 
 ### Detect
 Get the MIME type from a slice of bytes, from a reader and from a file.
@@ -52,9 +52,3 @@ fmt.Println(isText, err)
 
 // Output: true <nil>
 ```
-When calling `DetectReader` on a `ReadSeeker` interface, such as `os.File`, make sure
-to reset the offset of the reader to the beginning if needed:
-```go
-_, err = file.Seek(0, io.SeekStart)
-```
-
