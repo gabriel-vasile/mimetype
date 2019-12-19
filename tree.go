@@ -186,5 +186,5 @@ var (
 	mdb   = newMIME("application/x-msaccess", ".mdb", matchers.MsAccessMdb)
 	accdb = newMIME("application/x-msaccess", ".accdb", matchers.MsAccessAce)
 	zstd  = newMIME("application/zstd", ".zst", matchers.Zstd)
-	cab   = newMIME("application/cab", ".cab", matchers.Cab)
+	cab   = newMIME("application/vnd.ms-cab-compressed", ".cab", matchers.Cab)
 )

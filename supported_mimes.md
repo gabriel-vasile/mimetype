@@ -139,4 +139,4 @@ Extension | MIME type | Aliases
 **.mdb** | application/x-msaccess | -
 **.accdb** | application/x-msaccess | -
 **.zst** | application/zstd | -
-**.cab** | application/cab | -
+**.cab** | application/vnd.ms-cab-compressed | -
