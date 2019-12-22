@@ -8,11 +8,17 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 )
 
-// To find the MIME type of some bytes/reader/file, perform a detect on the input.
+// To find the MIME type of some input, perform a detect.
+// In addition to the basic Detect,
+//  mimetype.Detect([]byte) *MIME
+// there are shortcuts for detecting from a reader:
+//  mimetype.DetectReader(io.Reader) (*MIME, error)
+// or from a file:
+//  mimetype.DetectFile(string) (*MIME, error)
 func Example_detect() {
 	file := "testdata/pdf.pdf"
-	reader, _ := os.Open(file)
-	data, _ := ioutil.ReadFile(file)
+	reader, _ := os.Open(file)       // ignoring error for brevity's sake
+	data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 
 	dmime := mimetype.Detect(data)
 	rmime, rerr := mimetype.DetectReader(reader)
@@ -26,8 +32,9 @@ func Example_detect() {
 }
 
 // To check if some bytes/reader/file has a specific MIME type, first perform
-// a detect on the input and then test against the MIME. `Is` also works with
-// MIME aliases.
+// a detect on the input and then test against the MIME.
+//
+// Is method can also be called with MIME aliases.
 func Example_check() {
 	mime, err := mimetype.DetectFile("testdata/zip.zip")
 	// application/x-zip is an alias of application/zip,
@@ -40,22 +47,42 @@ func Example_check() {
 // To check if some bytes/reader/file has a base MIME type, first perform
 // a detect on the input and then navigate the parents until the base MIME type
 // is found.
+//
+// Considering JAR files are just ZIPs containing some metadata files,
+// if, for example, you need to tell if the input can be unzipped, go up the
+// hierarchy until zip is found or the root is reached.
 func Example_parent() {
-	// Ex: if you are interested in text/plain and all of its subtypes:
-	// text/html, text/xml, text/csv, etc.
-	mime, err := mimetype.DetectFile("testdata/html.html")
+	detectedMIME, err := mimetype.DetectFile("testdata/jar.jar")
 
-	isText := false
-	for ; mime != nil; mime = mime.Parent() {
-		if mime.Is("text/plain") {
-			isText = true
+	zip := false
+	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+		if mime.Is("application/zip") {
+			zip = true
 		}
 	}
 
-	// isText is true, even if the detected MIME was text/html.
-	fmt.Println(isText, err)
+	// zip is true, even if the detected MIME was application/jar.
+	fmt.Println(zip, detectedMIME, err)
 
-	// Output: true <nil>
+	// Output: true application/jar <nil>
+}
+
+// Considering the definition of a binary file as "a computer file that is not
+// a text file", they can differentiated by searching for the text/plain MIME
+// in it's MIME hierarchy.
+func Example_textVsBinary() {
+	detectedMIME, err := mimetype.DetectFile("testdata/xml.xml")
+
+	isBinary := true
+	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+		if mime.Is("text/plain") {
+			isBinary = false
+		}
+	}
+
+	fmt.Println(isBinary, detectedMIME, err)
+
+	// Output: false text/xml; charset=utf-8 <nil>
 }
 
 func ExampleDetect() {

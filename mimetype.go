@@ -31,6 +31,10 @@ func Detect(in []byte) (mime *MIME) {
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
 // Any error returned is related to the reading from the input reader.
+//
+// DetectReader assumes the reader offset is at the start. If the input
+// is a ReadSeeker you read from before, it should be rewinded before detection:
+//  reader.Seek(0, io.SeekStart)
 func DetectReader(r io.Reader) (mime *MIME, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
