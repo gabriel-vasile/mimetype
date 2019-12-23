@@ -119,8 +119,20 @@ var (
 	}
 )
 
-// Txt matches a text file.
-func Txt(in []byte) bool {
+// Utf16be matches a text file encoded with UTF-16 and with the characters
+// represented in big endian.
+func Utf16be(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0xFE, 0xFF})
+}
+
+// Utf16le matches a text file encoded with UTF-16 and with the characters
+// represented in little endian.
+func Utf16le(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0xFF, 0xFE})
+}
+
+// Utf8 matches a UTF-8 text file.
+func Utf8(in []byte) bool {
 	in = trimLWS(in)
 	for _, b := range in {
 		if b <= 0x08 ||
