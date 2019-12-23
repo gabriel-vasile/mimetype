@@ -2,15 +2,15 @@
  - [Detect MIME type](#detect)
  - [Check against MIME type](#check)
  - [Check base MIME type](#check-parent)
+ - [Binary file vs text file](#binary-file-vs-text-file)
 
 ### Detect
 Get the MIME type from a slice of bytes, from a reader and from a file.
 ```go
 file := "testdata/pdf.pdf"
-reader, _ := os.Open(file)
-data, _ := ioutil.ReadFile(file)
+reader, _ := os.Open(file)       // ignoring error for brevity's sake
+data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 
-// Detecting the same data three times, for the sake of example.
 dmime := mimetype.Detect(data)
 rmime, rerr := mimetype.DetectReader(reader)
 fmime, ferr := mimetype.DetectFile(file)
@@ -23,7 +23,7 @@ fmt.Println(rerr, ferr)
 ```
 
 ### Check
-Test if some file has a specific MIME type. Also accepts MIME type aliases.
+Test if a file has a specific MIME type. Also accepts MIME type aliases.
 ```go
 mime, err := mimetype.DetectFile("testdata/zip.zip")
 // application/x-zip is an alias of application/zip,
@@ -34,21 +34,43 @@ fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
 ```
 
 ### Check parent
-Test if some file has a specific base MIME type. First perform a detect on the input, then navigate parents until the base MIME type if found.
-```go
-// Ex: if you are interested in text/plain and all of its subtypes:
-// text/html, text/xml, text/csv, etc.
-mime, err := mimetype.DetectFile("testdata/html.html")
+Test if a file has a specific base MIME type. First perform a detect on the
+input and then navigate the parents until the base MIME type is found.
 
-isText := false
-for ; mime != nil; mime = mime.Parent() {
-	if mime.Is("text/plain") {
-		isText = true
-	}
+Considering JAR files are just ZIPs containing some metadata files,
+if, for example, you need to tell if the input can be unzipped, go up the
+MIME hierarchy until zip is found or the root is reached.
+```go
+detectedMIME, err := mimetype.DetectFile("testdata/jar.jar")
+
+zip := false
+for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+    if mime.Is("application/zip") {
+        zip = true
+    }
 }
 
-// isText is true, even if the detected MIME was text/html.
-fmt.Println(isText, err)
+// zip is true, even if the detected MIME was application/jar.
+fmt.Println(zip, detectedMIME, err)
 
-// Output: true <nil>
+// Output: true application/jar <nil>
+```
+
+### Binary file vs text file
+Considering the definition of a binary file as "a computer file that is not
+a text file", they can be differentiated by searching for the text/plain MIME
+in it's MIME hierarchy.
+```go
+detectedMIME, err := mimetype.DetectFile("testdata/xml.xml")
+
+isBinary := true
+for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+    if mime.Is("text/plain") {
+        isBinary = false
+    }
+}
+
+fmt.Println(isBinary, detectedMIME, err)
+
+// Output: false text/xml; charset=utf-8 <nil>
 ```
