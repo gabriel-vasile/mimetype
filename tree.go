@@ -9,10 +9,10 @@ var root = newMIME("application/octet-stream", "", matchers.True,
 	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
-	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, utf16le, utf16be, gzip,
-	class, swf, crx, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar, djvu,
-	mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic, heicSeq, heif,
-	heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
+	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, utf32le, utf32be, utf16le,
+	utf16be, gzip, class, swf, crx, woff, woff2, otf, eot, wasm, shx, dbf, dcm,
+	rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
+	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
 )
 
 // The list of nodes appended to the root node
@@ -46,6 +46,8 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", matchers.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", matchers.OggVideo)
+	utf32le  = newMIME("text/plain; charset=utf-32le", ".txt", matchers.Utf32le)
+	utf32be  = newMIME("text/plain; charset=utf-32be", ".txt", matchers.Utf32be)
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
 	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)

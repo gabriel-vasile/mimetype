@@ -119,6 +119,18 @@ var (
 	}
 )
 
+// Utf32be matches a text file encoded with UTF-32 and with the characters
+// represented in big endian.
+func Utf32be(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0xFE, 0xFF})
+}
+
+// Utf32le matches a text file encoded with UTF-32 and with the characters
+// represented in little endian.
+func Utf32le(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0xFF, 0xFE, 0x00, 0x00})
+}
+
 // Utf16be matches a text file encoded with UTF-16 and with the characters
 // represented in big endian.
 func Utf16be(in []byte) bool {

@@ -111,6 +111,8 @@ var files = map[string]*MIME{
 	"utf8.txt":          utf8,
 	"utf16lebom.txt":    utf16le,
 	"utf16bebom.txt":    utf16be,
+	"utf32bebom.txt":    utf32be,
+	"utf32lebom.txt":    utf32le,
 	"php.php":           php,
 	"ps.ps":             ps,
 	"json.json":         json,
