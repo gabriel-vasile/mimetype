@@ -1,4 +1,4 @@
-// Package matchers holds the matching functions used to find mime types.
+// Package matchers holds the matching functions used to find MIME types.
 package matchers
 
 // ReadLimit is the maximum number of bytes read

@@ -59,6 +59,13 @@ file formats. For example, Microsoft Office files are just zip archives,
 containing specific metadata files. Once a file a file has been identified as a
 zip, there is no need to check if it is a text file, but it is worth checking if
 it is an Microsoft Office file.
+
+To prevent loading entire files into memory, when detecting from a
+[reader](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectReader)
+or from a [file](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectFile)
+**mimetype** limits itself to reading only the first
+[3072](https://github.com/gabriel-vasile/mimetype/blob/master/internal/matchers/matchers.go#L6)
+bytes from the input.
 <div align="center">
   <img alt="structure" src="mimetype.gif" width="88%">
 </div>

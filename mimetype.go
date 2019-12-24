@@ -35,6 +35,9 @@ func Detect(in []byte) (mime *MIME) {
 // DetectReader assumes the reader offset is at the start. If the input
 // is a ReadSeeker you read from before, it should be rewinded before detection:
 //  reader.Seek(0, io.SeekStart)
+//
+// To prevent loading entire files into memory, DetectReader reads at most
+// matchers.ReadLimit bytes from the reader.
 func DetectReader(r io.Reader) (mime *MIME, err error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := r.Read(in)
@@ -51,6 +54,9 @@ func DetectReader(r io.Reader) (mime *MIME, err error) {
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
 // Any error returned is related to the opening and reading from the input file.
+//
+// To prevent loading entire files into memory, DetectFile reads at most
+// matchers.ReadLimit bytes from the reader.
 func DetectFile(file string) (mime *MIME, err error) {
 	f, err := os.Open(file)
 	if err != nil {
