@@ -6,7 +6,7 @@
   A package for detecting MIME types and extensions based on magic numbers
 </h4>
 <h6 align="center">
-  No bindings, thread safe and completely written in go
+  No C bindings, zero dependencies and thread safe
 </h6>
 
 <p align="center">

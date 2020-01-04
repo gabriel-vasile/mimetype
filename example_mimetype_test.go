@@ -17,18 +17,24 @@ import (
 //  mimetype.DetectFile(string) (*MIME, error)
 func Example_detect() {
 	file := "testdata/pdf.pdf"
-	reader, _ := os.Open(file)       // ignoring error for brevity's sake
+
+	// Detect the MIME type of a file stored as a byte slice.
 	data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
+	mime := mimetype.Detect(data)
+	fmt.Println(mime)
 
-	dmime := mimetype.Detect(data)
-	rmime, rerr := mimetype.DetectReader(reader)
-	fmime, ferr := mimetype.DetectFile(file)
+	// Detect the MIME type of a reader.
+	reader, _ := os.Open(file) // ignoring error for brevity's sake
+	mime, rerr := mimetype.DetectReader(reader)
+	fmt.Println(mime, rerr)
 
-	fmt.Println(dmime, rmime, fmime)
-	fmt.Println(rerr, ferr)
+	// Detect the MIME type of a file.
+	mime, ferr := mimetype.DetectFile(file)
+	fmt.Println(mime, ferr)
 
-	// Output: application/pdf application/pdf application/pdf
-	// <nil> <nil>
+	// Output: application/pdf
+	// application/pdf <nil>
+	// application/pdf <nil>
 }
 
 // To check if some bytes/reader/file has a specific MIME type, first perform

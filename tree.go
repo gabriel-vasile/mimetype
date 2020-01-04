@@ -4,7 +4,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 
 // root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers
-// are tried in order to find a more accurate mime type.
+// are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", matchers.True,
 	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,

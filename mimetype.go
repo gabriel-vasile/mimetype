@@ -16,8 +16,8 @@ import (
 
 // Detect returns the MIME type found from the provided byte slice.
 //
-// Failure to identify the format results in application/octet-stream
-// being returned.
+// The result is always a valid MIME type, with application/octet-stream
+// returned when identification failed.
 func Detect(in []byte) (mime *MIME) {
 	if len(in) == 0 {
 		return newMIME("inode/x-empty", "", matchers.True)

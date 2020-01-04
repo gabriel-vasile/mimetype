@@ -7,19 +7,22 @@
 ### Detect
 Get the MIME type from a slice of bytes, from a reader and from a file.
 ```go
+// Detect the MIME type of a file stored as a byte slice.
 file := "testdata/pdf.pdf"
+// Detect the MIME type of a file.
+mime, ferr := mimetype.DetectFile(file)
+fmt.Println(mime, ferr)
+// Output: application/pdf nil
+
+// Detect the MIME type of a reader.
 reader, _ := os.Open(file)       // ignoring error for brevity's sake
-data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
+mime, rerr := mimetype.DetectReader(reader)
+fmt.Println(mime, rerr)
+// Output: application/pdf nil
 
-dmime := mimetype.Detect(data)
-rmime, rerr := mimetype.DetectReader(reader)
-fmime, ferr := mimetype.DetectFile(file)
-
-fmt.Println(dmime, rmime, fmime)
-fmt.Println(rerr, ferr)
-
-// Output: application/pdf application/pdf application/pdf
-// <nil> <nil>
+mime := mimetype.Detect(data)
+fmt.Println(mime)
+// Output: application/pdf
 ```
 
 ### Check
