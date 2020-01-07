@@ -1,6 +1,9 @@
 package mimetype
 
-import "mime"
+import (
+	"mime"
+	"sync"
+)
 
 // MIME represents a file format in the tree structure of formats.
 type MIME struct {
@@ -10,6 +13,7 @@ type MIME struct {
 	matchFunc func([]byte) bool
 	children  []*MIME
 	parent    *MIME
+	root bool
 }
 
 // String returns the string representation of the MIME type, e.g., "application/zip".
@@ -52,6 +56,13 @@ func (n *MIME) Is(expectedMIME string) bool {
 	return false
 }
 
+func newRoot(mime, extension string, matchFunc func([]byte) bool, children ...*MIME) *MIME {
+	n := newMIME(mime, extension, matchFunc, children...)
+	n.root = true
+
+	return n
+}
+
 func newMIME(mime, extension string, matchFunc func([]byte) bool, children ...*MIME) *MIME {
 	n := &MIME{
 		mime:      mime,
@@ -69,6 +80,43 @@ func newMIME(mime, extension string, matchFunc func([]byte) bool, children ...*M
 
 func (n *MIME) alias(aliases ...string) *MIME {
 	n.aliases = aliases
+	return n
+}
+
+func (n *MIME) startMatching(in []byte) *MIME {
+	if !n.root {
+		panic("the match is for root")
+	}
+	results := []*MIME{}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	half := len(n.children) / 2
+	go func() {
+		for _, c := range n.children[:half] {
+			if c.matchFunc(in) {
+				res := c.match(in, c)
+				results = append(results, res)
+			}
+		}
+		defer wg.Done()
+	}()
+	go func() {
+		for _, c := range n.children[half:] {
+			if c.matchFunc(in) {
+				res := c.match(in, c)
+				results = append(results, res)
+			}
+		}
+		defer wg.Done()
+	}()
+
+	wg.Wait()
+	for _, r := range results {
+		if !r.root {
+			return r
+		}
+	}
+
 	return n
 }
 

@@ -23,7 +23,7 @@ func Detect(in []byte) (mime *MIME) {
 		return newMIME("inode/x-empty", "", matchers.True)
 	}
 
-	return root.match(in, root)
+	return root.startMatching(in)
 }
 
 // DetectReader returns the MIME type of the provided reader.
