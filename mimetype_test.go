@@ -20,6 +20,7 @@ var files = map[string]*MIME{
 	"tar.tar":     tar,
 	"xls.xls":     xls,
 	"xlsx.xlsx":   xlsx,
+	"xlsx.1.xlsx": xlsx,
 	"doc.doc":     doc,
 	"doc.1.doc":   doc,
 	"docx.docx":   docx,
