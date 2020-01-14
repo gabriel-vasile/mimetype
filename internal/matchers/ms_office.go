@@ -26,7 +26,7 @@ func msoXML(in, sig []byte) bool {
 	// github.com/file/file looks for the msoXML signature in the first 4 local
 	// headers, but some xlsx files have their signature in later headers.
 	// testdata/xlsx.1.xlsx is such an example, with the signature in the 5th header.
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 6 && lastCheckedIndex < len(in); i++ {
 		in = in[lastCheckedIndex:]
 		pkIndex := bytes.Index(in, pkSig)
 		if pkIndex == -1 {
