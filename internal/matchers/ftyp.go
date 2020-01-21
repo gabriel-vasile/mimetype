@@ -29,9 +29,17 @@ var (
 		// Nero Digital AAC Audio
 		ftypSig("NDAS"),
 	}
-	qtSigs  = []sig{ftypSig("qt  "), ftypSig("moov")}
-	mqvSigs = []sig{ftypSig("mqt ")}
-	m4aSigs = []sig{ftypSig("M4A ")}
+	qtSigs      = []sig{ftypSig("qt  "), ftypSig("moov")}
+	mqvSigs     = []sig{ftypSig("mqt ")}
+	m4aSigs     = []sig{ftypSig("M4A ")}
+	heicSigs    = []sig{ftypSig("heic"), ftypSig("heix")}
+	heicSeqSigs = []sig{ftypSig("hevc"), ftypSig("hevx")}
+	heifSigs    = []sig{
+		ftypSig("mif1"), ftypSig("heim"), ftypSig("heis"), ftypSig("avic"),
+	}
+	heifSeqSigs = []sig{
+		ftypSig("msf1"), ftypSig("hevm"), ftypSig("hevs"), ftypSig("avcs"),
+	}
 	// TODO: add support for remaining video formats at ftyps.com.
 )
 
@@ -68,4 +76,24 @@ func Mqv(in []byte) bool {
 // M4a matches an audio M4A file.
 func M4a(in []byte) bool {
 	return detect(in, m4aSigs)
+}
+
+// Heic matches a High Efficiency Image Coding (HEIC) file.
+func Heic(in []byte) bool {
+	return detect(in, heicSigs)
+}
+
+// HeicSequence matches a High Efficiency Image Coding (HEIC) file sequence.
+func HeicSequence(in []byte) bool {
+	return detect(in, heicSeqSigs)
+}
+
+// Heif matches a High Efficiency Image File Format (HEIF) file.
+func Heif(in []byte) bool {
+	return detect(in, heifSigs)
+}
+
+// HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
+func HeifSequence(in []byte) bool {
+	return detect(in, heifSeqSigs)
 }

@@ -1,6 +1,8 @@
 package matchers
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // Woff matches a Web Open Font Format file.
 func Woff(in []byte) bool {

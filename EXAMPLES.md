@@ -5,21 +5,24 @@
  - [Binary file vs text file](#binary-file-vs-text-file)
 
 ### Detect
-Get the MIME type from a slice of bytes, from a reader and from a file.
+Get the MIME type from a path to a file.
 ```go
-// Detect the MIME type of a file stored as a byte slice.
 file := "testdata/pdf.pdf"
-// Detect the MIME type of a file.
-mime, ferr := mimetype.DetectFile(file)
-fmt.Println(mime, ferr)
+mime, err := mimetype.DetectFile(file)
+fmt.Println(mime, err)
 // Output: application/pdf nil
-
-// Detect the MIME type of a reader.
-reader, _ := os.Open(file)       // ignoring error for brevity's sake
-mime, rerr := mimetype.DetectReader(reader)
-fmt.Println(mime, rerr)
+```
+Get the MIME type from a reader.
+```go
+reader, _ := os.Open(file) // ignoring error for brevity's sake
+mime, err := mimetype.DetectReader(reader)
+fmt.Println(mime, err)
 // Output: application/pdf nil
+```
 
+Get the MIME type from a byte slice.
+```go
+data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 mime := mimetype.Detect(data)
 fmt.Println(mime)
 // Output: application/pdf
