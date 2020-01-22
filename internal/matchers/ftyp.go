@@ -32,6 +32,7 @@ var (
 	qtSigs      = []sig{ftypSig("qt  "), ftypSig("moov")}
 	mqvSigs     = []sig{ftypSig("mqt ")}
 	m4aSigs     = []sig{ftypSig("M4A ")}
+	m4vSigs     = []sig{ftypSig("M4V "), ftypSig("M4VH"), ftypSig("M4VP")}
 	heicSigs    = []sig{ftypSig("heic"), ftypSig("heix")}
 	heicSeqSigs = []sig{ftypSig("hevc"), ftypSig("hevx")}
 	heifSigs    = []sig{
@@ -96,4 +97,9 @@ func Heif(in []byte) bool {
 // HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
 func HeifSequence(in []byte) bool {
 	return detect(in, heifSeqSigs)
+}
+
+// M4v matches an Appl4 M4V video file.
+func M4v(in []byte) bool {
+	return detect(in, m4vSigs)
 }

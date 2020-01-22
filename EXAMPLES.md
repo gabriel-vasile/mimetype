@@ -9,23 +9,23 @@ Get the MIME type from a path to a file.
 ```go
 file := "testdata/pdf.pdf"
 mime, err := mimetype.DetectFile(file)
-fmt.Println(mime, err)
-// Output: application/pdf nil
+fmt.Println(mime, mime.Extension(), err)
+// Output: application/pdf .pdf nil
 ```
 Get the MIME type from a reader.
 ```go
 reader, _ := os.Open(file) // ignoring error for brevity's sake
 mime, err := mimetype.DetectReader(reader)
-fmt.Println(mime, err)
-// Output: application/pdf nil
+fmt.Println(mime, mime.Extension(), err)
+// Output: application/pdf .pdf nil
 ```
 
 Get the MIME type from a byte slice.
 ```go
 data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 mime := mimetype.Detect(data)
-fmt.Println(mime)
-// Output: application/pdf
+fmt.Println(mime, mime.Extension())
+// Output: application/pdf .pdf
 ```
 
 ### Check
