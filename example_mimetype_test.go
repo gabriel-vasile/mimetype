@@ -21,16 +21,16 @@ func Example_detect() {
 	// Detect the MIME type of a file stored as a byte slice.
 	data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 	mime := mimetype.Detect(data)
-	fmt.Println(mime, mime.Extension())
+	fmt.Println(mime.String(), mime.Extension())
 
 	// Detect the MIME type of a reader.
 	reader, _ := os.Open(file) // ignoring error for brevity's sake
 	mime, rerr := mimetype.DetectReader(reader)
-	fmt.Println(mime, mime.Extension(), rerr)
+	fmt.Println(mime.String(), mime.Extension(), rerr)
 
 	// Detect the MIME type of a file.
 	mime, ferr := mimetype.DetectFile(file)
-	fmt.Println(mime, mime.Extension(), ferr)
+	fmt.Println(mime.String(), mime.Extension(), ferr)
 
 	// Output: application/pdf .pdf
 	// application/pdf .pdf <nil>
@@ -95,7 +95,7 @@ func ExampleDetect() {
 	data, err := ioutil.ReadFile("testdata/zip.zip")
 	mime := mimetype.Detect(data)
 
-	fmt.Println(mime, err)
+	fmt.Println(mime.String(), err)
 
 	// Output: application/zip <nil>
 }
@@ -104,7 +104,7 @@ func ExampleDetectReader() {
 	data, oerr := os.Open("testdata/zip.zip")
 	mime, merr := mimetype.DetectReader(data)
 
-	fmt.Println(mime, oerr, merr)
+	fmt.Println(mime.String(), oerr, merr)
 
 	// Output: application/zip <nil> <nil>
 }
@@ -112,7 +112,7 @@ func ExampleDetectReader() {
 func ExampleDetectFile() {
 	mime, err := mimetype.DetectFile("testdata/zip.zip")
 
-	fmt.Println(mime, err)
+	fmt.Println(mime.String(), err)
 
 	// Output: application/zip <nil>
 }
