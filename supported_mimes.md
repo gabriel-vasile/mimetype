@@ -26,7 +26,6 @@ Extension | MIME type | Aliases
 **.pub** | application/vnd.ms-publisher | -
 **.ppt** | application/vnd.ms-powerpoint | application/mspowerpoint
 **.doc** | application/msword | application/vnd.ms-word
-**.ps** | application/postscript | -
 **.psd** | image/vnd.adobe.photoshop | image/x-psd, application/photoshop
 **.ogg** | application/ogg | application/x-ogg
 **.oga** | audio/ogg | -
@@ -145,3 +144,4 @@ Extension | MIME type | Aliases
 **.vcf** | text/vcard | -
 **.ics** | text/calendar | -
 **.warc** | application/warc | -
+**.ps** | application/postscript | -

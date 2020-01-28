@@ -5,8 +5,8 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
-var root = newMIME("application/octet-stream", "", matchers.True,
-	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+var root = newRoot("application/octet-stream", "", matchers.True,
+	sevenZ, zip, pdf, ole,  psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, utf32le, utf32be, utf16le,
@@ -50,7 +50,7 @@ var (
 	utf32be  = newMIME("text/plain; charset=utf-32be", ".txt", matchers.Utf32be)
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
-	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
+	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc, ps)
 	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
