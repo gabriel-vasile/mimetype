@@ -12,7 +12,7 @@ var root = newMIME("application/octet-stream", "", matchers.True,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, utf32le, utf32be, utf16le,
 	utf16be, gzip, class, swf, crx, woff, woff2, otf, eot, wasm, shx, dbf, dcm,
 	rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
-	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
+	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm,
 )
 
 // The list of nodes appended to the root node
@@ -157,6 +157,7 @@ var (
 	ar      = newMIME("application/x-archive", ".a", matchers.Ar, deb).
 		alias("application/x-unix-archive")
 	deb = newMIME("application/vnd.debian.binary-package", ".deb", matchers.Deb)
+	rpm = newMIME("application/x-rpm", ".rpm", matchers.Rpm)
 	dcm = newMIME("application/dicom", ".dcm", matchers.Dcm)
 	odt = newMIME("application/vnd.oasis.opendocument.text", ".odt", matchers.Odt, ott).
 		alias("application/x-vnd.oasis.opendocument.text")
