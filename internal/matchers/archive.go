@@ -97,7 +97,9 @@ func Cab(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("MSCF"))
 }
 
-// Rpm matches an RPM package file.
+// Rpm matches an RPM or Delta RPM package file.
 func Rpm(in []byte) bool {
-	return len(in) > 4 && bytes.HasPrefix(in, []byte{0xed, 0xab, 0xee, 0xdb})
+	return len(in) > 4 &&
+		(bytes.HasPrefix(in, []byte{0xed, 0xab, 0xee, 0xdb}) ||
+			bytes.HasPrefix(in, []byte("drpm")))
 }

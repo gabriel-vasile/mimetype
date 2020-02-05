@@ -47,6 +47,7 @@ var files = map[string]*MIME{
 	"a.a":         ar,
 	"deb.deb":     deb,
 	"rpm.rpm":     rpm,
+	"drpm.rpm":    rpm,
 	"rar.rar":     rar,
 	"djvu.djvu":   djvu,
 	"mobi.mobi":   mobi,
