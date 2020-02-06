@@ -51,8 +51,9 @@ func Example_check() {
 }
 
 // It may happen that the returned MIME type is more accurate than needed.
+//
 // Suppose we have a text file containing HTML code. Detection performed on this
-// file will retrieve the `text/html` file. By walking up the MIME hierarchy, we
+// file will retrieve the text/html file. By walking up the MIME hierarchy, we
 // can tell if the file content can be used or not as text.
 //
 // Remember to always check for null before using the result of the Parent() method.

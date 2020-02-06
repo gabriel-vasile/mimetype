@@ -41,11 +41,13 @@ fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
 
 ### Parent
 Upon detection, it may happen that the returned MIME type is more accurate than
-needed. Suppose we have a text file containing HTML code. Detection performed on
-this file will retrieve the `text/html` file. By walking up the MIME hierarchy,
+needed.
+
+Suppose we have a text file containing HTML code. Detection performed on
+this file will retrieve the `text/html` MIME. By walking up the MIME hierarchy,
 we can tell if the file content can be used or not as text.
 
-Remember to always check for null before using the result of the Parent() method.
+Remember to always check for null before using the result of the `Parent()` method.
 ```
            .Parent()              .Parent()
 text/html ----------> text/plain ----------> application/octet-stream
