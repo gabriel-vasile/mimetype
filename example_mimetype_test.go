@@ -53,10 +53,11 @@ func Example_check() {
 // It may happen that the returned MIME type is more accurate than needed.
 //
 // Suppose we have a text file containing HTML code. Detection performed on this
-// file will retrieve the text/html file. By walking up the MIME hierarchy, we
-// can tell if the file content can be used or not as text.
+// file will retrieve the `text/html` MIME. If you are interested in telling if
+// the input can be used as a text file, you can walk up the MIME hierarchy
+// until `text/plain` is found.
 //
-// Remember to always check for null before using the result of the Parent() method.
+// Remember to always check for nil before using the result of the Parent() method.
 //            .Parent()              .Parent()
 //  text/html ----------> text/plain ----------> application/octet-stream
 func Example_parent() {

@@ -15,7 +15,7 @@ var root = newMIME("application/octet-stream", "", matchers.True,
 	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm,
 )
 
-// The list of nodes appended to the root node
+// The list of nodes appended to the root node.
 var (
 	gzip = newMIME("application/gzip", ".gz", matchers.Gzip).
 		alias("application/x-gzip", "application/x-gunzip", "application/gzipped", "application/gzip-compressed", "application/x-gzip-compressed", "gzip/document")
