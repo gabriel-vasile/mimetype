@@ -2,7 +2,7 @@
 package matchers
 
 // ReadLimit is the maximum number of bytes read
-// from the input when detecting a reader.
+// from the input when detecting from a reader.
 const ReadLimit = 3072
 
 // True is a dummy matching function used to match any input.

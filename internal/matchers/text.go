@@ -143,7 +143,7 @@ func Utf16le(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xFF, 0xFE})
 }
 
-// Utf8 matches a UTF-8 text file.
+// Utf8 matches an UTF-8 text file.
 func Utf8(in []byte) bool {
 	in = trimLWS(in)
 	for _, b := range in {
@@ -251,34 +251,30 @@ func GeoJson(in []byte) bool {
 
 // NdJson matches a Newline delimited JSON file.
 func NdJson(in []byte) bool {
-	// Separator with carriage return and new line `\r\n`
+	// Separator with carriage return and new line `\r\n`.
 	srn := []byte{0x0D, 0x0A}
 
-	// Separator with only new line `\n`
+	// Separator with only new line `\n`.
 	sn := []byte{0x0A}
 
-	// total bytes scanned
+	// Total bytes scanned.
 	parsed := 0
 
-	// Split by `srn`
+	// Split by `srn`.
 	for rni, insrn := range bytes.Split(in, srn) {
-		// separator byte count should be added only after the first split
+		// Separator byte count should be added only after the first split.
 		if rni != 0 {
-			// Add two as `\r\n` is used for split
+			// Add two as `\r\n` is used for split.
 			parsed += 2
 		}
-		// Return false if there is a carriage return `\r`
-		if bytes.Contains(insrn, []byte{0x0D}) {
-			return false
-		}
-		// Split again by `sn`
+		// Split again by `sn`.
 		for ni, insn := range bytes.Split(insrn, sn) {
-			// separator byte count should be added only after the first split
+			// Separator byte count should be added only after the first split.
 			if ni != 0 {
-				// Add one as `\n` is used for split
+				// Add one as `\n` is used for split.
 				parsed++
 			}
-			// Empty line is valid
+			// Empty line is valid.
 			if len(insn) == 0 {
 				continue
 			}
@@ -289,6 +285,7 @@ func NdJson(in []byte) bool {
 			}
 		}
 	}
+
 	return parsed == len(in)
 }
 
