@@ -36,17 +36,6 @@ go get github.com/gabriel-vasile/mimetype
 There are quick [examples](EXAMPLES.md) and
 [GoDoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
 
-## Upgrade from v0.3.x to v1.x
-In v1.x the detect functions no longer return the MIME type and extension as
-strings. Instead they return a [MIME](https://godoc.org/github.com/gabriel-vasile/mimetype#MIME)
-struct. To get the string value of the MIME and the extension, call the
-`String()` and the `Extension()` methods.
-
-In order to play better with the stdlib `mime` package, v1.x file extensions
-include the leading dot, as in ".html".
-
-In v1.x the `text/plain` MIME type is `text/plain; charset=utf-8`.
-
 ## Supported MIME types
 See [supported mimes](supported_mimes.md) for the list of detected MIME types.
 If support is needed for a specific file format, please open an [issue](https://github.com/gabriel-vasile/mimetype/issues/new/choose).

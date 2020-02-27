@@ -1,10 +1,10 @@
 ## Examples
- - [Detect MIME type](#detect)
- - [Check against MIME type](#check)
+ - [Detect MIME type](#detect-mime-type)
+ - [Check against a MIME type](#check-against-a-mime-type)
  - [Parent](#parent)
  - [Binary file vs text file](#binary-file-vs-text-file)
 
-### Detect
+### Detect MIME type
 Get the MIME type from a path to a file.
 ```go
 file := "testdata/pdf.pdf"
@@ -28,14 +28,19 @@ fmt.Println(mime.String(), mime.Extension())
 // Output: application/pdf .pdf
 ```
 
-### Check
-Test if a file has a specific MIME type. Also accepts MIME type aliases.
+### Check against a MIME type
+Test if a file has a specific MIME type. Different from the string comparison,
+e.g.: `mime.String() == "application/zip"`, `mime.Is("application/zip")` method
+has the following advantages:
+ - handles MIME aliases,
+ - is case insensitive,
+ - ignores optional MIME parameters,
+ - ignores any leading and trailing whitespace.
 ```go
 mime, err := mimetype.DetectFile("testdata/zip.zip")
 // application/x-zip is an alias of application/zip,
 // therefore Is returns true both times.
 fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
-
 // Output: true true <nil>
 ```
 
@@ -65,7 +70,6 @@ for mime := detectedMIME; mime != nil; mime = mime.Parent() {
 
 // isText is true, even if the detected MIME was text/html.
 fmt.Println(isText, detectedMIME, err)
-
 // Output: true text/html <nil>
 ```
 
@@ -84,6 +88,5 @@ for mime := detectedMIME; mime != nil; mime = mime.Parent() {
 }
 
 fmt.Println(isBinary, detectedMIME, err)
-
 // Output: false text/xml; charset=utf-8 <nil>
 ```
