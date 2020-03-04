@@ -4,7 +4,7 @@
  - [Parent](#parent)
  - [Binary file vs text file](#binary-file-vs-text-file)
 
-### Detect MIME type
+### Detect MIME type [<kbd>playground</kbd>](http://play.golang.org/p/rhRN3RdQyd)
 Get the MIME type from a path to a file.
 ```go
 file := "testdata/pdf.pdf"
@@ -28,7 +28,7 @@ fmt.Println(mime.String(), mime.Extension())
 // Output: application/pdf .pdf
 ```
 
-### Check against a MIME type
+### Check against a MIME type [<kbd>playground</kbd>](http://play.golang.org/p/rhRN3RdQyd)
 Test if a file has a specific MIME type. Different from the string comparison,
 e.g.: `mime.String() == "application/zip"`, `mime.Is("application/zip")` method
 has the following advantages:
@@ -44,7 +44,7 @@ fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
 // Output: true true <nil>
 ```
 
-### Parent
+### Parent [<kbd>playground</kbd>](http://play.golang.org/p/rhRN3RdQyd)
 Upon detection, it may happen that the returned MIME type is more accurate than
 needed.
 
@@ -73,7 +73,7 @@ fmt.Println(isText, detectedMIME, err)
 // Output: true text/html <nil>
 ```
 
-### Binary file vs text file
+### Binary file vs text file [<kbd>playground</kbd>](http://play.golang.org/p/rhRN3RdQyd)
 Considering the definition of a binary file as "a computer file that is not
 a text file", they can be differentiated by searching for the `text/plain` MIME
 in it's MIME hierarchy.
