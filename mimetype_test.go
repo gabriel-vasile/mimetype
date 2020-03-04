@@ -226,12 +226,6 @@ func TestFaultyInput(t *testing.T) {
 	}
 }
 
-func TestEmptyInput(t *testing.T) {
-	if mime := Detect([]byte{}); mime.String() != "inode/x-empty" {
-		t.Errorf("failed to detect empty file")
-	}
-}
-
 func TestBadBdfInput(t *testing.T) {
 	if mime, _ := DetectFile("testdata/bad.dbf"); mime.String() != "application/octet-stream" {
 		t.Errorf("failed to detect bad DBF file")

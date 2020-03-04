@@ -286,7 +286,8 @@ func NdJson(in []byte) bool {
 		}
 	}
 
-	return parsed == len(in)
+	// Empty inputs should not pass as valid NDJSON with 0 lines.
+	return parsed > 0 && parsed == len(in)
 }
 
 // Js matches a Javascript file.

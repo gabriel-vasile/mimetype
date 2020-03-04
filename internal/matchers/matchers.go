@@ -5,11 +5,6 @@ package matchers
 // from the input when detecting from a reader.
 const ReadLimit = 3072
 
-// True is a dummy matching function used to match any input.
-func True([]byte) bool {
-	return true
-}
-
 // trimLWS trims whitespace from beginning of the input.
 func trimLWS(in []byte) []byte {
 	firstNonWS := 0

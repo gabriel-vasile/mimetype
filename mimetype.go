@@ -19,10 +19,6 @@ import (
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) (mime *MIME) {
-	if len(in) == 0 {
-		return newMIME("inode/x-empty", "", matchers.True)
-	}
-
 	return root.match(in, root)
 }
 
