@@ -55,6 +55,7 @@ var files = map[string]*MIME{
 	"warc.warc":   warc,
 	"zst.zst":     zstd,
 	"cab.cab":     cab,
+	"xz.xz":       xz,
 
 	// images
 	"png.png":          png,

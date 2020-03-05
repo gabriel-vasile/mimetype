@@ -103,3 +103,8 @@ func Rpm(in []byte) bool {
 		(bytes.HasPrefix(in, []byte{0xed, 0xab, 0xee, 0xdb}) ||
 			bytes.HasPrefix(in, []byte("drpm")))
 }
+
+// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt
+func Xz(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
+}
