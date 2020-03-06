@@ -12,11 +12,12 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, utf32le, utf32be, utf16le,
 	utf16be, gzip, class, swf, crx, woff, woff2, otf, eot, wasm, shx, dbf, dcm,
 	rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
-	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm,
+	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm, xz,
 )
 
 // The list of nodes appended to the root node.
 var (
+	xz   = newMIME("application/x-xz", ".xz", matchers.Xz)
 	gzip = newMIME("application/gzip", ".gz", matchers.Gzip).
 		alias("application/x-gzip", "application/x-gunzip", "application/gzipped", "application/gzip-compressed", "application/x-gzip-compressed", "gzip/document")
 	sevenZ = newMIME("application/x-7z-compressed", ".7z", matchers.SevenZ)
