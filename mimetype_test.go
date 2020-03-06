@@ -152,6 +152,7 @@ var files = map[string]*MIME{
 	"mrc.mrc":     mrc,
 
 	// fonts
+	"ttf.ttf":     ttf,
 	"woff.woff":   woff,
 	"woff2.woff2": woff2,
 	"otf.otf":     otf,

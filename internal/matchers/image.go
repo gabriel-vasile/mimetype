@@ -68,7 +68,8 @@ func Psd(in []byte) bool {
 
 // Ico matches an ICO file.
 func Ico(in []byte) bool {
-	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0x01, 0x00})
+	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0x01, 0x00}) ||
+		bytes.HasPrefix(in, []byte{0x00, 0x00, 0x02, 0x00})
 }
 
 // Icns matches an ICNS (Apple Icon Image format) file.

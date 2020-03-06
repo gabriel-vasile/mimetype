@@ -4,6 +4,12 @@ import (
 	"bytes"
 )
 
+// Ttf matches a TrueType font file.
+func Ttf(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x00, 0x01, 0x00, 0x00}) &&
+		!MsAccessAce(in) && !MsAccessMdb(in)
+}
+
 // Woff matches a Web Open Font Format file.
 func Woff(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("wOFF"))

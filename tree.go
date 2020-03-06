@@ -10,8 +10,8 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, utf32le, utf32be, utf16le,
-	utf16be, gzip, class, swf, crx, woff, woff2, otf, eot, wasm, shx, dbf, dcm,
-	rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
+	utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf,
+	dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm, xz,
 )
 
@@ -138,9 +138,11 @@ var (
 	mkv = newMIME("video/x-matroska", ".mkv", matchers.Mkv)
 	asf = newMIME("video/x-ms-asf", ".asf", matchers.Asf).
 		alias("video/asf", "video/x-ms-wmv")
-	class   = newMIME("application/x-java-applet; charset=binary", ".class", matchers.Class)
-	swf     = newMIME("application/x-shockwave-flash", ".swf", matchers.Swf)
-	crx     = newMIME("application/x-chrome-extension", ".crx", matchers.Crx)
+	class = newMIME("application/x-java-applet; charset=binary", ".class", matchers.Class)
+	swf   = newMIME("application/x-shockwave-flash", ".swf", matchers.Swf)
+	crx   = newMIME("application/x-chrome-extension", ".crx", matchers.Crx)
+	ttf   = newMIME("font/ttf", ".ttf", matchers.Ttf).
+		alias("font/sfnt", "application/x-font-ttf", "application/font-sfnt")
 	woff    = newMIME("font/woff", ".woff", matchers.Woff)
 	woff2   = newMIME("font/woff2", ".woff2", matchers.Woff2)
 	otf     = newMIME("font/otf", ".otf", matchers.Otf)

@@ -74,10 +74,8 @@ func Deb(in []byte) bool {
 
 // Rar matches a RAR archive file.
 func Rar(in []byte) bool {
-	if !bytes.HasPrefix(in, []byte{0x52, 0x61, 0x72, 0x21, 0x1A, 0x07}) {
-		return false
-	}
-	return len(in) > 8 && (bytes.Equal(in[6:8], []byte{0x01, 0x00}) || in[6] == 0x00)
+	return bytes.HasPrefix(in, []byte("Rar!\x1A\x07\x00")) ||
+		bytes.HasPrefix(in, []byte("Rar!\x1A\x07\x01\x00"))
 }
 
 // Warc matches a Web ARChive file.
@@ -104,7 +102,7 @@ func Rpm(in []byte) bool {
 			bytes.HasPrefix(in, []byte("drpm")))
 }
 
-// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt
+// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
 func Xz(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 }
