@@ -4,9 +4,6 @@ import "mime"
 
 // MIME struct holds information about a file format: the string representation
 // of the MIME type, the extension and the parent file format.
-//
-// This struct should not be instantiated by clients. It is exposed purely for
-// documentation purposes.
 type MIME struct {
 	mime      string
 	aliases   []string

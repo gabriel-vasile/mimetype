@@ -52,7 +52,7 @@ func DetectReader(r io.Reader) (mime *MIME, err error) {
 // Any error returned is related to the opening and reading from the input file.
 //
 // To prevent loading entire files into memory, DetectFile reads at most
-// matchers.ReadLimit bytes from the reader.
+// matchers.ReadLimit bytes from the input file.
 func DetectFile(file string) (mime *MIME, err error) {
 	f, err := os.Open(file)
 	if err != nil {

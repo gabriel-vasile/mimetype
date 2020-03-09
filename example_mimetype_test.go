@@ -40,7 +40,11 @@ func Example_detect() {
 // To check if some bytes/reader/file has a specific MIME type, first perform
 // a detect on the input and then test against the MIME.
 //
-// Is method can also be called with MIME aliases.
+// Different from the string comparison,
+// e.g.: mime.String() == "application/zip", mime.Is("application/zip") method
+// has the following advantages: it handles MIME aliases, is case insensitive,
+// ignores optional MIME parameters, and ignores any leading and trailing
+// whitespace.
 func Example_check() {
 	mime, err := mimetype.DetectFile("testdata/zip.zip")
 	// application/x-zip is an alias of application/zip,
