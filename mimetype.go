@@ -36,8 +36,8 @@ func Detect(in []byte) (mime *MIME) {
 // matchers.ReadLimit bytes from the reader.
 func DetectReader(r io.Reader) (mime *MIME, err error) {
 	in := make([]byte, matchers.ReadLimit)
-	n, err := r.Read(in)
-	if err != nil && err != io.EOF {
+	n, err := io.ReadFull(r, in)
+	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
 		return root, err
 	}
 	in = in[:n]
