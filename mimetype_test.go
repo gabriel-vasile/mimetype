@@ -245,7 +245,7 @@ func (b *breakReader) Read(p []byte) (int, error) {
 		p = p[:b.breakSize]
 	}
 	n, err := io.ReadFull(b.r, p)
-	if err == io.EOF && err == io.ErrUnexpectedEOF {
+	if err == io.ErrUnexpectedEOF {
 		return n, io.EOF
 	}
 	return n, err
