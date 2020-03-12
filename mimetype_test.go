@@ -216,6 +216,41 @@ func TestDetect(t *testing.T) {
 	}
 }
 
+func TestDetectReader(t *testing.T) {
+	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
+	for fName, node := range files {
+		fileName := filepath.Join(testDataDir, fName)
+		f, err := os.Open(fileName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		r := breakReader{
+			r:         f,
+			breakSize: 3,
+		}
+		if mime, err := DetectReader(&r); mime.String() != node.mime {
+			t.Errorf(errStr, fName, node.mime, mime.String(), err)
+		}
+		f.Close()
+	}
+}
+
+type breakReader struct {
+	r         io.Reader
+	breakSize int
+}
+
+func (b *breakReader) Read(p []byte) (int, error) {
+	if len(p) > b.breakSize {
+		p = p[:b.breakSize]
+	}
+	n, err := io.ReadFull(b.r, p)
+	if err == io.EOF && err == io.ErrUnexpectedEOF {
+		return n, io.EOF
+	}
+	return n, err
+}
+
 func TestFaultyInput(t *testing.T) {
 	inexistent := "inexistent.file"
 	if _, err := DetectFile(inexistent); err == nil {
