@@ -53,7 +53,7 @@ To prevent loading entire files into memory, when detecting from a
 [reader](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectReader)
 or from a [file](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectFile)
 **mimetype** limits itself to reading only the first
-[3072](https://github.com/gabriel-vasile/mimetype/blob/master/internal/matchers/matchers.go#L6)
+[3072](https://github.com/gabriel-vasile/mimetype/blob/87fd6acfef4cd447de83ef07b3f83aa57612dcf1/internal/matchers/matchers.go#L6)
 bytes from the input.
 <div align="center">
   <img alt="structure" src="mimetype.gif" width="88%">

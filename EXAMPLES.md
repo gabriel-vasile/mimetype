@@ -76,7 +76,7 @@ fmt.Println(isText, detectedMIME, err)
 ### Binary file vs text file [<kbd>Go Playground</kbd>](https://play.golang.org/p/CHEFnkn5LQp)
 Considering the definition of a binary file as "a computer file that is not
 a text file", they can be differentiated by searching for the `text/plain` MIME
-in it's MIME hierarchy. This is a reiteration of the [Parent](#parent) example.
+in it's MIME hierarchy. This is a reiteration of the [Parent](#parent-go-playground) example.
 ```go
 detectedMIME, err := mimetype.DetectFile("testdata/xml.xml")
 

@@ -1,192 +1,176 @@
-package mimetype
+package mimetype_test
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
-	"mime"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
+
+	"github.com/gabriel-vasile/mimetype"
 )
 
 const testDataDir = "testdata"
 
-var files = map[string]*MIME{
-	// archives
-	"pdf.pdf":     pdf,
-	"zip.zip":     zip,
-	"tar.tar":     tar,
-	"xls.xls":     xls,
-	"xlsx.xlsx":   xlsx,
-	"xlsx.1.xlsx": xlsx,
-	"doc.doc":     doc,
-	"doc.1.doc":   doc,
-	"docx.docx":   docx,
-	"docx.1.docx": docx,
-	"ppt.ppt":     ppt,
-	"pptx.pptx":   pptx,
-	"pub.pub":     pub,
-	"odt.odt":     odt,
-	"ott.ott":     ott,
-	"ods.ods":     ods,
-	"ots.ots":     ots,
-	"odp.odp":     odp,
-	"otp.otp":     otp,
-	"odg.odg":     odg,
-	"otg.otg":     otg,
-	"odf.odf":     odf,
-	"epub.epub":   epub,
-	"7z.7z":       sevenZ,
-	"jar.jar":     jar,
-	"gz.gz":       gzip,
-	"fits.fits":   fits,
-	"xar.xar":     xar,
-	"bz2.bz2":     bz2,
-	"a.a":         ar,
-	"deb.deb":     deb,
-	"rpm.rpm":     rpm,
-	"drpm.rpm":    rpm,
-	"rar.rar":     rar,
-	"djvu.djvu":   djvu,
-	"mobi.mobi":   mobi,
-	"lit.lit":     lit,
-	"warc.warc":   warc,
-	"zst.zst":     zstd,
-	"cab.cab":     cab,
-	"xz.xz":       xz,
-
-	// images
-	"png.png":          png,
-	"jpg.jpg":          jpg,
-	"jp2.jp2":          jp2,
-	"jpf.jpf":          jpx,
-	"jpm.jpm":          jpm,
-	"psd.psd":          psd,
-	"webp.webp":        webp,
-	"tif.tif":          tiff,
-	"ico.ico":          ico,
-	"bmp.bmp":          bmp,
-	"bpg.bpg":          bpg,
-	"heic.single.heic": heic,
-
-	// video
-	"mp4.mp4":   mp4,
-	"mp4.1.mp4": mp4,
-	"webm.webm": webM,
-	"3gp.3gp":   threeGP,
-	"3g2.3g2":   threeG2,
-	"flv.flv":   flv,
-	"avi.avi":   avi,
-	"mov.mov":   quickTime,
-	"mqv.mqv":   mqv,
-	"mpeg.mpeg": mpeg,
-	"mkv.mkv":   mkv,
-	"asf.asf":   asf,
-
-	// audio
-	"mp3.mp3":            mp3,
-	"mp3.v1.notag.mp3":   mp3,
-	"mp3.v2.notag.mp3":   mp3,
-	"mp3.v2.5.notag.mp3": mp3,
-	"wav.wav":            wav,
-	"flac.flac":          flac,
-	"midi.midi":          midi,
-	"ape.ape":            ape,
-	"aiff.aiff":          aiff,
-	"au.au":              au,
-	"ogg.oga":            oggAudio,
-	"ogg.spx.oga":        oggAudio,
-	"ogg.ogv":            oggVideo,
-	"amr.amr":            amr,
-	"mpc.mpc":            musePack,
-	"aac.aac":            aac,
-	"voc.voc":            voc,
-	"m4a.m4a":            m4a,
-	"m4b.m4b":            aMp4,
-	"qcp.qcp":            qcp,
-
-	// source code
-	"html.html":         html,
-	"html.withbr.html":  html,
-	"svg.svg":           svg,
-	"svg.1.svg":         svg,
-	"utf8.txt":          utf8,
-	"utf16lebom.txt":    utf16le,
-	"utf16bebom.txt":    utf16be,
-	"utf32bebom.txt":    utf32be,
-	"utf32lebom.txt":    utf32le,
-	"php.php":           php,
-	"ps.ps":             ps,
-	"json.json":         json,
-	"geojson.geojson":   geoJson,
-	"geojson.1.geojson": geoJson,
-	"ndjson.ndjson":     ndJson,
-	"csv.csv":           csv,
-	"tsv.tsv":           tsv,
-	"rtf.rtf":           rtf,
-	"js.js":             js,
-	"lua.lua":           lua,
-	"pl.pl":             perl,
-	"py.py":             python,
-	"tcl.tcl":           tcl,
-	"vCard.vCard":       vCard,
-	"vCard.dos.vCard":   vCard,
-	"ics.ics":           iCalendar,
-	"ics.dos.ics":       iCalendar,
-
-	// binary
-	"class.class": class,
-	"swf.swf":     swf,
-	"crx.crx":     crx,
-	"wasm.wasm":   wasm,
-	"exe.exe":     exe,
-	"ln":          elfExe,
-	"so.so":       elfLib,
-	"o.o":         elfObj,
-	"dcm.dcm":     dcm,
-	"mach.o":      macho,
-	"sample32":    macho,
-	"sample64":    macho,
-	"mrc.mrc":     mrc,
-
-	// fonts
-	"ttf.ttf":     ttf,
-	"woff.woff":   woff,
-	"woff2.woff2": woff2,
-	"otf.otf":     otf,
-	"eot.eot":     eot,
-
-	// XML and subtypes of XML
-	"xml.withbr.xml": xml,
-	"kml.kml":        kml,
-	"xlf.xlf":        xliff,
-	"dae.dae":        collada,
-	"gml.gml":        gml,
-	"gpx.gpx":        gpx,
-	"tcx.tcx":        tcx,
-	"x3d.x3d":        x3d,
-	"amf.amf":        amf,
-	"3mf.3mf":        threemf,
-	"rss.rss":        rss,
-	"atom.atom":      atom,
-
-	"shp.shp": shp,
-	"shx.shx": shx,
-	"dbf.dbf": dbf,
-
-	"sqlite3.sqlite3": sqlite3,
-	"dwg.dwg":         dwg,
-	"dwg.1.dwg":       dwg,
-	"nes.nes":         nes,
-	"mdb.mdb":         mdb,
-	"accdb.accdb":     accdb,
+// test files sorted by the file name in alphabetical order.
+var files = map[string]string{
+	"3g2.3g2":            "video/3gpp2",
+	"3gp.3gp":            "video/3gpp",
+	"3mf.3mf":            "application/vnd.ms-package.3dmanufacturing-3dmodel+xml",
+	"7z.7z":              "application/x-7z-compressed",
+	"a.a":                "application/x-archive",
+	"aac.aac":            "audio/aac",
+	"accdb.accdb":        "application/x-msaccess",
+	"aiff.aiff":          "audio/aiff",
+	"amf.amf":            "application/x-amf",
+	"amr.amr":            "audio/amr",
+	"ape.ape":            "audio/ape",
+	"asf.asf":            "video/x-ms-asf",
+	"atom.atom":          "application/atom+xml",
+	"au.au":              "audio/basic",
+	"avi.avi":            "video/x-msvideo",
+	"bmp.bmp":            "image/bmp",
+	"bpg.bpg":            "image/bpg",
+	"bz2.bz2":            "application/x-bzip2",
+	"cab.cab":            "application/vnd.ms-cab-compressed",
+	"class.class":        "application/x-java-applet; charset=binary",
+	"crx.crx":            "application/x-chrome-extension",
+	"csv.csv":            "text/csv",
+	"dae.dae":            "model/vnd.collada+xml",
+	"dbf.dbf":            "application/x-dbf",
+	"dcm.dcm":            "application/dicom",
+	"deb.deb":            "application/vnd.debian.binary-package",
+	"djvu.djvu":          "image/vnd.djvu",
+	"doc.1.doc":          "application/msword",
+	"doc.doc":            "application/msword",
+	"docx.1.docx":        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"docx.docx":          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"drpm.rpm":           "application/x-rpm",
+	"dwg.1.dwg":          "image/vnd.dwg",
+	"dwg.dwg":            "image/vnd.dwg",
+	"eot.eot":            "application/vnd.ms-fontobject",
+	"epub.epub":          "application/epub+zip",
+	"exe.exe":            "application/vnd.microsoft.portable-executable",
+	"fits.fits":          "application/fits",
+	"flac.flac":          "audio/flac",
+	"flv.flv":            "video/x-flv",
+	"geojson.1.geojson":  "application/geo+json",
+	"geojson.geojson":    "application/geo+json",
+	"gml.gml":            "application/gml+xml",
+	"gpx.gpx":            "application/gpx+xml",
+	"gz.gz":              "application/gzip",
+	"heic.single.heic":   "image/heic",
+	"html.html":          "text/html; charset=utf-8",
+	"html.withbr.html":   "text/html; charset=utf-8",
+	"ico.ico":            "image/x-icon",
+	"ics.dos.ics":        "text/calendar",
+	"ics.ics":            "text/calendar",
+	"jar.jar":            "application/jar",
+	"jp2.jp2":            "image/jp2",
+	"jpf.jpf":            "image/jpx",
+	"jpg.jpg":            "image/jpeg",
+	"jpm.jpm":            "image/jpm",
+	"js.js":              "application/javascript",
+	"json.json":          "application/json",
+	"kml.kml":            "application/vnd.google-earth.kml+xml",
+	"lit.lit":            "application/x-ms-reader",
+	"ln":                 "application/x-executable",
+	"lua.lua":            "text/x-lua",
+	"m4a.m4a":            "audio/x-m4a",
+	"audio.mp4":          "audio/mp4",
+	"macho.macho":        "application/x-mach-binary",
+	"mdb.mdb":            "application/x-msaccess",
+	"midi.midi":          "audio/midi",
+	"mkv.mkv":            "video/x-matroska",
+	"mobi.mobi":          "application/x-mobipocket-ebook",
+	"mov.mov":            "video/quicktime",
+	"mp3.mp3":            "audio/mpeg",
+	"mp3.v1.notag.mp3":   "audio/mpeg",
+	"mp3.v2.5.notag.mp3": "audio/mpeg",
+	"mp3.v2.notag.mp3":   "audio/mpeg",
+	"mp4.1.mp4":          "video/mp4",
+	"mp4.mp4":            "video/mp4",
+	"mpc.mpc":            "audio/musepack",
+	"mpeg.mpeg":          "video/mpeg",
+	"mqv.mqv":            "video/quicktime",
+	"mrc.mrc":            "application/marc",
+	"ndjson.ndjson":      "application/x-ndjson",
+	"nes.nes":            "application/vnd.nintendo.snes.rom",
+	"elfobject":          "application/x-object",
+	"odf.odf":            "application/vnd.oasis.opendocument.formula",
+	"odg.odg":            "application/vnd.oasis.opendocument.graphics",
+	"odp.odp":            "application/vnd.oasis.opendocument.presentation",
+	"ods.ods":            "application/vnd.oasis.opendocument.spreadsheet",
+	"odt.odt":            "application/vnd.oasis.opendocument.text",
+	"ogg.oga":            "audio/ogg",
+	"ogg.ogv":            "video/ogg",
+	"ogg.spx.oga":        "audio/ogg",
+	"otf.otf":            "font/otf",
+	"otg.otg":            "application/vnd.oasis.opendocument.graphics-template",
+	"otp.otp":            "application/vnd.oasis.opendocument.presentation-template",
+	"ots.ots":            "application/vnd.oasis.opendocument.spreadsheet-template",
+	"ott.ott":            "application/vnd.oasis.opendocument.text-template",
+	"pdf.pdf":            "application/pdf",
+	"php.php":            "text/x-php; charset=utf-8",
+	"pl.pl":              "text/x-perl",
+	"png.png":            "image/png",
+	"ppt.ppt":            "application/vnd.ms-powerpoint",
+	"pptx.pptx":          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	"ps.ps":              "application/postscript",
+	"psd.psd":            "image/vnd.adobe.photoshop",
+	"pub.pub":            "application/vnd.ms-publisher",
+	"py.py":              "application/x-python",
+	"qcp.qcp":            "audio/qcelp",
+	"rar.rar":            "application/x-rar-compressed",
+	"rpm.rpm":            "application/x-rpm",
+	"rss.rss":            "application/rss+xml",
+	"rtf.rtf":            "text/rtf",
+	"sample32.macho":     "application/x-mach-binary",
+	"sample64.macho":     "application/x-mach-binary",
+	"shp.shp":            "application/octet-stream",
+	"shx.shx":            "application/octet-stream",
+	"so.so":              "application/x-sharedlib",
+	"sqlite.sqlite":      "application/x-sqlite3",
+	"svg.1.svg":          "image/svg+xml",
+	"svg.svg":            "image/svg+xml",
+	"swf.swf":            "application/x-shockwave-flash",
+	"tar.tar":            "application/x-tar",
+	"tcl.tcl":            "text/x-tcl",
+	"tcx.tcx":            "application/vnd.garmin.tcx+xml",
+	"tiff.tiff":          "image/tiff",
+	"tsv.tsv":            "text/tab-separated-values",
+	"ttf.ttf":            "font/ttf",
+	"utf16bebom.txt":     "text/plain; charset=utf-16be",
+	"utf16lebom.txt":     "text/plain; charset=utf-16le",
+	"utf32bebom.txt":     "text/plain; charset=utf-32be",
+	"utf32lebom.txt":     "text/plain; charset=utf-32le",
+	"utf8.txt":           "text/plain; charset=utf-8",
+	"vcf.dos.vcf":        "text/vcard",
+	"vcf.vcf":            "text/vcard",
+	"voc.voc":            "audio/x-unknown",
+	"warc.warc":          "application/warc",
+	"wasm.wasm":          "application/wasm",
+	"wav.wav":            "audio/wav",
+	"webm.webm":          "video/webm",
+	"webp.webp":          "image/webp",
+	"woff.woff":          "font/woff",
+	"woff2.woff2":        "font/woff2",
+	"x3d.x3d":            "model/x3d+xml",
+	"xar.xar":            "application/x-xar",
+	"xlf.xlf":            "application/x-xliff+xml",
+	"xls.xls":            "application/vnd.ms-excel",
+	"xlsx.1.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"xlsx.xlsx":          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"xml.withbr.xml":     "text/xml; charset=utf-8",
+	"xz.xz":              "application/x-xz",
+	"zip.zip":            "application/zip",
+	"zst.zst":            "application/zstd",
 }
 
 func TestDetect(t *testing.T) {
-	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
-	for fName, node := range files {
+	errStr := "File: %s; ExpectedMIME: %s != DetectedMIME: %s; err: %v"
+	extStr := "File: %s; ExpectedExt: %s != DetectedExt: %s"
+	for fName, expected := range files {
 		fileName := filepath.Join(testDataDir, fName)
 		f, err := os.Open(fileName)
 		if err != nil {
@@ -197,28 +181,30 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime := Detect(data); mime.String() != node.mime {
-			t.Errorf(errStr, fName, node.mime, mime.String(), nil)
+		if mime := mimetype.Detect(data); mime.String() != expected {
+			t.Errorf(errStr, fName, expected, mime.String(), nil)
 		}
 
 		if _, err := f.Seek(0, io.SeekStart); err != nil {
-			t.Errorf(errStr, fName, node.mime, root.mime, err)
+			t.Fatal(err)
 		}
 
-		if mime, err := DetectReader(f); mime.String() != node.mime {
-			t.Errorf(errStr, fName, node.mime, mime.String(), err)
+		if mime, err := mimetype.DetectReader(f); mime.String() != expected {
+			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
 
-		if mime, err := DetectFile(fileName); mime.String() != node.mime {
-			t.Errorf(errStr, fName, node.mime, mime.String(), err)
+		if mime, err := mimetype.DetectFile(fileName); mime.String() != expected {
+			t.Errorf(errStr, fName, expected, mime.String(), err)
+		} else if mime.Extension() != filepath.Ext(fName) {
+			t.Errorf(extStr, fName, filepath.Ext(fName), mime.Extension())
 		}
 	}
 }
 
 func TestDetectReader(t *testing.T) {
 	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
-	for fName, node := range files {
+	for fName, expected := range files {
 		fileName := filepath.Join(testDataDir, fName)
 		f, err := os.Open(fileName)
 		if err != nil {
@@ -228,13 +214,19 @@ func TestDetectReader(t *testing.T) {
 			r:         f,
 			breakSize: 3,
 		}
-		if mime, err := DetectReader(&r); mime.String() != node.mime {
-			t.Errorf(errStr, fName, node.mime, mime.String(), err)
+		if mime, err := mimetype.DetectReader(&r); mime.String() != expected {
+			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
 	}
 }
 
+// breakReader breaks the string every breakSize characters.
+// It is like:
+//   <html><h
+//   ead><tit
+//   le>html<
+//   ...
 type breakReader struct {
 	r         io.Reader
 	breakSize int
@@ -253,87 +245,12 @@ func (b *breakReader) Read(p []byte) (int, error) {
 
 func TestFaultyInput(t *testing.T) {
 	inexistent := "inexistent.file"
-	if _, err := DetectFile(inexistent); err == nil {
+	if _, err := mimetype.DetectFile(inexistent); err == nil {
 		t.Errorf("%s should not match successfully", inexistent)
 	}
 
 	f, _ := os.Open(inexistent)
-	if _, err := DetectReader(f); err == nil {
+	if _, err := mimetype.DetectReader(f); err == nil {
 		t.Errorf("%s reader should not match successfully", inexistent)
-	}
-}
-
-func TestBadBdfInput(t *testing.T) {
-	if mime, _ := DetectFile("testdata/bad.dbf"); mime.String() != "application/octet-stream" {
-		t.Errorf("failed to detect bad DBF file")
-	}
-}
-
-func TestGenerateSupportedMimesFile(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-
-	nodes := root.flatten()
-	header := fmt.Sprintf(`## %d Supported MIME types
-This file is automatically generated when running tests. Do not edit manually.
-
-Extension | MIME type | Aliases
---------- | --------- | -------
-`, len(nodes))
-
-	if _, err := f.WriteString(header); err != nil {
-		t.Fatal(err)
-	}
-	for _, n := range nodes {
-		ext := n.extension
-		if ext == "" {
-			ext = "n/a"
-		}
-
-		aliases := strings.Join(n.aliases, ", ")
-		if aliases == "" {
-			aliases = "-"
-		}
-		str := fmt.Sprintf("**%s** | %s | %s\n", ext, n.mime, aliases)
-		if _, err := f.WriteString(str); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
-func TestIndexOutOfRange(t *testing.T) {
-	for _, n := range root.flatten() {
-		_ = n.matchFunc(nil)
-	}
-}
-
-// MIME type equality ignores any optional MIME parameters, so, in order to not
-// parse each alias when testing for equality, we must ensure they are
-// registered with no parameters.
-func TestMIMEFormat(t *testing.T) {
-	for _, n := range root.flatten() {
-		// All extensions must be dot prefixed so they are compatible
-		// with the stdlib mime package.
-		if n.Extension() != "" && !strings.HasPrefix(n.Extension(), ".") {
-			t.Fatalf("")
-		}
-		// All MIMEs must be correctly formatted.
-		_, _, err := mime.ParseMediaType(n.String())
-		if err != nil {
-			t.Fatalf("error parsing node MIME: %s", err)
-		}
-		// Aliases must have no optional MIME parameters.
-		for _, a := range n.aliases {
-			parsed, params, err := mime.ParseMediaType(a)
-			if err != nil {
-				t.Fatalf("error parsing node alias MIME: %s", err)
-			}
-			if parsed != a || len(params) > 0 {
-				t.Fatalf("node alias MIME should have no optional params; alias: %s, params: %v", a, params)
-			}
-		}
 	}
 }
