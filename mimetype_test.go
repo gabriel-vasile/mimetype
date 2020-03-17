@@ -181,7 +181,7 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime := mimetype.Detect(data); mime.String() != expected {
+		if mime := mimetype.Detect(data); !mime.Is(expected) {
 			t.Errorf(errStr, fName, expected, mime.String(), nil)
 		}
 
@@ -189,12 +189,12 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime, err := mimetype.DetectReader(f); mime.String() != expected {
+		if mime, err := mimetype.DetectReader(f); !mime.Is(expected) {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
 
-		if mime, err := mimetype.DetectFile(fileName); mime.String() != expected {
+		if mime, err := mimetype.DetectFile(fileName); !mime.Is(expected) {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		} else if mime.Extension() != filepath.Ext(fName) {
 			t.Errorf(extStr, fName, filepath.Ext(fName), mime.Extension())
@@ -214,7 +214,7 @@ func TestDetectReader(t *testing.T) {
 			r:         f,
 			breakSize: 3,
 		}
-		if mime, err := mimetype.DetectReader(&r); mime.String() != expected {
+		if mime, err := mimetype.DetectReader(&r); !mime.Is(expected) {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
