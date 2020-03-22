@@ -12,7 +12,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, utf32le, utf32be, utf16le,
 	utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf,
 	dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp, icns, heic,
-	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm, xz,
+	heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8, rpm, xz, lzip,
 )
 
 // The list of nodes appended to the root node.
@@ -197,4 +197,5 @@ var (
 	accdb = newMIME("application/x-msaccess", ".accdb", matchers.MsAccessAce)
 	zstd  = newMIME("application/zstd", ".zst", matchers.Zstd)
 	cab   = newMIME("application/vnd.ms-cab-compressed", ".cab", matchers.Cab)
+	lzip  = newMIME("application/lzip", ".lz", matchers.Lzip)
 )
