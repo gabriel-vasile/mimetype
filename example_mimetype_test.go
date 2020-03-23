@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"testing"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -134,15 +133,4 @@ func ExampleMIME_Is() {
 	fmt.Println(pdf, xpdf, txt, err)
 
 	// Output: true true false <nil>
-}
-
-func Test_Lzip(t *testing.T) {
-	mime, err := mimetype.DetectFile("testdata/lz.lz")
-	expected := "application/lzip"
-	if err != nil {
-		t.Error("Opening file error for .lz test")
-	}
-	if mime.String() != expected {
-		t.Errorf("Test failed for .lz extention. '%s' expected '%s' received", expected, mime.String())
-	}
 }

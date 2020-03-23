@@ -76,6 +76,7 @@ var files = map[string]string{
 	"lit.lit":            "application/x-ms-reader",
 	"ln":                 "application/x-executable",
 	"lua.lua":            "text/x-lua",
+	"lz.lz":              "application/lzip",
 	"m4a.m4a":            "audio/x-m4a",
 	"audio.mp4":          "audio/mp4",
 	"macho.macho":        "application/x-mach-binary",
