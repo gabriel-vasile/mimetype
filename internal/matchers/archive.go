@@ -106,3 +106,7 @@ func Rpm(in []byte) bool {
 func Xz(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 }
+
+func Lzip(in []byte) bool {
+	return len(in) > 3 && in[0] == 0x4C && in[1] == 0x5A && in[2] == 0x49 && in[3] == 0x50
+}
