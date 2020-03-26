@@ -2,10 +2,13 @@ package mimetype
 
 import (
 	"fmt"
+	"io/ioutil"
 	"mime"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gabriel-vasile/mimetype/internal/matchers"
 )
 
 // This test generates the doc file containing the table with the supported MIMEs.
@@ -75,5 +78,12 @@ func TestMIMEFormat(t *testing.T) {
 				t.Fatalf("node alias MIME should have no optional params; alias: %s, params: %v", a, params)
 			}
 		}
+	}
+}
+
+func BenchmarkFailingXlsx(b *testing.B) {
+	src, _ := ioutil.ReadFile("testdata/pdf.pdf")
+	for i := 0; i < b.N; i++ {
+		matchers.Xlsx(src)
 	}
 }
