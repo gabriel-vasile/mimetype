@@ -3,39 +3,58 @@ package matchers
 import (
 	"bytes"
 	"encoding/binary"
-	"regexp"
+	"strings"
 )
 
-var msoXMLreg = regexp.MustCompile("\\[Content_Types\\]\\.xml|_rels/\\.rels|docProps")
+// zipTokenizer holds the source zip file and scanned index.
+type zipTokenizer struct {
+	in []byte
+	i  int // current index
+}
 
-// msoXML walks through the first 4 zip local file headers and returns whether
-// any of the headers contain a file whose name starts with sig.
-func msoXML(in, sig []byte) bool {
+// next returns the next file name from the zip headers.
+// https://web.archive.org/web/20191129114319/https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
+func (t *zipTokenizer) next() (fileName string) {
+	if t.i > len(t.in) {
+		return
+	}
+	in := t.in[t.i:]
+	// pkSig is the signature of the zip local file header.
 	pkSig := []byte("PK\003\004")
-
-	if !msoXMLreg.Match(in[:min(len(in), 8000)]) {
-		return false
+	pkIndex := bytes.Index(in, pkSig)
+	// 30 is the offset of the file name in the header.
+	fNameOffset := pkIndex + 30
+	// end if signature not found or file name offset outside of file.
+	if pkIndex == -1 || fNameOffset > len(in) {
+		return
 	}
 
-	// 30 is the offset where the file name is located in each zip header.
-	lastCheckedIndex := 0
-	check := func(in, sig []byte, offset int) bool {
-		return len(in) > offset && bytes.HasPrefix(in[offset:], sig)
+	fNameLen := int(binary.LittleEndian.Uint16(in[pkIndex+26 : pkIndex+28]))
+	if fNameLen <= 0 || fNameOffset+fNameLen > len(in) {
+		return
 	}
+	t.i += fNameOffset + fNameLen
+	return string(in[fNameOffset : fNameOffset+fNameLen])
+}
 
-	// github.com/file/file looks for the msoXML signature in the first 4 local
-	// headers, but some xlsx files have their signature in later headers.
-	// testdata/xlsx.1.xlsx is such an example, with the signature in the 5th header.
-	for i := 0; i < 6 && lastCheckedIndex < len(in); i++ {
-		in = in[lastCheckedIndex:]
-		pkIndex := bytes.Index(in, pkSig)
-		if pkIndex == -1 {
-			return false
+// msoXML reads at most first 10 local headers and returns whether the input
+// looks like a Microsoft Office file.
+func msoXML(in []byte, prefix string) bool {
+	t := zipTokenizer{in: in}
+	hasMsoXmlFiles, hasPrefix := false, false
+	for i, tok := 0, t.next(); i < 10 && tok != ""; i, tok = i+1, t.next() {
+		if tok == "[Content_Types].xml" ||
+			tok == "_rels/.rels" ||
+			tok == "docProps" {
+			hasMsoXmlFiles = true
 		}
-		if check(in, sig, pkIndex+30) {
+		if strings.HasPrefix(tok, prefix) {
+			hasPrefix = true
+		}
+
+		if hasMsoXmlFiles && hasPrefix {
 			return true
 		}
-		lastCheckedIndex = pkIndex + 30
 	}
 
 	return false
@@ -43,17 +62,17 @@ func msoXML(in, sig []byte) bool {
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(in []byte) bool {
-	return msoXML(in, []byte("xl/"))
+	return msoXML(in, "xl/")
 }
 
-// Docx matches a Microsoft Office 2007 file.
+// Docx matches a Microsoft Word 2007 file.
 func Docx(in []byte) bool {
-	return msoXML(in, []byte("word/"))
+	return msoXML(in, "word/")
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(in []byte) bool {
-	return msoXML(in, []byte("ppt/"))
+	return msoXML(in, "ppt/")
 }
 
 // Ole matches an Open Linking and Embedding file.
@@ -63,7 +82,7 @@ func Ole(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
-// Doc matches a Microsoft Office 97-2003 file.
+// Doc matches a Microsoft Word 97-2003 file.
 //
 // BUG(gabriel-vasile): Doc should look for subheaders like Ppt and Xls does.
 //
@@ -74,7 +93,7 @@ func Doc(in []byte) bool {
 	return true
 }
 
-// Ppt  matches a Microsoft PowerPoint 97-2003 file.
+// Ppt matches a Microsoft PowerPoint 97-2003 file.
 func Ppt(in []byte) bool {
 	if len(in) < 520 {
 		return false
@@ -99,7 +118,7 @@ func Ppt(in []byte) bool {
 		bytes.Contains(in, []byte("P\x00o\x00w\x00e\x00r\x00P\x00o\x00i\x00n\x00t\x00 D\x00o\x00c\x00u\x00m\x00e\x00n\x00t"))
 }
 
-// Xls  matches a Microsoft Excel 97-2003 file.
+// Xls matches a Microsoft Excel 97-2003 file.
 func Xls(in []byte) bool {
 	if len(in) <= 512 {
 		return false
