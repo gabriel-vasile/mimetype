@@ -56,8 +56,23 @@ or from a [file](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectFile
 [3072](https://github.com/gabriel-vasile/mimetype/blob/87fd6acfef4cd447de83ef07b3f83aa57612dcf1/internal/matchers/matchers.go#L6)
 bytes from the input.
 <div align="center">
-  <img alt="structure" src="mimetype.gif" width="88%">
+  <img alt="structure" src="https://github.com/gabriel-vasile/mimetype/blob/33abbe6cb78fe1a8486c92f95008a9e0fcef10a1/mimetype.gif?raw=true" width="88%">
 </div>
+
+## Performance
+Thanks to the hierarchical structure, searching for common formats first,
+and careful memory allocations **mimetype** outperforms **filetype**
+in benchmarks.
+
+Tests were run on an Intel Xeon Gold 6136 24 core CPU @ 3.00GHz.
+```bash
+                                 filetype            mimetype
+BenchmarkMatchTar-24            3778 ns/op          250 ns/op
+BenchmarkMatchZip-24            4884 ns/op          524 ns/op
+BenchmarkMatchJpeg-24            839 ns/op          103 ns/op
+BenchmarkMatchGif-24             751 ns/op          139 ns/op
+BenchmarkMatchPng-24            1176 ns/op          165 ns/op
+```
 
 ## Contributing
 See [CONTRIBUTING.md](CONTRIBUTING.md).
