@@ -56,6 +56,7 @@ var files = map[string]string{
 	"flv.flv":            "video/x-flv",
 	"geojson.1.geojson":  "application/geo+json",
 	"geojson.geojson":    "application/geo+json",
+	"gif.gif":            "image/gif",
 	"gml.gml":            "application/gml+xml",
 	"gpx.gpx":            "application/gpx+xml",
 	"gz.gz":              "application/gzip",
