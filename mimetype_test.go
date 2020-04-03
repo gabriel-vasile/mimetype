@@ -1,6 +1,7 @@
 package mimetype_test
 
 import (
+	"crypto/rand"
 	"io"
 	"io/ioutil"
 	"os"
@@ -254,5 +255,82 @@ func TestFaultyInput(t *testing.T) {
 	f, _ := os.Open(inexistent)
 	if _, err := mimetype.DetectReader(f); err == nil {
 		t.Errorf("%s reader should not match successfully", inexistent)
+	}
+}
+
+// Benchmarking a random slice of bytes is as close as possible to the real
+// world usage. A random byte slice is almost guaranteed to fail being detected.
+//
+// When performing a detection on a file it is very likely there will be
+// multiple rules failing before finding the one that matches, ex: a jpg file
+// might be tested for zip, gzip, etc., before it is identified.
+func BenchmarkSliceRand(b *testing.B) {
+	data := make([]byte, 3072)
+	if _, err := io.ReadFull(rand.Reader, data); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			mimetype.Detect(data)
+		}
+	})
+}
+
+func BenchmarkSliceTar(b *testing.B) {
+	tar, err := ioutil.ReadFile("testdata/tar.tar")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		mimetype.Detect(tar)
+	}
+}
+
+func BenchmarkSliceZip(b *testing.B) {
+	zip, err := ioutil.ReadFile("testdata/zip.zip")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		mimetype.Detect(zip)
+	}
+}
+
+func BenchmarkSliceJpeg(b *testing.B) {
+	jpeg, err := ioutil.ReadFile("testdata/jpg.jpg")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		mimetype.Detect(jpeg)
+	}
+}
+
+func BenchmarkSliceGif(b *testing.B) {
+	gif, err := ioutil.ReadFile("testdata/gif.gif")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		mimetype.Detect(gif)
+	}
+}
+
+func BenchmarkSlicePng(b *testing.B) {
+	png, err := ioutil.ReadFile("testdata/png.png")
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		mimetype.Detect(png)
 	}
 }
