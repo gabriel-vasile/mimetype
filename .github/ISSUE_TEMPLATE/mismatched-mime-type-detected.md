@@ -3,7 +3,6 @@ name: Mismatched MIME type detected
 about: Report a bug involving mismatched MIME type returned for a certain file
 title: ''
 labels: ''
-assignees: gabriel-vasile
 
 ---
 

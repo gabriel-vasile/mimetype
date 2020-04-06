@@ -4,7 +4,7 @@
  - [Parent](#parent-go-playground)
  - [Binary file vs text file](#binary-file-vs-text-file-go-playground)
 
-### Detect MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/Ti34KSv7HuR)
+### Detect MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/tvmXDKerjn3)
 Get the MIME type from a path to a file.
 ```go
 file := "testdata/pdf.pdf"
@@ -28,7 +28,7 @@ fmt.Println(mime.String(), mime.Extension())
 // Output: application/pdf .pdf
 ```
 
-### Test against a MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/luAl501AK1q)
+### Test against a MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/TzGomWZqCH-)
 Test if a file has a specific MIME type. Different from the string comparison,
 e.g.: `mime.String() == "application/zip"`, `mime.Is("application/zip")` method
 has the following advantages:
