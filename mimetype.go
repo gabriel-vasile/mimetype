@@ -62,3 +62,17 @@ func DetectFile(file string) (mime *MIME, err error) {
 
 	return DetectReader(f)
 }
+
+// Get a MIME type from the internal database.
+//
+// The result may be nil.
+//
+// The input is tested with MIME.Is() – aliases are considererd
+func GetMime(in string) (mime *MIME) {
+	for _, m := range root.flatten() {
+		if m.Is(in) {
+			return m
+		}
+	}
+	return nil
+}
