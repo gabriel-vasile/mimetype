@@ -334,3 +334,15 @@ func BenchmarkSlicePng(b *testing.B) {
 		mimetype.Detect(png)
 	}
 }
+
+func TestGetMime(t *testing.T) {
+	if mimetype.GetMime("text/plain; charset=utf-8").String() != "text/plain" {
+		t.Errorf("Query for text/plain; charset=utf-8 did not return text/plain.")
+	}
+	if mimetype.GetMime("text/plain").String() != "text/plain" {
+		t.Errorf("Query for text/plain did not return text/plain.")
+	}
+	if mimetype.GetMime("") != nil {
+		t.Errorf("Query for nonexistant mime type did not return nil.")
+	}
+}
