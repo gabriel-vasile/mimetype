@@ -54,32 +54,6 @@ func Example_check() {
 	// Output: true true <nil>
 }
 
-// It may happen that the returned MIME type is more accurate than needed.
-//
-// Suppose we have a text file containing HTML code. Detection performed on this
-// file will retrieve the `text/html` MIME. If you are interested in telling if
-// the input can be used as a text file, you can walk up the MIME hierarchy
-// until `text/plain` is found.
-//
-// Remember to always check for nil before using the result of the Parent() method.
-//            .Parent()              .Parent()
-//  text/html ----------> text/plain ----------> application/octet-stream
-func Example_parent() {
-	detectedMIME, err := mimetype.DetectFile("testdata/html.html")
-
-	isText := false
-	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
-		if mime.Is("text/plain") {
-			isText = true
-		}
-	}
-
-	// isText is true, even if the detected MIME was text/html.
-	fmt.Println(isText, detectedMIME, err)
-
-	// Output: true text/html; charset=utf-8 <nil>
-}
-
 // Considering the definition of a binary file as "a computer file that is not
 // a text file", they can differentiated by searching for the text/plain MIME
 // in it's MIME hierarchy.
@@ -128,18 +102,22 @@ func ExampleMIME_Is() {
 	mime, err := mimetype.DetectFile("testdata/pdf.pdf")
 
 	pdf := mime.Is("application/pdf")
-	xpdf := mime.Is("application/x-pdf")
+	xdf := mime.Is("application/x-pdf")
 	txt := mime.Is("text/plain")
-	fmt.Println(pdf, xpdf, txt, err)
+	fmt.Println(pdf, xdf, txt, err)
 
 	// Output: true true false <nil>
 }
 
 func ExampleEqualsAny() {
-	whitelist := []string{"text/plain", "application/zip"}
-	mime, err := mimetype.DetectFile("testdata/zip.zip")
+	allowed := []string{"text/plain", "text/html", "text/csv"}
+	mime, _ := mimetype.DetectFile("testdata/utf8.txt")
 
-	fmt.Println(mimetype.EqualsAny(mime.String(), whitelist...), err)
+	if mimetype.EqualsAny(mime.String(), allowed...) {
+		fmt.Printf("%s is allowed\n", mime)
+	} else {
+		fmt.Printf("%s is now allowed\n", mime)
+	}
 
-	// Output: true <nil>
+	// Output: text/plain; charset=utf-8 is allowed
 }

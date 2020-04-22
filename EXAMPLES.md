@@ -1,10 +1,10 @@
 ## Examples
  - [Detect MIME type](#detect-mime-type-go-playground)
  - [Test against a MIME type](#test-against-a-mime-type-go-playground)
- - [Parent](#parent-go-playground)
+ - [Whitelist](#whitelist-go-playground)
  - [Binary file vs text file](#binary-file-vs-text-file-go-playground)
 
-### Detect MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/tvmXDKerjn3)
+### Detect MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/axQsR4dOo9k)
 Get the MIME type from a path to a file.
 ```go
 file := "testdata/pdf.pdf"
@@ -28,7 +28,7 @@ fmt.Println(mime.String(), mime.Extension())
 // Output: application/pdf .pdf
 ```
 
-### Test against a MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/TzGomWZqCH-)
+### Test against a MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/H0ooIXD2N3-)
 Test if a file has a specific MIME type. Different from the string comparison,
 e.g.: `mime.String() == "application/zip"`, `mime.Is("application/zip")` method
 has the following advantages:
@@ -44,39 +44,24 @@ fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
 // Output: true true <nil>
 ```
 
-### Parent [<kbd>Go Playground</kbd>](https://play.golang.org/p/F-HBv_Z1Bfj)
-Upon detection, it may happen that the returned MIME type is more accurate than
-needed.
-
-Suppose we have a text file containing HTML code. Detection performed on this
-file will retrieve the `text/html` MIME. If you are interested in telling if
-the input can be used as a text file, you can walk up the MIME hierarchy until
-`text/plain` is found.
-
-Remember to always check for nil before using the result of the `Parent()` method.
-```
-           .Parent()              .Parent()
-text/html ----------> text/plain ----------> application/octet-stream
-```
+### Whitelist [<kbd>Go Playground</kbd>](https://play.golang.org/p/a8nNjs2BT8b)
+Test if a MIME type is in a list of allowed MIME types.
 ```go
-detectedMIME, err := mimetype.DetectFile("testdata/html.html")
+allowed := []string{"text/plain", "text/html", "text/csv"}
+mime, _ := mimetype.DetectFile("/etc/passwd")
 
-isText := false
-for mime := detectedMIME; mime != nil; mime = mime.Parent() {
-    if mime.Is("text/plain") {
-        isText = true
-    }
+if mimetype.EqualsAny(mime.String(), allowed...) {
+    fmt.Printf("%s is allowed\n", mime)
+} else {
+    fmt.Printf("%s is now allowed\n", mime)
 }
-
-// isText is true, even if the detected MIME was text/html.
-fmt.Println(isText, detectedMIME, err)
-// Output: true text/html <nil>
+// Output: text/plain; charset=utf-8 is allowed
 ```
 
 ### Binary file vs text file [<kbd>Go Playground</kbd>](https://play.golang.org/p/CHEFnkn5LQp)
 Considering the definition of a binary file as "a computer file that is not
 a text file", they can be differentiated by searching for the `text/plain` MIME
-in it's MIME hierarchy. This is a reiteration of the [Parent](#parent-go-playground) example.
+in it's MIME hierarchy.
 ```go
 detectedMIME, err := mimetype.DetectFile("testdata/xml.xml")
 
