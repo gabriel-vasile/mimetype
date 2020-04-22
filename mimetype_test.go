@@ -205,6 +205,29 @@ func TestDetect(t *testing.T) {
 	}
 }
 
+func TestEqualsAny(t *testing.T) {
+	type ss []string
+	testCases := []struct {
+		m1  string
+		m2  ss
+		res bool
+	}{
+		{"foo/bar", ss{"foo/bar"}, true},
+		{"  foo/bar", ss{"foo/bar	"}, true}, // whitespace
+		{"  foo/bar", ss{"foo/BAR	"}, true}, // case
+		{"  foo/bar", ss{"foo/baz"}, false},
+		{";charset=utf-8", ss{""}, true},
+		{"", ss{"", "foo/bar"}, true},
+		{"foo/bar", ss{""}, false},
+		{"foo/bar", nil, false},
+	}
+	for _, tc := range testCases {
+		if mimetype.EqualsAny(tc.m1, tc.m2...) != tc.res {
+			t.Errorf("Equality test failed for %+v", tc)
+		}
+	}
+}
+
 func TestDetectReader(t *testing.T) {
 	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
 	for fName, expected := range files {

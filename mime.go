@@ -38,7 +38,7 @@ func (n *MIME) Parent() *MIME {
 
 // Is checks whether this MIME type, or any of its aliases, is equal to the
 // expected MIME type. MIME type equality test is done on the "type/subtype"
-// sections, ignores any optional MIME parameters, ignores any leading and
+// section, ignores any optional MIME parameters, ignores any leading and
 // trailing whitespace, and is case insensitive.
 func (n *MIME) Is(expectedMIME string) bool {
 	// Parsing is needed because some detected MIME types contain parameters

@@ -9,6 +9,7 @@ package mimetype
 
 import (
 	"io"
+	"mime"
 	"os"
 
 	"github.com/gabriel-vasile/mimetype/internal/matchers"
@@ -61,4 +62,20 @@ func DetectFile(file string) (mime *MIME, err error) {
 	defer f.Close()
 
 	return DetectReader(f)
+}
+
+// EqualsAny reports whether s MIME type is equal to any MIME type in mimes.
+// MIME type equality test is done on the "type/subtype" section, ignores
+// any optional MIME parameters, ignores any leading and trailing whitespace,
+// and is case insensitive.
+func EqualsAny(s string, mimes ...string) bool {
+	s, _, _ = mime.ParseMediaType(s)
+	for _, m := range mimes {
+		m, _, _ = mime.ParseMediaType(m)
+		if s == m {
+			return true
+		}
+	}
+
+	return false
 }

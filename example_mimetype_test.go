@@ -134,3 +134,12 @@ func ExampleMIME_Is() {
 
 	// Output: true true false <nil>
 }
+
+func ExampleEqualsAny() {
+	whitelist := []string{"text/plain", "application/zip"}
+	mime, err := mimetype.DetectFile("testdata/zip.zip")
+
+	fmt.Println(mimetype.EqualsAny(mime.String(), whitelist...), err)
+
+	// Output: true <nil>
+}
