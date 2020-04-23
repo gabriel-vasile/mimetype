@@ -44,7 +44,7 @@ fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
 // Output: true true <nil>
 ```
 
-### Whitelist [<kbd>Go Playground</kbd>](https://play.golang.org/p/a8nNjs2BT8b)
+### Whitelist [<kbd>Go Playground</kbd>](https://play.golang.org/p/js_1nmWGG3j)
 Test if a MIME type is in a list of allowed MIME types.
 ```go
 allowed := []string{"text/plain", "text/html", "text/csv"}
