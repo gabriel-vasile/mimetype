@@ -34,7 +34,7 @@
 - small and simple API
 - handles MIME type aliases
 - thread safe
-- low memory usage: besides the file header, almost zero allocs
+- low memory usage, besides the file header
 
 ## Install
 ```bash
@@ -65,18 +65,18 @@ or from a [file](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectFile
 
 ## Performance
 Thanks to the hierarchical structure, searching for common formats first,
-and careful memory allocations **mimetype** has an order of magnitude faster
-detections.
+and limiting itself to file headers, **mimetype** matches the performance of
+stdlib `http.DetectContentType` while outperforming the alternative package.
 
 [Benchmarks](https://github.com/gabriel-vasile/mimetype/blob/d8628c314b5e59259afc7b0f4f84e6b31931b316/mimetype_test.go#L267)
-were run on an Intel Xeon Gold 6136 24 core CPU @ 3.00GHz.
+were run on an Intel Xeon Gold 6136 24 core CPU @ 3.00GHz. Lower is better.
 ```bash
-                                 filetype            mimetype
-BenchmarkMatchTar-24            3778 ns/op          250 ns/op
-BenchmarkMatchZip-24            4884 ns/op          524 ns/op
-BenchmarkMatchJpeg-24            839 ns/op          103 ns/op
-BenchmarkMatchGif-24             751 ns/op          139 ns/op
-BenchmarkMatchPng-24            1176 ns/op          165 ns/op
+                            mimetype  http.DetectContentType      filetype
+BenchmarkMatchTar-24       250 ns/op         400 ns/op           3778 ns/op
+BenchmarkMatchZip-24       524 ns/op         351 ns/op           4884 ns/op
+BenchmarkMatchJpeg-24      103 ns/op         228 ns/op            839 ns/op
+BenchmarkMatchGif-24       139 ns/op         202 ns/op            751 ns/op
+BenchmarkMatchPng-24       165 ns/op         221 ns/op           1176 ns/op
 ```
 
 ## Contributing

@@ -20,7 +20,7 @@ import (
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) (mime *MIME) {
-	return root.match(in, root)
+	return root.match(in)
 }
 
 // DetectReader returns the MIME type of the provided reader.
