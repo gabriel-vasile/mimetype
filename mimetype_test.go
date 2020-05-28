@@ -141,6 +141,7 @@ var files = map[string]string{
 	"tcl.tcl":            "text/x-tcl",
 	"tcx.tcx":            "application/vnd.garmin.tcx+xml",
 	"tiff.tiff":          "image/tiff",
+	"torrent.torrent":    "application/x-bittorrent",
 	"tsv.tsv":            "text/tab-separated-values",
 	"ttf.ttf":            "font/ttf",
 	"utf16bebom.txt":     "text/plain; charset=utf-16be",
