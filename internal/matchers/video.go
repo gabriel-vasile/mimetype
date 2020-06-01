@@ -69,3 +69,8 @@ func Asf(in []byte) bool {
 		0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C,
 	})
 }
+
+// Rmvb matches a RealMedia Variable Bitrate file.
+func Rmvb(in []byte) bool {
+	return bytes.HasPrefix(in, []byte{0x2E, 0x52, 0x4D, 0x46})
+}

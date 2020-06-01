@@ -125,6 +125,7 @@ var files = map[string]string{
 	"py.py":              "application/x-python",
 	"qcp.qcp":            "audio/qcelp",
 	"rar.rar":            "application/x-rar-compressed",
+	"rmvb.rmvb":          "application/vnd.rn-realmedia-vbr",
 	"rpm.rpm":            "application/x-rpm",
 	"rss.rss":            "application/rss+xml",
 	"rtf.rtf":            "text/rtf",
