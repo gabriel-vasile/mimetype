@@ -6,6 +6,45 @@ import (
 	"strings"
 )
 
+var (
+	xlsxSigFiles = []string{
+		"xl/worksheets/",
+		"xl/drawings/",
+		"xl/theme/",
+		"xl/_rels/",
+		"xl/styles.xml",
+		"xl/workbook.xml",
+		"xl/sharedStrings.xml",
+	}
+	docxSigFiles = []string{
+		"word/media/",
+		"word/_rels/document.xml.rels",
+		"word/document.xml",
+		"word/styles.xml",
+		"word/fontTable.xml",
+		"word/settings.xml",
+		"word/numbering.xml",
+		"word/header",
+		"word/footer",
+	}
+	pptxSigFiles = []string{
+		"ppt/slides/",
+		"ppt/media/",
+		"ppt/slideLayouts/",
+		"ppt/theme/",
+		"ppt/slideMasters/",
+		"ppt/tags/",
+		"ppt/notesMasters/",
+		"ppt/_rels/",
+		"ppt/handoutMasters/",
+		"ppt/notesSlides/",
+		"ppt/presentation.xml",
+		"ppt/tableStyles.xml",
+		"ppt/presProps.xml",
+		"ppt/viewProps.xml",
+	}
+)
+
 // zipTokenizer holds the source zip file and scanned index.
 type zipTokenizer struct {
 	in []byte
@@ -39,21 +78,13 @@ func (t *zipTokenizer) next() (fileName string) {
 
 // msoXML reads at most first 10 local headers and returns whether the input
 // looks like a Microsoft Office file.
-func msoXML(in []byte, prefix string) bool {
+func msoXML(in []byte, prefixes ...string) bool {
 	t := zipTokenizer{in: in}
-	hasMsoXmlFiles, hasPrefix := false, false
 	for i, tok := 0, t.next(); i < 10 && tok != ""; i, tok = i+1, t.next() {
-		if tok == "[Content_Types].xml" ||
-			tok == "_rels/.rels" ||
-			tok == "docProps" {
-			hasMsoXmlFiles = true
-		}
-		if strings.HasPrefix(tok, prefix) {
-			hasPrefix = true
-		}
-
-		if hasMsoXmlFiles && hasPrefix {
-			return true
+		for p := range prefixes {
+			if strings.HasPrefix(tok, prefixes[p]) {
+				return true
+			}
 		}
 	}
 
@@ -62,17 +93,17 @@ func msoXML(in []byte, prefix string) bool {
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(in []byte) bool {
-	return msoXML(in, "xl/")
+	return msoXML(in, xlsxSigFiles...)
 }
 
 // Docx matches a Microsoft Word 2007 file.
 func Docx(in []byte) bool {
-	return msoXML(in, "word/")
+	return msoXML(in, docxSigFiles...)
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(in []byte) bool {
-	return msoXML(in, "ppt/")
+	return msoXML(in, pptxSigFiles...)
 }
 
 // Ole matches an Open Linking and Embedding file.

@@ -165,6 +165,7 @@ var files = map[string]string{
 	"xlf.xlf":            "application/x-xliff+xml",
 	"xls.xls":            "application/vnd.ms-excel",
 	"xlsx.1.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"xlsx.2.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	"xlsx.xlsx":          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	"xml.withbr.xml":     "text/xml; charset=utf-8",
 	"xz.xz":              "application/x-xz",
