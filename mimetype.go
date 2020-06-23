@@ -19,7 +19,10 @@ import (
 //
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
-func Detect(in []byte) (mime *MIME) {
+func Detect(in []byte) *MIME {
+	if len(in) > matchers.ReadLimit {
+		in = in[:matchers.ReadLimit]
+	}
 	return root.match(in)
 }
 
