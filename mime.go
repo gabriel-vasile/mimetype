@@ -1,6 +1,8 @@
 package mimetype
 
-import "mime"
+import (
+	"mime"
+)
 
 // MIME struct holds information about a file format: the string representation
 // of the MIME type, the extension and the parent file format.

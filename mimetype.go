@@ -35,7 +35,7 @@ func Detect(in []byte) (mime *MIME) {
 //
 // To prevent loading entire files into memory, DetectReader reads at most
 // matchers.ReadLimit bytes from the reader.
-func DetectReader(r io.Reader) (mime *MIME, err error) {
+func DetectReader(r io.Reader) (*MIME, error) {
 	in := make([]byte, matchers.ReadLimit)
 	n, err := io.ReadFull(r, in)
 	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
@@ -54,7 +54,7 @@ func DetectReader(r io.Reader) (mime *MIME, err error) {
 //
 // To prevent loading entire files into memory, DetectFile reads at most
 // matchers.ReadLimit bytes from the input file.
-func DetectFile(file string) (mime *MIME, err error) {
+func DetectFile(file string) (*MIME, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return root, err
