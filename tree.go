@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent,
+	rpm, xz, lzip, torrent, cpio,
 )
 
 // The list of nodes appended to the root node.
@@ -201,4 +201,5 @@ var (
 	cab     = newMIME("application/vnd.ms-cab-compressed", ".cab", matchers.Cab)
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
+	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
 )

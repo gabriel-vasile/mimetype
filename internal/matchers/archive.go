@@ -92,3 +92,10 @@ func Xz(in []byte) bool {
 func Lzip(in []byte) bool {
 	return len(in) > 3 && in[0] == 0x4C && in[1] == 0x5A && in[2] == 0x49 && in[3] == 0x50
 }
+
+// Cpio matches a cpio archive file
+func Cpio(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("070707")) ||
+		bytes.HasPrefix(in, []byte("070701")) ||
+		bytes.HasPrefix(in, []byte("070702"))
+}

@@ -37,6 +37,7 @@ var files = map[string]string{
 	"class.class":        "application/x-java-applet; charset=binary",
 	"crx.crx":            "application/x-chrome-extension",
 	"csv.csv":            "text/csv",
+	"cpio.cpio":          "application/x-cpio",
 	"dae.dae":            "model/vnd.collada+xml",
 	"dbf.dbf":            "application/x-dbf",
 	"dcm.dcm":            "application/dicom",
