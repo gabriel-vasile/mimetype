@@ -1,6 +1,6 @@
 package mimetype
 
-import "github.com/gabriel-vasile/mimetype/internal/matchers"
+import "github.com/gabriel-vasile/mimetype/pkgs/matchers"
 
 // root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers
