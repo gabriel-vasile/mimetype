@@ -389,3 +389,8 @@ func VCard(in []byte) bool {
 func ICalendar(in []byte) bool {
 	return detect(in, iCalSigs)
 }
+
+// PgpAscii matches an ascii-armored pgp-encrypted file
+func PgpAscii(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("-----BEGIN PGP MESSAGE-----"))
+}
