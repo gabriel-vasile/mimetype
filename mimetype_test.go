@@ -36,6 +36,7 @@ var files = map[string]string{
 	"cab.cab":            "application/vnd.ms-cab-compressed",
 	"class.class":        "application/x-java-applet; charset=binary",
 	"crx.crx":            "application/x-chrome-extension",
+	"css.css":            "text/css",
 	"csv.csv":            "text/csv",
 	"cpio.cpio":          "application/x-cpio",
 	"dae.dae":            "model/vnd.collada+xml",

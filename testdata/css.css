@@ -1,0 +1,23 @@
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: white;
+	color: #222;
+	margin: 0px;
+	padding: 0px;
+	font-family: sans-serif;
+}
+
+@media screen and (prefers-color-scheme: dark) {
+	body {
+		color: white;
+		background: #222;
+	}
+	pre {
+		color:#222;
+	}
+}
