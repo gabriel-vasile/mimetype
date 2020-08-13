@@ -1,6 +1,8 @@
 package matchers
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // SevenZ matches a 7z archive.
 func SevenZ(in []byte) bool {

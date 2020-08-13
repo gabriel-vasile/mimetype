@@ -75,6 +75,10 @@ var (
 		ciSig("BEGIN:VCALENDAR\n"),
 		ciSig("BEGIN:VCALENDAR\r\n"),
 	}
+	ggrSigs = []sig{
+		ciSig("GIMP Gradient"),
+		ciSig("Name:"),
+	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -388,4 +392,16 @@ func VCard(in []byte) bool {
 // ICalendar matches a iCalendar file.
 func ICalendar(in []byte) bool {
 	return detect(in, iCalSigs)
+}
+
+// Ggr matches GIMP's gradient data files
+func Ggr(in []byte) bool {
+	ggrHeaderLength := 3
+	ggrLinesSplit := bytes.Split(in, []byte("\n"))
+
+	if len(ggrLinesSplit) < ggrHeaderLength {
+		return false
+	}
+
+	return detect(in, ggrSigs)
 }

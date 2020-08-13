@@ -1,6 +1,8 @@
 package matchers
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // Png matches a Portable Network Graphics file.
 func Png(in []byte) bool {
@@ -117,10 +119,5 @@ func Dwg(in []byte) bool {
 		}
 	}
 
-	return false
-}
-
-// Ggr matches GIMP's gradient data files
-func Ggr(in []byte) bool {
 	return false
 }
