@@ -1,8 +1,6 @@
 package matchers
 
-import (
-	"bytes"
-)
+import "bytes"
 
 // Png matches a Portable Network Graphics file.
 func Png(in []byte) bool {
