@@ -202,4 +202,5 @@ var (
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
+	ggr     = newMIME("text/x-gimp-ggr", ".ggr", matchers.Ggr)
 )

@@ -119,3 +119,8 @@ func Dwg(in []byte) bool {
 
 	return false
 }
+
+// Ggr matches GIMP's gradient data files
+func Ggr(in []byte) bool {
+	return false
+}
