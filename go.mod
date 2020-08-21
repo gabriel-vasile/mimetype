@@ -1,3 +1,3 @@
-module github.com/DarylDohner20/mimetype
+module github.com/gabriel-vasile/mimetype
 
 go 1.12

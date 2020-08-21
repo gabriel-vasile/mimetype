@@ -3,7 +3,7 @@ package matchers
 import (
 	"bytes"
 
-	"github.com/DarylDohner20/mimetype/internal/json"
+	"github.com/gabriel-vasile/mimetype/internal/json"
 )
 
 var (
