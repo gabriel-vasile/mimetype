@@ -34,7 +34,7 @@ var (
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
 	epub = newMIME("application/epub+zip", ".epub", matchers.Epub)
 	jar  = newMIME("application/jar", ".jar", matchers.Jar)
-	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, xls, pub, ppt, doc)
+	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, msg, xls, pub, ppt, doc)
 	doc  = newMIME("application/msword", ".doc", matchers.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", matchers.Ppt).
@@ -42,6 +42,7 @@ var (
 	pub = newMIME("application/vnd.ms-publisher", ".pub", matchers.Pub)
 	xls = newMIME("application/vnd.ms-excel", ".xls", matchers.Xls).
 		alias("application/msexcel")
+	msg  = newMIME("application/vnd.ms-outlook", ".msg", matchers.Msg)
 	ps   = newMIME("application/postscript", ".ps", matchers.Ps)
 	fits = newMIME("application/fits", ".fits", matchers.Fits)
 	ogg  = newMIME("application/ogg", ".ogg", matchers.Ogg, oggAudio, oggVideo).

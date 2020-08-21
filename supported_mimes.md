@@ -22,6 +22,7 @@ Extension | MIME type | Aliases
 **.odf** | application/vnd.oasis.opendocument.formula | application/x-vnd.oasis.opendocument.formula
 **.pdf** | application/pdf | application/x-pdf
 **n/a** | application/x-ole-storage | -
+**.msg** | application/vnd.ms-outlook | -
 **.xls** | application/vnd.ms-excel | application/msexcel
 **.pub** | application/vnd.ms-publisher | -
 **.ppt** | application/vnd.ms-powerpoint | application/mspowerpoint
