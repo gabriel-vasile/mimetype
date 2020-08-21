@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio,
+	rpm, xz, lzip, torrent, cpio, pgp,
 )
 
 // The list of nodes appended to the root node.
@@ -53,7 +53,7 @@ var (
 	utf32be  = newMIME("text/plain; charset=utf-32be", ".txt", matchers.Utf32be)
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
-	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
+	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc, pgpAscii)
 	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
@@ -191,16 +191,18 @@ var (
 	sqlite3 = newMIME("application/x-sqlite3", ".sqlite", matchers.Sqlite)
 	dwg     = newMIME("image/vnd.dwg", ".dwg", matchers.Dwg).
 		alias("image/x-dwg", "application/acad", "application/x-acad", "application/autocad_dwg", "application/dwg", "application/x-dwg", "application/x-autocad", "drawing/dwg")
-	warc    = newMIME("application/warc", ".warc", matchers.Warc)
-	nes     = newMIME("application/vnd.nintendo.snes.rom", ".nes", matchers.Nes)
-	macho   = newMIME("application/x-mach-binary", ".macho", matchers.MachO)
-	qcp     = newMIME("audio/qcelp", ".qcp", matchers.Qcp)
-	mrc     = newMIME("application/marc", ".mrc", matchers.Marc)
-	mdb     = newMIME("application/x-msaccess", ".mdb", matchers.MsAccessMdb)
-	accdb   = newMIME("application/x-msaccess", ".accdb", matchers.MsAccessAce)
-	zstd    = newMIME("application/zstd", ".zst", matchers.Zstd)
-	cab     = newMIME("application/vnd.ms-cab-compressed", ".cab", matchers.Cab)
-	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
-	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
-	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
+	warc     = newMIME("application/warc", ".warc", matchers.Warc)
+	nes      = newMIME("application/vnd.nintendo.snes.rom", ".nes", matchers.Nes)
+	macho    = newMIME("application/x-mach-binary", ".macho", matchers.MachO)
+	qcp      = newMIME("audio/qcelp", ".qcp", matchers.Qcp)
+	mrc      = newMIME("application/marc", ".mrc", matchers.Marc)
+	mdb      = newMIME("application/x-msaccess", ".mdb", matchers.MsAccessMdb)
+	accdb    = newMIME("application/x-msaccess", ".accdb", matchers.MsAccessAce)
+	zstd     = newMIME("application/zstd", ".zst", matchers.Zstd)
+	cab      = newMIME("application/vnd.ms-cab-compressed", ".cab", matchers.Cab)
+	lzip     = newMIME("application/lzip", ".lz", matchers.Lzip)
+	torrent  = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
+	cpio     = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
+	pgp      = newMIME("application/pgp-encrypted", ".pgp", matchers.Pgp)
+	pgpAscii = newMIME("application/pgp-encrypted", ".pgp", matchers.PgpAscii)
 )

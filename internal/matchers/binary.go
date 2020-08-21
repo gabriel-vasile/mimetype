@@ -144,3 +144,8 @@ func Marc(in []byte) bool {
 	// Field terminator is present
 	return bytes.Contains(in, []byte{0x1E})
 }
+
+// Pgp matches a pgp-encrypted file
+func Pgp(in []byte) bool {
+	return len(in) >= 4 && in[0] == 0x85 && in[3] == 0x03
+}

@@ -173,6 +173,8 @@ var files = map[string]string{
 	"xz.xz":              "application/x-xz",
 	"zip.zip":            "application/zip",
 	"zst.zst":            "application/zstd",
+	"pgp.pgp":            "application/pgp-encrypted",
+	"pgp.2.pgp":          "application/pgp-encrypted",
 }
 
 func TestDetect(t *testing.T) {
