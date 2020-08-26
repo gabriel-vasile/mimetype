@@ -2,7 +2,6 @@ package matchers
 
 import (
 	"bytes"
-	"strings"
 
 	"github.com/gabriel-vasile/mimetype/internal/json"
 )
@@ -404,20 +403,19 @@ func Ggr(in []byte) bool {
 		return false
 	}
 
+	// Check if the first line of .ggr has GIMP Gradient
 	if string(ggrLinesSplit[0]) != "GIMP Gradient" {
 		return false
 	}
 
-	if !bytes.HasPrefix(ggrLinesSplit[1], []byte("Name:")) {
+	// Split the second line at the ':'
+	grrSecondLine := bytes.Split(ggrLinesSplit[1], []byte(":"))
+
+	// Must exists 2 items separeted by comma
+	if len(grrSecondLine) != 2 {
 		return false
 	}
 
-	colonIndex := bytes.Index(ggrLinesSplit[1], []byte(":"))
-	afterColon := strings.TrimSpace(string(ggrLinesSplit[1][colonIndex+1:]))
-
-	if len(afterColon) < 1 {
-		return false
-	}
-
-	return detect(in, ggrSigs)
+	// The first item must be Name and the second one cannot be empty
+	return string(grrSecondLine[0]) == "Name" && len(grrSecondLine[1]) > 0
 }
