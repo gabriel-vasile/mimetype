@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio,
+	rpm, xz, lzip, torrent, cpio, owx, owl,
 )
 
 // The list of nodes appended to the root node.
@@ -64,7 +64,7 @@ var (
 	php      = newMIME("text/x-php; charset=utf-8", ".php", matchers.Php)
 	rtf      = newMIME("text/rtf", ".rtf", matchers.Rtf)
 	js       = newMIME("application/javascript", ".js", matchers.Js).
-			alias("application/x-javascript", "text/javascript")
+		alias("application/x-javascript", "text/javascript")
 	lua    = newMIME("text/x-lua", ".lua", matchers.Lua)
 	perl   = newMIME("text/x-perl", ".pl", matchers.Perl)
 	python = newMIME("application/x-python", ".py", matchers.Python)
@@ -74,7 +74,7 @@ var (
 	iCalendar = newMIME("text/calendar", ".ics", matchers.ICalendar)
 	svg       = newMIME("image/svg+xml", ".svg", matchers.Svg)
 	rss       = newMIME("application/rss+xml", ".rss", matchers.Rss).
-			alias("text/rss")
+		alias("text/rss")
 	atom    = newMIME("application/atom+xml", ".atom", matchers.Atom)
 	x3d     = newMIME("model/x3d+xml", ".x3d", matchers.X3d)
 	kml     = newMIME("application/vnd.google-earth.kml+xml", ".kml", matchers.Kml)
@@ -113,7 +113,7 @@ var (
 	ape      = newMIME("audio/ape", ".ape", matchers.Ape)
 	musePack = newMIME("audio/musepack", ".mpc", matchers.MusePack)
 	wav      = newMIME("audio/wav", ".wav", matchers.Wav).
-			alias("audio/x-wav", "audio/vnd.wave", "audio/wave")
+		alias("audio/x-wav", "audio/vnd.wave", "audio/wave")
 	aiff = newMIME("audio/aiff", ".aiff", matchers.Aiff)
 	au   = newMIME("audio/basic", ".au", matchers.Au)
 	amr  = newMIME("audio/amr", ".amr", matchers.Amr).
@@ -131,7 +131,7 @@ var (
 	quickTime = newMIME("video/quicktime", ".mov", matchers.QuickTime)
 	mqv       = newMIME("video/quicktime", ".mqv", matchers.Mqv)
 	threeGP   = newMIME("video/3gpp", ".3gp", matchers.ThreeGP).
-			alias("video/3gp", "audio/3gpp")
+		alias("video/3gp", "audio/3gpp")
 	threeG2 = newMIME("video/3gpp2", ".3g2", matchers.ThreeG2).
 		alias("video/3g2", "audio/3gpp2")
 	avi = newMIME("video/x-msvideo", ".avi", matchers.Avi).
@@ -203,4 +203,6 @@ var (
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
+	owl     = newMIME("application/owl+xml", ".owl", matchers.OwlXml, owx)
+	owx     = newMIME("application/owl+xml", ".owx", matchers.OwlXml)
 )
