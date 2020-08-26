@@ -15,6 +15,8 @@ const testDataDir = "testdata"
 
 // test files sorted by the file name in alphabetical order.
 var files = map[string]string{
+	"owl.owl":            "application/owl+xml",
+	"owl.owx":            "application/owl+xml",
 	"3g2.3g2":            "video/3gpp2",
 	"3gp.3gp":            "video/3gpp",
 	"3mf.3mf":            "application/vnd.ms-package.3dmanufacturing-3dmodel+xml",
