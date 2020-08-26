@@ -403,11 +403,6 @@ func Ggr(in []byte) bool {
 		return false
 	}
 
-	// Check if the first line of .ggr has GIMP Gradient
-	if string(ggrLinesSplit[0]) != "GIMP Gradient" {
-		return false
-	}
-
 	// Split the second line at the ':'
 	grrSecondLine := bytes.Split(ggrLinesSplit[1], []byte(":"))
 
@@ -416,6 +411,8 @@ func Ggr(in []byte) bool {
 		return false
 	}
 
-	// The first item must be Name and the second one cannot be empty
-	return string(grrSecondLine[0]) == "Name" && len(grrSecondLine[1]) > 0
+	// Check if the first line of .ggr has GIMP Gradient
+	// The first item from the second line must be Name and the second one cannot be emptyreaders ￼
+	return string(ggrLinesSplit[0]) != "GIMP Gradient" &&
+		string(grrSecondLine[0]) == "Name" && len(grrSecondLine[1]) > 0
 }
