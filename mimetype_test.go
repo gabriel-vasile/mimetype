@@ -15,8 +15,6 @@ const testDataDir = "testdata"
 
 // test files sorted by the file name in alphabetical order.
 var files = map[string]string{
-	"owl.owl":            "application/owl+xml",
-	"owl.owx":            "application/owl+xml",
 	"3g2.3g2":            "video/3gpp2",
 	"3gp.3gp":            "video/3gpp",
 	"3mf.3mf":            "application/vnd.ms-package.3dmanufacturing-3dmodel+xml",
@@ -117,6 +115,7 @@ var files = map[string]string{
 	"otp.otp":            "application/vnd.oasis.opendocument.presentation-template",
 	"ots.ots":            "application/vnd.oasis.opendocument.spreadsheet-template",
 	"ott.ott":            "application/vnd.oasis.opendocument.text-template",
+	"owl.owl":            "application/owl+xml",
 	"pdf.pdf":            "application/pdf",
 	"php.php":            "text/x-php; charset=utf-8",
 	"pl.pl":              "text/x-perl",

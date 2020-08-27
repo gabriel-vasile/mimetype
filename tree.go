@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio, owx, owl,
+	rpm, xz, lzip, torrent, cpio, owl,
 )
 
 // The list of nodes appended to the root node.
@@ -54,7 +54,7 @@ var (
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
 	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
-	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
+	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, owl)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", matchers.Tsv)
@@ -203,6 +203,5 @@ var (
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
-	owl     = newMIME("application/owl+xml", ".owl", matchers.OwlXml, owx)
-	owx     = newMIME("application/owl+xml", ".owx", matchers.OwlXml)
+	owl     = newMIME("application/owl+xml", ".owl", matchers.OwlXml)
 )
