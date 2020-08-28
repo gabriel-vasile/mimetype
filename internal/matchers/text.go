@@ -75,10 +75,6 @@ var (
 		ciSig("BEGIN:VCALENDAR\n"),
 		ciSig("BEGIN:VCALENDAR\r\n"),
 	}
-	ggrSigs = []sig{
-		ciSig("GIMP Gradient"),
-		ciSig("Name:"),
-	}
 	phpSigs = []sig{
 		ciSig("<?PHP"),
 		ciSig("<?\n"),
@@ -411,8 +407,9 @@ func Ggr(in []byte) bool {
 		return false
 	}
 
-	// Check if the first line of .ggr has GIMP Gradient
-	// The first item from the second line must be Name and the second one cannot be emptyreaders ￼
-	return string(ggrLinesSplit[0]) != "GIMP Gradient" &&
-		string(grrSecondLine[0]) == "Name" && len(grrSecondLine[1]) > 0
+	// Check if the first line of .ggr has 'GIMP Gradient'
+	// Check if the second line of .ggr has prefix 'Name:'
+	// After split the second line at ':' the content after ':' must not be empty
+	return bytes.Equal(ggrLinesSplit[0], []byte("GIMP Gradient")) &&
+		bytes.HasPrefix(ggrLinesSplit[1], []byte("Name:")) && len(grrSecondLine[1]) > 0
 }
