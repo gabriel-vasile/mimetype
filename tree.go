@@ -54,7 +54,7 @@ var (
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
 	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
-	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
+	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, owl2)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", matchers.Tsv)
@@ -75,6 +75,7 @@ var (
 	svg       = newMIME("image/svg+xml", ".svg", matchers.Svg)
 	rss       = newMIME("application/rss+xml", ".rss", matchers.Rss).
 			alias("text/rss")
+	owl2    = newMIME("application/owl+xml", ".owl", matchers.Owl2)
 	atom    = newMIME("application/atom+xml", ".atom", matchers.Atom)
 	x3d     = newMIME("model/x3d+xml", ".x3d", matchers.X3d)
 	kml     = newMIME("application/vnd.google-earth.kml+xml", ".kml", matchers.Kml)

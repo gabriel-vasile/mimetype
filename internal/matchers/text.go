@@ -29,6 +29,9 @@ var (
 	xmlSigs = []sig{
 		markupSig("<?XML"),
 	}
+	owlSigs = []sig{
+		newXmlSig("Ontology", `xmlns="http://www.w3.org/2002/07/owl#"`),
+	}
 	rssSigs = []sig{
 		newXmlSig("rss", ""),
 	}
@@ -156,6 +159,11 @@ func Utf8(in []byte) bool {
 	}
 
 	return true
+}
+
+// Owl2 matches an Owl ontology file.
+func Owl2(in []byte) bool {
+	return detect(in, owlSigs)
 }
 
 // Html matches a Hypertext Markup Language file.
