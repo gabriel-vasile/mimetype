@@ -59,7 +59,6 @@ var files = map[string]string{
 	"geojson.1.geojson":  "application/geo+json",
 	"geojson.geojson":    "application/geo+json",
 	"gif.gif":            "image/gif",
-	"ggr.ggr":            "text/x-gimp-ggr",
 	"gml.gml":            "application/gml+xml",
 	"gpx.gpx":            "application/gpx+xml",
 	"gz.gz":              "application/gzip",
@@ -99,6 +98,7 @@ var files = map[string]string{
 	"mpeg.mpeg":          "video/mpeg",
 	"mqv.mqv":            "video/quicktime",
 	"mrc.mrc":            "application/marc",
+	"msg.msg":            "application/vnd.ms-outlook",
 	"ndjson.ndjson":      "application/x-ndjson",
 	"nes.nes":            "application/vnd.nintendo.snes.rom",
 	"elfobject":          "application/x-object",
@@ -176,7 +176,7 @@ var files = map[string]string{
 }
 
 func TestDetect(t *testing.T) {
-	errStr := "File: %s; ExpectedMIME: %s != DetectedMIME: %s; err: %v"
+	errStr := "File: %s; Expected: %s != Detected: %s; err: %v"
 	extStr := "File: %s; ExpectedExt: %s != DetectedExt: %s"
 	for fName, expected := range files {
 		fileName := filepath.Join(testDataDir, fName)

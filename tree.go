@@ -34,7 +34,7 @@ var (
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
 	epub = newMIME("application/epub+zip", ".epub", matchers.Epub)
 	jar  = newMIME("application/jar", ".jar", matchers.Jar)
-	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, xls, pub, ppt, doc)
+	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, msg, xls, pub, ppt, doc)
 	doc  = newMIME("application/msword", ".doc", matchers.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", matchers.Ppt).
@@ -42,6 +42,7 @@ var (
 	pub = newMIME("application/vnd.ms-publisher", ".pub", matchers.Pub)
 	xls = newMIME("application/vnd.ms-excel", ".xls", matchers.Xls).
 		alias("application/msexcel")
+	msg  = newMIME("application/vnd.ms-outlook", ".msg", matchers.Msg)
 	ps   = newMIME("application/postscript", ".ps", matchers.Ps)
 	fits = newMIME("application/fits", ".fits", matchers.Fits)
 	ogg  = newMIME("application/ogg", ".ogg", matchers.Ogg, oggAudio, oggVideo).
@@ -52,7 +53,7 @@ var (
 	utf32be  = newMIME("text/plain; charset=utf-32be", ".txt", matchers.Utf32be)
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
-	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc, ggr)
+	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
 	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
@@ -202,5 +203,4 @@ var (
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
-	ggr     = newMIME("text/x-gimp-ggr", ".ggr", matchers.Ggr)
 )
