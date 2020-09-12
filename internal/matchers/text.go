@@ -395,17 +395,14 @@ func Ggr(in []byte) bool {
 	ggrHeaderLength := 3
 	ggrLinesSplit := bytes.Split(in, []byte("\n"))
 
-	if len(ggrLinesSplit) < ggrHeaderLength {
-		return false
-	}
-
 	// Split the second line at the ':'
 	grrSecondLine := bytes.Split(bytes.TrimSpace(ggrLinesSplit[1]), []byte(":"))
 
 	// Check if the first line of .ggr has 'GIMP Gradient'
 	// Check if the second line of .ggr has prefix 'Name:'
 	// After split the second line at ':' the content after ':' must not be empty
-	return bytes.Equal(ggrLinesSplit[0], []byte("GIMP Gradient")) &&
+	return len(ggrLinesSplit) > ggrHeaderLength &&
+		bytes.Equal(ggrLinesSplit[0], []byte("GIMP Gradient")) &&
 		bytes.HasPrefix(ggrLinesSplit[1], []byte("Name:")) &&
 		len(grrSecondLine[1]) > 0
 }
