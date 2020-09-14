@@ -292,7 +292,7 @@ func TestFaultyInput(t *testing.T) {
 // When performing a detection on a file it is very likely there will be
 // multiple rules failing before finding the one that matches, ex: a jpg file
 // might be tested for zip, gzip, etc., before it is identified.
-func BenchmarkSliceRand(b *testing.B) {
+func BenchmarkDetectSliceRand(b *testing.B) {
 	data := make([]byte, 3072)
 	if _, err := io.ReadFull(rand.Reader, data); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
@@ -308,7 +308,7 @@ func BenchmarkSliceRand(b *testing.B) {
 	})
 }
 
-func BenchmarkSliceTar(b *testing.B) {
+func BenchmarkDetectSliceTar(b *testing.B) {
 	tar, err := ioutil.ReadFile("testdata/tar.tar")
 	if err != nil {
 		b.Fatal(err)
@@ -319,7 +319,7 @@ func BenchmarkSliceTar(b *testing.B) {
 	}
 }
 
-func BenchmarkSliceZip(b *testing.B) {
+func BenchmarkDetectSliceZip(b *testing.B) {
 	zip, err := ioutil.ReadFile("testdata/zip.zip")
 	if err != nil {
 		b.Fatal(err)
@@ -330,7 +330,7 @@ func BenchmarkSliceZip(b *testing.B) {
 	}
 }
 
-func BenchmarkSliceJpeg(b *testing.B) {
+func BenchmarkDetectSliceJpeg(b *testing.B) {
 	jpeg, err := ioutil.ReadFile("testdata/jpg.jpg")
 	if err != nil {
 		b.Fatal(err)
@@ -341,7 +341,7 @@ func BenchmarkSliceJpeg(b *testing.B) {
 	}
 }
 
-func BenchmarkSliceGif(b *testing.B) {
+func BenchmarkDetectSliceGif(b *testing.B) {
 	gif, err := ioutil.ReadFile("testdata/gif.gif")
 	if err != nil {
 		b.Fatal(err)
@@ -352,7 +352,7 @@ func BenchmarkSliceGif(b *testing.B) {
 	}
 }
 
-func BenchmarkSlicePng(b *testing.B) {
+func BenchmarkDetectSlicePng(b *testing.B) {
 	png, err := ioutil.ReadFile("testdata/png.png")
 	if err != nil {
 		b.Fatal(err)

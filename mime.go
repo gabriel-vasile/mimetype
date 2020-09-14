@@ -72,11 +72,17 @@ func newMIME(mime, extension string, matchFunc func([]byte) bool, children ...*M
 		c.parent = m
 	}
 
+	registerMIME(mime, m.fullMatchFunc)
+	registerExtension(extension, m.fullMatchFunc)
+
 	return m
 }
 
 func (m *MIME) alias(aliases ...string) *MIME {
 	m.aliases = aliases
+	for _, alias := range aliases {
+		registerMIME(alias, m.fullMatchFunc)
+	}
 	return m
 }
 
@@ -90,6 +96,14 @@ func (m *MIME) match(in []byte) *MIME {
 	}
 
 	return m
+}
+
+func (m *MIME) fullMatchFunc(in []byte) bool {
+	ok := true
+	if m.parent != nil {
+		ok = m.parent.fullMatchFunc(in)
+	}
+	return ok && m.matchFunc(in)
 }
 
 func (m *MIME) flatten() []*MIME {
