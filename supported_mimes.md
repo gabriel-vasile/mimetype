@@ -154,3 +154,4 @@ Extension | MIME type | Aliases
 **.torrent** | application/x-bittorrent | -
 **.cpio** | application/x-cpio | -
 **n/a** | application/tzif | -
+**.p7s** | application/pkcs7-signature

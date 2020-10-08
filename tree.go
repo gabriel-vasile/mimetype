@@ -204,4 +204,5 @@ var (
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
 	tzif    = newMIME("application/tzif", "", matchers.TzIf)
+	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s)
 )
