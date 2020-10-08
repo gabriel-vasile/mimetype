@@ -27,7 +27,10 @@ func P7s(in []byte) bool {
 	if bytes.Contains(in, []byte("BEGIN PKCS7")) {
 		return true
 	}
-	// Check DER Encoding
+	// Check if DER Encoding is long enough
+	if len(in) < 20 {
+		return false
+	}
 	// Magic Bytes for the signedData ASN.1 encoding
 	startHeader := [][]byte{{0x30, 0x80}, {0x30, 0x81}, {0x30, 0x82}, {0x30, 0x83}, {0x30, 0x84}}
 	signedDataMatch := []byte{0x26, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07}

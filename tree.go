@@ -6,14 +6,14 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", func([]byte) bool { return true },
-	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+	sevenZ, zip, pdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, rmvb, utf32le, utf32be,
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio, tzif,
+	rpm, xz, lzip, torrent, cpio, tzif, p7s,
 )
 
 // The list of nodes appended to the root node.
@@ -204,5 +204,6 @@ var (
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
 	tzif    = newMIME("application/tzif", "", matchers.TzIf)
-	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s)
+	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s).
+		alias(".pem", ".der")
 )
