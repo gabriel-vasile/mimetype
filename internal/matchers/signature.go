@@ -35,9 +35,9 @@ func P7s(in []byte) bool {
 	startHeader := [][]byte{{0x30, 0x80}, {0x30, 0x81}, {0x30, 0x82}, {0x30, 0x83}, {0x30, 0x84}}
 	signedDataMatch := []byte{0x26, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07}
 	// Check if Header is correct. There are multiple valid headers
-	for _, match := range startHeader {
+	for i, match := range startHeader {
 		if bytes.Contains(in[0:2], match) { // If first bytes match -> check for ASN.1 Object Type
-			if bytes.Contains(in[2:20], signedDataMatch) { // only check first part of the ASN.1 Message for OBJECT: signedData
+			if bytes.Contains(in[i:18+i], signedDataMatch) { // only check first part of the ASN.1 Message for OBJECT: signedData
 				return true
 			}
 		}

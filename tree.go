@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio, tzif, p7s,
+	rpm, xz, lzip, torrent, cpio, tzif,
 )
 
 // The list of nodes appended to the root node.
@@ -204,6 +204,5 @@ var (
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
 	tzif    = newMIME("application/tzif", "", matchers.TzIf)
-	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s).
-		alias(".pem", ".der")
+	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s)
 )
