@@ -24,7 +24,7 @@ type (
 // P7s matches an .p7s signature File (PEM,Base64)
 func P7s(in []byte) bool {
 	// Check for PEM Encoding
-	if bytes.Contains(in, []byte("BEGIN PKCS7")) {
+	if bytes.Contains(in, []byte("-----BEGIN PKCS7")) {
 		return true
 	}
 	// Check if DER Encoding is long enough
