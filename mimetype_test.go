@@ -123,6 +123,8 @@ var files = map[string]string{
 	"pptx.pptx":          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 	"ps.ps":              "application/postscript",
 	"psd.psd":            "image/vnd.adobe.photoshop",
+	"p7s_pem.p7s":        "application/pkcs7-signature",
+	"p7s_der.p7s":        "application/pkcs7-signature",
 	"pub.pub":            "application/vnd.ms-publisher",
 	"py.py":              "application/x-python",
 	"qcp.qcp":            "audio/qcelp",
