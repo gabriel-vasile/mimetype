@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio, tzif,
+	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr,
 )
 
 // The list of nodes appended to the root node.
@@ -205,4 +205,7 @@ var (
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
 	tzif    = newMIME("application/tzif", "", matchers.TzIf)
 	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s)
+	xcf     = newMIME("image/x-xcf", ".xcf", matchers.Xcf)
+	pat     = newMIME("image/x-gimp-pat", ".pat", matchers.Pat)
+	gbr     = newMIME("image/x-gimp-gbr", ".gbr", matchers.Gbr)
 )
