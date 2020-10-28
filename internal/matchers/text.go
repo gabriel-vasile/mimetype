@@ -67,6 +67,9 @@ var (
 	threemfSigs = []sig{
 		newXmlSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`),
 	}
+	xfdfSigs = []sig{
+		newXmlSig("xfdf", `xmlns="http://ns.adobe.com/xfdf/"`),
+	}
 	vCardSigs = []sig{
 		ciSig("BEGIN:VCARD\n"),
 		ciSig("BEGIN:VCARD\r\n"),
@@ -388,4 +391,9 @@ func VCard(in []byte) bool {
 // ICalendar matches a iCalendar file.
 func ICalendar(in []byte) bool {
 	return detect(in, iCalSigs)
+}
+
+// Xfdf matches a XML Forms Data Format file.
+func Xfdf(in []byte) bool {
+	return detect(in, xfdfSigs)
 }
