@@ -53,6 +53,7 @@ var files = map[string]string{
 	"eot.eot":            "application/vnd.ms-fontobject",
 	"epub.epub":          "application/epub+zip",
 	"exe.exe":            "application/vnd.microsoft.portable-executable",
+	"fdf.fdf":            "application/vnd.fdf",
 	"fits.fits":          "application/fits",
 	"flac.flac":          "audio/flac",
 	"flv.flv":            "video/x-flv",

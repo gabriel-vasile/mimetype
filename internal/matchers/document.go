@@ -7,6 +7,11 @@ func Pdf(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0x25, 0x50, 0x44, 0x46})
 }
 
+// Fdf matches a Forms Data Format file.
+func Fdf(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("%FDF"))
+}
+
 // DjVu matches a DjVu file.
 func DjVu(in []byte) bool {
 	if len(in) < 12 {
