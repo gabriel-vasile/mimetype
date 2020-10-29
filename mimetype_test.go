@@ -171,6 +171,7 @@ var files = map[string]string{
 	"x3d.x3d":            "model/x3d+xml",
 	"xar.xar":            "application/x-xar",
 	"xcf.xcf":            "image/x-xcf",
+	"xfdf.xfdf":          "application/vnd.adobe.xfdf",
 	"xlf.xlf":            "application/x-xliff+xml",
 	"xls.xls":            "application/vnd.ms-excel",
 	"xlsx.1.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

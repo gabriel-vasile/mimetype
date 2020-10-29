@@ -135,6 +135,7 @@ Extension | MIME type | Aliases
 **.tcx** | application/vnd.garmin.tcx+xml | -
 **.amf** | application/x-amf | -
 **.3mf** | application/vnd.ms-package.3dmanufacturing-3dmodel+xml | -
+**.xfdf** | application/vnd.adobe.xfdf | -
 **.php** | text/x-php; charset=utf-8 | -
 **.js** | application/javascript | application/x-javascript, text/javascript
 **.lua** | text/x-lua | -
