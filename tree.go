@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", func([]byte) bool { return true },
-	sevenZ, zip, pdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+	sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, rmvb, utf32le, utf32be,
@@ -29,6 +29,7 @@ var (
 	bz2 = newMIME("application/x-bzip2", ".bz2", matchers.Bz2)
 	pdf = newMIME("application/pdf", ".pdf", matchers.Pdf).
 		alias("application/x-pdf")
+	fdf  = newMIME("application/vnd.fdf", ".fdf", matchers.Fdf)
 	xlsx = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", matchers.Xlsx)
 	docx = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", matchers.Docx)
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
