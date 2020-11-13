@@ -53,7 +53,7 @@ mime, _ := mimetype.DetectFile("/etc/passwd")
 if mimetype.EqualsAny(mime.String(), allowed...) {
     fmt.Printf("%s is allowed\n", mime)
 } else {
-    fmt.Printf("%s is now allowed\n", mime)
+    fmt.Printf("%s is not allowed\n", mime)
 }
 // Output: text/plain; charset=utf-8 is allowed
 ```
