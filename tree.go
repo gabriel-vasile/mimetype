@@ -9,7 +9,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
-	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, rmvb, utf32le, utf32be,
+	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
@@ -123,7 +123,9 @@ var (
 	voc  = newMIME("audio/x-unknown", ".voc", matchers.Voc)
 	aMp4 = newMIME("audio/mp4", ".mp4", matchers.AMp4).
 		alias("audio/x-m4a", "audio/x-mp4a")
-	m4a  = newMIME("audio/x-m4a", ".m4a", matchers.M4a)
+	m4a = newMIME("audio/x-m4a", ".m4a", matchers.M4a)
+	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", matchers.M3u).
+		alias("audio/mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", matchers.M4v)
 	mp4  = newMIME("video/mp4", ".mp4", matchers.Mp4)
 	webM = newMIME("video/webm", ".webm", matchers.WebM).
