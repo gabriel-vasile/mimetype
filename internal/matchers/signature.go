@@ -21,30 +21,6 @@ type (
 	}
 )
 
-// P7s matches an .p7s signature File (PEM,Base64)
-func P7s(in []byte) bool {
-	// Check for PEM Encoding
-	if bytes.Contains(in, []byte("-----BEGIN PKCS7")) {
-		return true
-	}
-	// Check if DER Encoding is long enough
-	if len(in) < 20 {
-		return false
-	}
-	// Magic Bytes for the signedData ASN.1 encoding
-	startHeader := [][]byte{{0x30, 0x80}, {0x30, 0x81}, {0x30, 0x82}, {0x30, 0x83}, {0x30, 0x84}}
-	signedDataMatch := []byte{0x26, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07}
-	// Check if Header is correct. There are multiple valid headers
-	for i, match := range startHeader {
-		if bytes.Contains(in[0:2], match) { // If first bytes match -> check for ASN.1 Object Type
-			if bytes.Contains(in[i:18+i], signedDataMatch) { // only check first part of the ASN.1 Message for OBJECT: signedData
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func newXmlSig(localName, xmlns string) xmlSig {
 	ret := xmlSig{xmlns: []byte(xmlns)}
 	if localName != "" {
