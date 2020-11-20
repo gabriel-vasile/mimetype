@@ -20,6 +20,7 @@ Extension | MIME type | Aliases
 **.odg** | application/vnd.oasis.opendocument.graphics | application/x-vnd.oasis.opendocument.graphics
 **.otg** | application/vnd.oasis.opendocument.graphics-template | application/x-vnd.oasis.opendocument.graphics-template
 **.odf** | application/vnd.oasis.opendocument.formula | application/x-vnd.oasis.opendocument.formula
+**.sxc** | application/vnd.sun.xml.calc | -
 **.pdf** | application/pdf | application/x-pdf
 **.fdf** | application/vnd.fdf | -
 **n/a** | application/x-ole-storage | -

@@ -60,6 +60,11 @@ func Epub(in []byte) bool {
 	return len(in) > 30 && bytes.HasPrefix(in[30:], []byte("mimetypeapplication/epub+zip"))
 }
 
+// Sxc matches an OpenOffice Spreadsheet file.
+func Sxc(in []byte) bool {
+	return len(in) > 30 && bytes.HasPrefix(in[30:], []byte("mimetypeapplication/vnd.sun.xml.calc"))
+}
+
 // Jar matches a Java archive file.
 func Jar(in []byte) bool {
 	t := zipTokenizer{in: in}

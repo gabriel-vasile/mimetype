@@ -106,6 +106,7 @@ var files = map[string]string{
 	"nes.nes":            "application/vnd.nintendo.snes.rom",
 	"elfobject":          "application/x-object",
 	"odf.odf":            "application/vnd.oasis.opendocument.formula",
+	"sxc.sxc":            "application/vnd.sun.xml.calc",
 	"odg.odg":            "application/vnd.oasis.opendocument.graphics",
 	"odp.odp":            "application/vnd.oasis.opendocument.presentation",
 	"ods.ods":            "application/vnd.oasis.opendocument.spreadsheet",
