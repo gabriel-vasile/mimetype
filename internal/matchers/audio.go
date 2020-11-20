@@ -93,3 +93,9 @@ func Qcp(in []byte) bool {
 		bytes.Equal(in[:4], []byte("RIFF")) &&
 		bytes.Equal(in[8:12], []byte("QLCM"))
 }
+
+// M3u matches a Playlist file.
+func M3u(in []byte) bool {
+	return len(in) > 7 &&
+		bytes.Equal(in[:7], []byte("#EXTM3U"))
+}

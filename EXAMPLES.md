@@ -1,18 +1,18 @@
 ## Examples
- - [Detect MIME type](#detect-mime-type-go-playground)
+ - [Detect MIME type](#detect-mime-type)
  - [Test against a MIME type](#test-against-a-mime-type-go-playground)
  - [Whitelist](#whitelist-go-playground)
  - [Binary file vs text file](#binary-file-vs-text-file-go-playground)
 
-### Detect MIME type [<kbd>Go Playground</kbd>](https://play.golang.org/p/axQsR4dOo9k)
-Get the MIME type from a path to a file.
+### Detect MIME type
+Get the MIME type from a path to a file. [<kbd>Go Playground</kbd>](https://play.golang.org/p/AkZOfZffk76)
 ```go
 file := "testdata/pdf.pdf"
 mime, err := mimetype.DetectFile(file)
 fmt.Println(mime.String(), mime.Extension(), err)
 // Output: application/pdf .pdf nil
 ```
-Get the MIME type from a reader.
+Get the MIME type from a reader. [<kbd>Go Playground</kbd>](https://play.golang.org/p/vuftk8TPJwX)
 ```go
 reader, _ := os.Open(file) // ignoring error for brevity's sake
 mime, err := mimetype.DetectReader(reader)
@@ -20,7 +20,7 @@ fmt.Println(mime.String(), mime.Extension(), err)
 // Output: application/pdf .pdf nil
 ```
 
-Get the MIME type from a byte slice.
+Get the MIME type from a byte slice. [<kbd>Go Playground</kbd>](https://play.golang.org/p/uriZsOaEUI1)
 ```go
 data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
 mime := mimetype.Detect(data)
@@ -53,7 +53,7 @@ mime, _ := mimetype.DetectFile("/etc/passwd")
 if mimetype.EqualsAny(mime.String(), allowed...) {
     fmt.Printf("%s is allowed\n", mime)
 } else {
-    fmt.Printf("%s is now allowed\n", mime)
+    fmt.Printf("%s is not allowed\n", mime)
 }
 // Output: text/plain; charset=utf-8 is allowed
 ```

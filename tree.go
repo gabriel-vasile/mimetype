@@ -6,14 +6,14 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", func([]byte) bool { return true },
-	sevenZ, zip, pdf, ole, ps, psd, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+	sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
-	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m4v, rmvb, utf32le, utf32be,
+	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio,
+	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr,
 )
 
 // The list of nodes appended to the root node.
@@ -29,6 +29,7 @@ var (
 	bz2 = newMIME("application/x-bzip2", ".bz2", matchers.Bz2)
 	pdf = newMIME("application/pdf", ".pdf", matchers.Pdf).
 		alias("application/x-pdf")
+	fdf  = newMIME("application/vnd.fdf", ".fdf", matchers.Fdf)
 	xlsx = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", matchers.Xlsx)
 	docx = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", matchers.Docx)
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
@@ -54,7 +55,7 @@ var (
 	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", matchers.Utf16le)
 	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", matchers.Utf16be)
 	utf8     = newMIME("text/plain; charset=utf-8", ".txt", matchers.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
-	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, owl2)
+	xml      = newMIME("text/xml; charset=utf-8", ".xml", matchers.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
 	json     = newMIME("application/json", ".json", matchers.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", matchers.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", matchers.Tsv)
@@ -123,7 +124,9 @@ var (
 	voc  = newMIME("audio/x-unknown", ".voc", matchers.Voc)
 	aMp4 = newMIME("audio/mp4", ".mp4", matchers.AMp4).
 		alias("audio/x-m4a", "audio/x-mp4a")
-	m4a  = newMIME("audio/x-m4a", ".m4a", matchers.M4a)
+	m4a = newMIME("audio/x-m4a", ".m4a", matchers.M4a)
+	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", matchers.M3u).
+		alias("audio/mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", matchers.M4v)
 	mp4  = newMIME("video/mp4", ".mp4", matchers.Mp4)
 	webM = newMIME("video/webm", ".webm", matchers.WebM).
@@ -204,4 +207,10 @@ var (
 	lzip    = newMIME("application/lzip", ".lz", matchers.Lzip)
 	torrent = newMIME("application/x-bittorrent", ".torrent", matchers.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", matchers.Cpio)
+	tzif    = newMIME("application/tzif", "", matchers.TzIf)
+	p7s     = newMIME("application/pkcs7-signature", ".p7s", matchers.P7s)
+	xcf     = newMIME("image/x-xcf", ".xcf", matchers.Xcf)
+	pat     = newMIME("image/x-gimp-pat", ".pat", matchers.Pat)
+	gbr     = newMIME("image/x-gimp-gbr", ".gbr", matchers.Gbr)
+	xfdf    = newMIME("application/vnd.adobe.xfdf", ".xfdf", matchers.Xfdf)
 )

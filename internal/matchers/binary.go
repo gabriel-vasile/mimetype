@@ -144,3 +144,8 @@ func Marc(in []byte) bool {
 	// Field terminator is present
 	return bytes.Contains(in, []byte{0x1E})
 }
+
+// TzIf matches a Time Zone Information Format (TZif) file.
+func TzIf(in []byte) bool {
+	return len(in) > 4 && bytes.HasPrefix(in, []byte("TZif"))
+}

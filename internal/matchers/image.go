@@ -119,3 +119,18 @@ func Dwg(in []byte) bool {
 
 	return false
 }
+
+// Xcf matches GIMP image data
+func Xcf(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("gimp xcf"))
+}
+
+// Pat matches GIMP pattern data
+func Pat(in []byte) bool {
+	return len(in) >= 24 && bytes.Equal(in[20:24], []byte("GPAT"))
+}
+
+// Gbr matches GIMP brush data
+func Gbr(in []byte) bool {
+	return len(in) >= 24 && bytes.Equal(in[20:24], []byte("GIMP"))
+}
