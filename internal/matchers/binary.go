@@ -149,3 +149,8 @@ func Marc(in []byte) bool {
 func TzIf(in []byte) bool {
 	return len(in) > 4 && bytes.HasPrefix(in, []byte("TZif"))
 }
+
+// Fig matches a Figma file.
+func Fig(in []byte) bool {
+	return len(in) > 8 && bytes.HasPrefix(in[:8], []byte("fig-kiwi"))
+}

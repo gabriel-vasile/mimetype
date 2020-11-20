@@ -161,3 +161,4 @@ Extension | MIME type | Aliases
 **.xcf** | image/x-xcf | -
 **.pat** | image/x-gimp-pat | -
 **.gbr** | image/x-gimp-gbr | -
+**.fig** | application/octet-stream | -

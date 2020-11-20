@@ -182,6 +182,7 @@ var files = map[string]string{
 	"xz.xz":              "application/x-xz",
 	"zip.zip":            "application/zip",
 	"zst.zst":            "application/zstd",
+	"fig.fig":            "application/octet-stream",
 }
 
 func TestDetect(t *testing.T) {
