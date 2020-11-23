@@ -119,6 +119,7 @@ var files = map[string]string{
 	"otp.otp":            "application/vnd.oasis.opendocument.presentation-template",
 	"ots.ots":            "application/vnd.oasis.opendocument.spreadsheet-template",
 	"ott.ott":            "application/vnd.oasis.opendocument.text-template",
+	"owl2.owl":           "application/owl+xml",
 	"pat.pat":            "image/x-gimp-pat",
 	"pdf.pdf":            "application/pdf",
 	"php.php":            "text/x-php; charset=utf-8",
