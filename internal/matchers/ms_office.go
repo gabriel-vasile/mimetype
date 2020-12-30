@@ -117,7 +117,7 @@ func Ole(in []byte) bool {
 // See: https://pyaaf.readthedocs.io/en/latest/about.html
 // See: https://en.wikipedia.org/wiki/Advanced_Authoring_Format
 func Aaf(in []byte) bool {
-	if len(in) < 30 {
+	if len(in) < 31 {
 		return false
 	}
 	return bytes.HasPrefix(in[8:], []byte{0x41, 0x41, 0x46, 0x42, 0x0D, 0x00, 0x4F, 0x4D}) &&
