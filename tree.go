@@ -6,7 +6,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", func([]byte) bool { return true },
-	aaf, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+	sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
@@ -18,7 +18,6 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 
 // The list of nodes appended to the root node.
 var (
-	aaf  = newMIME("application/octet-stream", ".aaf", matchers.Aaf)
 	xz   = newMIME("application/x-xz", ".xz", matchers.Xz)
 	gzip = newMIME("application/gzip", ".gz", matchers.Gzip).
 		alias("application/x-gzip", "application/x-gunzip", "application/gzipped", "application/gzip-compressed", "application/x-gzip-compressed", "gzip/document")
@@ -36,7 +35,8 @@ var (
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
 	epub = newMIME("application/epub+zip", ".epub", matchers.Epub)
 	jar  = newMIME("application/jar", ".jar", matchers.Jar)
-	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, msg, xls, pub, ppt, doc)
+	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, aaf, msg, xls, pub, ppt, doc)
+	aaf  = newMIME("application/octet-stream", ".aaf", matchers.Aaf)
 	doc  = newMIME("application/msword", ".doc", matchers.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", matchers.Ppt).
