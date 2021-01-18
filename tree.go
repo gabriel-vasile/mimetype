@@ -35,7 +35,8 @@ var (
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", matchers.Pptx)
 	epub = newMIME("application/epub+zip", ".epub", matchers.Epub)
 	jar  = newMIME("application/jar", ".jar", matchers.Jar)
-	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, msg, xls, pub, ppt, doc)
+	ole  = newMIME("application/x-ole-storage", "", matchers.Ole, aaf, msg, xls, pub, ppt, doc)
+	aaf  = newMIME("application/octet-stream", ".aaf", matchers.Aaf)
 	doc  = newMIME("application/msword", ".doc", matchers.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", matchers.Ppt).

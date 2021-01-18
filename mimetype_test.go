@@ -21,6 +21,7 @@ var files = map[string]string{
 	"7z.7z":              "application/x-7z-compressed",
 	"a.a":                "application/x-archive",
 	"aac.aac":            "audio/aac",
+	"aaf.aaf":            "application/octet-stream",
 	"accdb.accdb":        "application/x-msaccess",
 	"aiff.aiff":          "audio/aiff",
 	"amf.amf":            "application/x-amf",

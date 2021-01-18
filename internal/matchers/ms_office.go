@@ -113,6 +113,17 @@ func Ole(in []byte) bool {
 	return bytes.HasPrefix(in, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
+// Aaf matches an Advanced Authoring Format file.
+// See: https://pyaaf.readthedocs.io/en/latest/about.html
+// See: https://en.wikipedia.org/wiki/Advanced_Authoring_Format
+func Aaf(in []byte) bool {
+	if len(in) < 31 {
+		return false
+	}
+	return bytes.HasPrefix(in[8:], []byte{0x41, 0x41, 0x46, 0x42, 0x0D, 0x00, 0x4F, 0x4D}) &&
+		(in[30] == 0x09 || in[30] == 0x0C)
+}
+
 // Doc matches a Microsoft Word 97-2003 file.
 //
 // BUG(gabriel-vasile): Doc should look for subheaders like Ppt and Xls does.
