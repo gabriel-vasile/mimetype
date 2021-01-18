@@ -12,7 +12,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
-	icns, heic, heicSeq, heif, heifSeq, mrc, mdb, accdb, zstd, cab, utf8,
+	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, utf8,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr,
 )
 
@@ -108,6 +108,7 @@ var (
 	heicSeq = newMIME("image/heic-sequence", ".heic", matchers.HeicSequence)
 	heif    = newMIME("image/heif", ".heif", matchers.Heif)
 	heifSeq = newMIME("image/heif-sequence", ".heif", matchers.HeifSequence)
+	hdr     = newMIME("image/vnd.radiance", ".hdr", matchers.Hdr)
 	mp3     = newMIME("audio/mpeg", ".mp3", matchers.Mp3).
 		alias("audio/x-mpeg", "audio/mp3")
 	flac = newMIME("audio/flac", ".flac", matchers.Flac)

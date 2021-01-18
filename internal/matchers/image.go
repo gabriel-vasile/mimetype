@@ -120,17 +120,23 @@ func Dwg(in []byte) bool {
 	return false
 }
 
-// Xcf matches GIMP image data
+// Xcf matches GIMP image data.
 func Xcf(in []byte) bool {
 	return bytes.HasPrefix(in, []byte("gimp xcf"))
 }
 
-// Pat matches GIMP pattern data
+// Pat matches GIMP pattern data.
 func Pat(in []byte) bool {
 	return len(in) >= 24 && bytes.Equal(in[20:24], []byte("GPAT"))
 }
 
-// Gbr matches GIMP brush data
+// Gbr matches GIMP brush data.
 func Gbr(in []byte) bool {
 	return len(in) >= 24 && bytes.Equal(in[20:24], []byte("GIMP"))
+}
+
+// Hdr matches Radiance HDR image.
+// https://web.archive.org/web/20060913152809/http://local.wasp.uwa.edu.au/~pbourke/dataformats/pic/
+func Hdr(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("#?RADIANCE\n"))
 }
