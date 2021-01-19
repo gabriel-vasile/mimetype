@@ -187,7 +187,7 @@ var (
 		alias("application/x-vnd.oasis.opendocument.graphics-template")
 	odf = newMIME("application/vnd.oasis.opendocument.formula", ".odf", matchers.Odf).
 		alias("application/x-vnd.oasis.opendocument.formula")
-	odc = newMIME("application/x-vnd.oasis.opendocument.chart", ".odc", matchers.Odc).
+	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", matchers.Odc).
 		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", matchers.Sxc)
 	rar = newMIME("application/x-rar-compressed", ".rar", matchers.Rar).
