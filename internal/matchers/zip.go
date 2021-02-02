@@ -55,6 +55,11 @@ func Odf(in []byte) bool {
 	return len(in) > 30 && bytes.HasPrefix(in[30:], []byte("mimetypeapplication/vnd.oasis.opendocument.formula"))
 }
 
+// Odc matches an OpenDocument Chart file.
+func Odc(in []byte) bool {
+	return len(in) > 30 && bytes.HasPrefix(in[30:], []byte("mimetypeapplication/vnd.oasis.opendocument.chart"))
+}
+
 // Epub matches an EPUB file.
 func Epub(in []byte) bool {
 	return len(in) > 30 && bytes.HasPrefix(in[30:], []byte("mimetypeapplication/epub+zip"))
