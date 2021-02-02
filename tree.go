@@ -13,7 +13,7 @@ var root = newMIME("application/octet-stream", "", func([]byte) bool { return tr
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, utf8,
-	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr,
+	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb,
 )
 
 // The list of nodes appended to the root node.
@@ -216,4 +216,5 @@ var (
 	pat     = newMIME("image/x-gimp-pat", ".pat", matchers.Pat)
 	gbr     = newMIME("image/x-gimp-gbr", ".gbr", matchers.Gbr)
 	xfdf    = newMIME("application/vnd.adobe.xfdf", ".xfdf", matchers.Xfdf)
+	glb     = newMIME("model/gltf-binary", ".glb", matchers.Glb)
 )
