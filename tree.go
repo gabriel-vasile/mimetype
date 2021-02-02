@@ -22,7 +22,7 @@ var (
 	gzip = newMIME("application/gzip", ".gz", matchers.Gzip).
 		alias("application/x-gzip", "application/x-gunzip", "application/gzipped", "application/gzip-compressed", "application/x-gzip-compressed", "gzip/document")
 	sevenZ = newMIME("application/x-7z-compressed", ".7z", matchers.SevenZ)
-	zip    = newMIME("application/zip", ".zip", matchers.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, sxc).
+	zip    = newMIME("application/zip", ".zip", matchers.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, odc, sxc).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", matchers.Tar)
 	xar = newMIME("application/x-xar", ".xar", matchers.Xar)
@@ -189,6 +189,8 @@ var (
 		alias("application/x-vnd.oasis.opendocument.graphics-template")
 	odf = newMIME("application/vnd.oasis.opendocument.formula", ".odf", matchers.Odf).
 		alias("application/x-vnd.oasis.opendocument.formula")
+	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", matchers.Odc).
+		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", matchers.Sxc)
 	rar = newMIME("application/x-rar-compressed", ".rar", matchers.Rar).
 		alias("application/x-rar")
