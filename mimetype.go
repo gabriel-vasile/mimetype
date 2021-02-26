@@ -9,19 +9,23 @@ package mimetype
 
 import (
 	"io"
+	"io/ioutil"
 	"mime"
 	"os"
-
-	"github.com/gabriel-vasile/mimetype/internal/matchers"
+	"sync/atomic"
 )
+
+// readLimit is the maximum number of bytes from the input used when detecting.
+var readLimit uint64 = 3072
 
 // Detect returns the MIME type found from the provided byte slice.
 //
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) *MIME {
-	if len(in) > matchers.ReadLimit {
-		in = in[:matchers.ReadLimit]
+	l := atomic.LoadUint64(&readLimit)
+	if l > 0 && len(in) > int(l) {
+		in = in[:l]
 	}
 	return root.match(in)
 }
@@ -35,16 +39,27 @@ func Detect(in []byte) *MIME {
 // DetectReader assumes the reader offset is at the start. If the input
 // is a ReadSeeker you read from before, it should be rewinded before detection:
 //  reader.Seek(0, io.SeekStart)
-//
-// To prevent loading entire files into memory, DetectReader reads at most
-// matchers.ReadLimit bytes from the reader.
 func DetectReader(r io.Reader) (*MIME, error) {
-	in := make([]byte, matchers.ReadLimit)
-	n, err := io.ReadFull(r, in)
-	if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
-		return root, err
+	l := atomic.LoadUint64(&readLimit)
+	var in []byte
+	var err error
+
+	if l == 0 {
+		in, err = ioutil.ReadAll(r)
+		if err != nil {
+			return root, err
+		}
+	} else {
+		// io.UnexpectedEOF means len(r) < len(in). It is not an error in this case,
+		// it just means the input file is smaller than the allocated bytes slice.
+		n := 0
+		in = make([]byte, l)
+		n, err = io.ReadFull(r, in)
+		if err != nil && err != io.ErrUnexpectedEOF {
+			return root, err
+		}
+		in = in[:n]
 	}
-	in = in[:n]
 
 	return Detect(in), nil
 }
@@ -54,9 +69,6 @@ func DetectReader(r io.Reader) (*MIME, error) {
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
 // Any error returned is related to the opening and reading from the input file.
-//
-// To prevent loading entire files into memory, DetectFile reads at most
-// matchers.ReadLimit bytes from the input file.
 func DetectFile(file string) (*MIME, error) {
 	f, err := os.Open(file)
 	if err != nil {
@@ -81,4 +93,12 @@ func EqualsAny(s string, mimes ...string) bool {
 	}
 
 	return false
+}
+
+// SetLimit sets the maximum number of bytes read from input when detecting the MIME type.
+// Increasing the limit provides better detection for file formats which store
+// their magical numbers towards the end of the file.
+// A limit of 0 means the whole input file will be used.
+func SetLimit(limit uint64) {
+	atomic.StoreUint64(&readLimit, limit)
 }

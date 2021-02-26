@@ -1,10 +1,6 @@
 // Package matchers holds the matching functions used to find MIME types.
 package matchers
 
-// ReadLimit is the maximum number of bytes read from the input when detecting
-// from a reader or from a file.
-const ReadLimit = 3072
-
 // trimLWS trims whitespace from beginning of the input.
 func trimLWS(in []byte) []byte {
 	firstNonWS := 0

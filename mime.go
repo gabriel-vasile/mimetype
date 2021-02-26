@@ -33,7 +33,7 @@ func (m *MIME) Extension() string {
 // For example, the application/json and text/html MIME types have text/plain as
 // their parent because they are text files who happen to contain JSON or HTML.
 // Another example is the ZIP format, which is used as container
-// for Microsoft Office files, EPUB files, JAR files and others.
+// for Microsoft Office files, EPUB files, JAR files, and others.
 func (m *MIME) Parent() *MIME {
 	return m.parent
 }
@@ -92,6 +92,7 @@ func (m *MIME) match(in []byte) *MIME {
 	return m
 }
 
+// flatten transforms an hierarchy of MIMEs into a slice of MIMEs.
 func (m *MIME) flatten() []*MIME {
 	out := []*MIME{m}
 	for _, c := range m.children {

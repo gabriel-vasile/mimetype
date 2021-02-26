@@ -17,7 +17,7 @@ func Tsv(in []byte) bool {
 }
 
 func sv(in []byte, comma rune) bool {
-	r := csv.NewReader(butLastLineReader(in, ReadLimit))
+	r := csv.NewReader(butLastLineReader(in, len(in)))
 	r.Comma = comma
 	r.TrimLeadingSpace = true
 	r.LazyQuotes = true

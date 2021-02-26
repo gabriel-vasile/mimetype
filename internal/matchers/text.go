@@ -194,11 +194,7 @@ func Php(in []byte) bool {
 
 // Json matches a JavaScript Object Notation file.
 func Json(in []byte) bool {
-	parsed, err := json.Scan(in)
-	if len(in) < ReadLimit {
-		return err == nil
-	}
-
+	parsed, _ := json.Scan(in)
 	return parsed == len(in)
 }
 
@@ -270,6 +266,7 @@ func NdJson(in []byte) bool {
 
 	// Total bytes scanned.
 	parsed := 0
+	lenin := len(in)
 
 	// Split by `srn`.
 	for rni, insrn := range bytes.Split(in, srn) {
@@ -291,14 +288,14 @@ func NdJson(in []byte) bool {
 			}
 			p, err := json.Scan(insn)
 			parsed += p
-			if parsed < ReadLimit && err != nil {
+			if parsed < lenin && err != nil {
 				return false
 			}
 		}
 	}
 
 	// Empty inputs should not pass as valid NDJSON with 0 lines.
-	return parsed > 0 && parsed == len(in)
+	return parsed > 0 && parsed == lenin
 }
 
 // Js matches a Javascript file.
