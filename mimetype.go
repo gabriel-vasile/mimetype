@@ -1,10 +1,4 @@
 // Package mimetype uses magic number signatures to detect the MIME type of a file.
-//
-// mimetype stores the list of MIME types in a tree structure with
-// "application/octet-stream" at the root of the hierarchy. The hierarchy
-// approach minimizes the number of checks that need to be done on the input
-// and allows for more precise results once the base type of file has been
-// identified.
 package mimetype
 
 import (
@@ -38,8 +32,8 @@ func Detect(in []byte) *MIME {
 // returned when identification failed with or without an error.
 // Any error returned is related to the reading from the input reader.
 //
-// DetectReader assumes the reader offset is at the start. If the input
-// is a ReadSeeker you read from before, it should be rewinded before detection:
+// DetectReader assumes the reader offset is at the start. If the input is an
+// io.ReadSeeker you previously read from, it should be rewinded before detection:
 //  reader.Seek(0, io.SeekStart)
 func DetectReader(r io.Reader) (*MIME, error) {
 	// using atomic because readLimit can be concurrently
@@ -101,7 +95,7 @@ func EqualsAny(s string, mimes ...string) bool {
 
 // SetLimit sets the maximum number of bytes read from input when detecting the MIME type.
 // Increasing the limit provides better detection for file formats which store
-// their magical numbers towards the end of the file.
+// their magical numbers towards the end of the file: docx, pptx, xlsx, etc.
 // A limit of 0 means the whole input file will be used.
 func SetLimit(limit uint32) {
 	atomic.StoreUint32(&readLimit, limit)

@@ -2,6 +2,12 @@ package mimetype
 
 import "github.com/gabriel-vasile/mimetype/internal/matchers"
 
+// mimetype stores the list of MIME types in a tree structure with
+// "application/octet-stream" at the root of the hierarchy. The hierarchy
+// approach minimizes the number of checks that need to be done on the input
+// and allows for more precise results once the base type of file has been
+// identified.
+//
 // root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.

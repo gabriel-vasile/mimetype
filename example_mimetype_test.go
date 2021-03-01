@@ -1,64 +1,37 @@
 package mimetype_test
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
 	"github.com/gabriel-vasile/mimetype"
 )
 
-// To find the MIME type of some input, perform a detect.
-// In addition to the basic Detect,
-//  mimetype.Detect([]byte) *MIME
-// there are shortcuts for detecting from a reader:
-//  mimetype.DetectReader(io.Reader) (*MIME, error)
-// or from a file:
-//  mimetype.DetectFile(string) (*MIME, error)
 func Example_detect() {
-	file := "testdata/pdf.pdf"
+	testBytes := []byte("This random text should have a MIME type of text/plain; charset=utf-8.")
 
-	// Detect the MIME type of a file stored as a byte slice.
-	data, _ := ioutil.ReadFile(file) // ignoring error for brevity's sake
-	mime := mimetype.Detect(data)
-	fmt.Println(mime.String(), mime.Extension())
+	mime := mimetype.Detect(testBytes)
+	fmt.Println(mime.Is("text/plain"), mime.String(), mime.Extension())
 
-	// Detect the MIME type of a reader.
-	reader, _ := os.Open(file) // ignoring error for brevity's sake
-	mime, rerr := mimetype.DetectReader(reader)
-	fmt.Println(mime.String(), mime.Extension(), rerr)
+	mime, err := mimetype.DetectReader(bytes.NewReader(testBytes))
+	fmt.Println(mime.Is("text/plain"), mime.String(), mime.Extension(), err)
 
-	// Detect the MIME type of a file.
-	mime, ferr := mimetype.DetectFile(file)
-	fmt.Println(mime.String(), mime.Extension(), ferr)
-
-	// Output: application/pdf .pdf
-	// application/pdf .pdf <nil>
-	// application/pdf .pdf <nil>
-}
-
-// To check if some bytes/reader/file has a specific MIME type, first perform
-// a detect on the input and then test against the MIME.
-//
-// Different from the string comparison,
-// e.g.: mime.String() == "application/zip", mime.Is("application/zip") method
-// has the following advantages: it handles MIME aliases, is case insensitive,
-// ignores optional MIME parameters, and ignores any leading and trailing
-// whitespace.
-func Example_check() {
-	mime, err := mimetype.DetectFile("testdata/zip.zip")
-	// application/x-zip is an alias of application/zip,
-	// therefore Is returns true both times.
-	fmt.Println(mime.Is("application/zip"), mime.Is("application/x-zip"), err)
-
-	// Output: true true <nil>
+	mime, err = mimetype.DetectFile("a nonexistent file")
+	fmt.Println(mime.Is("application/octet-stream"), mime.String(), os.IsNotExist(err))
+	// Output: true text/plain; charset=utf-8 .txt
+	// true text/plain; charset=utf-8 .txt <nil>
+	// true application/octet-stream true
 }
 
 // Considering the definition of a binary file as "a computer file that is not
 // a text file", they can differentiated by searching for the text/plain MIME
-// in it's MIME hierarchy.
+// in their MIME hierarchy.
 func Example_textVsBinary() {
-	detectedMIME, err := mimetype.DetectFile("testdata/xml.xml")
+	testBytes := []byte("This random text should have a MIME type of text/plain; charset=utf-8.")
+	detectedMIME := mimetype.Detect(testBytes)
 
 	isBinary := true
 	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
@@ -67,57 +40,48 @@ func Example_textVsBinary() {
 		}
 	}
 
-	fmt.Println(isBinary, detectedMIME, err)
-
-	// Output: false text/xml; charset=utf-8 <nil>
+	fmt.Println(isBinary, detectedMIME)
+	// Output: false text/plain; charset=utf-8
 }
 
-func ExampleDetect() {
-	data, err := ioutil.ReadFile("testdata/zip.zip")
-	mime := mimetype.Detect(data)
-
-	fmt.Println(mime.String(), err)
-
-	// Output: application/zip <nil>
-}
-
-func ExampleDetectReader() {
-	data, oerr := os.Open("testdata/zip.zip")
-	mime, merr := mimetype.DetectReader(data)
-
-	fmt.Println(mime.String(), oerr, merr)
-
-	// Output: application/zip <nil> <nil>
-}
-
-func ExampleDetectFile() {
-	mime, err := mimetype.DetectFile("testdata/zip.zip")
-
-	fmt.Println(mime.String(), err)
-
-	// Output: application/zip <nil>
-}
-
-func ExampleMIME_Is() {
-	mime, err := mimetype.DetectFile("testdata/pdf.pdf")
-
-	pdf := mime.Is("application/pdf")
-	xdf := mime.Is("application/x-pdf")
-	txt := mime.Is("text/plain")
-	fmt.Println(pdf, xdf, txt, err)
-
-	// Output: true true false <nil>
-}
-
-func ExampleEqualsAny() {
-	allowed := []string{"text/plain", "text/html", "text/csv"}
-	mime, _ := mimetype.DetectFile("testdata/utf8.txt")
+func Example_whitelist() {
+	testBytes := []byte("This random text should have a MIME type of text/plain; charset=utf-8.")
+	allowed := []string{"text/plain", "application/zip", "application/pdf"}
+	mime := mimetype.Detect(testBytes)
 
 	if mimetype.EqualsAny(mime.String(), allowed...) {
 		fmt.Printf("%s is allowed\n", mime)
 	} else {
 		fmt.Printf("%s is now allowed\n", mime)
 	}
-
 	// Output: text/plain; charset=utf-8 is allowed
+}
+
+// When detecting from an io.Reader, mimetype will read the header of the input.
+// This means the reader cannot just be reused (to save the file, for example)
+// because the header is now missing from the reader.
+//
+// If the input is a pure io.Reader, use io.TeeReader, io.MultiReader and bytes.Buffer
+// to create a new reader containing the whole unaltered data.
+//
+// If the input is an io.ReadSeeker, call reader.Seek(0, io.SeekStart) to rewind it.
+func Example_reusableReader() {
+	// Set header size to 10 bytes for this example.
+	mimetype.SetLimit(10)
+
+	testBytes := []byte("This random text should have a MIME type of text/plain; charset=utf-8.")
+	inputReader := bytes.NewReader(testBytes)
+
+	// buf will store the 10 bytes mimetype used for detection.
+	header := bytes.NewBuffer(nil)
+
+	// After DetectReader, the first 10 bytes are stored in buf.
+	mime, err := mimetype.DetectReader(io.TeeReader(inputReader, header))
+
+	// Concatenate back the first 10 bytes.
+	// reusableReader now contains the complete, original data.
+	reusableReader := io.MultiReader(header, inputReader)
+	text, _ := ioutil.ReadAll(reusableReader)
+	fmt.Println(mime, bytes.Equal(testBytes, text), err)
+	// Output: text/plain; charset=utf-8 true <nil>
 }

@@ -13,8 +13,8 @@
   <a href="https://travis-ci.org/gabriel-vasile/mimetype">
     <img alt="Build Status" src="https://travis-ci.org/gabriel-vasile/mimetype.svg?branch=master">
   </a>
-  <a href="https://godoc.org/github.com/gabriel-vasile/mimetype">
-    <img alt="Documentation" src="https://godoc.org/github.com/gabriel-vasile/mimetype?status.svg">
+  <a href="https://pkg.go.dev/github.com/gabriel-vasile/mimetype">
+    <img src="https://pkg.go.dev/badge/github.com/gabriel-vasile/mimetype.svg" alt="Go Reference">
   </a>
   <a href="https://goreportcard.com/report/github.com/gabriel-vasile/mimetype">
     <img alt="Go report card" src="https://goreportcard.com/badge/github.com/gabriel-vasile/mimetype">
@@ -42,8 +42,15 @@ go get github.com/gabriel-vasile/mimetype
 ```
 
 ## Usage
-There are quick [examples](EXAMPLES.md) and
-[GoDoc](https://godoc.org/github.com/gabriel-vasile/mimetype) for full reference.
+```go
+mime := mimetype.Detect([]byte)
+// OR
+mime, err := mime.DetectReader(io.Reader)
+// OR
+mime, err := mime.DetectFile("/path/to/file")
+fmt.Println(mime.String(), mime.Extension())
+```
+See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
 
 
 ## Structure
@@ -56,8 +63,8 @@ zip, there is no need to check if it is a text file, but it is worth checking if
 it is an Microsoft Office file.
 
 To prevent loading entire files into memory, when detecting from a
-[reader](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectReader)
-or from a [file](https://godoc.org/github.com/gabriel-vasile/mimetype#DetectFile)
+[reader](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#DetectReader)
+or from a [file](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#DetectFile)
 **mimetype** limits itself to reading only the header of the input.
 <div align="center">
   <img alt="structure" src="https://github.com/gabriel-vasile/mimetype/blob/33abbe6cb78fe1a8486c92f95008a9e0fcef10a1/mimetype.gif?raw=true" width="88%">
