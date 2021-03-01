@@ -9,6 +9,6 @@ before_script:
   - go vet .
 script:
   - diff -u <(echo -n) <(gofmt -d ./)
-  - go test -v
+  - go test -v -race
   - $GOPATH/bin/goveralls -service=travis-ci
   - misspell -locale US -error *.md *.go
