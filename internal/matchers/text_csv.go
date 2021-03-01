@@ -7,12 +7,12 @@ import (
 )
 
 // Csv matches a comma-separated values file.
-func Csv(in []byte) bool {
+func Csv(in []byte, _ uint32) bool {
 	return sv(in, ',')
 }
 
 // Tsv matches a tab-separated values file.
-func Tsv(in []byte) bool {
+func Tsv(in []byte, _ uint32) bool {
 	return sv(in, '\t')
 }
 

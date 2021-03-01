@@ -301,6 +301,17 @@ func TestFaultyInput(t *testing.T) {
 	}
 }
 
+func TestZeroLimit(t *testing.T) {
+	mimetype.SetLimit(0)
+	mime, err := mimetype.DetectFile("testdata/utf8.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !mime.Is("text/plain") {
+		t.Fatal("utf8.txt should have text/plain MIME")
+	}
+}
+
 // Benchmarking a random slice of bytes is as close as possible to the real
 // world usage. A random byte slice is almost guaranteed to fail being detected.
 //

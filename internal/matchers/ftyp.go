@@ -45,61 +45,61 @@ var (
 )
 
 // Mp4 matches an MP4 file.
-func Mp4(in []byte) bool {
+func Mp4(in []byte, _ uint32) bool {
 	return detect(in, mp4Sigs)
 }
 
 // ThreeGP matches a 3GPP file.
-func ThreeGP(in []byte) bool {
+func ThreeGP(in []byte, _ uint32) bool {
 	return detect(in, threeGPSigs)
 }
 
 // ThreeG2 matches a 3GPP2 file.
-func ThreeG2(in []byte) bool {
+func ThreeG2(in []byte, _ uint32) bool {
 	return detect(in, threeG2Sigs)
 }
 
 // AMp4 matches an audio MP4 file.
-func AMp4(in []byte) bool {
+func AMp4(in []byte, _ uint32) bool {
 	return detect(in, amp4Sigs)
 }
 
 // QuickTime matches a QuickTime File Format file.
-func QuickTime(in []byte) bool {
+func QuickTime(in []byte, _ uint32) bool {
 	return detect(in, qtSigs)
 }
 
 // Mqv matches a Sony / Mobile QuickTime  file.
-func Mqv(in []byte) bool {
+func Mqv(in []byte, _ uint32) bool {
 	return detect(in, mqvSigs)
 }
 
 // M4a matches an audio M4A file.
-func M4a(in []byte) bool {
+func M4a(in []byte, _ uint32) bool {
 	return detect(in, m4aSigs)
 }
 
 // Heic matches a High Efficiency Image Coding (HEIC) file.
-func Heic(in []byte) bool {
+func Heic(in []byte, _ uint32) bool {
 	return detect(in, heicSigs)
 }
 
 // HeicSequence matches a High Efficiency Image Coding (HEIC) file sequence.
-func HeicSequence(in []byte) bool {
+func HeicSequence(in []byte, _ uint32) bool {
 	return detect(in, heicSeqSigs)
 }
 
 // Heif matches a High Efficiency Image File Format (HEIF) file.
-func Heif(in []byte) bool {
+func Heif(in []byte, _ uint32) bool {
 	return detect(in, heifSigs)
 }
 
 // HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
-func HeifSequence(in []byte) bool {
+func HeifSequence(in []byte, _ uint32) bool {
 	return detect(in, heifSeqSigs)
 }
 
 // M4v matches an Appl4 M4V video file.
-func M4v(in []byte) bool {
+func M4v(in []byte, _ uint32) bool {
 	return detect(in, m4vSigs)
 }

@@ -3,17 +3,17 @@ package matchers
 import "bytes"
 
 // Pdf matches a Portable Document Format file.
-func Pdf(in []byte) bool {
+func Pdf(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0x25, 0x50, 0x44, 0x46})
 }
 
 // Fdf matches a Forms Data Format file.
-func Fdf(in []byte) bool {
+func Fdf(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte("%FDF"))
 }
 
 // DjVu matches a DjVu file.
-func DjVu(in []byte) bool {
+func DjVu(in []byte, _ uint32) bool {
 	if len(in) < 12 {
 		return false
 	}
@@ -27,17 +27,17 @@ func DjVu(in []byte) bool {
 }
 
 // Mobi matches a Mobi file.
-func Mobi(in []byte) bool {
+func Mobi(in []byte, _ uint32) bool {
 	return len(in) > 67 && bytes.Equal(in[60:68], []byte("BOOKMOBI"))
 }
 
 // Lit matches a Microsoft Lit file.
-func Lit(in []byte) bool {
+func Lit(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte("ITOLITLS"))
 }
 
 // P7s matches an .p7s signature File (PEM, Base64).
-func P7s(in []byte) bool {
+func P7s(in []byte, _ uint32) bool {
 	// Check for PEM Encoding.
 	if bytes.HasPrefix(in, []byte("-----BEGIN PKCS7")) {
 		return true

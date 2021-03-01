@@ -7,7 +7,7 @@ import (
 
 // Shp matches a shape format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
-func Shp(in []byte) bool {
+func Shp(in []byte, _ uint32) bool {
 	if len(in) < 112 {
 		return false
 	}
@@ -39,6 +39,6 @@ func Shp(in []byte) bool {
 
 // Shx matches a shape index format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
-func Shx(in []byte) bool {
+func Shx(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0x27, 0x0A})
 }

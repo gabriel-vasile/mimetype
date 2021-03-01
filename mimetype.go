@@ -16,18 +16,20 @@ import (
 )
 
 // readLimit is the maximum number of bytes from the input used when detecting.
-var readLimit uint64 = 3072
+var readLimit uint32 = 3072
 
 // Detect returns the MIME type found from the provided byte slice.
 //
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) *MIME {
-	l := atomic.LoadUint64(&readLimit)
+	// using atomic because readLimit can be concurrently
+	// altered by another goroutine calling SetLimit.
+	l := atomic.LoadUint32(&readLimit)
 	if l > 0 && len(in) > int(l) {
 		in = in[:l]
 	}
-	return root.match(in)
+	return root.match(in, l)
 }
 
 // DetectReader returns the MIME type of the provided reader.
@@ -40,7 +42,9 @@ func Detect(in []byte) *MIME {
 // is a ReadSeeker you read from before, it should be rewinded before detection:
 //  reader.Seek(0, io.SeekStart)
 func DetectReader(r io.Reader) (*MIME, error) {
-	l := atomic.LoadUint64(&readLimit)
+	// using atomic because readLimit can be concurrently
+	// altered by another goroutine calling SetLimit.
+	l := atomic.LoadUint32(&readLimit)
 	var in []byte
 	var err error
 
@@ -61,7 +65,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 		in = in[:n]
 	}
 
-	return Detect(in), nil
+	return root.match(in, l), nil
 }
 
 // DetectFile returns the MIME type of the provided file.
@@ -99,6 +103,6 @@ func EqualsAny(s string, mimes ...string) bool {
 // Increasing the limit provides better detection for file formats which store
 // their magical numbers towards the end of the file.
 // A limit of 0 means the whole input file will be used.
-func SetLimit(limit uint64) {
-	atomic.StoreUint64(&readLimit, limit)
+func SetLimit(limit uint32) {
+	atomic.StoreUint32(&readLimit, limit)
 }

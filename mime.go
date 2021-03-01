@@ -10,7 +10,7 @@ type MIME struct {
 	mime      string
 	aliases   []string
 	extension string
-	matchFunc func([]byte) bool
+	matchFunc func([]byte, uint32) bool
 	children  []*MIME
 	parent    *MIME
 }
@@ -60,7 +60,7 @@ func (m *MIME) Is(expectedMIME string) bool {
 	return false
 }
 
-func newMIME(mime, extension string, matchFunc func([]byte) bool, children ...*MIME) *MIME {
+func newMIME(mime, extension string, matchFunc func([]byte, uint32) bool, children ...*MIME) *MIME {
 	m := &MIME{
 		mime:      mime,
 		extension: extension,
@@ -80,12 +80,12 @@ func (m *MIME) alias(aliases ...string) *MIME {
 	return m
 }
 
-// match does a depth-first search on the matchers tree.
-// It returns the deepest successful matcher for which all the children fail.
-func (m *MIME) match(in []byte) *MIME {
+// match does a depth-first search on the matchers tree. It returns the deepest
+// successful node for which all the children matching functions fail.
+func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 	for _, c := range m.children {
-		if c.matchFunc(in) {
-			return c.match(in)
+		if c.matchFunc(in, readLimit) {
+			return c.match(in, readLimit)
 		}
 	}
 

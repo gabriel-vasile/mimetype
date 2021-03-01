@@ -127,30 +127,30 @@ var (
 
 // Utf32be matches a text file encoded with UTF-32 and with the characters
 // represented in big endian.
-func Utf32be(in []byte) bool {
+func Utf32be(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0xFE, 0xFF})
 }
 
 // Utf32le matches a text file encoded with UTF-32 and with the characters
 // represented in little endian.
-func Utf32le(in []byte) bool {
+func Utf32le(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0xFF, 0xFE, 0x00, 0x00})
 }
 
 // Utf16be matches a text file encoded with UTF-16 and with the characters
 // represented in big endian.
-func Utf16be(in []byte) bool {
+func Utf16be(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0xFE, 0xFF})
 }
 
 // Utf16le matches a text file encoded with UTF-16 and with the characters
 // represented in little endian.
-func Utf16le(in []byte) bool {
+func Utf16le(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0xFF, 0xFE})
 }
 
 // Utf8 matches an UTF-8 text file.
-func Utf8(in []byte) bool {
+func Utf8(in []byte, _ uint32) bool {
 	in = trimLWS(in)
 	for _, b := range in {
 		if b <= 0x08 ||
@@ -165,12 +165,12 @@ func Utf8(in []byte) bool {
 }
 
 // Owl2 matches an Owl ontology file.
-func Owl2(in []byte) bool {
+func Owl2(in []byte, _ uint32) bool {
 	return detect(in, owlSigs)
 }
 
 // Html matches a Hypertext Markup Language file.
-func Html(in []byte) bool {
+func Html(in []byte, _ uint32) bool {
 	in = trimLWS(in)
 	if len(in) == 0 {
 		return false
@@ -179,7 +179,7 @@ func Html(in []byte) bool {
 }
 
 // Xml matches an Extensible Markup Language file.
-func Xml(in []byte) bool {
+func Xml(in []byte, _ uint32) bool {
 	in = trimLWS(in)
 	if len(in) == 0 {
 		return false
@@ -188,13 +188,17 @@ func Xml(in []byte) bool {
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.
-func Php(in []byte) bool {
+func Php(in []byte, _ uint32) bool {
 	return detect(in, phpSigs)
 }
 
 // Json matches a JavaScript Object Notation file.
-func Json(in []byte) bool {
-	parsed, _ := json.Scan(in)
+func Json(in []byte, readLimit uint32) bool {
+	parsed, err := json.Scan(in)
+	if len(in) < int(readLimit) {
+		return err == nil
+	}
+
 	return parsed == len(in)
 }
 
@@ -203,12 +207,12 @@ func Json(in []byte) bool {
 // GeoJson detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 // BUG(gabriel-vasile): The "type" key should be searched for in the root object.
-func GeoJson(in []byte) bool {
+func GeoJson(in []byte, _ uint32) bool {
 	in = trimLWS(in)
 	if len(in) == 0 {
 		return false
 	}
-	// GeoJSON is always a JSON object.
+	// GeoJSON is always a JSON object, not a JSON array.
 	if in[0] != '{' {
 		return false
 	}
@@ -257,7 +261,7 @@ func GeoJson(in []byte) bool {
 }
 
 // NdJson matches a Newline delimited JSON file.
-func NdJson(in []byte) bool {
+func NdJson(in []byte, readLimit uint32) bool {
 	// Separator with carriage return and new line `\r\n`.
 	srn := []byte{0x0D, 0x0A}
 
@@ -266,7 +270,6 @@ func NdJson(in []byte) bool {
 
 	// Total bytes scanned.
 	parsed := 0
-	lenin := len(in)
 
 	// Split by `srn`.
 	for rni, insrn := range bytes.Split(in, srn) {
@@ -288,117 +291,117 @@ func NdJson(in []byte) bool {
 			}
 			p, err := json.Scan(insn)
 			parsed += p
-			if parsed < lenin && err != nil {
+			if parsed < int(readLimit) && err != nil {
 				return false
 			}
 		}
 	}
 
 	// Empty inputs should not pass as valid NDJSON with 0 lines.
-	return parsed > 0 && parsed == lenin
+	return parsed > 2 && parsed == len(in)
 }
 
 // Js matches a Javascript file.
-func Js(in []byte) bool {
+func Js(in []byte, _ uint32) bool {
 	return detect(in, jsSigs)
 }
 
 // Lua matches a Lua programming language file.
-func Lua(in []byte) bool {
+func Lua(in []byte, _ uint32) bool {
 	return detect(in, luaSigs)
 }
 
 // Perl matches a Perl programming language file.
-func Perl(in []byte) bool {
+func Perl(in []byte, _ uint32) bool {
 	return detect(in, perlSigs)
 }
 
 // Python matches a Python programming language file.
-func Python(in []byte) bool {
+func Python(in []byte, _ uint32) bool {
 	return detect(in, pythonSigs)
 }
 
 // Tcl matches a Tcl programming language file.
-func Tcl(in []byte) bool {
+func Tcl(in []byte, _ uint32) bool {
 	return detect(in, tclSigs)
 }
 
 // Rtf matches a Rich Text Format file.
-func Rtf(in []byte) bool {
+func Rtf(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte("{\\rtf1"))
 }
 
 // Svg matches a SVG file.
-func Svg(in []byte) bool {
+func Svg(in []byte, _ uint32) bool {
 	return bytes.Contains(in, []byte("<svg"))
 }
 
 // Rss matches a Rich Site Summary file.
-func Rss(in []byte) bool {
+func Rss(in []byte, _ uint32) bool {
 	return detect(in, rssSigs)
 }
 
 // Atom matches an Atom Syndication Format file.
-func Atom(in []byte) bool {
+func Atom(in []byte, _ uint32) bool {
 	return detect(in, atomSigs)
 }
 
 // Kml matches a Keyhole Markup Language file.
-func Kml(in []byte) bool {
+func Kml(in []byte, _ uint32) bool {
 	return detect(in, kmlSigs)
 }
 
 // Xliff matches a XML Localization Interchange File Format file.
-func Xliff(in []byte) bool {
+func Xliff(in []byte, _ uint32) bool {
 	return detect(in, xliffSigs)
 }
 
 // Collada matches a COLLAborative Design Activity file.
-func Collada(in []byte) bool {
+func Collada(in []byte, _ uint32) bool {
 	return detect(in, colladaSigs)
 }
 
 // Gml matches a Geography Markup Language file.
-func Gml(in []byte) bool {
+func Gml(in []byte, _ uint32) bool {
 	return detect(in, gmlSigs)
 }
 
 // Gpx matches a GPS Exchange Format file.
-func Gpx(in []byte) bool {
+func Gpx(in []byte, _ uint32) bool {
 	return detect(in, gpxSigs)
 }
 
 // Tcx matches a Training Center XML file.
-func Tcx(in []byte) bool {
+func Tcx(in []byte, _ uint32) bool {
 	return detect(in, tcxSigs)
 }
 
 // Amf matches an Additive Manufacturing XML file.
-func Amf(in []byte) bool {
+func Amf(in []byte, _ uint32) bool {
 	return detect(in, amfSigs)
 }
 
 // Threemf matches a 3D Manufacturing Format file.
-func Threemf(in []byte) bool {
+func Threemf(in []byte, _ uint32) bool {
 	return detect(in, threemfSigs)
 }
 
 // X3d matches an Extensible 3D Graphics file.
-func X3d(in []byte) bool {
+func X3d(in []byte, _ uint32) bool {
 	return detect(in, x3dSigs)
 }
 
 // VCard matches a Virtual Contact File.
-func VCard(in []byte) bool {
+func VCard(in []byte, _ uint32) bool {
 	return detect(in, vCardSigs)
 }
 
 // ICalendar matches a iCalendar file.
-func ICalendar(in []byte) bool {
+func ICalendar(in []byte, _ uint32) bool {
 	return detect(in, iCalSigs)
 }
 
 // Xfdf matches a XML Forms Data Format file.
-func Xfdf(in []byte) bool {
+func Xfdf(in []byte, _ uint32) bool {
 	return detect(in, xfdfSigs)
 }

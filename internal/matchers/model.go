@@ -3,7 +3,7 @@ package matchers
 import "bytes"
 
 // Glb matches a glTF model format file.
-func Glb(in []byte) bool {
+func Glb(in []byte, _ uint32) bool {
 	// GLB is the binary file format representation of 3D models save in
 	// the GL transmission Format (glTF).
 	// see more: https://docs.fileformat.com/3d/glb/

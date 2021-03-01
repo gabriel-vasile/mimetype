@@ -44,9 +44,10 @@ Extension | MIME type | Aliases
 	}
 }
 
-func TestIndexOutOfRange(t *testing.T) {
+// Check there are no panics for nil inputs.
+func TestIndexOutOfRangePanic(t *testing.T) {
 	for _, n := range root.flatten() {
-		_ = n.matchFunc(nil)
+		_ = n.matchFunc(nil, 0)
 	}
 }
 

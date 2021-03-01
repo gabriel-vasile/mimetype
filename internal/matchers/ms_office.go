@@ -92,31 +92,31 @@ func msoXML(in []byte, prefixes ...string) bool {
 }
 
 // Xlsx matches a Microsoft Excel 2007 file.
-func Xlsx(in []byte) bool {
+func Xlsx(in []byte, _ uint32) bool {
 	return msoXML(in, xlsxSigFiles...)
 }
 
 // Docx matches a Microsoft Word 2007 file.
-func Docx(in []byte) bool {
+func Docx(in []byte, _ uint32) bool {
 	return msoXML(in, docxSigFiles...)
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
-func Pptx(in []byte) bool {
+func Pptx(in []byte, _ uint32) bool {
 	return msoXML(in, pptxSigFiles...)
 }
 
 // Ole matches an Open Linking and Embedding file.
 //
 // https://en.wikipedia.org/wiki/Object_Linking_and_Embedding
-func Ole(in []byte) bool {
+func Ole(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
 // Aaf matches an Advanced Authoring Format file.
 // See: https://pyaaf.readthedocs.io/en/latest/about.html
 // See: https://en.wikipedia.org/wiki/Advanced_Authoring_Format
-func Aaf(in []byte) bool {
+func Aaf(in []byte, _ uint32) bool {
 	if len(in) < 31 {
 		return false
 	}
@@ -131,12 +131,12 @@ func Aaf(in []byte) bool {
 // Ole is a container for Doc, Ppt, Pub and Xls.
 // Right now, when an Ole file is detected, it is considered to be a Doc file
 // if the checks for Ppt, Pub and Xls failed.
-func Doc(in []byte) bool {
+func Doc(in []byte, _ uint32) bool {
 	return true
 }
 
 // Ppt matches a Microsoft PowerPoint 97-2003 file or a PowerPoint 95 presentation.
-func Ppt(in []byte) bool {
+func Ppt(in []byte, _ uint32) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
 	if matchOleClsid(in, []byte{
@@ -174,7 +174,7 @@ func Ppt(in []byte) bool {
 }
 
 // Xls matches a Microsoft Excel 97-2003 file.
-func Xls(in []byte) bool {
+func Xls(in []byte, _ uint32) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
 	if matchOleClsid(in, []byte{
@@ -209,7 +209,7 @@ func Xls(in []byte) bool {
 }
 
 // Pub matches a Microsoft Publisher file.
-func Pub(in []byte) bool {
+func Pub(in []byte, _ uint32) bool {
 	return matchOleClsid(in, []byte{
 		0x01, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
@@ -217,7 +217,7 @@ func Pub(in []byte) bool {
 }
 
 // Msg matches a Microsoft Outlook email file.
-func Msg(in []byte) bool {
+func Msg(in []byte, _ uint32) bool {
 	return matchOleClsid(in, []byte{
 		0x0B, 0x0D, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
