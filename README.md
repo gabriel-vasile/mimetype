@@ -45,9 +45,9 @@ go get github.com/gabriel-vasile/mimetype
 ```go
 mime := mimetype.Detect([]byte)
 // OR
-mime, err := mime.DetectReader(io.Reader)
+mime, err := mimetype.DetectReader(io.Reader)
 // OR
-mime, err := mime.DetectFile("/path/to/file")
+mime, err := mimetype.DetectFile("/path/to/file")
 fmt.Println(mime.String(), mime.Extension())
 ```
 See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
