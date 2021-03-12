@@ -88,6 +88,7 @@ var files = map[string]string{
 	"m3u.m3u":            "audio/mpegurl",
 	"m4a.m4a":            "audio/x-m4a",
 	"audio.mp4":          "audio/mp4",
+	"lnk.lnk":            "application/x-ms-shortcut",
 	"macho.macho":        "application/x-mach-binary",
 	"mdb.mdb":            "application/x-msaccess",
 	"midi.midi":          "audio/midi",
