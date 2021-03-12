@@ -23,7 +23,7 @@ func Class(in []byte, _ uint32) bool {
 	return classOrMachOFat(in) && in[7] > 30
 }
 
-// Lnk matches Microst lnk binary format.
+// Lnk matches Microsoft lnk binary format.
 func Lnk(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
 }
