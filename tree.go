@@ -17,7 +17,7 @@ var root = newMIME("application/octet-stream", "", func([]byte, uint32) bool { r
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
 	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
-	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, macho, qcp,
+	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp,
 	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, utf8,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb,
 )
@@ -208,6 +208,7 @@ var (
 		alias("image/x-dwg", "application/acad", "application/x-acad", "application/autocad_dwg", "application/dwg", "application/x-dwg", "application/x-autocad", "drawing/dwg")
 	warc    = newMIME("application/warc", ".warc", matchers.Warc)
 	nes     = newMIME("application/vnd.nintendo.snes.rom", ".nes", matchers.Nes)
+	lnk     = newMIME("application/x-ms-shortcut", ".lnk", matchers.Lnk)
 	macho   = newMIME("application/x-mach-binary", ".macho", matchers.MachO)
 	qcp     = newMIME("audio/qcelp", ".qcp", matchers.Qcp)
 	mrc     = newMIME("application/marc", ".mrc", matchers.Marc)
