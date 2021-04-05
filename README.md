@@ -52,6 +52,10 @@ fmt.Println(mime.String(), mime.Extension())
 ```
 See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
 
+## Usage'
+Only use this as a last resort. Content type detection using magic numbers is slow,
+inaccurate, and non-standard. If the used protocol allows setting content type 
+metadata, like HTTP and SMTP do, then use the standard headers.
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the MIME type detection logic.
