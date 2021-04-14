@@ -42,6 +42,7 @@ Extension | MIME type | Aliases
 **.jp2** | image/jp2 | -
 **.jpf** | image/jpx | -
 **.jpm** | image/jpm | video/jpm
+**.xpm** | image/x-xpixmap | -
 **.gif** | image/gif | -
 **.webp** | image/webp | -
 **.exe** | application/vnd.microsoft.portable-executable | -

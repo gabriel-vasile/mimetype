@@ -140,3 +140,8 @@ func Gbr(in []byte, _ uint32) bool {
 func Hdr(in []byte, _ uint32) bool {
 	return bytes.HasPrefix(in, []byte("#?RADIANCE\n"))
 }
+
+// Xpm matches X PixMap image data.
+func Xpm(in []byte, _ uint32) bool {
+	return bytes.HasPrefix(in, []byte{0x2F, 0x2A, 0x20, 0x58})
+}

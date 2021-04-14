@@ -78,6 +78,7 @@ var files = map[string]string{
 	"jpf.jpf":            "image/jpx",
 	"jpg.jpg":            "image/jpeg",
 	"jpm.jpm":            "image/jpm",
+	"xpm.xpm":            "image/x-xpixmap",
 	"js.js":              "application/javascript",
 	"json.json":          "application/json",
 	"kml.kml":            "application/vnd.google-earth.kml+xml",
