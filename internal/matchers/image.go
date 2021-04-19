@@ -143,5 +143,5 @@ func Hdr(in []byte, _ uint32) bool {
 
 // Xpm matches X PixMap image data.
 func Xpm(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0x2F, 0x2A, 0x20, 0x58})
+	return bytes.HasPrefix(in, []byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
 }
