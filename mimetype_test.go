@@ -1,9 +1,9 @@
 package mimetype_test
 
 import (
-	"crypto/rand"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"testing"
@@ -321,8 +321,9 @@ func TestZeroLimit(t *testing.T) {
 // multiple rules failing before finding the one that matches, ex: a jpg file
 // might be tested for zip, gzip, etc., before it is identified.
 func BenchmarkSliceRand(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
 	data := make([]byte, 3072)
-	if _, err := io.ReadFull(rand.Reader, data); err != io.ErrUnexpectedEOF && err != nil {
+	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
 
