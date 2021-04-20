@@ -12,7 +12,7 @@ import "github.com/gabriel-vasile/mimetype/internal/matchers"
 // When a matcher passes the check, the children matchers
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return true },
-	sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
+	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
 	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
@@ -100,6 +100,7 @@ var (
 	jpx     = newMIME("image/jpx", ".jpf", matchers.Jpx)
 	jpm     = newMIME("image/jpm", ".jpm", matchers.Jpm).
 		alias("video/jpm")
+	xpm  = newMIME("image/x-xpixmap", ".xpm", matchers.Xpm)
 	bpg  = newMIME("image/bpg", ".bpg", matchers.Bpg)
 	gif  = newMIME("image/gif", ".gif", matchers.Gif)
 	webp = newMIME("image/webp", ".webp", matchers.Webp)
