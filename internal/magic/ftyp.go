@@ -1,4 +1,4 @@
-package matchers
+package magic
 
 var (
 	mp4Sigs = []sig{

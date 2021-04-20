@@ -80,7 +80,7 @@ func (m *MIME) alias(aliases ...string) *MIME {
 	return m
 }
 
-// match does a depth-first search on the matchers tree. It returns the deepest
+// match does a depth-first search on the magic tree. It returns the deepest
 // successful node for which all the children matching functions fail.
 func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 	for _, c := range m.children {

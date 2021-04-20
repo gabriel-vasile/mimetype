@@ -1,5 +1,5 @@
-// Package matchers holds the matching functions used to find MIME types.
-package matchers
+// Package magic holds the matching functions used to find MIME types.
+package magic
 
 // trimLWS trims whitespace from beginning of the input.
 func trimLWS(in []byte) []byte {
