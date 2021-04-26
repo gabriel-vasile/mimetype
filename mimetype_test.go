@@ -314,6 +314,32 @@ func TestZeroLimit(t *testing.T) {
 	}
 }
 
+func TestHierarchy(t *testing.T) {
+	detectedMIME, err := mimetype.DetectFile("testdata/html.html")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := []string{
+		"text/html",
+		"text/plain",
+		"application/octet-stream",
+	}
+
+	i := 0
+	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+		if len(expected)-1 < i {
+			t.Fatalf("hierarchy len error; expected: %d, got: %d", len(expected), i)
+		}
+		if !mime.Is(expected[i]) {
+			t.Fatalf("hierarchy error; expected: %s, got: %s", expected[i], mime)
+		}
+		i++
+	}
+	if len(expected) != i {
+		t.Fatalf("hierarchy len error; expected: %d, got: %d", len(expected), i)
+	}
+}
+
 // Benchmarking a random slice of bytes is as close as possible to the real
 // world usage. A random byte slice is almost guaranteed to fail being detected.
 //
