@@ -3,6 +3,7 @@ package mimetype
 import (
 	"mime"
 
+	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
@@ -98,7 +99,20 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 		}
 	}
 
-	return m.cloneHierarchy(nil)
+	needsCharset := map[string]func([]byte) string{
+		"text/plain": charset.FromPlain,
+		"text/html":  charset.FromHTML,
+		"text/xml":   charset.FromXML,
+	}
+	// ps holds optional MIME parameters.
+	ps := map[string]string{}
+	if f, ok := needsCharset[m.mime]; ok {
+		if cset := f(in); cset != "" {
+			ps["charset"] = cset
+		}
+	}
+
+	return m.cloneHierarchy(ps)
 }
 
 // flatten transforms an hierarchy of MIMEs into a slice of MIMEs.
