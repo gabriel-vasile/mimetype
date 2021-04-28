@@ -3,203 +3,153 @@ package magic
 import (
 	"bytes"
 
+	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
 )
 
 var (
-	htmlSigs = []sig{
-		markupSig("<!DOCTYPE HTML"),
-		markupSig("<HTML"),
-		markupSig("<HEAD"),
-		markupSig("<SCRIPT"),
-		markupSig("<IFRAME"),
-		markupSig("<H1"),
-		markupSig("<DIV"),
-		markupSig("<FONT"),
-		markupSig("<TABLE"),
-		markupSig("<A"),
-		markupSig("<STYLE"),
-		markupSig("<TITLE"),
-		markupSig("<B"),
-		markupSig("<BODY"),
-		markupSig("<BR"),
-		markupSig("<P"),
-		markupSig("<!--"),
-	}
-	xmlSigs = []sig{
-		markupSig("<?XML"),
-	}
-	owlSigs = []sig{
-		newXmlSig("Ontology", `xmlns="http://www.w3.org/2002/07/owl#"`),
-	}
-	rssSigs = []sig{
-		newXmlSig("rss", ""),
-	}
-	atomSigs = []sig{
-		newXmlSig("feed", `xmlns="http://www.w3.org/2005/Atom"`),
-	}
-	kmlSigs = []sig{
+	// Html matches a Hypertext Markup Language file.
+	Html = markup(
+		[]byte("<!DOCTYPE HTML"),
+		[]byte("<HTML"),
+		[]byte("<HEAD"),
+		[]byte("<SCRIPT"),
+		[]byte("<IFRAME"),
+		[]byte("<H1"),
+		[]byte("<DIV"),
+		[]byte("<FONT"),
+		[]byte("<TABLE"),
+		[]byte("<A"),
+		[]byte("<STYLE"),
+		[]byte("<TITLE"),
+		[]byte("<B"),
+		[]byte("<BODY"),
+		[]byte("<BR"),
+		[]byte("<P"),
+		[]byte("<!--"),
+	)
+	// Xml matches an Extensible Markup Language file.
+	Xml = markup([]byte("<?XML"))
+	// Owl2 matches an Owl ontology file.
+	Owl2 = xml(newXmlSig("Ontology", `xmlns="http://www.w3.org/2002/07/owl#"`))
+	// Rss matches a Rich Site Summary file.
+	Rss = xml(newXmlSig("rss", ""))
+	// Atom matches an Atom Syndication Format file.
+	Atom = xml(newXmlSig("feed", `xmlns="http://www.w3.org/2005/Atom"`))
+	// Kml matches a Keyhole Markup Language file.
+	Kml = xml(
 		newXmlSig("kml", `xmlns="http://www.opengis.net/kml/2.2"`),
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.0"`),
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.1"`),
 		newXmlSig("kml", `xmlns="http://earth.google.com/kml/2.2"`),
-	}
-	xliffSigs = []sig{
-		newXmlSig("xliff", `xmlns="urn:oasis:names:tc:xliff:document:1.2"`),
-	}
-	colladaSigs = []sig{
-		newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`),
-	}
-	gmlSigs = []sig{
+	)
+	// Xliff matches a XML Localization Interchange File Format file.
+	Xliff = xml(newXmlSig("xliff", `xmlns="urn:oasis:names:tc:xliff:document:1.2"`))
+	// Collada matches a COLLAborative Design Activity file.
+	Collada = xml(newXmlSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`))
+	// Gml matches a Geography Markup Language file.
+	Gml = xml(
 		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml"`),
 		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.2"`),
 		newXmlSig("", `xmlns:gml="http://www.opengis.net/gml/3.3/exr"`),
-	}
-	gpxSigs = []sig{
-		newXmlSig("gpx", `xmlns="http://www.topografix.com/GPX/1/1"`),
-	}
-	tcxSigs = []sig{
-		newXmlSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`),
-	}
-	x3dSigs = []sig{
-		newXmlSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`),
-	}
-	amfSigs = []sig{
-		newXmlSig("amf", ""),
-	}
-	threemfSigs = []sig{
-		newXmlSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`),
-	}
-	xfdfSigs = []sig{
-		newXmlSig("xfdf", `xmlns="http://ns.adobe.com/xfdf/"`),
-	}
-	vCardSigs = []sig{
-		ciSig("BEGIN:VCARD\n"),
-		ciSig("BEGIN:VCARD\r\n"),
-	}
-	iCalSigs = []sig{
-		ciSig("BEGIN:VCALENDAR\n"),
-		ciSig("BEGIN:VCALENDAR\r\n"),
-	}
-	phpSigs = []sig{
-		ciSig("<?PHP"),
-		ciSig("<?\n"),
-		ciSig("<?\r"),
-		ciSig("<? "),
-		shebangSig("/usr/local/bin/php"),
-		shebangSig("/usr/bin/php"),
-		shebangSig("/usr/bin/env php"),
-	}
-	jsSigs = []sig{
-		shebangSig("/bin/node"),
-		shebangSig("/usr/bin/node"),
-		shebangSig("/bin/nodejs"),
-		shebangSig("/usr/bin/nodejs"),
-		shebangSig("/usr/bin/env node"),
-		shebangSig("/usr/bin/env nodejs"),
-	}
-	luaSigs = []sig{
-		shebangSig("/usr/bin/lua"),
-		shebangSig("/usr/local/bin/lua"),
-		shebangSig("/usr/bin/env lua"),
-	}
-	perlSigs = []sig{
-		shebangSig("/usr/bin/perl"),
-		shebangSig("/usr/bin/env perl"),
-	}
-	pythonSigs = []sig{
-		shebangSig("/usr/bin/python"),
-		shebangSig("/usr/local/bin/python"),
-		shebangSig("/usr/bin/env python"),
-	}
-	tclSigs = []sig{
-		shebangSig("/usr/bin/tcl"),
-		shebangSig("/usr/local/bin/tcl"),
-		shebangSig("/usr/bin/env tcl"),
-		shebangSig("/usr/bin/tclsh"),
-		shebangSig("/usr/local/bin/tclsh"),
-		shebangSig("/usr/bin/env tclsh"),
-		shebangSig("/usr/bin/wish"),
-		shebangSig("/usr/local/bin/wish"),
-		shebangSig("/usr/bin/env wish"),
-	}
+	)
+	// Gpx matches a GPS Exchange Format file.
+	Gpx = xml(newXmlSig("gpx", `xmlns="http://www.topografix.com/GPX/1/1"`))
+	// Tcx matches a Training Center XML file.
+	Tcx = xml(newXmlSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`))
+	// X3d matches an Extensible 3D Graphics file.
+	X3d = xml(newXmlSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`))
+	// Amf matches an Additive Manufacturing XML file.
+	Amf = xml(newXmlSig("amf", ""))
+	// Threemf matches a 3D Manufacturing Format file.
+	Threemf = xml(newXmlSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`))
+	// Xfdf matches a XML Forms Data Format file.
+	Xfdf = xml(newXmlSig("xfdf", `xmlns="http://ns.adobe.com/xfdf/"`))
+	// VCard matches a Virtual Contact File.
+	VCard = ciPrefix([]byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
+	// ICalendar matches a iCalendar file.
+	ICalendar = ciPrefix([]byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
+	phpPageF  = ciPrefix(
+		[]byte("<?PHP"),
+		[]byte("<?\n"),
+		[]byte("<?\r"),
+		[]byte("<? "),
+	)
+	phpScriptF = shebang(
+		[]byte("/usr/local/bin/php"),
+		[]byte("/usr/bin/php"),
+		[]byte("/usr/bin/env php"),
+	)
+	// Js matches a Javascript file.
+	Js = shebang(
+		[]byte("/bin/node"),
+		[]byte("/usr/bin/node"),
+		[]byte("/bin/nodejs"),
+		[]byte("/usr/bin/nodejs"),
+		[]byte("/usr/bin/env node"),
+		[]byte("/usr/bin/env nodejs"),
+	)
+	// Lua matches a Lua programming language file.
+	Lua = shebang(
+		[]byte("/usr/bin/lua"),
+		[]byte("/usr/local/bin/lua"),
+		[]byte("/usr/bin/env lua"),
+	)
+	// Perl matches a Perl programming language file.
+	Perl = shebang(
+		[]byte("/usr/bin/perl"),
+		[]byte("/usr/bin/env perl"),
+	)
+	// Python matches a Python programming language file.
+	Python = shebang(
+		[]byte("/usr/bin/python"),
+		[]byte("/usr/local/bin/python"),
+		[]byte("/usr/bin/env python"),
+	)
+	// Tcl matches a Tcl programming language file.
+	Tcl = shebang(
+		[]byte("/usr/bin/tcl"),
+		[]byte("/usr/local/bin/tcl"),
+		[]byte("/usr/bin/env tcl"),
+		[]byte("/usr/bin/tclsh"),
+		[]byte("/usr/local/bin/tclsh"),
+		[]byte("/usr/bin/env tclsh"),
+		[]byte("/usr/bin/wish"),
+		[]byte("/usr/local/bin/wish"),
+		[]byte("/usr/bin/env wish"),
+	)
+	// Rtf matches a Rich Text Format file.
+	Rtf = prefix([]byte("{\\rtf1"))
 )
 
-// Utf32be matches a text file encoded with UTF-32 and with the characters
-// represented in big endian.
-func Utf32be(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0xFE, 0xFF})
-}
-
-// Utf32le matches a text file encoded with UTF-32 and with the characters
-// represented in little endian.
-func Utf32le(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0xFF, 0xFE, 0x00, 0x00})
-}
-
-// Utf16be matches a text file encoded with UTF-16 and with the characters
-// represented in big endian.
-func Utf16be(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0xFE, 0xFF})
-}
-
-// Utf16le matches a text file encoded with UTF-16 and with the characters
-// represented in little endian.
-func Utf16le(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0xFF, 0xFE})
-}
-
-// Utf8 matches an UTF-8 text file.
-func Utf8(in []byte, _ uint32) bool {
-	in = trimLWS(in)
-	for _, b := range in {
-		if b <= 0x08 ||
-			b == 0x0B ||
-			0x0E <= b && b <= 0x1A ||
-			0x1C <= b && b <= 0x1F {
-			return false
-		}
+// Text matches a plain text file.
+//
+// TODO: This function does not parse BOM-less UTF16 and UTF32 files. Not really
+// sure it should. Linux file utility also requires a BOM for UTF16 and UTF32.
+func Text(raw []byte, limit uint32) bool {
+	// First look for BOM.
+	if cset := charset.FromBOM(raw); cset != "" {
+		return true
 	}
-
-	return true
-}
-
-// Owl2 matches an Owl ontology file.
-func Owl2(in []byte, _ uint32) bool {
-	return detect(in, owlSigs)
-}
-
-// Html matches a Hypertext Markup Language file.
-func Html(in []byte, _ uint32) bool {
-	in = trimLWS(in)
-	if len(in) == 0 {
-		return false
-	}
-	return detect(in, htmlSigs)
-}
-
-// Xml matches an Extensible Markup Language file.
-func Xml(in []byte, _ uint32) bool {
-	in = trimLWS(in)
-	if len(in) == 0 {
-		return false
-	}
-	return detect(in, xmlSigs)
+	return isText(raw)
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.
-func Php(in []byte, _ uint32) bool {
-	return detect(in, phpSigs)
+func Php(raw []byte, limit uint32) bool {
+	if res := phpPageF(raw, limit); res {
+		return res
+	}
+	return phpScriptF(raw, limit)
 }
 
 // Json matches a JavaScript Object Notation file.
-func Json(in []byte, readLimit uint32) bool {
-	parsed, err := json.Scan(in)
-	if len(in) < int(readLimit) {
+func Json(raw []byte, limit uint32) bool {
+	parsed, err := json.Scan(raw)
+	if len(raw) < int(limit) {
 		return err == nil
 	}
 
-	return parsed == len(in)
+	return parsed == len(raw)
 }
 
 // GeoJson matches a RFC 7946 GeoJSON file.
@@ -207,18 +157,18 @@ func Json(in []byte, readLimit uint32) bool {
 // GeoJson detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 // BUG(gabriel-vasile): The "type" key should be searched for in the root object.
-func GeoJson(in []byte, _ uint32) bool {
-	in = trimLWS(in)
-	if len(in) == 0 {
+func GeoJson(raw []byte, limit uint32) bool {
+	raw = trimLWS(raw)
+	if len(raw) == 0 {
 		return false
 	}
 	// GeoJSON is always a JSON object, not a JSON array.
-	if in[0] != '{' {
+	if raw[0] != '{' {
 		return false
 	}
 
 	s := []byte(`"type"`)
-	si, sl := bytes.Index(in, s), len(s)
+	si, sl := bytes.Index(raw, s), len(s)
 
 	if si == -1 {
 		return false
@@ -226,19 +176,19 @@ func GeoJson(in []byte, _ uint32) bool {
 
 	// If the "type" string is the suffix of the input,
 	// there is no need to search for the value of the key.
-	if si+sl == len(in) {
+	if si+sl == len(raw) {
 		return false
 	}
 	// Skip the "type" part.
-	in = in[si+sl:]
+	raw = raw[si+sl:]
 	// Skip any whitespace before the colon.
-	in = trimLWS(in)
+	raw = trimLWS(raw)
 	// Check for colon.
-	if len(in) == 0 || in[0] != ':' {
+	if len(raw) == 0 || raw[0] != ':' {
 		return false
 	}
 	// Skip any whitespace after the colon.
-	in = trimLWS(in[1:])
+	raw = trimLWS(raw[1:])
 
 	geoJsonTypes := [][]byte{
 		[]byte(`"Feature"`),
@@ -252,7 +202,7 @@ func GeoJson(in []byte, _ uint32) bool {
 		[]byte(`"GeometryCollection"`),
 	}
 	for _, t := range geoJsonTypes {
-		if bytes.HasPrefix(in, t) {
+		if bytes.HasPrefix(raw, t) {
 			return true
 		}
 	}
@@ -261,7 +211,7 @@ func GeoJson(in []byte, _ uint32) bool {
 }
 
 // NdJson matches a Newline delimited JSON file.
-func NdJson(in []byte, readLimit uint32) bool {
+func NdJson(raw []byte, limit uint32) bool {
 	// Separator with carriage return and new line `\r\n`.
 	srn := []byte{0x0D, 0x0A}
 
@@ -272,7 +222,7 @@ func NdJson(in []byte, readLimit uint32) bool {
 	parsed := 0
 
 	// Split by `srn`.
-	for rni, insrn := range bytes.Split(in, srn) {
+	for rni, insrn := range bytes.Split(raw, srn) {
 		// Separator byte count should be added only after the first split.
 		if rni != 0 {
 			// Add two as `\r\n` is used for split.
@@ -291,117 +241,28 @@ func NdJson(in []byte, readLimit uint32) bool {
 			}
 			p, err := json.Scan(insn)
 			parsed += p
-			if parsed < int(readLimit) && err != nil {
+			if parsed < int(limit) && err != nil {
 				return false
 			}
 		}
 	}
 
 	// Empty inputs should not pass as valid NDJSON with 0 lines.
-	return parsed > 2 && parsed == len(in)
-}
-
-// Js matches a Javascript file.
-func Js(in []byte, _ uint32) bool {
-	return detect(in, jsSigs)
-}
-
-// Lua matches a Lua programming language file.
-func Lua(in []byte, _ uint32) bool {
-	return detect(in, luaSigs)
-}
-
-// Perl matches a Perl programming language file.
-func Perl(in []byte, _ uint32) bool {
-	return detect(in, perlSigs)
-}
-
-// Python matches a Python programming language file.
-func Python(in []byte, _ uint32) bool {
-	return detect(in, pythonSigs)
-}
-
-// Tcl matches a Tcl programming language file.
-func Tcl(in []byte, _ uint32) bool {
-	return detect(in, tclSigs)
-}
-
-// Rtf matches a Rich Text Format file.
-func Rtf(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte("{\\rtf1"))
+	return parsed > 2 && parsed == len(raw)
 }
 
 // Svg matches a SVG file.
-func Svg(in []byte, _ uint32) bool {
-	return bytes.Contains(in, []byte("<svg"))
+func Svg(raw []byte, limit uint32) bool {
+	return bytes.Contains(raw, []byte("<svg"))
 }
 
-// Rss matches a Rich Site Summary file.
-func Rss(in []byte, _ uint32) bool {
-	return detect(in, rssSigs)
-}
-
-// Atom matches an Atom Syndication Format file.
-func Atom(in []byte, _ uint32) bool {
-	return detect(in, atomSigs)
-}
-
-// Kml matches a Keyhole Markup Language file.
-func Kml(in []byte, _ uint32) bool {
-	return detect(in, kmlSigs)
-}
-
-// Xliff matches a XML Localization Interchange File Format file.
-func Xliff(in []byte, _ uint32) bool {
-	return detect(in, xliffSigs)
-}
-
-// Collada matches a COLLAborative Design Activity file.
-func Collada(in []byte, _ uint32) bool {
-	return detect(in, colladaSigs)
-}
-
-// Gml matches a Geography Markup Language file.
-func Gml(in []byte, _ uint32) bool {
-	return detect(in, gmlSigs)
-}
-
-// Gpx matches a GPS Exchange Format file.
-func Gpx(in []byte, _ uint32) bool {
-	return detect(in, gpxSigs)
-}
-
-// Tcx matches a Training Center XML file.
-func Tcx(in []byte, _ uint32) bool {
-	return detect(in, tcxSigs)
-}
-
-// Amf matches an Additive Manufacturing XML file.
-func Amf(in []byte, _ uint32) bool {
-	return detect(in, amfSigs)
-}
-
-// Threemf matches a 3D Manufacturing Format file.
-func Threemf(in []byte, _ uint32) bool {
-	return detect(in, threemfSigs)
-}
-
-// X3d matches an Extensible 3D Graphics file.
-func X3d(in []byte, _ uint32) bool {
-	return detect(in, x3dSigs)
-}
-
-// VCard matches a Virtual Contact File.
-func VCard(in []byte, _ uint32) bool {
-	return detect(in, vCardSigs)
-}
-
-// ICalendar matches a iCalendar file.
-func ICalendar(in []byte, _ uint32) bool {
-	return detect(in, iCalSigs)
-}
-
-// Xfdf matches a XML Forms Data Format file.
-func Xfdf(in []byte, _ uint32) bool {
-	return detect(in, xfdfSigs)
+// isText considers any file containing null bytes as a binary file.
+// There is plenty room for disagreement regarding what should be considered a
+// text file. This approach is used by diff, cat, and other linux utilities.
+func isText(raw []byte) bool {
+	l := 8000
+	if len(raw) > l {
+		raw = raw[:l]
+	}
+	return bytes.IndexByte(raw, 0) == -1
 }

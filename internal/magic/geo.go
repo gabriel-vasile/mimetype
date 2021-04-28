@@ -7,8 +7,8 @@ import (
 
 // Shp matches a shape format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
-func Shp(in []byte, _ uint32) bool {
-	if len(in) < 112 {
+func Shp(raw []byte, limit uint32) bool {
+	if len(raw) < 112 {
 		return false
 	}
 	shapeTypes := []int{
@@ -29,7 +29,7 @@ func Shp(in []byte, _ uint32) bool {
 	}
 
 	for _, st := range shapeTypes {
-		if st == int(binary.LittleEndian.Uint32(in[108:112])) {
+		if st == int(binary.LittleEndian.Uint32(raw[108:112])) {
 			return true
 		}
 	}
@@ -39,6 +39,6 @@ func Shp(in []byte, _ uint32) bool {
 
 // Shx matches a shape index format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
-func Shx(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0x00, 0x00, 0x27, 0x0A})
+func Shx(raw []byte, limit uint32) bool {
+	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x27, 0x0A})
 }

@@ -65,36 +65,39 @@ func FromPlain(content []byte) string {
 	if len(content) == 0 {
 		return ""
 	}
+	if cset := FromBOM(content); cset != "" {
+		return cset
+	}
+	origContent := content
 	// Try to detect UTF-8.
 	// First eliminate any partial rune at the end.
-	var utf8Content []byte
 	for i := len(content) - 1; i >= 0 && i > len(content)-4; i-- {
 		b := content[i]
 		if b < 0x80 {
 			break
 		}
 		if utf8.RuneStart(b) {
-			utf8Content = content[:i]
+			content = content[:i]
 			break
 		}
 	}
 	hasHighBit := false
-	for _, c := range utf8Content {
+	for _, c := range content {
 		if c >= 0x80 {
 			hasHighBit = true
 			break
 		}
 	}
-	if hasHighBit && utf8.Valid(utf8Content) {
+	if hasHighBit && utf8.Valid(content) {
 		return "utf-8"
 	}
 
 	// ASCII is a subset of UTF8. Follow W3C recommendation and replace with UTF8.
-	if ascii(content) {
+	if ascii(origContent) {
 		return "utf-8"
 	}
 
-	return latin(content)
+	return latin(origContent)
 }
 
 func latin(content []byte) string {
@@ -127,6 +130,13 @@ func ascii(content []byte) bool {
 }
 
 func FromXML(content []byte) string {
+	if cset := fromXML(content); cset != "" {
+		return cset
+	}
+	return FromPlain(content)
+}
+func fromXML(content []byte) string {
+	content = trimLWS(content)
 	dec := xml.NewDecoder(bytes.NewReader(content))
 	rawT, err := dec.RawToken()
 	if err != nil {
@@ -142,6 +152,13 @@ func FromXML(content []byte) string {
 }
 
 func FromHTML(content []byte) string {
+	if cset := fromHTML(content); cset != "" {
+		return cset
+	}
+	return FromPlain(content)
+}
+
+func fromHTML(content []byte) string {
 	z := html.NewTokenizer(bytes.NewReader(content))
 	for {
 		switch z.Next() {
@@ -261,4 +278,19 @@ func xmlEncoding(s string) string {
 		return ""
 	}
 	return v[1 : idx+1]
+}
+
+// trimLWS trims whitespace from beginning of the input.
+// TODO: find a way to call trimLWS once per detection instead of once in each
+// detector which needs the trimmed input.
+func trimLWS(in []byte) []byte {
+	firstNonWS := 0
+	for ; firstNonWS < len(in) && isWS(in[firstNonWS]); firstNonWS++ {
+	}
+
+	return in[firstNonWS:]
+}
+
+func isWS(b byte) bool {
+	return b == '\t' || b == '\n' || b == '\x0c' || b == '\r' || b == ' '
 }

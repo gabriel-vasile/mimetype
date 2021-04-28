@@ -11,22 +11,27 @@ import "github.com/gabriel-vasile/mimetype/internal/magic"
 // root is a matcher which passes for any slice of bytes.
 // When a matcher passes the check, the children magic
 // are tried in order to find a more accurate MIME type.
-var root = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return true },
+var root = newMIME("application/octet-stream", "",
+	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
 	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
 	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
-	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb, utf32le, utf32be,
-	utf16le, utf16be, gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
+	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
+	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
 	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp,
-	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, utf8,
+	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb,
+	// Keep text last because it is the slowest check
+	text,
 )
 
 // The list of nodes appended to the root node.
 var (
 	xz   = newMIME("application/x-xz", ".xz", magic.Xz)
-	gzip = newMIME("application/gzip", ".gz", magic.Gzip).
-		alias("application/x-gzip", "application/x-gunzip", "application/gzipped", "application/gzip-compressed", "application/x-gzip-compressed", "gzip/document")
+	gzip = newMIME("application/gzip", ".gz", magic.Gzip).alias(
+		"application/x-gzip", "application/x-gunzip", "application/gzipped",
+		"application/gzip-compressed", "application/x-gzip-compressed",
+		"gzip/document")
 	sevenZ = newMIME("application/x-7z-compressed", ".7z", magic.SevenZ)
 	zip    = newMIME("application/zip", ".zip", magic.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, odc, sxc).
 		alias("application/x-zip", "application/x-zip-compressed")
@@ -57,19 +62,15 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	utf32le  = newMIME("text/plain; charset=utf-32le", ".txt", magic.Utf32le)
-	utf32be  = newMIME("text/plain; charset=utf-32be", ".txt", magic.Utf32be)
-	utf16le  = newMIME("text/plain; charset=utf-16le", ".txt", magic.Utf16le)
-	utf16be  = newMIME("text/plain; charset=utf-16be", ".txt", magic.Utf16be)
-	utf8     = newMIME("text/plain; charset=utf-8", ".txt", magic.Utf8, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
-	xml      = newMIME("text/xml; charset=utf-8", ".xml", magic.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
+	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
+	xml      = newMIME("text/xml", ".xml", magic.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
 	json     = newMIME("application/json", ".json", magic.Json, geoJson)
 	csv      = newMIME("text/csv", ".csv", magic.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", magic.Tsv)
 	geoJson  = newMIME("application/geo+json", ".geojson", magic.GeoJson)
 	ndJson   = newMIME("application/x-ndjson", ".ndjson", magic.NdJson)
-	html     = newMIME("text/html; charset=utf-8", ".html", magic.Html)
-	php      = newMIME("text/x-php; charset=utf-8", ".php", magic.Php)
+	html     = newMIME("text/html", ".html", magic.Html)
+	php      = newMIME("text/x-php", ".php", magic.Php)
 	rtf      = newMIME("text/rtf", ".rtf", magic.Rtf)
 	js       = newMIME("application/javascript", ".js", magic.Js).
 			alias("application/x-javascript", "text/javascript")
@@ -154,7 +155,7 @@ var (
 	asf = newMIME("video/x-ms-asf", ".asf", magic.Asf).
 		alias("video/asf", "video/x-ms-wmv")
 	rmvb  = newMIME("application/vnd.rn-realmedia-vbr", ".rmvb", magic.Rmvb)
-	class = newMIME("application/x-java-applet; charset=binary", ".class", magic.Class)
+	class = newMIME("application/x-java-applet", ".class", magic.Class)
 	swf   = newMIME("application/x-shockwave-flash", ".swf", magic.Swf)
 	crx   = newMIME("application/x-chrome-extension", ".crx", magic.Crx)
 	ttf   = newMIME("font/ttf", ".ttf", magic.Ttf).
@@ -206,7 +207,9 @@ var (
 	lit     = newMIME("application/x-ms-reader", ".lit", magic.Lit)
 	sqlite3 = newMIME("application/x-sqlite3", ".sqlite", magic.Sqlite)
 	dwg     = newMIME("image/vnd.dwg", ".dwg", magic.Dwg).
-		alias("image/x-dwg", "application/acad", "application/x-acad", "application/autocad_dwg", "application/dwg", "application/x-dwg", "application/x-autocad", "drawing/dwg")
+		alias("image/x-dwg", "application/acad", "application/x-acad",
+			"application/autocad_dwg", "application/dwg", "application/x-dwg",
+			"application/x-autocad", "drawing/dwg")
 	warc    = newMIME("application/warc", ".warc", magic.Warc)
 	nes     = newMIME("application/vnd.nintendo.snes.rom", ".nes", magic.Nes)
 	lnk     = newMIME("application/x-ms-shortcut", ".lnk", magic.Lnk)

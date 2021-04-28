@@ -47,7 +47,7 @@ Extension | MIME type | Aliases
 // Check there are no panics for nil inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
 	for _, n := range root.flatten() {
-		_ = n.matchFunc(nil, 0)
+		n.detector(nil, 0)
 	}
 }
 

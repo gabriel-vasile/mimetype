@@ -2,48 +2,39 @@ package magic
 
 import "bytes"
 
-// Pdf matches a Portable Document Format file.
-func Pdf(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte{0x25, 0x50, 0x44, 0x46})
-}
-
-// Fdf matches a Forms Data Format file.
-func Fdf(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte("%FDF"))
-}
+var (
+	// Pdf matches a Portable Document Format file.
+	Pdf = prefix([]byte{0x25, 0x50, 0x44, 0x46})
+	// Fdf matches a Forms Data Format file.
+	Fdf = prefix([]byte("%FDF"))
+	// Mobi matches a Mobi file.
+	Mobi = offset([]byte("BOOKMOBI"), 60)
+	// Lit matches a Microsoft Lit file.
+	Lit = prefix([]byte("ITOLITLS"))
+)
 
 // DjVu matches a DjVu file.
-func DjVu(in []byte, _ uint32) bool {
-	if len(in) < 12 {
+func DjVu(raw []byte, limit uint32) bool {
+	if len(raw) < 12 {
 		return false
 	}
-	if !bytes.HasPrefix(in, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
+	if !bytes.HasPrefix(raw, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
 		return false
 	}
-	return bytes.HasPrefix(in[12:], []byte("DJVM")) ||
-		bytes.HasPrefix(in[12:], []byte("DJVU")) ||
-		bytes.HasPrefix(in[12:], []byte("DJVI")) ||
-		bytes.HasPrefix(in[12:], []byte("THUM"))
-}
-
-// Mobi matches a Mobi file.
-func Mobi(in []byte, _ uint32) bool {
-	return len(in) > 67 && bytes.Equal(in[60:68], []byte("BOOKMOBI"))
-}
-
-// Lit matches a Microsoft Lit file.
-func Lit(in []byte, _ uint32) bool {
-	return bytes.HasPrefix(in, []byte("ITOLITLS"))
+	return bytes.HasPrefix(raw[12:], []byte("DJVM")) ||
+		bytes.HasPrefix(raw[12:], []byte("DJVU")) ||
+		bytes.HasPrefix(raw[12:], []byte("DJVI")) ||
+		bytes.HasPrefix(raw[12:], []byte("THUM"))
 }
 
 // P7s matches an .p7s signature File (PEM, Base64).
-func P7s(in []byte, _ uint32) bool {
+func P7s(raw []byte, limit uint32) bool {
 	// Check for PEM Encoding.
-	if bytes.HasPrefix(in, []byte("-----BEGIN PKCS7")) {
+	if bytes.HasPrefix(raw, []byte("-----BEGIN PKCS7")) {
 		return true
 	}
 	// Check if DER Encoding is long enough.
-	if len(in) < 20 {
+	if len(raw) < 20 {
 		return false
 	}
 	// Magic Bytes for the signedData ASN.1 encoding.
@@ -52,8 +43,8 @@ func P7s(in []byte, _ uint32) bool {
 	// Check if Header is correct. There are multiple valid headers.
 	for i, match := range startHeader {
 		// If first bytes match, then check for ASN.1 Object Type.
-		if bytes.HasPrefix(in, match) {
-			if bytes.HasPrefix(in[i+2:], signedDataMatch) {
+		if bytes.HasPrefix(raw, match) {
+			if bytes.HasPrefix(raw[i+2:], signedDataMatch) {
 				return true
 			}
 		}

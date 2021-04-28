@@ -2,6 +2,8 @@ package mimetype
 
 import (
 	"mime"
+
+	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
 // MIME struct holds information about a file format: the string representation
@@ -10,9 +12,12 @@ type MIME struct {
 	mime      string
 	aliases   []string
 	extension string
-	matchFunc func([]byte, uint32) bool
-	children  []*MIME
-	parent    *MIME
+	// detector receives the raw input and a limit for the number of bytes
+	// it is allowed to check. It returns whether the input matches a signature
+	// and any optional MIME parameters.
+	detector magic.Detector
+	children []*MIME
+	parent   *MIME
 }
 
 // String returns the string representation of the MIME type, e.g., "application/zip".
@@ -60,11 +65,15 @@ func (m *MIME) Is(expectedMIME string) bool {
 	return false
 }
 
-func newMIME(mime, extension string, matchFunc func([]byte, uint32) bool, children ...*MIME) *MIME {
+func newMIME(
+	mime, extension string,
+	detector magic.Detector,
+	children ...*MIME) *MIME {
+
 	m := &MIME{
 		mime:      mime,
 		extension: extension,
-		matchFunc: matchFunc,
+		detector:  detector,
 		children:  children,
 	}
 
@@ -80,16 +89,16 @@ func (m *MIME) alias(aliases ...string) *MIME {
 	return m
 }
 
-// match does a depth-first search on the magic tree. It returns the deepest
-// successful node for which all the children matching functions fail.
+// match does a depth-first search on the signature tree. It returns the deepest
+// successful node for which all the children detection functions fail.
 func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 	for _, c := range m.children {
-		if c.matchFunc(in, readLimit) {
+		if c.detector(in, readLimit) {
 			return c.match(in, readLimit)
 		}
 	}
 
-	return m
+	return m.cloneHierarchy(nil)
 }
 
 // flatten transforms an hierarchy of MIMEs into a slice of MIMEs.
@@ -100,4 +109,32 @@ func (m *MIME) flatten() []*MIME {
 	}
 
 	return out
+}
+
+// clone creates a new MIME with the provided optional MIME parameters.
+func (m *MIME) clone(ps map[string]string) *MIME {
+	clonedMIME := m.mime
+	if len(ps) > 0 {
+		clonedMIME = mime.FormatMediaType(m.mime, ps)
+	}
+
+	return &MIME{
+		mime:      clonedMIME,
+		aliases:   m.aliases,
+		extension: m.extension,
+	}
+}
+
+// cloneHierarchy creates a clone of m and all its ancestors. The optional MIME
+// parametes are set on the last child of the hierarchy.
+func (m *MIME) cloneHierarchy(ps map[string]string) *MIME {
+	ret := m.clone(ps)
+	lastChild := ret
+	for p := m.Parent(); p != nil; p = p.Parent() {
+		pClone := p.clone(nil)
+		lastChild.parent = pClone
+		lastChild = pClone
+	}
+
+	return ret
 }

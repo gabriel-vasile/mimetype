@@ -7,13 +7,13 @@ import (
 )
 
 // Csv matches a comma-separated values file.
-func Csv(in []byte, _ uint32) bool {
-	return sv(in, ',')
+func Csv(raw []byte, limit uint32) bool {
+	return sv(raw, ',')
 }
 
 // Tsv matches a tab-separated values file.
-func Tsv(in []byte, _ uint32) bool {
-	return sv(in, '\t')
+func Tsv(raw []byte, limit uint32) bool {
+	return sv(raw, '\t')
 }
 
 func sv(in []byte, comma rune) bool {

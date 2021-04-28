@@ -35,7 +35,7 @@ var files = map[string]string{
 	"bpg.bpg":            "image/bpg",
 	"bz2.bz2":            "application/x-bzip2",
 	"cab.cab":            "application/vnd.ms-cab-compressed",
-	"class.class":        "application/x-java-applet; charset=binary",
+	"class.class":        "application/x-java-applet",
 	"crx.crx":            "application/x-chrome-extension",
 	"csv.csv":            "text/csv",
 	"cpio.cpio":          "application/x-cpio",
@@ -86,7 +86,7 @@ var files = map[string]string{
 	"ln":                 "application/x-executable",
 	"lua.lua":            "text/x-lua",
 	"lz.lz":              "application/lzip",
-	"m3u.m3u":            "audio/mpegurl",
+	"m3u.m3u":            "application/vnd.apple.mpegurl",
 	"m4a.m4a":            "audio/x-m4a",
 	"audio.mp4":          "audio/mp4",
 	"lnk.lnk":            "application/x-ms-shortcut",
@@ -128,7 +128,7 @@ var files = map[string]string{
 	"owl2.owl":           "application/owl+xml",
 	"pat.pat":            "image/x-gimp-pat",
 	"pdf.pdf":            "application/pdf",
-	"php.php":            "text/x-php; charset=utf-8",
+	"php.php":            "text/x-php",
 	"pl.pl":              "text/x-perl",
 	"png.png":            "image/png",
 	"ppt.ppt":            "application/vnd.ms-powerpoint",
@@ -186,6 +186,7 @@ var files = map[string]string{
 	"xlsx.1.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	"xlsx.2.xlsx":        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	"xlsx.xlsx":          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"xml.xml":            "text/xml; charset=utf-8",
 	"xml.withbr.xml":     "text/xml; charset=utf-8",
 	"xz.xz":              "application/x-xz",
 	"zip.zip":            "application/zip",
@@ -206,7 +207,7 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime := mimetype.Detect(data); !mime.Is(expected) {
+		if mime := mimetype.Detect(data); mime.String() != expected {
 			t.Errorf(errStr, fName, expected, mime.String(), nil)
 		}
 
@@ -214,12 +215,12 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime, err := mimetype.DetectReader(f); !mime.Is(expected) {
+		if mime, err := mimetype.DetectReader(f); mime.String() != expected {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
 
-		if mime, err := mimetype.DetectFile(fileName); !mime.Is(expected) {
+		if mime, err := mimetype.DetectFile(fileName); mime.String() != expected {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		} else if mime.Extension() != filepath.Ext(fName) {
 			t.Errorf(extStr, fName, filepath.Ext(fName), mime.Extension())
@@ -262,7 +263,7 @@ func TestDetectReader(t *testing.T) {
 			r:         f,
 			breakSize: 3,
 		}
-		if mime, err := mimetype.DetectReader(&r); !mime.Is(expected) {
+		if mime, err := mimetype.DetectReader(&r); mime.String() != expected {
 			t.Errorf(errStr, fName, expected, mime.String(), err)
 		}
 		f.Close()
@@ -309,7 +310,7 @@ func TestZeroLimit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !mime.Is("text/plain") {
+	if mime.String() != "text/plain; charset=utf-8" {
 		t.Fatal("utf8.txt should have text/plain MIME")
 	}
 }
@@ -353,7 +354,6 @@ func BenchmarkSliceRand(b *testing.B) {
 		b.Fatal(err)
 	}
 
-	b.ReportAllocs()
 	b.ResetTimer()
 
 	b.RunParallel(func(pb *testing.PB) {
