@@ -13,9 +13,8 @@ type MIME struct {
 	mime      string
 	aliases   []string
 	extension string
-	// detector receives the raw input and a limit for the number of bytes
-	// it is allowed to check. It returns whether the input matches a signature
-	// and any optional MIME parameters.
+	// detector receives the raw input and a limit for the number of bytes it is
+	// allowed to check. It returns whether the input matches a signature or not.
 	detector magic.Detector
 	children []*MIME
 	parent   *MIME
