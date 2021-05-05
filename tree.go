@@ -1,6 +1,10 @@
 package mimetype
 
-import "github.com/gabriel-vasile/mimetype/internal/magic"
+import (
+	"sync"
+
+	"github.com/gabriel-vasile/mimetype/internal/magic"
+)
 
 // mimetype stores the list of MIME types in a tree structure with
 // "application/octet-stream" at the root of the hierarchy. The hierarchy
@@ -24,6 +28,9 @@ var root = newMIME("application/octet-stream", "",
 	// Keep text last because it is the slowest check
 	text,
 )
+
+// rootMu guards the root tree and the readLimit used when creating the detection buffer.
+var rootMu sync.RWMutex
 
 // The list of nodes appended to the root node.
 var (

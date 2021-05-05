@@ -54,3 +54,20 @@ func Example_whitelist() {
 	}
 	// Output: text/plain; charset=utf-8 is allowed
 }
+
+// Use Extend to add support for a file format which is not detected by mimetype.
+//
+// https://www.garykessler.net/library/file_sigs.html and
+// https://github.com/file/file/tree/master/magic/Magdir
+// have signatures for a multitude of file formats.
+func Example_extend() {
+	foobarDetector := func(raw []byte, limit uint32) bool {
+		return bytes.HasPrefix(raw, []byte("foobar"))
+	}
+
+	mimetype.Extend(foobarDetector, "text/foobar", ".fb")
+	mime := mimetype.Detect([]byte("foobar file content"))
+
+	fmt.Println(mime.String(), mime.Extension())
+	// Output: text/foobar .fb
+}

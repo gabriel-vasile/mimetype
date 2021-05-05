@@ -1,11 +1,13 @@
 package mimetype_test
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -343,6 +345,44 @@ func TestHierarchy(t *testing.T) {
 	if len(expected) != i {
 		t.Fatalf("hierarchy len error; expected: %d, got: %d", len(expected), i)
 	}
+}
+
+func TestExtend(t *testing.T) {
+	foobarDet := func(raw []byte, limit uint32) bool {
+		return bytes.HasPrefix(raw, []byte("foobar"))
+	}
+
+	mimetype.Extend(foobarDet, "text/foobar", ".fb")
+
+	mime := mimetype.Detect([]byte("foobar file content"))
+	if !mime.Is("text/foobar") {
+		t.Fatalf("extend error; expected text/foobar, got: %s", mime)
+	}
+	if !mime.Parent().Is("application/octet-stream") {
+		t.Fatalf("extend parent error; expected application/octet-stream, got: %s", mime.Parent())
+	}
+}
+
+func TestConcurrent(t *testing.T) {
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		for i := 0; i < 1000; i++ {
+			mimetype.Detect([]byte("text content"))
+		}
+		wg.Done()
+	}()
+	go func() {
+		for i := 0; i < 1000; i++ {
+			mimetype.SetLimit(5000 + uint32(i))
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	// Reset to original limit for benchmarks.
+	mimetype.SetLimit(3072)
 }
 
 // Benchmarking a random slice of bytes is as close as possible to the real

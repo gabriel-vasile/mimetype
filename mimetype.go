@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"mime"
 	"os"
-	"sync/atomic"
 )
 
 // readLimit is the maximum number of bytes from the input used when detecting.
@@ -17,13 +16,12 @@ var readLimit uint32 = 3072
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) *MIME {
-	// using atomic because readLimit can be concurrently
-	// altered by another goroutine calling SetLimit.
-	l := atomic.LoadUint32(&readLimit)
-	if l > 0 && len(in) > int(l) {
-		in = in[:l]
+	rootMu.RLock()
+	defer rootMu.RUnlock()
+	if readLimit > 0 && len(in) > int(readLimit) {
+		in = in[:readLimit]
 	}
-	return root.match(in, l)
+	return root.match(in, readLimit)
 }
 
 // DetectReader returns the MIME type of the provided reader.
@@ -36,13 +34,12 @@ func Detect(in []byte) *MIME {
 // io.ReadSeeker you previously read from, it should be rewinded before detection:
 //  reader.Seek(0, io.SeekStart)
 func DetectReader(r io.Reader) (*MIME, error) {
-	// using atomic because readLimit can be concurrently
-	// altered by another goroutine calling SetLimit.
-	l := atomic.LoadUint32(&readLimit)
+	rootMu.RLock()
+	defer rootMu.RUnlock()
 	var in []byte
 	var err error
 
-	if l == 0 {
+	if readLimit == 0 {
 		in, err = ioutil.ReadAll(r)
 		if err != nil {
 			return root, err
@@ -51,7 +48,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 		// io.UnexpectedEOF means len(r) < len(in). It is not an error in this case,
 		// it just means the input file is smaller than the allocated bytes slice.
 		n := 0
-		in = make([]byte, l)
+		in = make([]byte, readLimit)
 		n, err = io.ReadFull(r, in)
 		if err != nil && err != io.ErrUnexpectedEOF {
 			return root, err
@@ -59,7 +56,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 		in = in[:n]
 	}
 
-	return root.match(in, l), nil
+	return root.match(in, readLimit), nil
 }
 
 // DetectFile returns the MIME type of the provided file.
@@ -67,8 +64,8 @@ func DetectReader(r io.Reader) (*MIME, error) {
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed with or without an error.
 // Any error returned is related to the opening and reading from the input file.
-func DetectFile(file string) (*MIME, error) {
-	f, err := os.Open(file)
+func DetectFile(path string) (*MIME, error) {
+	f, err := os.Open(path)
 	if err != nil {
 		return root, err
 	}
@@ -98,5 +95,24 @@ func EqualsAny(s string, mimes ...string) bool {
 // their magical numbers towards the end of the file: docx, pptx, xlsx, etc.
 // A limit of 0 means the whole input file will be used.
 func SetLimit(limit uint32) {
-	atomic.StoreUint32(&readLimit, limit)
+	rootMu.Lock()
+	readLimit = limit
+	rootMu.Unlock()
+}
+
+// Extend adds detection for other file formats. The detector is a function
+// returning true when the raw input file satisfies a  signature.
+// The extension should include the leading dot, as in ".html".
+func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
+	m := &MIME{
+		mime:      mime,
+		extension: extension,
+		detector:  detector,
+		parent:    root,
+		aliases:   aliases,
+	}
+
+	rootMu.Lock()
+	root.children = append([]*MIME{m}, root.children...)
+	rootMu.Unlock()
 }

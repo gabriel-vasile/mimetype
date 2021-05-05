@@ -6,7 +6,7 @@
   A package for detecting MIME types and extensions based on magic numbers
 </h4>
 <h6 align="center">
-  No C bindings, zero dependencies and thread safe
+  Thread safe, extensible, no C bindings
 </h6>
 
 <p align="center">
@@ -30,6 +30,7 @@
 ## Features
 - fast and precise MIME type and file extension detection
 - long list of [supported MIME types](supported_mimes.md)
+- posibility to [extend](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#example-package-Extend) with other file formats
 - common file formats are prioritized
 - small and simple API
 - handles MIME type aliases
@@ -53,10 +54,10 @@ fmt.Println(mime.String(), mime.Extension())
 See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
 
 ## Usage'
-Only use magic number detection as a last resort. Content type detection using
-magic numbers is slow, inaccurate, and non-standard. Most of the times protocols
-have methods for specifying such metadata; e.g., `Content-Type` header in HTTP
-and SMTP.
+Only use libraries like **mimetype** as a last resort. Content type detection
+using magic numbers is slow, inaccurate, and non-standard. Most of the times
+protocols have methods for specifying such metadata; e.g., `Content-Type` header
+in HTTP and SMTP.
 
 ## Structure
 **mimetype** uses an hierarchical structure to keep the MIME type detection logic.
