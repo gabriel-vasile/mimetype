@@ -2,6 +2,7 @@ package magic
 
 import (
 	"bytes"
+	"encoding/binary"
 )
 
 var (
@@ -9,8 +10,6 @@ var (
 	SevenZ = prefix([]byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 	// Gzip matches gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
 	Gzip = prefix([]byte{0x1f, 0x8b})
-	// Crx matches a Chrome extension file: a zip archive prepended by "Cr24".
-	Crx = prefix([]byte("Cr24"))
 	// Tar matches a (t)ape (ar)chive file.
 	Tar = offset([]byte("ustar"), 257)
 	// Fits matches an Flexible Image Transport System file.
@@ -64,4 +63,19 @@ func Cpio(raw []byte, limit uint32) bool {
 func Rar(raw []byte, limit uint32) bool {
 	return bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x00")) ||
 		bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x01\x00"))
+}
+
+// Crx matches a Chrome extension file: a zip archive prepended by a package header.
+func Crx(raw []byte, limit uint32) bool {
+	const minHeaderLen = 16
+	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
+		return false
+	}
+	pubkeyLen := binary.LittleEndian.Uint32(raw[8:12])
+	sigLen := binary.LittleEndian.Uint32(raw[12:16])
+	zipOffset := minHeaderLen + pubkeyLen + sigLen
+	if uint32(len(raw)) < zipOffset {
+		return false
+	}
+	return Zip(raw[zipOffset:], limit)
 }
