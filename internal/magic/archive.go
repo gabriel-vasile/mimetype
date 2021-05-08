@@ -52,7 +52,7 @@ func Rpm(raw []byte, limit uint32) bool {
 		bytes.HasPrefix(raw, []byte("drpm"))
 }
 
-// Cpio matches a cpio archive file
+// Cpio matches a cpio archive file.
 func Cpio(raw []byte, limit uint32) bool {
 	return bytes.HasPrefix(raw, []byte("070707")) ||
 		bytes.HasPrefix(raw, []byte("070701")) ||
