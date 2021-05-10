@@ -9,10 +9,10 @@ labels: ''
 **Attach the file for which the detection is inaccurate**
 You can use the file sharing site of your choice, just ensure the file will not expire or get deleted.
 
-**Expected mime type**
+**Expected MIME type**
 ...
 
-**Returned mime type**
+**Returned MIME type**
 ...
 
 **Version of the library you are using**
