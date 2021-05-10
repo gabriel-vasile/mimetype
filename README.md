@@ -78,8 +78,6 @@ Thanks to the hierarchical structure, searching for common formats first,
 and limiting itself to file headers, **mimetype** matches the performance of
 stdlib `http.DetectContentType` while outperforming the alternative package.
 
-[Benchmarks](https://github.com/gabriel-vasile/mimetype/blob/d8628c314b5e59259afc7b0f4f84e6b31931b316/mimetype_test.go#L267)
-were run on an Intel Xeon Gold 6136 24 core CPU @ 3.00GHz. Lower is better.
 ```bash
                             mimetype  http.DetectContentType      filetype
 BenchmarkMatchTar-24       250 ns/op         400 ns/op           3778 ns/op
