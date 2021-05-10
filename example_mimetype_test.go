@@ -11,14 +11,14 @@ import (
 func Example_detect() {
 	testBytes := []byte("This random text has a MIME type of text/plain; charset=utf-8.")
 
-	mime := mimetype.Detect(testBytes)
-	fmt.Println(mime.Is("text/plain"), mime.String(), mime.Extension())
+	mtype := mimetype.Detect(testBytes)
+	fmt.Println(mtype.Is("text/plain"), mtype.String(), mtype.Extension())
 
-	mime, err := mimetype.DetectReader(bytes.NewReader(testBytes))
-	fmt.Println(mime.Is("text/plain"), mime.String(), mime.Extension(), err)
+	mtype, err := mimetype.DetectReader(bytes.NewReader(testBytes))
+	fmt.Println(mtype.Is("text/plain"), mtype.String(), mtype.Extension(), err)
 
-	mime, err = mimetype.DetectFile("a nonexistent file")
-	fmt.Println(mime.Is("application/octet-stream"), mime.String(), os.IsNotExist(err))
+	mtype, err = mimetype.DetectFile("a nonexistent file")
+	fmt.Println(mtype.Is("application/octet-stream"), mtype.String(), os.IsNotExist(err))
 	// Output: true text/plain; charset=utf-8 .txt
 	// true text/plain; charset=utf-8 .txt <nil>
 	// true application/octet-stream true
@@ -32,8 +32,8 @@ func Example_textVsBinary() {
 	detectedMIME := mimetype.Detect(testBytes)
 
 	isBinary := true
-	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
-		if mime.Is("text/plain") {
+	for mtype := detectedMIME; mtype != nil; mtype = mtype.Parent() {
+		if mtype.Is("text/plain") {
 			isBinary = false
 		}
 	}
@@ -45,12 +45,12 @@ func Example_textVsBinary() {
 func Example_whitelist() {
 	testBytes := []byte("This random text has a MIME type of text/plain; charset=utf-8.")
 	allowed := []string{"text/plain", "application/zip", "application/pdf"}
-	mime := mimetype.Detect(testBytes)
+	mtype := mimetype.Detect(testBytes)
 
-	if mimetype.EqualsAny(mime.String(), allowed...) {
-		fmt.Printf("%s is allowed\n", mime)
+	if mimetype.EqualsAny(mtype.String(), allowed...) {
+		fmt.Printf("%s is allowed\n", mtype)
 	} else {
-		fmt.Printf("%s is now allowed\n", mime)
+		fmt.Printf("%s is now allowed\n", mtype)
 	}
 	// Output: text/plain; charset=utf-8 is allowed
 }
@@ -66,8 +66,8 @@ func Example_extend() {
 	}
 
 	mimetype.Extend(foobarDetector, "text/foobar", ".fb")
-	mime := mimetype.Detect([]byte("foobar file content"))
+	mtype := mimetype.Detect([]byte("foobar file content"))
 
-	fmt.Println(mime.String(), mime.Extension())
+	fmt.Println(mtype.String(), mtype.Extension())
 	// Output: text/foobar .fb
 }

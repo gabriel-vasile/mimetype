@@ -213,23 +213,23 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mime := mimetype.Detect(data); mime.String() != expected {
-			t.Errorf(errStr, fName, expected, mime.String(), nil)
+		if mtype := mimetype.Detect(data); mtype.String() != expected {
+			t.Errorf(errStr, fName, expected, mtype.String(), nil)
 		}
 
 		if _, err := f.Seek(0, io.SeekStart); err != nil {
 			t.Fatal(err)
 		}
 
-		if mime, err := mimetype.DetectReader(f); mime.String() != expected {
-			t.Errorf(errStr, fName, expected, mime.String(), err)
+		if mtype, err := mimetype.DetectReader(f); mtype.String() != expected {
+			t.Errorf(errStr, fName, expected, mtype.String(), err)
 		}
 		f.Close()
 
-		if mime, err := mimetype.DetectFile(fileName); mime.String() != expected {
-			t.Errorf(errStr, fName, expected, mime.String(), err)
-		} else if mime.Extension() != filepath.Ext(fName) {
-			t.Errorf(extStr, fName, filepath.Ext(fName), mime.Extension())
+		if mtype, err := mimetype.DetectFile(fileName); mtype.String() != expected {
+			t.Errorf(errStr, fName, expected, mtype.String(), err)
+		} else if mtype.Extension() != filepath.Ext(fName) {
+			t.Errorf(extStr, fName, filepath.Ext(fName), mtype.Extension())
 		}
 	}
 }
@@ -269,8 +269,8 @@ func TestDetectReader(t *testing.T) {
 			r:         f,
 			breakSize: 3,
 		}
-		if mime, err := mimetype.DetectReader(&r); mime.String() != expected {
-			t.Errorf(errStr, fName, expected, mime.String(), err)
+		if mtype, err := mimetype.DetectReader(&r); mtype.String() != expected {
+			t.Errorf(errStr, fName, expected, mtype.String(), err)
 		}
 		f.Close()
 	}
@@ -312,11 +312,11 @@ func TestFaultyInput(t *testing.T) {
 
 func TestZeroLimit(t *testing.T) {
 	mimetype.SetLimit(0)
-	mime, err := mimetype.DetectFile("testdata/utf8.txt")
+	mtype, err := mimetype.DetectFile("testdata/utf8.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if mime.String() != "text/plain; charset=utf-8" {
+	if mtype.String() != "text/plain; charset=utf-8" {
 		t.Fatal("utf8.txt should have text/plain MIME")
 	}
 }
@@ -333,12 +333,12 @@ func TestHierarchy(t *testing.T) {
 	}
 
 	i := 0
-	for mime := detectedMIME; mime != nil; mime = mime.Parent() {
+	for mtype := detectedMIME; mtype != nil; mtype = mtype.Parent() {
 		if len(expected)-1 < i {
 			t.Fatalf("hierarchy len error; expected: %d, got: %d", len(expected), i)
 		}
-		if !mime.Is(expected[i]) {
-			t.Fatalf("hierarchy error; expected: %s, got: %s", expected[i], mime)
+		if !mtype.Is(expected[i]) {
+			t.Fatalf("hierarchy error; expected: %s, got: %s", expected[i], mtype)
 		}
 		i++
 	}
@@ -354,12 +354,12 @@ func TestExtend(t *testing.T) {
 
 	mimetype.Extend(foobarDet, "text/foobar", ".fb")
 
-	mime := mimetype.Detect([]byte("foobar file content"))
-	if !mime.Is("text/foobar") {
-		t.Fatalf("extend error; expected text/foobar, got: %s", mime)
+	mtype := mimetype.Detect([]byte("foobar file content"))
+	if !mtype.Is("text/foobar") {
+		t.Fatalf("extend error; expected text/foobar, got: %s", mtype)
 	}
-	if !mime.Parent().Is("application/octet-stream") {
-		t.Fatalf("extend parent error; expected application/octet-stream, got: %s", mime.Parent())
+	if !mtype.Parent().Is("application/octet-stream") {
+		t.Fatalf("extend parent error; expected application/octet-stream, got: %s", mtype.Parent())
 	}
 }
 
