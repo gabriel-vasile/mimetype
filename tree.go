@@ -17,14 +17,14 @@ import (
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
-	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jp2, jpx, jpm, gif, webp,
-	exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac, midi, ape,
-	musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM, threeGP,
-	threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
-	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm,
-	shx, dbf, dcm, rar, djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp,
-	icns, heic, heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab,
-	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb,
+	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
+	jpm, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac,
+	midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM,
+	threeGP, threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
+	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar,
+	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
+	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
+	torrent, cpio, tzif, xcf, pat, gbr, glb,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -104,6 +104,7 @@ var (
 	threemf = newMIME("application/vnd.ms-package.3dmanufacturing-3dmodel+xml", ".3mf", magic.Threemf)
 	png     = newMIME("image/png", ".png", magic.Png)
 	jpg     = newMIME("image/jpeg", ".jpg", magic.Jpg)
+	jxl     = newMIME("image/jxl", ".jxl", magic.Jxl)
 	jp2     = newMIME("image/jp2", ".jp2", magic.Jp2)
 	jpx     = newMIME("image/jpx", ".jpf", magic.Jpx)
 	jpm     = newMIME("image/jpm", ".jpm", magic.Jpm).
