@@ -43,7 +43,7 @@ var (
 )
 
 func jpeg2k(sig []byte) Detector {
-	return func(raw []byte, limit uint32) bool {
+	return func(raw []byte, _ uint32) bool {
 		if len(raw) < 24 {
 			return false
 		}
@@ -57,14 +57,14 @@ func jpeg2k(sig []byte) Detector {
 }
 
 // Webp matches a WebP file.
-func Webp(raw []byte, limit uint32) bool {
+func Webp(raw []byte, _ uint32) bool {
 	return len(raw) > 12 &&
 		bytes.Equal(raw[0:4], []byte("RIFF")) &&
 		bytes.Equal(raw[8:12], []byte{0x57, 0x45, 0x42, 0x50})
 }
 
 // Dwg matches a CAD drawing file.
-func Dwg(raw []byte, limit uint32) bool {
+func Dwg(raw []byte, _ uint32) bool {
 	if len(raw) < 6 || raw[0] != 0x41 || raw[1] != 0x43 {
 		return false
 	}
@@ -93,4 +93,10 @@ func Dwg(raw []byte, limit uint32) bool {
 	}
 
 	return false
+}
+
+// Jxl matches JPEG XL image file.
+func Jxl(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte{0xFF, 0x0A}) ||
+		bytes.HasPrefix(raw, []byte("\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a"))
 }
