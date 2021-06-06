@@ -182,3 +182,21 @@ func (m *MIME) lookup(mime string) *MIME {
 	}
 	return nil
 }
+
+// Extend adds detection for a sub-format. The detector is a function
+// returning true when the raw input file satisfies a signature.
+// The sub-format will be detected if all the detectors in the parent chain return true.
+// The extension should include the leading dot, as in ".html".
+func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
+	c := &MIME{
+		mime:      mime,
+		extension: extension,
+		detector:  detector,
+		parent:    m,
+		aliases:   aliases,
+	}
+
+	m.mu.Lock()
+	m.children = append([]*MIME{c}, m.children...)
+	m.mu.Unlock()
+}

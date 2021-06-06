@@ -353,14 +353,15 @@ func TestExtend(t *testing.T) {
 		return bytes.HasPrefix(raw, []byte("foobar"))
 	}
 
-	mimetype.Extend(foobarDet, "text/foobar", ".fb")
+	txt := "text/plain"
+	mimetype.Lookup(txt).Extend(foobarDet, "text/foobar", ".fb")
 
 	mtype := mimetype.Detect([]byte("foobar file content"))
 	if !mtype.Is("text/foobar") {
 		t.Fatalf("extend error; expected text/foobar, got: %s", mtype)
 	}
-	if !mtype.Parent().Is("application/octet-stream") {
-		t.Fatalf("extend parent error; expected application/octet-stream, got: %s", mtype.Parent())
+	if !mtype.Parent().Is(txt) {
+		t.Fatalf("extend parent error; expected %s, got: %s", txt, mtype.Parent())
 	}
 }
 

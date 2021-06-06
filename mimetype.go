@@ -104,21 +104,10 @@ func SetLimit(limit uint32) {
 	rootMu.Unlock()
 }
 
-// Extend adds detection for other file formats. The detector is a function
-// returning true when the raw input file satisfies a  signature.
-// The extension should include the leading dot, as in ".html".
+// Extend adds detection for other file formats.
+// It is equivalent to calling Extend() on the root mime type "application/octet-stream".
 func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
-	m := &MIME{
-		mime:      mime,
-		extension: extension,
-		detector:  detector,
-		parent:    root,
-		aliases:   aliases,
-	}
-
-	rootMu.Lock()
-	root.children = append([]*MIME{m}, root.children...)
-	rootMu.Unlock()
+	root.Extend(detector, mime, extension, aliases...)
 }
 
 // Lookup finds a MIME object by its string representation.
