@@ -165,3 +165,20 @@ func (m *MIME) cloneHierarchy(ps map[string]string) *MIME {
 
 	return ret
 }
+
+func (m *MIME) lookup(mime string) *MIME {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	for _, n := range append(m.aliases, m.mime) {
+		if n == mime {
+			return m
+		}
+	}
+
+	for _, c := range m.children {
+		if m := c.lookup(mime); m != nil {
+			return m
+		}
+	}
+	return nil
+}

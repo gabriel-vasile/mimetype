@@ -78,3 +78,23 @@ func TestMIMEFormat(t *testing.T) {
 		}
 	}
 }
+
+func TestLookup(t *testing.T) {
+	data := []struct {
+		mime string
+		m    *MIME
+	}{
+		{root.mime, root},
+		{zip.mime, zip},
+		{zip.aliases[0], zip},
+		{xlsx.mime, xlsx},
+	}
+
+	for _, tt := range data {
+		t.Run(fmt.Sprintf("lookup %s", tt.mime), func(t *testing.T) {
+			if m := Lookup(tt.mime); m != tt.m {
+				t.Fatalf("failed to lookup: %s", tt.mime)
+			}
+		})
+	}
+}

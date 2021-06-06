@@ -120,3 +120,9 @@ func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string
 	root.children = append([]*MIME{m}, root.children...)
 	rootMu.Unlock()
 }
+
+// Lookup finds a MIME object by its string representation.
+// The representation can be the main mime type, or any of its aliases.
+func Lookup(mime string) *MIME {
+	return root.lookup(mime)
+}
