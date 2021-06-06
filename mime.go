@@ -2,6 +2,7 @@ package mimetype
 
 import (
 	"mime"
+	"sync"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/magic"
@@ -18,6 +19,8 @@ type MIME struct {
 	detector magic.Detector
 	children []*MIME
 	parent   *MIME
+
+	mu sync.RWMutex
 }
 
 // String returns the string representation of the MIME type, e.g., "application/zip".
@@ -56,6 +59,9 @@ func (m *MIME) Is(expectedMIME string) bool {
 	if expectedMIME == found {
 		return true
 	}
+
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	for _, alias := range m.aliases {
 		if alias == expectedMIME {
 			return true
@@ -85,13 +91,17 @@ func newMIME(
 }
 
 func (m *MIME) alias(aliases ...string) *MIME {
+	m.mu.Lock()
 	m.aliases = aliases
+	m.mu.Unlock()
 	return m
 }
 
 // match does a depth-first search on the signature tree. It returns the deepest
 // successful node for which all the children detection functions fail.
 func (m *MIME) match(in []byte, readLimit uint32) *MIME {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	for _, c := range m.children {
 		if c.detector(in, readLimit) {
 			return c.match(in, readLimit)
@@ -117,6 +127,8 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 // flatten transforms an hierarchy of MIMEs into a slice of MIMEs.
 func (m *MIME) flatten() []*MIME {
 	out := []*MIME{m}
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	for _, c := range m.children {
 		out = append(out, c.flatten()...)
 	}
@@ -131,6 +143,8 @@ func (m *MIME) clone(ps map[string]string) *MIME {
 		clonedMIME = mime.FormatMediaType(m.mime, ps)
 	}
 
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 	return &MIME{
 		mime:      clonedMIME,
 		aliases:   m.aliases,

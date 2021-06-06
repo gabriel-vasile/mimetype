@@ -6,10 +6,14 @@ import (
 	"io/ioutil"
 	"mime"
 	"os"
+	"sync"
 )
 
 // readLimit is the maximum number of bytes from the input used when detecting.
 var readLimit uint32 = 3072
+
+// rootMu guards the readLimit used when creating the detection buffer.
+var rootMu sync.RWMutex
 
 // Detect returns the MIME type found from the provided byte slice.
 //
