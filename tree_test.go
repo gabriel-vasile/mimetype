@@ -78,3 +78,55 @@ func TestMIMEFormat(t *testing.T) {
 		}
 	}
 }
+
+func TestLookup(t *testing.T) {
+	data := []struct {
+		mime string
+		m    *MIME
+	}{
+		{root.mime, root},
+		{zip.mime, zip},
+		{zip.aliases[0], zip},
+		{xlsx.mime, xlsx},
+	}
+
+	for _, tt := range data {
+		t.Run(fmt.Sprintf("lookup %s", tt.mime), func(t *testing.T) {
+			if m := Lookup(tt.mime); m != tt.m {
+				t.Fatalf("failed to lookup: %s", tt.mime)
+			}
+		})
+	}
+}
+
+func TestExtend(t *testing.T) {
+	data := []struct {
+		mime   string
+		ext    string
+		parent *MIME
+	}{
+		{"foo", ".foo", nil},
+		{"bar", ".bar", root},
+		{"baz", ".baz", zip},
+	}
+
+	for _, tt := range data {
+		t.Run(fmt.Sprintf("extending to %s", tt.mime), func(t *testing.T) {
+			extend := Extend
+			if tt.parent != nil {
+				extend = tt.parent.Extend
+			} else {
+				tt.parent = root
+			}
+
+			extend(func(raw []byte, limit uint32) bool { return false }, tt.mime, tt.ext)
+			m := Lookup(tt.mime)
+			if m == nil {
+				t.Fatalf("mime %s not found", tt.mime)
+			}
+			if m.parent != tt.parent {
+				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
+			}
+		})
+	}
+}

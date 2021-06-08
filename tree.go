@@ -1,8 +1,6 @@
 package mimetype
 
 import (
-	"sync"
-
 	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
@@ -28,9 +26,6 @@ var root = newMIME("application/octet-stream", "",
 	// Keep text last because it is the slowest check
 	text,
 )
-
-// rootMu guards the root tree and the readLimit used when creating the detection buffer.
-var rootMu sync.RWMutex
 
 // The list of nodes appended to the root node.
 var (

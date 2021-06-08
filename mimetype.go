@@ -6,10 +6,14 @@ import (
 	"io/ioutil"
 	"mime"
 	"os"
+	"sync"
 )
 
 // readLimit is the maximum number of bytes from the input used when detecting.
 var readLimit uint32 = 3072
+
+// rootMu guards the readLimit used when creating the detection buffer.
+var rootMu sync.RWMutex
 
 // Detect returns the MIME type found from the provided byte slice.
 //
@@ -100,19 +104,14 @@ func SetLimit(limit uint32) {
 	rootMu.Unlock()
 }
 
-// Extend adds detection for other file formats. The detector is a function
-// returning true when the raw input file satisfies a  signature.
-// The extension should include the leading dot, as in ".html".
+// Extend adds detection for other file formats.
+// It is equivalent to calling Extend() on the root mime type "application/octet-stream".
 func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
-	m := &MIME{
-		mime:      mime,
-		extension: extension,
-		detector:  detector,
-		parent:    root,
-		aliases:   aliases,
-	}
+	root.Extend(detector, mime, extension, aliases...)
+}
 
-	rootMu.Lock()
-	root.children = append([]*MIME{m}, root.children...)
-	rootMu.Unlock()
+// Lookup finds a MIME object by its string representation.
+// The representation can be the main mime type, or any of its aliases.
+func Lookup(mime string) *MIME {
+	return root.lookup(mime)
 }
