@@ -65,7 +65,7 @@ func Example_extend() {
 		return bytes.HasPrefix(raw, []byte("foobar"))
 	}
 
-	mimetype.Extend(foobarDetector, "text/foobar", ".fb")
+	mimetype.Lookup("text/plain").Extend(foobarDetector, "text/foobar", ".fb")
 	mtype := mimetype.Detect([]byte("foobar file content"))
 
 	fmt.Println(mtype.String(), mtype.Extension())
