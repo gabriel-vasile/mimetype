@@ -20,7 +20,7 @@ var root = newMIME("application/octet-stream", "",
 	midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM,
 	threeGP, threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
 	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar,
-	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
+	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, avif, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
 	torrent, cpio, tzif, xcf, pat, gbr, glb,
 	// Keep text last because it is the slowest check
@@ -115,6 +115,7 @@ var (
 	icns = newMIME("image/x-icns", ".icns", magic.Icns)
 	psd  = newMIME("image/vnd.adobe.photoshop", ".psd", magic.Psd).
 		alias("image/x-psd", "application/photoshop")
+	avif    = newMIME("image/avif", ".avif", magic.Avif)
 	heic    = newMIME("image/heic", ".heic", magic.Heic)
 	heicSeq = newMIME("image/heic-sequence", ".heic", magic.HeicSequence)
 	heif    = newMIME("image/heif", ".heif", magic.Heif)
