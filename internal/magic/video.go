@@ -18,24 +18,19 @@ var (
 
 // WebM matches a WebM file.
 func WebM(raw []byte, limit uint32) bool {
-	return isMatroskaFileTypeMatched(raw, "webm")
+	return isMatroskaMediaContainer(raw) && !isFileTypeNamePresent(raw, "matroska")
 }
 
 // Mkv matches a mkv file.
 func Mkv(raw []byte, limit uint32) bool {
-	return isMatroskaFileTypeMatched(raw, "matroska")
+	return isMatroskaMediaContainer(raw) && isFileTypeNamePresent(raw, "matroska")
 }
 
-// isMatroskaFileTypeMatched is used for webm and mkv file matching.
+// isMatroskaMediaContainer is used for webm and mkv file matching.
 // It checks for .Eß£ sequence. If the sequence is found,
 // then it means it is Matroska media container, including WebM.
-// Then it verifies which of the file type it is representing by matching the
-// file specific string.
-func isMatroskaFileTypeMatched(in []byte, flType string) bool {
-	if bytes.HasPrefix(in, []byte("\x1A\x45\xDF\xA3")) {
-		return isFileTypeNamePresent(in, flType)
-	}
-	return false
+func isMatroskaMediaContainer(in []byte) bool {
+	return bytes.HasPrefix(in, []byte("\x1A\x45\xDF\xA3"))
 }
 
 // isFileTypeNamePresent accepts the matroska input data stream and searches
