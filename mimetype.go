@@ -53,7 +53,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 		n := 0
 		in = make([]byte, l)
 		n, err = io.ReadFull(r, in)
-		if err != nil && err != io.ErrUnexpectedEOF {
+		if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
 			return root, err
 		}
 		in = in[:n]

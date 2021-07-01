@@ -387,6 +387,22 @@ func TestConcurrent(t *testing.T) {
 	mimetype.SetLimit(3072)
 }
 
+// For #162.
+func TestEmptyInput(t *testing.T) {
+	mtype, err := mimetype.DetectReader(bytes.NewReader(nil))
+	if err != nil {
+		t.Fatalf("empty reader err; expected: nil, got: %s", err)
+	}
+	plain := "text/plain"
+	if !mtype.Is(plain) {
+		t.Fatalf("empty reader detection; expected: %s, got: %s", plain, mtype)
+	}
+	mtype = mimetype.Detect(nil)
+	if !mtype.Is(plain) {
+		t.Fatalf("empty bytes slice detection; expected: %s, got: %s", plain, mtype)
+	}
+}
+
 // Benchmarking a random slice of bytes is as close as possible to the real
 // world usage. A random byte slice is almost guaranteed to fail being detected.
 //
