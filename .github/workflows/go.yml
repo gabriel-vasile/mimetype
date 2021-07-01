@@ -1,11 +1,6 @@
 on:
   push:
-    branches:
-      - master
-      - actions
   pull_request:
-    branches:
-      - master
 
 name: run tests
 jobs:
