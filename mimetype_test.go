@@ -2,6 +2,7 @@ package mimetype_test
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -198,6 +199,7 @@ var files = map[string]string{
 	"xz.xz":              "application/x-xz",
 	"zip.zip":            "application/zip",
 	"zst.zst":            "application/zstd",
+	"dll.dll":            "application/vnd.microsoft.portable-executable-dll",
 }
 
 func TestDetect(t *testing.T) {
@@ -232,6 +234,11 @@ func TestDetect(t *testing.T) {
 		} else if mtype.Extension() != filepath.Ext(fName) {
 			t.Errorf(extStr, fName, filepath.Ext(fName), mtype.Extension())
 		}
+		if mtype, _ := mimetype.DetectFile(fileName); mtype.String() == expected {
+			fmt.Printf("%s=%s\n", fName, mtype)
+
+		}
+
 	}
 }
 
