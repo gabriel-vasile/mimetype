@@ -237,7 +237,7 @@ func TestDetect(t *testing.T) {
 }
 
 // This test generates the doc file containing the table with the supported MIMEs.
-func TestGenerateSupportedMimesFile(t *testing.T) {
+func TestGenerateSupportedFormats(t *testing.T) {
 	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		t.Fatal(err)
@@ -338,13 +338,17 @@ func (b *breakReader) Read(p []byte) (int, error) {
 
 func TestFaultyInput(t *testing.T) {
 	inexistent := "inexistent.file"
-	if _, err := DetectFile(inexistent); err == nil {
+	if mtype, err := DetectFile(inexistent); err == nil {
 		t.Errorf("%s should not match successfully", inexistent)
+	} else if mtype.String() != "application/octet-stream" {
+		t.Errorf("inexistent.file expected application/octet-stream, got %s", mtype)
 	}
 
 	f, _ := os.Open(inexistent)
-	if _, err := DetectReader(f); err == nil {
+	if mtype, err := DetectReader(f); err == nil {
 		t.Errorf("%s reader should not match successfully", inexistent)
+	} else if mtype.String() != "application/octet-stream" {
+		t.Errorf("inexistent.file reader expected application/octet-stream, got %s", mtype)
 	}
 }
 
@@ -397,7 +401,7 @@ func TestConcurrent(t *testing.T) {
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 1000; i++ {
 			Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 			Lookup("text/plain").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
@@ -423,6 +427,15 @@ func TestEmptyInput(t *testing.T) {
 	if !mtype.Is(plain) {
 		t.Fatalf("empty bytes slice detection; expected: %s, got: %s", plain, mtype)
 	}
+	SetLimit(0)
+	mtype, err = DetectReader(bytes.NewReader(nil))
+	if err != nil {
+		t.Fatalf("0 limіt, empty reader err; expected: nil, got: %s", err)
+	}
+	if !mtype.Is(plain) {
+		t.Fatalf("0 limit, empty reader detection; expected: %s, got: %s", plain, mtype)
+	}
+	SetLimit(3072)
 }
 
 // Benchmarking a random slice of bytes is as close as possible to the real

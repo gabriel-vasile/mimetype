@@ -1,6 +1,8 @@
 package mimetype
 
 import (
+	"sync"
+
 	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
@@ -10,8 +12,8 @@ import (
 // and allows for more precise results once the base type of file has been
 // identified.
 //
-// root is a matcher which passes for any slice of bytes.
-// When a matcher passes the check, the children magic
+// root is a detector which passes for any slice of bytes.
+// When a detector passes the check, the children detectors
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
@@ -26,6 +28,14 @@ var root = newMIME("application/octet-stream", "",
 	// Keep text last because it is the slowest check
 	text,
 )
+
+// errMIME is returned from Detect functions when err is not nil.
+// Detect can return root for erroneous cases, but it needs to lock mu in order to do so.
+// errMIME is same as root but it does not require locking.
+var errMIME = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return false })
+
+// mu guards access to the root MIME tree. Access to root must be synchonized with this lock.
+var mu = &sync.RWMutex{}
 
 // The list of nodes appended to the root node.
 var (

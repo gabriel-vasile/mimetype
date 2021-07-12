@@ -21,10 +21,13 @@ var readLimit uint32 = 3072
 // The result is always a valid MIME type, with application/octet-stream
 // returned when identification failed.
 func Detect(in []byte) *MIME {
+	// Using atomic because readLimit can be written at the same time in other goroutine.
 	l := atomic.LoadUint32(&readLimit)
 	if l > 0 && len(in) > int(l) {
 		in = in[:l]
 	}
+	mu.RLock()
+	defer mu.RUnlock()
 	return root.match(in, l)
 }
 
@@ -41,24 +44,27 @@ func DetectReader(r io.Reader) (*MIME, error) {
 	var in []byte
 	var err error
 
+	// Using atomic because readLimit can be written at the same time in other goroutine.
 	l := atomic.LoadUint32(&readLimit)
 	if l == 0 {
 		in, err = ioutil.ReadAll(r)
 		if err != nil {
-			return root, err
+			return errMIME, err
 		}
 	} else {
-		// io.UnexpectedEOF means len(r) < len(in). It is not an error in this case,
-		// it just means the input file is smaller than the allocated bytes slice.
 		n := 0
 		in = make([]byte, l)
+		// io.UnexpectedEOF means len(r) < len(in). It is not an error in this case,
+		// it just means the input file is smaller than the allocated bytes slice.
 		n, err = io.ReadFull(r, in)
 		if err != nil && err != io.EOF && err != io.ErrUnexpectedEOF {
-			return root, err
+			return errMIME, err
 		}
 		in = in[:n]
 	}
 
+	mu.RLock()
+	defer mu.RUnlock()
 	return root.match(in, l), nil
 }
 
@@ -70,7 +76,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 func DetectFile(path string) (*MIME, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return root, err
+		return errMIME, err
 	}
 	defer f.Close()
 
@@ -98,6 +104,7 @@ func EqualsAny(s string, mimes ...string) bool {
 // their magical numbers towards the end of the file: docx, pptx, xlsx, etc.
 // A limit of 0 means the whole input file will be used.
 func SetLimit(limit uint32) {
+	// Using atomic because readLimit can be read at the same time in other goroutine.
 	atomic.StoreUint32(&readLimit, limit)
 }
 
@@ -110,5 +117,7 @@ func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string
 // Lookup finds a MIME object by its string representation.
 // The representation can be the main mime type, or any of its aliases.
 func Lookup(mime string) *MIME {
+	mu.RLock()
+	defer mu.RUnlock()
 	return root.lookup(mime)
 }
