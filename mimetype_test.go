@@ -70,6 +70,7 @@ var files = map[string]string{
 	"gz.gz":              "application/gzip",
 	"hdr.hdr":            "image/vnd.radiance",
 	"heic.single.heic":   "image/heic",
+	"heif.heif":          "image/heif",
 	"html.html":          "text/html; charset=utf-8",
 	"html.iso88591.html": "text/html; charset=iso-8859-1",
 	"html.usascii.html":  "text/html; charset=us-ascii",
