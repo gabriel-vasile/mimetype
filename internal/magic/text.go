@@ -149,7 +149,7 @@ func Json(raw []byte, limit uint32) bool {
 		return err == nil
 	}
 
-	return parsed == len(raw)
+	return parsed == len(raw) && len(raw) > 0
 }
 
 // GeoJson matches a RFC 7946 GeoJSON file.

@@ -6,13 +6,15 @@ import (
 	"fmt"
 )
 
-type Detector func(raw []byte, limit uint32) bool
-type xmlSig struct {
-	// the local name of the root tag
-	localName []byte
-	// the namespace of the XML document
-	xmlns []byte
-}
+type (
+	Detector func(raw []byte, limit uint32) bool
+	xmlSig   struct {
+		// the local name of the root tag
+		localName []byte
+		// the namespace of the XML document
+		xmlns []byte
+	}
+)
 
 // prefix creates a Detector which returns true if any of the provided signatures
 // is the prefix of the raw input.
