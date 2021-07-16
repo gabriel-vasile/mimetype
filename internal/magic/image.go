@@ -42,6 +42,14 @@ var (
 	Xpm = prefix([]byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
 )
 
+func Avif(raw []byte, limit uint32) bool {
+	if len(raw) < 24 {
+		return false
+	}
+	return bytes.Equal(raw[4:8], []byte("ftyp")) &&
+		bytes.Equal(raw[20:24], []byte("avif"))
+}
+
 func jpeg2k(sig []byte) Detector {
 	return func(raw []byte, _ uint32) bool {
 		if len(raw) < 24 {
