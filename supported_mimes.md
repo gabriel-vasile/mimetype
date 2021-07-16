@@ -74,12 +74,12 @@ Extension | MIME type | Aliases
 **.mov** | video/quicktime | -
 **.mqv** | video/quicktime | -
 **.mp4** | video/mp4 | -
+**.mkv** | video/x-matroska | -
 **.webm** | video/webm | audio/webm
 **.3gp** | video/3gpp | video/3gp, audio/3gpp
 **.3g2** | video/3gpp2 | video/3g2, audio/3gpp2
 **.avi** | video/x-msvideo | video/avi, video/msvideo
 **.flv** | video/x-flv | -
-**.mkv** | video/x-matroska | -
 **.asf** | video/x-ms-asf | video/asf, video/x-ms-wmv
 **.aac** | audio/aac | -
 **.voc** | audio/x-unknown | -

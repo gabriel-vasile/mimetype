@@ -14,28 +14,13 @@ var (
 	})
 	// Rmvb matches a RealMedia Variable Bitrate file.
 	Rmvb = prefix([]byte{0x2E, 0x52, 0x4D, 0x46})
+	// WebM matches a WebM file.
+	WebM = prefix([]byte{0x1A, 0x45, 0xDF, 0xA3})
 )
-
-// WebM matches a WebM file.
-func WebM(raw []byte, limit uint32) bool {
-	return isMatroskaFileTypeMatched(raw, "webm")
-}
 
 // Mkv matches a mkv file.
 func Mkv(raw []byte, limit uint32) bool {
-	return isMatroskaFileTypeMatched(raw, "matroska")
-}
-
-// isMatroskaFileTypeMatched is used for webm and mkv file matching.
-// It checks for .Eß£ sequence. If the sequence is found,
-// then it means it is Matroska media container, including WebM.
-// Then it verifies which of the file type it is representing by matching the
-// file specific string.
-func isMatroskaFileTypeMatched(in []byte, flType string) bool {
-	if bytes.HasPrefix(in, []byte("\x1A\x45\xDF\xA3")) {
-		return isFileTypeNamePresent(in, flType)
-	}
-	return false
+	return WebM(raw, 4) && isFileTypeNamePresent(raw, "matroska")
 }
 
 // isFileTypeNamePresent accepts the matroska input data stream and searches
