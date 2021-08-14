@@ -251,6 +251,32 @@ func NdJson(raw []byte, limit uint32) bool {
 	return parsed > 2 && parsed == len(raw)
 }
 
+// Har matches a HAR Spec file.
+// Spec: http://www.softwareishard.com/blog/har-12-spec/
+func HAR(raw []byte, limit uint32) bool {
+	raw = trimLWS(raw)
+	if len(raw) == 0 {
+		return false
+	}
+	// HAR is always a JSON object, not a JSON array.
+	if raw[0] != '{' {
+		return false
+	}
+
+	// Trim `{` before the colon.
+	raw = bytes.TrimPrefix(raw, []byte(`{`))
+	// Skip any whitespace before the colon.
+	raw = trimLWS(raw)
+	// Trim `"` before the colon.
+	raw = bytes.TrimPrefix(raw, []byte(`"`))
+	// Check for colon.
+	if len(raw) == 0 {
+		return false
+	}
+
+	return bytes.HasPrefix(raw, []byte("log"))
+}
+
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
