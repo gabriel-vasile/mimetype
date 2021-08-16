@@ -134,7 +134,6 @@ Extension | MIME type | Aliases
 **.pat** | image/x-gimp-pat | -
 **.gbr** | image/x-gimp-gbr | -
 **.glb** | model/gltf-binary | -
-**.har** | application/json | -
 **.txt** | text/plain | -
 **.html** | text/html | -
 **.svg** | image/svg+xml | -
@@ -159,6 +158,7 @@ Extension | MIME type | Aliases
 **.py** | application/x-python | -
 **.json** | application/json | -
 **.geojson** | application/geo+json | -
+**.har** | application/json | -
 **.ndjson** | application/x-ndjson | -
 **.rtf** | text/rtf | -
 **.tcl** | text/x-tcl | application/x-tcl

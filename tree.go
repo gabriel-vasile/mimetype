@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, har,
+	torrent, cpio, tzif, xcf, pat, gbr, glb,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -76,7 +76,7 @@ var (
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
 	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJson, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
 	xml      = newMIME("text/xml", ".xml", magic.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
-	json     = newMIME("application/json", ".json", magic.Json, geoJson)
+	json     = newMIME("application/json", ".json", magic.Json, geoJson, har)
 	har      = newMIME("application/json", ".har", magic.HAR)
 	csv      = newMIME("text/csv", ".csv", magic.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", magic.Tsv)
