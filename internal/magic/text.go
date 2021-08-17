@@ -144,11 +144,17 @@ func Php(raw []byte, limit uint32) bool {
 
 // Json matches a JavaScript Object Notation file.
 func Json(raw []byte, limit uint32) bool {
+	raw = trimLWS(raw)
+	if len(raw) == 0 || (raw[0] != '[' && raw[0] != '{') {
+		return false
+	}
 	parsed, err := json.Scan(raw)
+	// If the full file content was provided, check there is no error.
 	if len(raw) < int(limit) {
 		return err == nil
 	}
 
+	// If a section of the file was provided, check if all of it was parsed.
 	return parsed == len(raw) && len(raw) > 0
 }
 
