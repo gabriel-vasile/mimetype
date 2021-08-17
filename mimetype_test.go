@@ -90,6 +90,12 @@ var files = map[string]string{
 	"xpm.xpm":            "image/x-xpixmap",
 	"js.js":              "application/javascript",
 	"json.json":          "application/json",
+	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
+	// documents, but they should not be detected as application/json. This mimics
+	// the behaviour of the file utility and seems the correct thing to do.
+	"json.int.txt":       "text/plain; charset=utf-8",
+	"json.float.txt":     "text/plain; charset=utf-8",
+	"json.string.txt":    "text/plain; charset=utf-8",
 	"kml.kml":            "application/vnd.google-earth.kml+xml",
 	"lit.lit":            "application/x-ms-reader",
 	"ln":                 "application/x-executable",
@@ -116,6 +122,7 @@ var files = map[string]string{
 	"mqv.mqv":            "video/quicktime",
 	"mrc.mrc":            "application/marc",
 	"msg.msg":            "application/vnd.ms-outlook",
+	"ndjson.xl.ndjson":   "application/x-ndjson",
 	"ndjson.ndjson":      "application/x-ndjson",
 	"nes.nes":            "application/vnd.nintendo.snes.rom",
 	"elfobject":          "application/x-object",
