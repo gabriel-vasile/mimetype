@@ -1,6 +1,7 @@
 package magic
 
 import (
+	"bufio"
 	"bytes"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
@@ -218,43 +219,21 @@ func GeoJson(raw []byte, limit uint32) bool {
 
 // NdJson matches a Newline delimited JSON file.
 func NdJson(raw []byte, limit uint32) bool {
-	// Separator with carriage return and new line `\r\n`.
-	srn := []byte{0x0D, 0x0A}
-
-	// Separator with only new line `\n`.
-	sn := []byte{0x0A}
-
-	// Total bytes scanned.
-	parsed := 0
-
-	// Split by `srn`.
-	for rni, insrn := range bytes.Split(raw, srn) {
-		// Separator byte count should be added only after the first split.
-		if rni != 0 {
-			// Add two as `\r\n` is used for split.
-			parsed += 2
+	lCount := 0
+	sc := bufio.NewScanner(dropLastLine(raw, limit))
+	for sc.Scan() {
+		l := sc.Bytes()
+		if l = trimRWS(trimLWS(l)); len(l) == 0 {
+			continue
 		}
-		// Split again by `sn`.
-		for ni, insn := range bytes.Split(insrn, sn) {
-			// Separator byte count should be added only after the first split.
-			if ni != 0 {
-				// Add one as `\n` is used for split.
-				parsed++
-			}
-			// Empty line is valid.
-			if len(insn) == 0 {
-				continue
-			}
-			p, err := json.Scan(insn)
-			parsed += p
-			if parsed < int(limit) && err != nil {
-				return false
-			}
+		_, err := json.Scan(l)
+		if err != nil {
+			return false
 		}
+		lCount++
 	}
 
-	// Empty inputs should not pass as valid NDJSON with 0 lines.
-	return parsed > 2 && parsed == len(raw)
+	return lCount > 1
 }
 
 // Svg matches a SVG file.
