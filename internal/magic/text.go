@@ -143,8 +143,8 @@ func Php(raw []byte, limit uint32) bool {
 	return phpScriptF(raw, limit)
 }
 
-// Json matches a JavaScript Object Notation file.
-func Json(raw []byte, limit uint32) bool {
+// JSON matches a JavaScript Object Notation file.
+func JSON(raw []byte, limit uint32) bool {
 	raw = trimLWS(raw)
 	if len(raw) == 0 || (raw[0] != '[' && raw[0] != '{') {
 		return false
@@ -159,17 +159,17 @@ func Json(raw []byte, limit uint32) bool {
 	return parsed == len(raw) && len(raw) > 0
 }
 
-// GeoJson matches a RFC 7946 GeoJSON file.
+// GeoJSON matches a RFC 7946 GeoJSON file.
 //
-// GeoJson detection implies searching for key:value pairs like: `"type": "Feature"`
+// GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 // BUG(gabriel-vasile): The "type" key should be searched for in the root object.
-func GeoJson(raw []byte, limit uint32) bool {
+func GeoJSON(raw []byte, limit uint32) bool {
 	raw = trimLWS(raw)
 	if len(raw) == 0 {
 		return false
 	}
-	// GeoJSON is always a JSON object, not a JSON array.
+	// GeoJSON is always a JSON object, not a JSON array or any other JSON value.
 	if raw[0] != '{' {
 		return false
 	}
@@ -197,7 +197,7 @@ func GeoJson(raw []byte, limit uint32) bool {
 	// Skip any whitespace after the colon.
 	raw = trimLWS(raw[1:])
 
-	geoJsonTypes := [][]byte{
+	geoJSONTypes := [][]byte{
 		[]byte(`"Feature"`),
 		[]byte(`"FeatureCollection"`),
 		[]byte(`"Point"`),
@@ -208,7 +208,7 @@ func GeoJson(raw []byte, limit uint32) bool {
 		[]byte(`"MultiPolygon"`),
 		[]byte(`"GeometryCollection"`),
 	}
-	for _, t := range geoJsonTypes {
+	for _, t := range geoJSONTypes {
 		if bytes.HasPrefix(raw, t) {
 			return true
 		}
@@ -217,12 +217,13 @@ func GeoJson(raw []byte, limit uint32) bool {
 	return false
 }
 
-// NdJson matches a Newline delimited JSON file.
-func NdJson(raw []byte, limit uint32) bool {
+// NdJSON matches a Newline delimited JSON file.
+func NdJSON(raw []byte, limit uint32) bool {
 	lCount := 0
 	sc := bufio.NewScanner(dropLastLine(raw, limit))
 	for sc.Scan() {
 		l := sc.Bytes()
+		// Empty lines are allowed in NDJSON.
 		if l = trimRWS(trimLWS(l)); len(l) == 0 {
 			continue
 		}
