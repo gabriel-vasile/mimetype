@@ -251,6 +251,47 @@ func NdJson(raw []byte, limit uint32) bool {
 	return parsed > 2 && parsed == len(raw)
 }
 
+// Har matches a HAR Spec file.
+// Spec: http://www.softwareishard.com/blog/har-12-spec/
+func HAR(raw []byte, limit uint32) bool {
+	s := []byte(`"log"`)
+	si, sl := bytes.Index(raw, s), len(s)
+
+	if si == -1 {
+		return false
+	}
+
+	// If the "log" string is the suffix of the input,
+	// there is no need to search for the value of the key.
+	if si+sl == len(raw) {
+		return false
+	}
+	// Skip the "log" part.
+	raw = raw[si+sl:]
+	// Skip any whitespace before the colon.
+	raw = trimLWS(raw)
+	// Check for colon.
+	if len(raw) == 0 || raw[0] != ':' {
+		return false
+	}
+	// Skip any whitespace after the colon.
+	raw = trimLWS(raw[1:])
+
+	harJsonTypes := [][]byte{
+		[]byte(`"version"`),
+		[]byte(`"creator"`),
+		[]byte(`"entries"`),
+	}
+	for _, t := range harJsonTypes {
+		si := bytes.Index(raw, t)
+		if si > -1 {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))

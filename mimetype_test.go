@@ -69,6 +69,7 @@ var files = map[string]string{
 	"gml.gml":            "application/gml+xml",
 	"gpx.gpx":            "application/gpx+xml",
 	"gz.gz":              "application/gzip",
+	"har.har":            "application/json",
 	"hdr.hdr":            "image/vnd.radiance",
 	"heic.single.heic":   "image/heic",
 	"heif.heif":          "image/heif",
