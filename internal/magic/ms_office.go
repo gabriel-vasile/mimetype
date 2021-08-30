@@ -224,6 +224,15 @@ func Msg(raw []byte, limit uint32) bool {
 	})
 }
 
+// Msi matches a Microsoft Windows Installer file.
+// http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
+func Msi(raw []byte, limit uint32) bool {
+	return matchOleClsid(raw, []byte{
+		0x84, 0x10, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
+	})
+}
+
 // Helper to match by a specific CLSID of a compound file.
 //
 // http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File

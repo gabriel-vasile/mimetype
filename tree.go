@@ -58,9 +58,11 @@ var (
 	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", magic.Pptx)
 	epub = newMIME("application/epub+zip", ".epub", magic.Epub)
 	jar  = newMIME("application/jar", ".jar", magic.Jar)
-	ole  = newMIME("application/x-ole-storage", "", magic.Ole, aaf, msg, xls, pub, ppt, doc)
-	aaf  = newMIME("application/octet-stream", ".aaf", magic.Aaf)
-	doc  = newMIME("application/msword", ".doc", magic.Doc).
+	ole  = newMIME("application/x-ole-storage", "", magic.Ole, msi, aaf, msg, xls, pub, ppt, doc)
+	msi  = newMIME("application/x-ms-installer", ".msi", magic.Msi).
+		alias("application/x-windows-installer", "application/x-msi")
+	aaf = newMIME("application/octet-stream", ".aaf", magic.Aaf)
+	doc = newMIME("application/msword", ".doc", magic.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", magic.Ppt).
 		alias("application/mspowerpoint")
