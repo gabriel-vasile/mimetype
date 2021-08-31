@@ -30,7 +30,7 @@ var root = newMIME("application/octet-stream", "",
 )
 
 // errMIME is returned from Detect functions when err is not nil.
-// Detect can return root for erroneous cases, but it needs to lock mu in order to do so.
+// Detect could return root for erroneous cases, but it needs to lock mu in order to do so.
 // errMIME is same as root but it does not require locking.
 var errMIME = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return false })
 
