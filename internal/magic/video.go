@@ -53,7 +53,7 @@ func isFileTypeNamePresent(in []byte, flType string) bool {
 
 		// filetype name will be present exactly
 		// n bytes after the match of the two bytes "\x42\x82"
-		n := vint(int(in[ind]))
+		n := vintWidth(int(in[ind]))
 		if lenIn > ind+n {
 			return bytes.HasPrefix(in[ind+n:], []byte(flType))
 		}
@@ -61,8 +61,8 @@ func isFileTypeNamePresent(in []byte, flType string) bool {
 	return false
 }
 
-// vint parses the offset of the media signature in matroska containers
-func vint(v int) int {
+// vintWidth parses the variable-integer width in matroska containers
+func vintWidth(v int) int {
 	mask, max, num := 128, 8, 1
 	for num < max && v&mask == 0 {
 		mask = mask >> 1
