@@ -41,19 +41,34 @@ func isMatroskaFileTypeMatched(in []byte, flType string) bool {
 // isFileTypeNamePresent accepts the matroska input data stream and searches
 // for the given file type in the stream. Return whether a match is found.
 // The logic of search is: find first instance of \x42\x82 and then
-// search for given string after one byte of above instance.
+// search for given string after n bytes of above instance.
 func isFileTypeNamePresent(in []byte, flType string) bool {
 	ind, maxInd, lenIn := 0, 4096, len(in)
 	if lenIn < maxInd { // restricting length to 4096
 		maxInd = lenIn
 	}
 	ind = bytes.Index(in[:maxInd], []byte("\x42\x82"))
-	if ind > 0 && lenIn > ind+3 {
+	if ind > 0 && lenIn > ind+2 {
+		ind += 2
+
 		// filetype name will be present exactly
-		// one byte after the match of the two bytes "\x42\x82"
-		return bytes.HasPrefix(in[ind+3:], []byte(flType))
+		// n bytes after the match of the two bytes "\x42\x82"
+		n := vintWidth(int(in[ind]))
+		if lenIn > ind+n {
+			return bytes.HasPrefix(in[ind+n:], []byte(flType))
+		}
 	}
 	return false
+}
+
+// vintWidth parses the variable-integer width in matroska containers
+func vintWidth(v int) int {
+	mask, max, num := 128, 8, 1
+	for num < max && v&mask == 0 {
+		mask = mask >> 1
+		num++
+	}
+	return num
 }
 
 // Mpeg matches a Moving Picture Experts Group file.
