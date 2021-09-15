@@ -45,21 +45,22 @@ var (
 		"application/gzip-compressed", "application/x-gzip-compressed",
 		"gzip/document")
 	sevenZ = newMIME("application/x-7z-compressed", ".7z", magic.SevenZ)
-	zip    = newMIME("application/zip", ".zip", magic.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, odc, sxc).
+	zip    = newMIME("application/zip", ".zip", magic.Zip, xlsx, docx, pptx, epub, epub2, jar, odt, ods, odp, odg, odf, odc, sxc).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
 	bz2 = newMIME("application/x-bzip2", ".bz2", magic.Bz2)
 	pdf = newMIME("application/pdf", ".pdf", magic.Pdf).
 		alias("application/x-pdf")
-	fdf  = newMIME("application/vnd.fdf", ".fdf", magic.Fdf)
-	xlsx = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", magic.Xlsx)
-	docx = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", magic.Docx)
-	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", magic.Pptx)
-	epub = newMIME("application/epub+zip", ".epub", magic.Epub)
-	jar  = newMIME("application/jar", ".jar", magic.Jar)
-	ole  = newMIME("application/x-ole-storage", "", magic.Ole, msi, aaf, msg, xls, pub, ppt, doc)
-	msi  = newMIME("application/x-ms-installer", ".msi", magic.Msi).
+	fdf   = newMIME("application/vnd.fdf", ".fdf", magic.Fdf)
+	xlsx  = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", magic.Xlsx)
+	docx  = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", magic.Docx)
+	pptx  = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", magic.Pptx)
+	epub  = newMIME("application/epub+zip", ".epub", magic.Epub)
+	epub2 = newMIME("application/epub+zip", ".epub", magic.Epub2)
+	jar   = newMIME("application/jar", ".jar", magic.Jar)
+	ole   = newMIME("application/x-ole-storage", "", magic.Ole, msi, aaf, msg, xls, pub, ppt, doc)
+	msi   = newMIME("application/x-ms-installer", ".msi", magic.Msi).
 		alias("application/x-windows-installer", "application/x-msi")
 	aaf = newMIME("application/octet-stream", ".aaf", magic.Aaf)
 	doc = newMIME("application/msword", ".doc", magic.Doc).

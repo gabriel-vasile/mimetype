@@ -38,6 +38,7 @@ var (
 		"ppt/_rels/",
 		"ppt/handoutMasters/",
 		"ppt/notesSlides/",
+		"ppt/diagrams/",
 		"ppt/presentation.xml",
 		"ppt/tableStyles.xml",
 		"ppt/presProps.xml",
@@ -74,6 +75,36 @@ func (t *zipTokenizer) next() (fileName string) {
 	}
 	t.i += fNameOffset + fNameLen
 	return string(in[fNameOffset : fNameOffset+fNameLen])
+}
+
+func (t *zipTokenizer) nextFile() (fileName string, data []byte) {
+	if t.i > len(t.in) {
+		return
+	}
+	in := t.in[t.i:]
+	// pkSig is the signature of the zip local file header.
+	pkSig := []byte("PK\003\004")
+	pkIndex := bytes.Index(in, pkSig)
+	// 30 is the offset of the file name in the header.
+	fNameOffset := pkIndex + 30
+	// end if signature not found or file name offset outside of file.
+	if pkIndex == -1 || fNameOffset > len(in) {
+		return
+	}
+
+	fNameLen := int(binary.LittleEndian.Uint16(in[pkIndex+26 : pkIndex+28]))
+	if fNameLen <= 0 || fNameOffset+fNameLen > len(in) {
+		return
+	}
+
+	fDataLen := int(binary.LittleEndian.Uint16(in[pkIndex+18 : pkIndex+22]))
+	extralen := int(binary.LittleEndian.Uint16(in[pkIndex+28 : pkIndex+30]))
+	fDataOffset := fNameOffset + fNameLen + extralen
+	if fDataLen <= 0 || extralen < 0 || fDataOffset+fDataLen > len(in) {
+		return
+	}
+	t.i += fNameOffset + fNameLen + extralen + fDataLen
+	return string(in[fNameOffset : fNameOffset+fNameLen]), in[fDataOffset : fDataOffset+fDataLen]
 }
 
 // msoXML reads at most first 10 local headers and returns whether the input

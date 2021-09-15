@@ -1,5 +1,7 @@
 package magic
 
+import "bytes"
+
 var (
 	// Odt matches an OpenDocument Text file.
 	Odt = offset([]byte("mimetypeapplication/vnd.oasis.opendocument.text"), 30)
@@ -40,6 +42,19 @@ func Jar(raw []byte, limit uint32) bool {
 	t := zipTokenizer{in: raw}
 	for i, tok := 0, t.next(); i < 10 && tok != ""; i, tok = i+1, t.next() {
 		if tok == "META-INF/MANIFEST.MF" {
+			return true
+		}
+	}
+
+	return false
+}
+
+func Epub2(raw []byte, limit uint32) bool {
+	t := zipTokenizer{in: raw}
+	i := 0
+	for tok, data := t.nextFile(); i < 10 && tok != ""; tok, data = t.nextFile() {
+		i += 1
+		if tok == "mimetype" && string(bytes.TrimSpace(data)) == "application/epub+zip" {
 			return true
 		}
 	}
