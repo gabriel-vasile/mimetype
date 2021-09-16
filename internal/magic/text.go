@@ -131,7 +131,16 @@ func Text(raw []byte, limit uint32) bool {
 	if cset := charset.FromBOM(raw); cset != "" {
 		return true
 	}
-	return isText(raw)
+	// Binary data bytes as defined here: https://mimesniff.spec.whatwg.org/#binary-data-byte
+	for _, b := range raw {
+		if b <= 0x08 ||
+			b == 0x0B ||
+			0x0E <= b && b <= 0x1A ||
+			0x1C <= b && b <= 0x1F {
+			return false
+		}
+	}
+	return true
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.
@@ -295,15 +304,4 @@ func HAR(raw []byte, limit uint32) bool {
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
-}
-
-// isText considers any file containing null bytes as a binary file.
-// There is plenty room for disagreement regarding what should be considered a
-// text file. This approach is used by diff, cat, and other linux utilities.
-func isText(raw []byte) bool {
-	l := 8000
-	if len(raw) > l {
-		raw = raw[:l]
-	}
-	return bytes.IndexByte(raw, 0) == -1
 }
