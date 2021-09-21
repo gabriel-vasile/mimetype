@@ -8,16 +8,16 @@ import (
 
 // Csv matches a comma-separated values file.
 func Csv(raw []byte, limit uint32) bool {
-	return sv(raw, ',')
+	return sv(raw, ',', limit)
 }
 
 // Tsv matches a tab-separated values file.
 func Tsv(raw []byte, limit uint32) bool {
-	return sv(raw, '\t')
+	return sv(raw, '\t', limit)
 }
 
-func sv(in []byte, comma rune) bool {
-	r := csv.NewReader(butLastLineReader(in, len(in)))
+func sv(in []byte, comma rune, limit uint32) bool {
+	r := csv.NewReader(dropLastLine(in, limit))
 	r.Comma = comma
 	r.TrimLeadingSpace = true
 	r.LazyQuotes = true
@@ -27,20 +27,25 @@ func sv(in []byte, comma rune) bool {
 	return err == nil && r.FieldsPerRecord > 1 && len(lines) > 1
 }
 
-// butLastLineReader returns a reader to the provided byte slice.
-// The reader is guaranteed to reach EOF before it reads `cutAt` bytes.
-// Bytes after the last newline are dropped from the input.
-func butLastLineReader(in []byte, cutAt int) io.Reader {
-	if len(in) >= cutAt {
+// dropLastLine drops the last incomplete line from b.
+//
+// mimetype limits itself to ReadLimit bytes when performing a detection.
+// This means, for file formats like CSV for NDJSON, the last line of the input
+// can be an incomplete line.
+func dropLastLine(b []byte, cutAt uint32) io.Reader {
+	if cutAt == 0 {
+		return bytes.NewReader(b)
+	}
+	if uint32(len(b)) >= cutAt {
 		for i := cutAt - 1; i > 0; i-- {
-			if in[i] == '\n' {
-				return bytes.NewReader(in[:i])
+			if b[i] == '\n' {
+				return bytes.NewReader(b[:i])
 			}
 		}
 
-		// no newline was found between the 0 index and cutAt
-		return bytes.NewReader(in[:cutAt])
+		// No newline was found between the 0 index and cutAt.
+		return bytes.NewReader(b[:cutAt])
 	}
 
-	return bytes.NewReader(in)
+	return bytes.NewReader(b)
 }
