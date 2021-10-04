@@ -221,8 +221,9 @@ var (
 	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
 	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
 	lit     = newMIME("application/x-ms-reader", ".lit", magic.Lit)
-	sqlite3 = newMIME("application/x-sqlite3", ".sqlite", magic.Sqlite)
-	dwg     = newMIME("image/vnd.dwg", ".dwg", magic.Dwg).
+	sqlite3 = newMIME("application/vnd.sqlite3", ".sqlite", magic.Sqlite).
+		alias("application/x-sqlite3")
+	dwg = newMIME("image/vnd.dwg", ".dwg", magic.Dwg).
 		alias("image/x-dwg", "application/acad", "application/x-acad",
 			"application/autocad_dwg", "application/dwg", "application/x-dwg",
 			"application/x-autocad", "drawing/dwg")
