@@ -11,6 +11,8 @@ import (
 	"mime"
 	"os"
 	"sync/atomic"
+
+	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
 // readLimit is the maximum number of bytes from the input used when detecting.
@@ -106,6 +108,13 @@ func EqualsAny(s string, mimes ...string) bool {
 func SetLimit(limit uint32) {
 	// Using atomic because readLimit can be read at the same time in other goroutine.
 	atomic.StoreUint32(&readLimit, limit)
+}
+
+// SetMaxMSOFileHeaders sets the maximum number of local headers that are checked when
+// trying to identify a Microsoft Office file.
+func SetMaxMSOFileHeaders(max int32) {
+	// Using atomic because MaxMSOFileHeaders can be written at the same time in other goroutine.
+	atomic.StoreInt32(&magic.MaxMSOFileHeaders, max)
 }
 
 // Extend adds detection for other file formats.
