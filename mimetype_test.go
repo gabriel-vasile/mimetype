@@ -184,6 +184,7 @@ var files = map[string]string{
 	"utf32bebom.txt":     "text/plain; charset=utf-32be",
 	"utf32lebom.txt":     "text/plain; charset=utf-32le",
 	"utf8.txt":           "text/plain; charset=utf-8",
+	"utf8ctrlchars":      "application/octet-stream",
 	"vcf.dos.vcf":        "text/vcard",
 	"vcf.vcf":            "text/vcard",
 	"voc.voc":            "audio/x-unknown",
