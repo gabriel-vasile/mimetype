@@ -38,6 +38,7 @@ var files = map[string]string{
 	"bpg.bpg":            "image/bpg",
 	"bz2.bz2":            "application/x-bzip2",
 	"cab.cab":            "application/vnd.ms-cab-compressed",
+	"cbor":               "application/cbor-seq",
 	"class.class":        "application/x-java-applet",
 	"crx.crx":            "application/x-chrome-extension",
 	"csv.csv":            "text/csv",

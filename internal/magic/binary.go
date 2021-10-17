@@ -142,3 +142,119 @@ func Marc(raw []byte, limit uint32) bool {
 	// Field terminator is present.
 	return bytes.Contains(raw, []byte{0x1E})
 }
+
+// Cbor matches CBOR sequence data
+func Cbor(raw []byte, limit uint32) bool {
+	if len(raw) == 0 {
+		return false
+	}
+	for ok := true; ok == true; {
+		ok = cborHelper(&raw)
+	}
+	if len(raw) == 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+// a helper function for Cbor 
+// inspired by https://www.rfc-editor.org/rfc/rfc8949.html#section-appendix.c
+func cborHelper(raw *[]byte) bool {
+	if len(*raw) == 0 {
+		return false
+	}
+	t := uint8((*raw)[0] & 0xe0)
+	ai := (*raw)[0] & 0x1f
+	uval := uint64(ai)
+	*raw = (*raw)[1:]
+	val, ok := cborHead(raw, t, ai, uval)
+	if ok == false {
+		return ok
+	}
+	switch t {
+	case 0x40, 0x60:
+		if val < 0 {
+			return false
+		}
+		if len(*raw) < val {
+			return false
+		}
+		*raw = (*raw)[val:]
+	case 0x80, 0xa0:
+		if val < 0 {
+			return false
+		}
+		count := 1
+		if t == 0xa0 {
+			count = 2
+		}
+		for i := 0; i < val*count; i++ {
+			if ok = cborHelper(raw); ok == false {
+				return ok
+			}
+		}
+	case 0xc0:
+		for {
+			if len(*raw) == 0 {
+				return false
+			}
+			if uint8((*raw)[0]&0xe0) != 0xc0 {
+				break
+			}
+		}
+		return cborHelper(raw)
+	default:
+		return false
+	}
+	return true
+}
+
+func cborHead(raw *[]byte, t uint8, ai byte, val uint64) (int, bool) {
+	raw_len := len(*raw)
+	if raw_len == 0 {
+		return 0, false
+	}
+	if ai < 24 {
+		return int(val), true
+	}
+	switch ai {
+	case 24:
+		if raw_len < 2 {
+			return 0, false
+		}
+		val = uint64((*raw)[0])
+		*raw = (*raw)[1:]
+		if t == 0xe0 && val < 32 {
+			return 0, false
+		}
+	case 25:
+		if raw_len < 3 {
+			return 0, false
+		}
+		val = uint64(binary.BigEndian.Uint16((*raw)[0:2]))
+		*raw = (*raw)[2:]
+	case 26:
+		if raw_len < 5 {
+			return 0, false
+		}
+		val = uint64(binary.BigEndian.Uint32((*raw)[0:4]))
+		*raw = (*raw)[4:]
+	case 27:
+		if raw_len < 9 {
+			return 0, false
+		}
+		val = binary.BigEndian.Uint64((*raw)[0:8])
+		*raw = (*raw)[8:]
+	case 31:
+		switch t {
+		case 0x00, 0x20, 0xc0:
+			return 0, false
+		case 0xe0:
+			return 0, false
+		}
+	default:
+		return 0, false
+	}
+	return int(val), true
+}
