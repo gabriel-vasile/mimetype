@@ -144,7 +144,7 @@ func Marc(raw []byte, limit uint32) bool {
 }
 
 // Cbor matches CBOR sequence data
-func Cbor(raw []byte, limit uint32) bool {
+func CborSeq(raw []byte, limit uint32) bool {
 	if len(raw) == 0 {
 		return false
 	}
