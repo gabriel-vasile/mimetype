@@ -75,6 +75,7 @@ var files = map[string]string{
 	"heif.heif":          "image/heif",
 	"html.html":          "text/html; charset=utf-8",
 	"html.iso88591.html": "text/html; charset=iso-8859-1",
+	"html.svg.html":      "text/html; charset=utf-8",
 	"html.usascii.html":  "text/html; charset=us-ascii",
 	"html.utf8.html":     "text/html; charset=utf-8",
 	"html.withbr.html":   "text/html; charset=utf-8",
