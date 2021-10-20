@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"strings"
-	"sync/atomic"
 )
 
 var (
@@ -46,10 +45,6 @@ var (
 	}
 )
 
-// MaxMSOFileHeaders maximum number of local headers that are checked when
-// trying to identify a Microsoft Office file.
-var MaxMSOFileHeaders int32 = 10
-
 // zipTokenizer holds the source zip file and scanned index.
 type zipTokenizer struct {
 	in []byte
@@ -84,11 +79,8 @@ func (t *zipTokenizer) next() (fileName string) {
 // msoXML reads at most first 10 local headers and returns whether the input
 // looks like a Microsoft Office file.
 func msoXML(in []byte, prefixes ...string) bool {
-	// Using atomic because MaxMSOFileHeaders can be written at the same time in other goroutine.
-	maxTokensToCheck := int(atomic.LoadInt32(&MaxMSOFileHeaders))
-
 	t := zipTokenizer{in: in}
-	for i, tok := 0, t.next(); i < maxTokensToCheck && tok != ""; i, tok = i+1, t.next() {
+	for i, tok := 0, t.next(); tok != ""; i, tok = i+1, t.next() {
 		for p := range prefixes {
 			if strings.HasPrefix(tok, prefixes[p]) {
 				return true
