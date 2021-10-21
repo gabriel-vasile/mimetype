@@ -136,8 +136,8 @@ Extension | MIME type | Aliases
 **.gbr** | image/x-gimp-gbr | -
 **.glb** | model/gltf-binary | -
 **.txt** | text/plain | -
-**.svg** | image/svg+xml | -
 **.html** | text/html | -
+**.svg** | image/svg+xml | -
 **.xml** | text/xml | -
 **.rss** | application/rss+xml | text/rss
 **.atom** | application/atom+xml | -

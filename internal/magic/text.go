@@ -27,7 +27,6 @@ var (
 		[]byte("<BODY"),
 		[]byte("<BR"),
 		[]byte("<P"),
-		[]byte("<!--"),
 	)
 	// Xml matches an Extensible Markup Language file.
 	Xml = markup([]byte("<?XML"))
