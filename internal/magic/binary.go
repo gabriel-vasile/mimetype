@@ -143,118 +143,138 @@ func Marc(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte{0x1E})
 }
 
-// Cbor matches CBOR sequence data
+// CborSeq matches CBOR sequences
 func CborSeq(raw []byte, limit uint32) bool {
 	if len(raw) == 0 {
 		return false
 	}
-	for ok := true; ok == true; {
-		ok = cborHelper(&raw)
+
+	offset := 0
+	ok := true
+	for ok && offset != len(raw) {
+		offset, ok = cborHelper(raw, offset)
 	}
-	if len(raw) == 0 {
+
+	if len(raw) == offset && ok {
 		return true
 	} else {
 		return false
 	}
 }
 
-// a helper function for Cbor 
-// inspired by https://www.rfc-editor.org/rfc/rfc8949.html#section-appendix.c
-func cborHelper(raw *[]byte) bool {
-	if len(*raw) == 0 {
-		return false
-	}
-	t := uint8((*raw)[0] & 0xe0)
-	ai := (*raw)[0] & 0x1f
-	uval := uint64(ai)
-	*raw = (*raw)[1:]
-	val, ok := cborHead(raw, t, ai, uval)
-	if ok == false {
-		return ok
-	}
-	switch t {
-	case 0x40, 0x60:
-		if val < 0 {
-			return false
-		}
-		if len(*raw) < val {
-			return false
-		}
-		*raw = (*raw)[val:]
-	case 0x80, 0xa0:
-		if val < 0 {
-			return false
-		}
-		count := 1
-		if t == 0xa0 {
-			count = 2
-		}
-		for i := 0; i < val*count; i++ {
-			if ok = cborHelper(raw); ok == false {
-				return ok
-			}
-		}
-	case 0xc0:
-		for {
-			if len(*raw) == 0 {
-				return false
-			}
-			if uint8((*raw)[0]&0xe0) != 0xc0 {
-				break
-			}
-		}
-		return cborHelper(raw)
-	default:
-		return false
-	}
-	return true
-}
-
-func cborHead(raw *[]byte, t uint8, ai byte, val uint64) (int, bool) {
-	raw_len := len(*raw)
+func cborHelper(raw []byte, offset int) (int, bool) {
+	raw_len := len(raw) - offset
 	if raw_len == 0 {
 		return 0, false
 	}
-	if ai < 24 {
-		return int(val), true
-	}
+
+	mt := uint8(raw[offset] & 0xe0)
+	ai := raw[offset] & 0x1f
+	val := uint64(ai)
+	offset++
+
 	switch ai {
 	case 24:
 		if raw_len < 2 {
 			return 0, false
 		}
-		val = uint64((*raw)[0])
-		*raw = (*raw)[1:]
-		if t == 0xe0 && val < 32 {
+		val = uint64(raw[offset])
+		offset++
+		if mt == 0xe0 && val < 32 {
 			return 0, false
 		}
 	case 25:
 		if raw_len < 3 {
 			return 0, false
 		}
-		val = uint64(binary.BigEndian.Uint16((*raw)[0:2]))
-		*raw = (*raw)[2:]
+		val = uint64(binary.BigEndian.Uint16(raw[offset : offset+2]))
+		offset += 2
 	case 26:
 		if raw_len < 5 {
 			return 0, false
 		}
-		val = uint64(binary.BigEndian.Uint32((*raw)[0:4]))
-		*raw = (*raw)[4:]
+		val = uint64(binary.BigEndian.Uint32(raw[offset : offset+4]))
+		offset += 4
 	case 27:
 		if raw_len < 9 {
 			return 0, false
 		}
-		val = binary.BigEndian.Uint64((*raw)[0:8])
-		*raw = (*raw)[8:]
+		val = binary.BigEndian.Uint64(raw[offset : offset+8])
+		offset += 8
 	case 31:
-		switch t {
+		switch mt {
 		case 0x00, 0x20, 0xc0:
 			return 0, false
 		case 0xe0:
 			return 0, false
 		}
 	default:
+		if ai > 24 { // ie. case 28: case 29: case 30
+			return 0, false
+		}
+	}
+
+	switch mt {
+	case 0x40, 0x60:
+		if ai == 31 {
+			return cborIndefinite(raw, mt, offset)
+		}
+		val_int := int(val)
+		if val_int < 0 {
+			return 0, false
+		}
+		if len(raw)-offset < val_int {
+			return 0, false
+		}
+		offset += val_int
+	case 0x80, 0xa0:
+		if ai == 31 {
+			return cborIndefinite(raw, mt, offset)
+		}
+
+		val_int := int(val)
+		if val_int < 0 {
+			return 0, false
+		}
+
+		count := 1
+		if mt == 0xa0 {
+			count = 2
+		}
+		for i := 0; i < val_int*count; i++ {
+			var ok bool
+			offset, ok = cborHelper(raw, offset)
+			if !ok {
+				return 0, false
+			}
+		}
+	case 0xc0:
+		return cborHelper(raw, offset)
+	default:
 		return 0, false
 	}
-	return int(val), true
+	return offset, true
+}
+
+func cborIndefinite(raw []byte, mt uint8, offset int) (int, bool) {
+	var ok bool
+	i := 0
+	for {
+		if len(raw) == offset {
+			return 0, false
+		}
+		if raw[offset] == 0xff {
+			offset++
+			break
+		}
+		offset, ok = cborHelper(raw, offset)
+		if !ok {
+			return 0, false
+		}
+		i++
+	}
+	if mt == 0xa0 && i%2 == 1 {
+		return 0, false
+	}
+	return offset, true
 }
