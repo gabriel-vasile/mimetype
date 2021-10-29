@@ -148,18 +148,12 @@ func CborSeq(raw []byte, limit uint32) bool {
 	if len(raw) == 0 {
 		return false
 	}
-
 	offset := 0
 	ok := true
 	for ok && offset != len(raw) {
 		offset, ok = cborHelper(raw, offset)
 	}
-
-	if len(raw) == offset && ok {
-		return true
-	} else {
-		return false
-	}
+	return len(raw) == offset && ok
 }
 
 func cborHelper(raw []byte, offset int) (int, bool) {
@@ -170,36 +164,37 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 
 	mt := uint8(raw[offset] & 0xe0)
 	ai := raw[offset] & 0x1f
-	val := uint64(ai)
+	val := int(ai)
 	offset++
 
+	BgEn := binary.BigEndian
 	switch ai {
 	case 24:
 		if raw_len < 2 {
 			return 0, false
 		}
-		val = uint64(raw[offset])
+		val = int(raw[offset])
 		offset++
-		if mt == 0xe0 && val < 32 {
+		if mt == 0xe0 && uint64(raw[offset]) < 32 {
 			return 0, false
 		}
 	case 25:
 		if raw_len < 3 {
 			return 0, false
 		}
-		val = uint64(binary.BigEndian.Uint16(raw[offset : offset+2]))
+		val = int(BgEn.Uint16(raw[offset : offset+2]))
 		offset += 2
 	case 26:
 		if raw_len < 5 {
 			return 0, false
 		}
-		val = uint64(binary.BigEndian.Uint32(raw[offset : offset+4]))
+		val = int(BgEn.Uint32(raw[offset : offset+4]))
 		offset += 4
 	case 27:
 		if raw_len < 9 {
 			return 0, false
 		}
-		val = binary.BigEndian.Uint64(raw[offset : offset+8])
+		val = int(BgEn.Uint64(raw[offset : offset+8]))
 		offset += 8
 	case 31:
 		switch mt {
@@ -219,29 +214,22 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 		if ai == 31 {
 			return cborIndefinite(raw, mt, offset)
 		}
-		val_int := int(val)
-		if val_int < 0 {
+		if val < 0 || len(raw)-offset < val {
 			return 0, false
 		}
-		if len(raw)-offset < val_int {
-			return 0, false
-		}
-		offset += val_int
+		offset += val
 	case 0x80, 0xa0:
 		if ai == 31 {
 			return cborIndefinite(raw, mt, offset)
 		}
-
-		val_int := int(val)
-		if val_int < 0 {
+		if val < 0 {
 			return 0, false
 		}
-
 		count := 1
 		if mt == 0xa0 {
 			count = 2
 		}
-		for i := 0; i < val_int*count; i++ {
+		for i := 0; i < val*count; i++ {
 			var ok bool
 			offset, ok = cborHelper(raw, offset)
 			if !ok {
