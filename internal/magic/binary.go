@@ -148,12 +148,25 @@ func CborSeq(raw []byte, limit uint32) bool {
 	if len(raw) == 0 {
 		return false
 	}
+	var oks []bool
 	offset := 0
 	ok := true
 	for ok && offset != len(raw) {
 		offset, ok = cborHelper(raw, offset)
+		oks = append(oks, ok)
 	}
-	return len(raw) == offset && ok
+	if limit == uint32(len(raw)) {
+		oks = oks[:len(oks)-1]
+	}
+	if len(oks) == 0 {
+		return false
+	}
+	for _, v := range(oks) {
+		if v == false {
+			return false
+		}
+	}
+	return true
 }
 
 func cborHelper(raw []byte, offset int) (int, bool) {
