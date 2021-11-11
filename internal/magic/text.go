@@ -155,12 +155,14 @@ func Php(raw []byte, limit uint32) bool {
 // JSON matches a JavaScript Object Notation file.
 func JSON(raw []byte, limit uint32) bool {
 	raw = trimLWS(raw)
-	if len(raw) == 0 || (raw[0] != '[' && raw[0] != '{') {
+	// #175 A single JSON string, number or bool is not considered JSON.
+	// JSON objects and arrays are reported as JSON.
+	if len(raw) < 2 || (raw[0] != '[' && raw[0] != '{') {
 		return false
 	}
 	parsed, err := json.Scan(raw)
 	// If the full file content was provided, check there is no error.
-	if len(raw) < int(limit) {
+	if limit == 0 || len(raw) < int(limit) {
 		return err == nil
 	}
 
