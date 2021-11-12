@@ -166,7 +166,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 		return 0, false
 	}
 
-	mt := uint8(raw[offset] & 0xe0)
+	mt := uint8(raw[offset] >> 5)
 	ai := raw[offset] & 0x1f
 	val := int(ai)
 	offset++
@@ -179,7 +179,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 		}
 		val = int(raw[offset])
 		offset++
-		if mt == 0xe0 && uint64(raw[offset]) < 32 {
+		if mt == 7 && uint64(raw[offset]) < 32 {
 			return 0, false
 		}
 	case 25:
@@ -202,9 +202,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 		offset += 8
 	case 31:
 		switch mt {
-		case 0x00, 0x20, 0xc0:
-			return 0, false
-		case 0xe0:
+		case 0, 1, 6, 7:
 			return 0, false
 		}
 	default:
@@ -214,7 +212,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 	}
 
 	switch mt {
-	case 0x40, 0x60:
+	case 2, 3:
 		if ai == 31 {
 			return cborIndefinite(raw, mt, offset)
 		}
@@ -222,7 +220,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 			return 0, false
 		}
 		offset += val
-	case 0x80, 0xa0:
+	case 4, 5:
 		if ai == 31 {
 			return cborIndefinite(raw, mt, offset)
 		}
@@ -230,7 +228,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 			return 0, false
 		}
 		count := 1
-		if mt == 0xa0 {
+		if mt == 5 {
 			count = 2
 		}
 		for i := 0; i < val*count; i++ {
@@ -240,7 +238,7 @@ func cborHelper(raw []byte, offset int) (int, bool) {
 				return 0, false
 			}
 		}
-	case 0xc0:
+	case 6:
 		return cborHelper(raw, offset)
 	default:
 		return 0, false
@@ -265,7 +263,7 @@ func cborIndefinite(raw []byte, mt uint8, offset int) (int, bool) {
 		}
 		i++
 	}
-	if mt == 0xa0 && i%2 == 1 {
+	if mt == 5 && i%2 == 1 {
 		return 0, false
 	}
 	return offset, true
