@@ -80,7 +80,7 @@ func (t *zipTokenizer) next() (fileName string) {
 // looks like a Microsoft Office file.
 func msoXML(in []byte, prefixes ...string) bool {
 	t := zipTokenizer{in: in}
-	for i, tok := 0, t.next(); i < 10 && tok != ""; i, tok = i+1, t.next() {
+	for i, tok := 0, t.next(); tok != ""; i, tok = i+1, t.next() {
 		for p := range prefixes {
 			if strings.HasPrefix(tok, prefixes[p]) {
 				return true
