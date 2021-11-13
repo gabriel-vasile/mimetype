@@ -33,7 +33,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2.3.5
     - name: Run tests
-      run: go test -v -race
+      run: go test -race ./...
 
   coverage:
     runs-on: ubuntu-latest
