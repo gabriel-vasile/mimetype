@@ -32,7 +32,9 @@
 // if some slice of bytes is a valid beginning of a json string.
 package json
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type (
 	scanStatus int
@@ -55,6 +57,10 @@ const (
 	scanSkipSpace                      // space byte; can skip; known to be last "continue" result
 	scanEnd                            // top-level value ended *before* this byte; known to be first "stop" result
 	scanError                          // hit an error, scanner.err.
+
+	// This limits the max nesting depth to prevent stack overflow.
+	// This is permitted by https://tools.ietf.org/html/rfc7159#section-9
+	maxNestingDepth = 10000
 )
 
 type (
@@ -121,8 +127,13 @@ func (s *scanner) eof() scanStatus {
 }
 
 // pushParseState pushes a new parse state p onto the parse stack.
-func (s *scanner) pushParseState(newParseState int) {
+// an error state is returned if maxNestingDepth was exceeded, otherwise successState is returned.
+func (s *scanner) pushParseState(c byte, newParseState int, successState scanStatus) scanStatus {
 	s.parseState = append(s.parseState, newParseState)
+	if len(s.parseState) <= maxNestingDepth {
+		return successState
+	}
+	return s.error(c, "exceeded max depth")
 }
 
 // popParseState pops a parse state (already obtained) off the stack
@@ -157,12 +168,10 @@ func stateBeginValue(s *scanner, c byte) scanStatus {
 	switch c {
 	case '{':
 		s.step = stateBeginStringOrEmpty
-		s.pushParseState(parseObjectKey)
-		return scanBeginObject
+		return s.pushParseState(c, parseObjectKey, scanBeginObject)
 	case '[':
 		s.step = stateBeginValueOrEmpty
-		s.pushParseState(parseArrayValue)
-		return scanBeginArray
+		return s.pushParseState(c, parseArrayValue, scanBeginArray)
 	case '"':
 		s.step = stateInString
 		return scanBeginLiteral
