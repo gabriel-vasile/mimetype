@@ -4,7 +4,10 @@
 
 package json
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestScan(t *testing.T) {
 	tCases := []struct {
@@ -38,5 +41,51 @@ func TestScan(t *testing.T) {
 		if err == nil && !st.ok {
 			t.Errorf("Scan should fail for input: %s", st.data)
 		}
+	}
+}
+
+func TestScannerMaxDepth(t *testing.T) {
+	tCases := []struct {
+		name        string
+		data        string
+		errMaxDepth bool
+	}{
+		{
+			name:        "ArrayUnderMaxNestingDepth",
+			data:        `{"a":` + strings.Repeat(`[`, 10000-1) + strings.Repeat(`]`, 10000-1) + `}`,
+			errMaxDepth: false,
+		},
+		{
+			name:        "ArrayOverMaxNestingDepth",
+			data:        `{"a":` + strings.Repeat(`[`, 10000) + strings.Repeat(`]`, 10000) + `}`,
+			errMaxDepth: true,
+		},
+		{
+			name:        "ObjectUnderMaxNestingDepth",
+			data:        `{"a":` + strings.Repeat(`{"a":`, 10000-1) + `0` + strings.Repeat(`}`, 10000-1) + `}`,
+			errMaxDepth: false,
+		},
+		{
+			name:        "ObjectOverMaxNestingDepth",
+			data:        `{"a":` + strings.Repeat(`{"a":`, 10000) + `0` + strings.Repeat(`}`, 10000) + `}`,
+			errMaxDepth: true,
+		},
+	}
+
+	for _, tt := range tCases {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := Scan([]byte(tt.data))
+			if !tt.errMaxDepth {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+			} else {
+				if err == nil {
+					t.Errorf("expected error containing 'exceeded max depth', got none")
+				} else if !strings.Contains(err.Error(), "exceeded max depth") {
+					t.Errorf("expected error containing 'exceeded max depth', got: %v", err)
+				}
+			}
+		})
 	}
 }
