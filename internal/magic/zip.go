@@ -43,14 +43,7 @@ func Zip(raw []byte, limit uint32) bool {
 
 // Jar matches a Java archive file.
 func Jar(raw []byte, limit uint32) bool {
-	t := zipTokenizer{in: raw}
-	for i, tok := 0, t.next(); i < 10 && tok != ""; i, tok = i+1, t.next() {
-		if tok == "META-INF/MANIFEST.MF" {
-			return true
-		}
-	}
-
-	return false
+	return zipContains(raw, "META-INF/MANIFEST.MF")
 }
 
 // zipTokenizer holds the source zip file and scanned index.
