@@ -46,17 +46,17 @@ var (
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(raw []byte, limit uint32) bool {
-	return msoXML(raw, xlsxSigFiles...)
+	return zipContains(raw, xlsxSigFiles...)
 }
 
 // Docx matches a Microsoft Word 2007 file.
 func Docx(raw []byte, limit uint32) bool {
-	return msoXML(raw, docxSigFiles...)
+	return zipContains(raw, docxSigFiles...)
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(raw []byte, limit uint32) bool {
-	return msoXML(raw, pptxSigFiles...)
+	return zipContains(raw, pptxSigFiles...)
 }
 
 // Ole matches an Open Linking and Embedding file.
