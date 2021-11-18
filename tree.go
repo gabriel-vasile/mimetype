@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -133,6 +133,7 @@ var (
 	heif    = newMIME("image/heif", ".heif", magic.Heif)
 	heifSeq = newMIME("image/heif-sequence", ".heif", magic.HeifSequence)
 	hdr     = newMIME("image/vnd.radiance", ".hdr", magic.Hdr)
+	avif    = newMIME("image/avif", ".avif", magic.AVIF)
 	mp3     = newMIME("audio/mpeg", ".mp3", magic.Mp3).
 		alias("audio/x-mpeg", "audio/mp3")
 	flac = newMIME("audio/flac", ".flac", magic.Flac)
