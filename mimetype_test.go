@@ -34,6 +34,8 @@ var files = map[string]string{
 	"atom.atom":          "application/atom+xml",
 	"au.au":              "audio/basic",
 	"avi.avi":            "video/x-msvideo",
+	"avif.avif":          "image/avif",
+	"avifsequence.avif":  "image/avif",
 	"bmp.bmp":            "image/bmp",
 	"bpg.bpg":            "image/bpg",
 	"bz2.bz2":            "application/x-bzip2",
