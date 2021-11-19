@@ -142,3 +142,18 @@ func Marc(raw []byte, limit uint32) bool {
 	// Field terminator is present.
 	return bytes.Contains(raw, []byte{0x1E})
 }
+
+// Microsoft PE dll
+func Dll(raw []byte, limit uint32) bool {
+	l := len(raw)
+	if l < 0x40 {
+		return false
+	}
+	signoff := binary.LittleEndian.Uint32(raw[0x3c:])
+	if uint32(l) < signoff+0x18 {
+		return false
+	}
+	characteristics := binary.LittleEndian.Uint16(raw[signoff+0x16:])
+
+	return characteristics&0x2000 == 0x2000
+}
