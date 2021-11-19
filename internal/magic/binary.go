@@ -142,3 +142,129 @@ func Marc(raw []byte, limit uint32) bool {
 	// Field terminator is present.
 	return bytes.Contains(raw, []byte{0x1E})
 }
+
+// CborSeq matches CBOR sequences
+func CborSeq(raw []byte, limit uint32) bool {
+	if len(raw) == 0 {
+		return false
+	}
+	offset, i := 0, 0
+	ok, oldok := true, true
+	for ; ok && offset != len(raw); i++ {
+		oldok = ok
+		offset, ok = cborHelper(raw, offset)
+	}
+	if limit == uint32(len(raw)) {
+		ok = oldok
+	}
+	return ok && i > 1
+}
+
+func cborHelper(raw []byte, offset int) (int, bool) {
+	raw_len := len(raw) - offset
+	if raw_len == 0 {
+		return 0, false
+	}
+
+	mt := uint8(raw[offset] >> 5)
+	ai := raw[offset] & 0x1f
+	val := int(ai)
+	offset++
+
+	BgEn := binary.BigEndian
+	switch ai {
+	case 24:
+		if raw_len < 2 {
+			return 0, false
+		}
+		val = int(raw[offset])
+		offset++
+		if mt == 7 && uint64(raw[offset]) < 32 {
+			return 0, false
+		}
+	case 25:
+		if raw_len < 3 {
+			return 0, false
+		}
+		val = int(BgEn.Uint16(raw[offset : offset+2]))
+		offset += 2
+	case 26:
+		if raw_len < 5 {
+			return 0, false
+		}
+		val = int(BgEn.Uint32(raw[offset : offset+4]))
+		offset += 4
+	case 27:
+		if raw_len < 9 {
+			return 0, false
+		}
+		val = int(BgEn.Uint64(raw[offset : offset+8]))
+		offset += 8
+	case 31:
+		switch mt {
+		case 0, 1, 6, 7:
+			return 0, false
+		}
+	default:
+		if ai > 24 { // ie. case 28: case 29: case 30
+			return 0, false
+		}
+	}
+
+	switch mt {
+	case 2, 3:
+		if ai == 31 {
+			return cborIndefinite(raw, mt, offset)
+		}
+		if val < 0 || len(raw)-offset < val {
+			return 0, false
+		}
+		offset += val
+	case 4, 5:
+		if ai == 31 {
+			return cborIndefinite(raw, mt, offset)
+		}
+		if val < 0 {
+			return 0, false
+		}
+		count := 1
+		if mt == 5 {
+			count = 2
+		}
+		for i := 0; i < val*count; i++ {
+			var ok bool
+			offset, ok = cborHelper(raw, offset)
+			if !ok {
+				return 0, false
+			}
+		}
+	case 6:
+		return cborHelper(raw, offset)
+	default:
+		return 0, false
+	}
+	return offset, true
+}
+
+func cborIndefinite(raw []byte, mt uint8, offset int) (int, bool) {
+	var ok bool
+	i := 0
+	for {
+		if len(raw) == offset {
+			return 0, false
+		}
+		if raw[offset] == 0xff {
+			offset++
+			break
+		}
+		offset, ok = cborHelper(raw, offset)
+		if !ok {
+			return 0, false
+		}
+		i++
+	}
+	if mt == 5 && i%2 == 1 {
+		return 0, false
+	}
+	return offset, true
+}
