@@ -19,6 +19,10 @@ var (
 	Nes = prefix([]byte{0x4E, 0x45, 0x53, 0x1A})
 	// TzIf matches a Time Zone Information Format (TZif) file.
 	TzIf = prefix([]byte("TZif"))
+	// SWF matches an Adobe Flash swf file.
+	SWF = prefix([]byte("CWS"), []byte("FWS"), []byte("ZWS"))
+	// Torrent has bencoded text in the beginning.
+	Torrent = prefix([]byte("d8:announce"))
 )
 
 // Java bytecode and Mach-O binaries share the same magic number.
@@ -55,13 +59,6 @@ func MachO(raw []byte, limit uint32) bool {
 		le == macho.Magic32 ||
 		be == macho.Magic64 ||
 		le == macho.Magic64
-}
-
-// Swf matches an Adobe Flash swf file.
-func Swf(raw []byte, limit uint32) bool {
-	return bytes.HasPrefix(raw, []byte("CWS")) ||
-		bytes.HasPrefix(raw, []byte("FWS")) ||
-		bytes.HasPrefix(raw, []byte("ZWS"))
 }
 
 // Dbf matches a dBase file.

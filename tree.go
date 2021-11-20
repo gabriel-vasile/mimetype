@@ -147,7 +147,7 @@ var (
 	au   = newMIME("audio/basic", ".au", magic.Au)
 	amr  = newMIME("audio/amr", ".amr", magic.Amr).
 		alias("audio/amr-nb")
-	aac  = newMIME("audio/aac", ".aac", magic.Aac)
+	aac  = newMIME("audio/aac", ".aac", magic.AAC)
 	voc  = newMIME("audio/x-unknown", ".voc", magic.Voc)
 	aMp4 = newMIME("audio/mp4", ".mp4", magic.AMp4).
 		alias("audio/x-m4a", "audio/x-mp4a")
@@ -173,8 +173,8 @@ var (
 		alias("video/asf", "video/x-ms-wmv")
 	rmvb  = newMIME("application/vnd.rn-realmedia-vbr", ".rmvb", magic.Rmvb)
 	class = newMIME("application/x-java-applet", ".class", magic.Class)
-	swf   = newMIME("application/x-shockwave-flash", ".swf", magic.Swf)
-	crx   = newMIME("application/x-chrome-extension", ".crx", magic.Crx)
+	swf   = newMIME("application/x-shockwave-flash", ".swf", magic.SWF)
+	crx   = newMIME("application/x-chrome-extension", ".crx", magic.CRX)
 	ttf   = newMIME("font/ttf", ".ttf", magic.Ttf).
 		alias("font/sfnt", "application/x-font-ttf", "application/font-sfnt")
 	woff    = newMIME("font/woff", ".woff", magic.Woff)
@@ -194,7 +194,7 @@ var (
 	ar      = newMIME("application/x-archive", ".a", magic.Ar, deb).
 		alias("application/x-unix-archive")
 	deb = newMIME("application/vnd.debian.binary-package", ".deb", magic.Deb)
-	rpm = newMIME("application/x-rpm", ".rpm", magic.Rpm)
+	rpm = newMIME("application/x-rpm", ".rpm", magic.RPM)
 	dcm = newMIME("application/dicom", ".dcm", magic.Dcm)
 	odt = newMIME("application/vnd.oasis.opendocument.text", ".odt", magic.Odt, ott).
 		alias("application/x-vnd.oasis.opendocument.text")
@@ -217,7 +217,7 @@ var (
 	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", magic.Odc).
 		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", magic.Sxc)
-	rar = newMIME("application/x-rar-compressed", ".rar", magic.Rar).
+	rar = newMIME("application/x-rar-compressed", ".rar", magic.RAR).
 		alias("application/x-rar")
 	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
 	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
