@@ -22,7 +22,7 @@ var (
 	Voc = prefix([]byte("Creative Voice File"))
 	// M3u matches a Playlist file.
 	M3u = prefix([]byte("#EXTM3U"))
-	// Aac matches an Advanced Audio Coding file.
+	// AAC matches an Advanced Audio Coding file.
 	AAC = prefix([]byte{0xFF, 0xF1}, []byte{0xFF, 0xF9})
 )
 
