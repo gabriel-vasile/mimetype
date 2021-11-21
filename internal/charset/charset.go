@@ -29,7 +29,7 @@ var (
 	}
 
 	// https://github.com/file/file/blob/fa93fb9f7d21935f1c7644c47d2975d31f12b812/src/encoding.c#L241
-	textChars [256]byte = [256]byte{
+	textChars = [256]byte{
 		/*                  BEL BS HT LF VT FF CR    */
 		F, F, F, F, F, F, F, T, T, T, T, T, T, T, F, F, /* 0x0X */
 		/*                              ESC          */
