@@ -143,7 +143,7 @@ var (
 	musePack = newMIME("audio/musepack", ".mpc", magic.MusePack)
 	wav      = newMIME("audio/wav", ".wav", magic.Wav).
 			alias("audio/x-wav", "audio/vnd.wave", "audio/wave")
-	aiff = newMIME("audio/aiff", ".aiff", magic.Aiff)
+	aiff = newMIME("audio/aiff", ".aiff", magic.Aiff).alias("audio/x-aiff")
 	au   = newMIME("audio/basic", ".au", magic.Au)
 	amr  = newMIME("audio/amr", ".amr", magic.Amr).
 		alias("audio/amr-nb")
@@ -238,7 +238,7 @@ var (
 	accdb   = newMIME("application/x-msaccess", ".accdb", magic.MsAccessAce)
 	zstd    = newMIME("application/zstd", ".zst", magic.Zstd)
 	cab     = newMIME("application/vnd.ms-cab-compressed", ".cab", magic.Cab)
-	lzip    = newMIME("application/lzip", ".lz", magic.Lzip)
+	lzip    = newMIME("application/lzip", ".lz", magic.Lzip).alias("application/x-lzip")
 	torrent = newMIME("application/x-bittorrent", ".torrent", magic.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", magic.Cpio)
 	tzif    = newMIME("application/tzif", "", magic.TzIf)
