@@ -30,7 +30,7 @@ var (
 		0x62, 0x69, 0x6E, 0x61, 0x72, 0x79,
 	}, 8)
 	// Warc matches a Web ARChive file.
-	Warc = prefix([]byte("WARC/"))
+	Warc = prefix([]byte("WARC/1.0"), []byte("WARC/1.1"))
 	// Cab matches a Cabinet archive file.
 	Cab = prefix([]byte("MSCF"))
 	// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
