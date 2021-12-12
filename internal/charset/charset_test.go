@@ -85,3 +85,58 @@ func TestFromPlain(t *testing.T) {
 		}
 	}
 }
+
+func FuzzFromPlain(f *testing.F) {
+	samples := [][]byte{
+		[]byte{0xe6, 0xf8, 0xe5, 0x85, 0x85},
+		[]byte{0xe6, 0xf8, 0xe5},
+		[]byte("æøå"),
+	}
+
+	for _, s := range samples {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(t *testing.T, d []byte) {
+		if charset := FromPlain(d); charset == "" {
+			t.Skip()
+		}
+	})
+}
+func FuzzFromHTML(f *testing.F) {
+	samples := []string{
+		`<meta charset="c">`,
+		`<meta charset="щ">`,
+		`<meta http-equiv="content-type" content="a/b; charset=c">`,
+		`<meta http-equiv="content-type" content="a/b; charset=щ">`,
+		`<f 1=2 /><meta charset="c">`,
+		`<f a=2><meta http-equiv="content-type" content="a/b; charset=c">`,
+		`<f 1=2 /><meta b="b" charset="c">`,
+		`<f a=2><meta b="b" http-equiv="content-type" content="a/b; charset=c">`,
+	}
+
+	for _, s := range samples {
+		f.Add([]byte(s))
+	}
+
+	f.Fuzz(func(t *testing.T, d []byte) {
+		if charset := FromHTML(d); charset == "" {
+			t.Skip()
+		}
+	})
+}
+func FuzzFromXML(f *testing.F) {
+	samples := []string{
+		`<?xml version="1.0" encoding="c"?>`,
+	}
+
+	for _, s := range samples {
+		f.Add([]byte(s))
+	}
+
+	f.Fuzz(func(t *testing.T, d []byte) {
+		if charset := FromXML(d); charset == "" {
+			t.Skip()
+		}
+	})
+}
