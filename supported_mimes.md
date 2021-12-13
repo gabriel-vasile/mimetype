@@ -69,7 +69,7 @@ Extension | MIME type | Aliases
 **.mpc** | audio/musepack | -
 **.amr** | audio/amr | audio/amr-nb
 **.wav** | audio/wav | audio/x-wav, audio/vnd.wave, audio/wave
-**.aiff** | audio/aiff | -
+**.aiff** | audio/aiff | audio/x-aiff
 **.au** | audio/basic | -
 **.mpeg** | video/mpeg | -
 **.mov** | video/quicktime | -
@@ -127,7 +127,7 @@ Extension | MIME type | Aliases
 **.cab** | application/vnd.ms-cab-compressed | -
 **.rpm** | application/x-rpm | -
 **.xz** | application/x-xz | -
-**.lz** | application/lzip | -
+**.lz** | application/lzip | application/x-lzip
 **.torrent** | application/x-bittorrent | -
 **.cpio** | application/x-cpio | -
 **n/a** | application/tzif | -
