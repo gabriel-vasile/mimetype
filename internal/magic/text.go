@@ -228,9 +228,11 @@ func GeoJSON(raw []byte, limit uint32) bool {
 	return false
 }
 
-// NdJSON matches a Newline delimited JSON file.
+// NdJSON matches a Newline delimited JSON file. All complete lines from raw
+// must be valid JSON documents meaning they contain one of the valid JSON data
+// types.
 func NdJSON(raw []byte, limit uint32) bool {
-	lCount := 0
+	lCount, hasObjOrArr := 0, false
 	sc := bufio.NewScanner(dropLastLine(raw, limit))
 	for sc.Scan() {
 		l := sc.Bytes()
@@ -242,10 +244,13 @@ func NdJSON(raw []byte, limit uint32) bool {
 		if err != nil {
 			return false
 		}
+		if l[0] == '[' || l[0] == '{' {
+			hasObjOrArr = true
+		}
 		lCount++
 	}
 
-	return lCount > 1
+	return lCount > 1 && hasObjOrArr
 }
 
 // Har matches a HAR Spec file.
