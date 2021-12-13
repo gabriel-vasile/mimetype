@@ -139,6 +139,6 @@ func Marc(raw []byte, limit uint32) bool {
 		}
 	}
 
-	// Field terminator is present.
-	return bytes.Contains(raw, []byte{0x1E})
+	// Field terminator is present in first 2048 bytes.
+	return bytes.Contains(raw[:min(2048, len(raw))], []byte{0x1E})
 }
