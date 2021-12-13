@@ -1,4 +1,4 @@
-// package magic holds the matching functions used to find MIME types.
+// Package magic holds the matching functions used to find MIME types.
 package magic
 
 import (
@@ -7,6 +7,10 @@ import (
 )
 
 type (
+	// Detector receiveѕ the raw data of a file and returns whether the data
+	// meets any conditions. The limit parameter is an upper limit to the number
+	// of bytes received and is used to tell if the byte slice represents the
+	// whole file or is just the header of a file: len(raw) < limit or len(raw)>limit.
 	Detector func(raw []byte, limit uint32) bool
 	xmlSig   struct {
 		// the local name of the root tag
@@ -151,7 +155,7 @@ func ftyp(sigs ...[]byte) Detector {
 	}
 }
 
-func newXmlSig(localName, xmlns string) xmlSig {
+func newXMLSig(localName, xmlns string) xmlSig {
 	ret := xmlSig{xmlns: []byte(xmlns)}
 	if localName != "" {
 		ret.localName = []byte(fmt.Sprintf("<%s", localName))

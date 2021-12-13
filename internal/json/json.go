@@ -74,7 +74,7 @@ type (
 )
 
 // Scan returns the number of bytes scanned and if there was any error
-// in trying to reach the end of data
+// in trying to reach the end of data.
 func Scan(data []byte) (int, error) {
 	s := &scanner{}
 	_ = checkValid(data, s)

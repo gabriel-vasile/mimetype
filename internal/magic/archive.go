@@ -37,6 +37,12 @@ var (
 	Xz = prefix([]byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 	// Lzip matches an Lzip compressed file.
 	Lzip = prefix([]byte{0x4c, 0x5a, 0x49, 0x50})
+	// RPM matches an RPM or Delta RPM package file.
+	RPM = prefix([]byte{0xed, 0xab, 0xee, 0xdb}, []byte("drpm"))
+	// Cpio matches a cpio archive file.
+	Cpio = prefix([]byte("070707"), []byte("070701"), []byte("070702"))
+	// RAR matches a RAR archive file.
+	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
 )
 
 // Zstd matches a Zstandard archive file.
@@ -46,27 +52,8 @@ func Zstd(raw []byte, limit uint32) bool {
 		bytes.HasPrefix(raw[1:], []byte{0xB5, 0x2F, 0xFD})
 }
 
-// Rpm matches an RPM or Delta RPM package file.
-func Rpm(raw []byte, limit uint32) bool {
-	return bytes.HasPrefix(raw, []byte{0xed, 0xab, 0xee, 0xdb}) ||
-		bytes.HasPrefix(raw, []byte("drpm"))
-}
-
-// Cpio matches a cpio archive file.
-func Cpio(raw []byte, limit uint32) bool {
-	return bytes.HasPrefix(raw, []byte("070707")) ||
-		bytes.HasPrefix(raw, []byte("070701")) ||
-		bytes.HasPrefix(raw, []byte("070702"))
-}
-
-// Rar matches a RAR archive file.
-func Rar(raw []byte, limit uint32) bool {
-	return bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x00")) ||
-		bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x01\x00"))
-}
-
-// Crx matches a Chrome extension file: a zip archive prepended by a package header.
-func Crx(raw []byte, limit uint32) bool {
+// CRX matches a Chrome extension file: a zip archive prepended by a package header.
+func CRX(raw []byte, limit uint32) bool {
 	const minHeaderLen = 16
 	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
 		return false

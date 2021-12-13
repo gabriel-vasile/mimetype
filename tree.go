@@ -77,14 +77,14 @@ var (
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
 	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJSON, rtf, tcl, csv, tsv, vCard, iCalendar, warc)
-	xml      = newMIME("text/xml", ".xml", magic.Xml, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
+	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
 	json     = newMIME("application/json", ".json", magic.JSON, geoJSON, har)
 	har      = newMIME("application/json", ".har", magic.HAR)
 	csv      = newMIME("text/csv", ".csv", magic.Csv)
 	tsv      = newMIME("text/tab-separated-values", ".tsv", magic.Tsv)
 	geoJSON  = newMIME("application/geo+json", ".geojson", magic.GeoJSON)
 	ndJSON   = newMIME("application/x-ndjson", ".ndjson", magic.NdJSON)
-	html     = newMIME("text/html", ".html", magic.Html)
+	html     = newMIME("text/html", ".html", magic.HTML)
 	php      = newMIME("text/x-php", ".php", magic.Php)
 	rtf      = newMIME("text/rtf", ".rtf", magic.Rtf)
 	js       = newMIME("application/javascript", ".js", magic.Js).
@@ -147,7 +147,7 @@ var (
 	au   = newMIME("audio/basic", ".au", magic.Au)
 	amr  = newMIME("audio/amr", ".amr", magic.Amr).
 		alias("audio/amr-nb")
-	aac  = newMIME("audio/aac", ".aac", magic.Aac)
+	aac  = newMIME("audio/aac", ".aac", magic.AAC)
 	voc  = newMIME("audio/x-unknown", ".voc", magic.Voc)
 	aMp4 = newMIME("audio/mp4", ".mp4", magic.AMp4).
 		alias("audio/x-m4a", "audio/x-mp4a")
@@ -173,8 +173,8 @@ var (
 		alias("video/asf", "video/x-ms-wmv")
 	rmvb  = newMIME("application/vnd.rn-realmedia-vbr", ".rmvb", magic.Rmvb)
 	class = newMIME("application/x-java-applet", ".class", magic.Class)
-	swf   = newMIME("application/x-shockwave-flash", ".swf", magic.Swf)
-	crx   = newMIME("application/x-chrome-extension", ".crx", magic.Crx)
+	swf   = newMIME("application/x-shockwave-flash", ".swf", magic.SWF)
+	crx   = newMIME("application/x-chrome-extension", ".crx", magic.CRX)
 	ttf   = newMIME("font/ttf", ".ttf", magic.Ttf).
 		alias("font/sfnt", "application/x-font-ttf", "application/font-sfnt")
 	woff    = newMIME("font/woff", ".woff", magic.Woff)
@@ -194,7 +194,7 @@ var (
 	ar      = newMIME("application/x-archive", ".a", magic.Ar, deb).
 		alias("application/x-unix-archive")
 	deb = newMIME("application/vnd.debian.binary-package", ".deb", magic.Deb)
-	rpm = newMIME("application/x-rpm", ".rpm", magic.Rpm)
+	rpm = newMIME("application/x-rpm", ".rpm", magic.RPM)
 	dcm = newMIME("application/dicom", ".dcm", magic.Dcm)
 	odt = newMIME("application/vnd.oasis.opendocument.text", ".odt", magic.Odt, ott).
 		alias("application/x-vnd.oasis.opendocument.text")
@@ -217,7 +217,7 @@ var (
 	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", magic.Odc).
 		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", magic.Sxc)
-	rar = newMIME("application/x-rar-compressed", ".rar", magic.Rar).
+	rar = newMIME("application/x-rar-compressed", ".rar", magic.RAR).
 		alias("application/x-rar")
 	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
 	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)

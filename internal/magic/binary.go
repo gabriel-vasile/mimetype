@@ -19,6 +19,10 @@ var (
 	Nes = prefix([]byte{0x4E, 0x45, 0x53, 0x1A})
 	// TzIf matches a Time Zone Information Format (TZif) file.
 	TzIf = prefix([]byte("TZif"))
+	// SWF matches an Adobe Flash swf file.
+	SWF = prefix([]byte("CWS"), []byte("FWS"), []byte("ZWS"))
+	// Torrent has bencoded text in the beginning.
+	Torrent = prefix([]byte("d8:announce"))
 )
 
 // Java bytecode and Mach-O binaries share the same magic number.
@@ -55,13 +59,6 @@ func MachO(raw []byte, limit uint32) bool {
 		le == macho.Magic32 ||
 		be == macho.Magic64 ||
 		le == macho.Magic64
-}
-
-// Swf matches an Adobe Flash swf file.
-func Swf(raw []byte, limit uint32) bool {
-	return bytes.HasPrefix(raw, []byte("CWS")) ||
-		bytes.HasPrefix(raw, []byte("FWS")) ||
-		bytes.HasPrefix(raw, []byte("ZWS"))
 }
 
 // Dbf matches a dBase file.
@@ -142,3 +139,19 @@ func Marc(raw []byte, limit uint32) bool {
 	// Field terminator is present in first 2048 bytes.
 	return bytes.Contains(raw[:min(2048, len(raw))], []byte{0x1E})
 }
+
+// Glb matches a glTF model format file.
+// GLB is the binary file format representation of 3D models save in
+// the GL transmission Format (glTF).
+// see more: https://docs.fileformat.com/3d/glb/
+//           https://www.iana.org/assignments/media-types/model/gltf-binary
+// GLB file format is based on little endian and its header structure
+// show  below:
+//
+// <-- 12-byte header                             -->
+// | magic            | version          | length   |
+// | (uint32)         | (uint32)         | (uint32) |
+// | \x67\x6C\x54\x46 | \x01\x00\x00\x00 | ...      |
+// | g   l   T   F    | 1                | ...      |
+var Glb = prefix([]byte("\x67\x6C\x54\x46\x02\x00\x00\x00"),
+	[]byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
