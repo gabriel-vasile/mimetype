@@ -52,6 +52,7 @@ var (
 	}
 )
 
+// FromBOM returns the charset declared in the BOM of content.
 func FromBOM(content []byte) string {
 	for _, b := range boms {
 		if bytes.HasPrefix(content, b.bom) {
@@ -61,6 +62,8 @@ func FromBOM(content []byte) string {
 	return ""
 }
 
+// FromPlain returns the charset of a plain text. It relies on BOM presence
+// and it falls back on checking each byte in content.
 func FromPlain(content []byte) string {
 	if len(content) == 0 {
 		return ""
@@ -122,13 +125,16 @@ func latin(content []byte) string {
 
 func ascii(content []byte) bool {
 	for _, b := range content {
-		if textChars[b] != T {
+		if textChars[b] != t {
 			return false
 		}
 	}
 	return true
 }
 
+// FromXML returns the charset of an XML document. It relies on the XML
+// header <?xml version="1.0" encoding="UTF-8"?> and falls back on the plain
+// text content.
 func FromXML(content []byte) string {
 	if cset := fromXML(content); cset != "" {
 		return cset
@@ -151,6 +157,8 @@ func fromXML(content []byte) string {
 	return strings.ToLower(xmlEncoding(string(t.Inst)))
 }
 
+// FromHTML returns the charset of an HTML document. It relies on the meta tag
+// <meta charset="UTF-8"> and falls back on the plain text content.
 func FromHTML(content []byte) string {
 	if cset := fromHTML(content); cset != "" {
 		return cset
