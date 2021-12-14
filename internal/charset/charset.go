@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	F = 0 /* character never appears in text */
-	T = 1 /* character appears in plain ASCII text */
-	I = 2 /* character appears in ISO-8859 text */
-	X = 3 /* character appears in non-ISO extended ASCII (Mac, IBM PC) */
+	f = 0 /* character never appears in text */
+	t = 1 /* character appears in plain ASCII text */
+	i = 2 /* character appears in ISO-8859 text */
+	x = 3 /* character appears in non-ISO extended ASCII (Mac, IBM PC) */
 )
 
 var (
@@ -31,24 +31,24 @@ var (
 	// https://github.com/file/file/blob/fa93fb9f7d21935f1c7644c47d2975d31f12b812/src/encoding.c#L241
 	textChars = [256]byte{
 		/*                  BEL BS HT LF VT FF CR    */
-		F, F, F, F, F, F, F, T, T, T, T, T, T, T, F, F, /* 0x0X */
+		f, f, f, f, f, f, f, t, t, t, t, t, t, t, f, f, /* 0x0X */
 		/*                              ESC          */
-		F, F, F, F, F, F, F, F, F, F, F, T, F, F, F, F, /* 0x1X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x2X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x3X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x4X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x5X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, /* 0x6X */
-		T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, F, /* 0x7X */
+		f, f, f, f, f, f, f, f, f, f, f, t, f, f, f, f, /* 0x1X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, /* 0x2X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, /* 0x3X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, /* 0x4X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, /* 0x5X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, /* 0x6X */
+		t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, f, /* 0x7X */
 		/*            NEL                            */
-		X, X, X, X, X, T, X, X, X, X, X, X, X, X, X, X, /* 0x8X */
-		X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, /* 0x9X */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xaX */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xbX */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xcX */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xdX */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xeX */
-		I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, I, /* 0xfX */
+		x, x, x, x, x, t, x, x, x, x, x, x, x, x, x, x, /* 0x8X */
+		x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, /* 0x9X */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xaX */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xbX */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xcX */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xdX */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xeX */
+		i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, /* 0xfX */
 	}
 )
 
@@ -103,8 +103,8 @@ func FromPlain(content []byte) string {
 func latin(content []byte) string {
 	hasControlBytes := false
 	for _, b := range content {
-		t := textChars[b]
-		if t != T && t != I {
+		tt := textChars[b]
+		if tt != t && tt != i {
 			return ""
 		}
 		if b >= 0x80 && b <= 0x9F {
