@@ -602,3 +602,30 @@ func TestExtend(t *testing.T) {
 		})
 	}
 }
+
+// Because of the random nature of fuzzing I don't think there is a way to test
+// the correctness of the Detect results. Still there is value in fuzzing in
+// search for panics.
+func FuzzMimetype(f *testing.F) {
+	corpus := []string{
+		"testdata/mkv.mkv",
+		"testdata/webm.webm",
+		"testdata/docx.docx",
+		"testdata/pptx.pptx",
+		"testdata/xlsx.xlsx",
+		"testdata/3gp.3gp",
+		"testdata/class.class",
+	}
+	for _, c := range corpus {
+		data, err := ioutil.ReadFile(c)
+		if err != nil {
+			f.Fatal(err)
+		}
+		f.Add(data[:100])
+	}
+	f.Fuzz(func(t *testing.T, d []byte) {
+		if m := Detect(d); m.Extension() == "" {
+			t.Skip()
+		}
+	})
+}
