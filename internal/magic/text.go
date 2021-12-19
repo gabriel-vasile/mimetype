@@ -122,6 +122,8 @@ var (
 	Rtf = prefix([]byte("{\\rtf1"))
 	// Srt matches a SubRip file.
 	Srt = regexPrefix("^1\n[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> [0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
+	// Vtt matches a Web Video Text Tracks (WebVTT) file.
+	Vtt = prefix([]byte("WEBVTT"))
 )
 
 // Text matches a plain text file.

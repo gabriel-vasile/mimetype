@@ -192,6 +192,7 @@ var files = map[string]string{
 	"vcf.dos.vcf":        "text/vcard",
 	"vcf.vcf":            "text/vcard",
 	"voc.voc":            "audio/x-unknown",
+	"vtt.vtt":            "text/vtt",
 	"warc.warc":          "application/warc",
 	"wasm.wasm":          "application/wasm",
 	"wav.wav":            "audio/wav",
