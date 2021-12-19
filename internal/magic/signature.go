@@ -34,8 +34,8 @@ func prefix(sigs ...[]byte) Detector {
 	}
 }
 
-// prefix creates a Detector which returns true if any of the provided regular
-// expression patterns match the prefix of the raw input.
+// regexPrefix creates a Detector which returns true if any of the provided
+// regular expression patterns match the prefix of the raw input.
 func regexPrefix(patterns ...string) Detector {
 	return func(raw []byte, limit uint32) bool {
 		for _, pattern := range patterns {
