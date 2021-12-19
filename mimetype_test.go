@@ -170,6 +170,7 @@ var files = map[string]string{
 	"shp.shp":            "application/octet-stream",
 	"shx.shx":            "application/octet-stream",
 	"so.so":              "application/x-sharedlib",
+	"srt.srt":            "text/srt",
 	"sqlite.sqlite":      "application/vnd.sqlite3",
 	"svg.1.svg":          "image/svg+xml",
 	"svg.svg":            "image/svg+xml",
