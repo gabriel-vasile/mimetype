@@ -39,8 +39,8 @@ func prefix(sigs ...[]byte) Detector {
 func regexPrefix(patterns ...string) Detector {
 	return func(raw []byte, limit uint32) bool {
 		for _, pattern := range patterns {
-			// Ensures that the pattern begins at the start of a line.
-			pattern = "^" + pattern
+			// Assert position at the start of the string.
+			pattern = `\A` + pattern
 			re := regexp.MustCompile(pattern)
 			if re.Find(raw) != nil {
 				return true
