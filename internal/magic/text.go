@@ -120,17 +120,6 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf1"))
-	// Vtt matches a Web Video Text Tracks (WebVTT) file. See
-	Vtt = prefix(
-		[]byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0A},
-		[]byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0D},
-		[]byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x20},
-		[]byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x09},
-		[]byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0A},
-		[]byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0D},
-		[]byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x20},
-		[]byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x09},
-	)
 )
 
 // Text matches a plain text file.
@@ -307,4 +296,40 @@ func HAR(raw []byte, limit uint32) bool {
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
+}
+
+// Vtt matches a Web Video Text Tracks (WebVTT) file. See
+// <https://www.iana.org/assignments/media-types/text/vtt>.
+func Vtt(raw []byte, limit uint32) bool {
+	sigStarts := [][]byte{
+		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}, // UTF-8 BOM and "WEBVTT"
+		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54},                   // "WEBVTT"
+	}
+	sigEnds := []*byte{
+		bytePointer(0x0A), // line feed
+		bytePointer(0x0D), // carriage return
+		bytePointer(0x20), // space
+		bytePointer(0x09), // horizontal tab
+		nil,               // EOF
+	}
+
+	for _, sigStart := range sigStarts {
+		for _, sigEnd := range sigEnds {
+			if sigEnd == nil {
+				if bytes.Equal(raw, sigStart) {
+					return true
+				}
+				continue
+			}
+			sig := append(sigStart, *sigEnd)
+			if bytes.HasPrefix(raw, sig) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func bytePointer(b byte) *byte {
+	return &b
 }
