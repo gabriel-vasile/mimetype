@@ -4,6 +4,7 @@ package magic
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 )
 
 type (
@@ -26,6 +27,22 @@ func prefix(sigs ...[]byte) Detector {
 	return func(raw []byte, limit uint32) bool {
 		for _, s := range sigs {
 			if bytes.HasPrefix(raw, s) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+// regexPrefix creates a Detector which returns true if any of the provided
+// regular expression patterns match the prefix of the raw input.
+func regexPrefix(patterns ...string) Detector {
+	return func(raw []byte, limit uint32) bool {
+		for _, pattern := range patterns {
+			// Assert position at the start of the string.
+			pattern = `\A` + pattern
+			re := regexp.MustCompile(pattern)
+			if re.Find(raw) != nil {
 				return true
 			}
 		}

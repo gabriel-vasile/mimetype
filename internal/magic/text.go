@@ -120,6 +120,13 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf1"))
+	// Srt matches a SubRip file. This matches the first numeric counter,
+	// followed by a time range. For example
+	// ```
+	// 1
+	// 00:02:16,612 --> 00:02:19,376
+	// ```
+	Srt = regexPrefix("1\n[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> [0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
 )
 
 // Text matches a plain text file.

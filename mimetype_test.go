@@ -171,6 +171,7 @@ var files = map[string]string{
 	"shx.shx":            "application/octet-stream",
 	"so.so":              "application/x-sharedlib",
 	"sqlite.sqlite":      "application/vnd.sqlite3",
+	"srt.srt":            "text/x-subrip",
 	"svg.1.svg":          "image/svg+xml",
 	"svg.svg":            "image/svg+xml",
 	"swf.swf":            "application/x-shockwave-flash",
