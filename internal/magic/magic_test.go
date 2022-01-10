@@ -1,8 +1,12 @@
 package magic
 
 import (
+	"bufio"
+	"bytes"
 	"io"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestMagic(t *testing.T) {
@@ -111,4 +115,61 @@ func TestDropLastLine(t *testing.T) {
 			t.Errorf("dropLastLine %d error: expected %q; got %q", i, tt.res, got)
 		}
 	}
+}
+
+func BenchmarkRegexSrt(b *testing.B) {
+	const subtitle = `1
+00:02:16,612 --> 00:02:19,376
+Senator, we're making
+our final approach into Coruscant.
+
+`
+	for i := 0; i < b.N; i++ {
+		Srt([]byte(subtitle), 0)
+	}
+}
+func BenchmarkParseSrt(b *testing.B) {
+	const subtitle = `1
+00:02:16,612 --> 00:02:19,376
+Senator, we're making
+our final approach into Coruscant.
+
+`
+	for i := 0; i < b.N; i++ {
+		ParseSrt([]byte(subtitle), 0)
+	}
+}
+
+func ParseSrt(in []byte, _ uint32) bool {
+	s := bufio.NewScanner(bytes.NewReader(in))
+	if !s.Scan() {
+		return false
+	}
+	// First line must be 1.
+	if s.Text() != "1" {
+		return false
+	}
+
+	if !s.Scan() {
+		return false
+	}
+	// Second line must be a time range.
+	ts := strings.Split(s.Text(), " --> ")
+	if len(ts) != 2 {
+		return false
+	}
+	t0, err := time.Parse("15:04:05", ts[0])
+	if err != nil {
+		return false
+	}
+	t1, err := time.Parse("15:04:05", ts[1])
+	if err != nil {
+		return false
+	}
+	if t0.After(t1) {
+		return false
+	}
+
+	// A third line must exist and not be empty. This is the actual subtitle text.
+	return s.Scan() && len(s.Bytes()) != 0
 }
