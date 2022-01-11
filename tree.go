@@ -87,7 +87,7 @@ var (
 	html     = newMIME("text/html", ".html", magic.HTML)
 	php      = newMIME("text/x-php", ".php", magic.Php)
 	rtf      = newMIME("text/rtf", ".rtf", magic.Rtf)
-	srt      = newMIME("text/x-subrip", ".srt", magic.Srt).
+	srt      = newMIME("text/x-subrip", ".srt", magic.ParseSrt).
 			alias("text/x-srt", "application/srt")
 	js = newMIME("application/javascript", ".js", magic.Js).
 		alias("application/x-javascript", "text/javascript")

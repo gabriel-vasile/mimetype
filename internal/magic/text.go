@@ -3,6 +3,8 @@ package magic
 import (
 	"bufio"
 	"bytes"
+	"strings"
+	"time"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
@@ -126,7 +128,7 @@ var (
 	// 1
 	// 00:02:16,612 --> 00:02:19,376
 	// ```
-	Srt = regexPrefix("1\r?\n[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> [0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
+	RegexSrt = regexPrefix("1\r?\n[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> [0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
 )
 
 // Text matches a plain text file.
@@ -303,4 +305,46 @@ func HAR(raw []byte, limit uint32) bool {
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
+}
+
+func ParseSrt(in []byte, _ uint32) bool {
+	s := bufio.NewScanner(bytes.NewReader(in))
+	if !s.Scan() {
+		return false
+	}
+	// First line must be 1.
+	if s.Text() != "1" {
+		return false
+	}
+
+	if !s.Scan() {
+		return false
+	}
+	secondLine := s.Text()
+	// Second line must be a time range.
+	ts := strings.Split(secondLine, " --> ")
+	if len(ts) != 2 {
+		return false
+	}
+	// Decimal separator in timestamps must be a comma, not a period. Need to
+	// check manually because `time.Parse` does not differentiate between the
+	// two.
+	if strings.Contains(secondLine, ".") {
+		return false
+	}
+	layout := "15:04:05,000"
+	t0, err := time.Parse(layout, ts[0])
+	if err != nil {
+		return false
+	}
+	t1, err := time.Parse(layout, ts[1])
+	if err != nil {
+		return false
+	}
+	if t0.After(t1) {
+		return false
+	}
+
+	// A third line must exist and not be empty. This is the actual subtitle text.
+	return s.Scan() && len(s.Bytes()) != 0
 }
