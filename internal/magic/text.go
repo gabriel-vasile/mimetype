@@ -122,13 +122,6 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf1"))
-	// Srt matches a SubRip file. This matches the first numeric counter,
-	// followed by a time range. For example
-	// ```
-	// 1
-	// 00:02:16,612 --> 00:02:19,376
-	// ```
-	RegexSrt = regexPrefix("1\r?\n[0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3} --> [0-9]{2}:[0-5][0-9]:[0-5][0-9],[0-9]{3}")
 )
 
 // Text matches a plain text file.
@@ -307,7 +300,13 @@ func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
 }
 
-func ParseSrt(in []byte, _ uint32) bool {
+// Srt matches a SubRip file. This matches the first numeric counter,
+// followed by a time range. For example
+// ```
+// 1
+// 00:02:16,612 --> 00:02:19,376
+// ```
+func Srt(in []byte, _ uint32) bool {
 	s := bufio.NewScanner(bytes.NewReader(in))
 	if !s.Scan() {
 		return false

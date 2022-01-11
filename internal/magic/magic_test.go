@@ -113,7 +113,7 @@ func TestDropLastLine(t *testing.T) {
 	}
 }
 
-func BenchmarkRegexSrt(b *testing.B) {
+func BenchmarkSrt(b *testing.B) {
 	const subtitle = `1
 00:02:16,612 --> 00:02:19,376
 Senator, we're making
@@ -121,17 +121,6 @@ our final approach into Coruscant.
 
 `
 	for i := 0; i < b.N; i++ {
-		RegexSrt([]byte(subtitle), 0)
-	}
-}
-func BenchmarkParseSrt(b *testing.B) {
-	const subtitle = `1
-00:02:16,612 --> 00:02:19,376
-Senator, we're making
-our final approach into Coruscant.
-
-`
-	for i := 0; i < b.N; i++ {
-		ParseSrt([]byte(subtitle), 0)
+		Srt([]byte(subtitle), 0)
 	}
 }
