@@ -331,7 +331,7 @@ func Srt(in []byte, _ uint32) bool {
 	if strings.Contains(secondLine, ".") {
 		return false
 	}
-	layout := "15:04:05,000"
+	const layout = "15:04:05,000"
 	t0, err := time.Parse(layout, ts[0])
 	if err != nil {
 		return false
