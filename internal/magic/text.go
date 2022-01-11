@@ -300,12 +300,7 @@ func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
 }
 
-// Srt matches a SubRip file. This matches the first numeric counter,
-// followed by a time range. For example
-// ```
-// 1
-// 00:02:16,612 --> 00:02:19,376
-// ```
+// Srt matches a SubRip file.
 func Srt(in []byte, _ uint32) bool {
 	s := bufio.NewScanner(bytes.NewReader(in))
 	if !s.Scan() {
