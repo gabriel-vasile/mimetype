@@ -315,18 +315,19 @@ func Srt(in []byte, _ uint32) bool {
 		return false
 	}
 	secondLine := s.Text()
+	// Decimal separator of fractional seconds in the timestamps must be a
+	// comma, not a period.
+	if strings.Contains(secondLine, ".") {
+		return false
+	}
+	// For Go <1.17, comma is not recognised as a decimal separator by `time.Parse`.
+	secondLine = strings.ReplaceAll(secondLine, ",", ".")
 	// Second line must be a time range.
 	ts := strings.Split(secondLine, " --> ")
 	if len(ts) != 2 {
 		return false
 	}
-	// Decimal separator in timestamps must be a comma, not a period. Need to
-	// check manually because `time.Parse` does not differentiate between the
-	// two.
-	if strings.Contains(secondLine, ".") {
-		return false
-	}
-	const layout = "15:04:05,000"
+	const layout = "15:04:05.000"
 	t0, err := time.Parse(layout, ts[0])
 	if err != nil {
 		return false
