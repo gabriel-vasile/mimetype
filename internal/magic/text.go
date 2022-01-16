@@ -315,6 +315,11 @@ func Srt(in []byte, _ uint32) bool {
 		return false
 	}
 	secondLine := s.Text()
+	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits secondLine
+	// length to exactly 29 characters.
+	if len(secondLine) != 29 {
+		return false
+	}
 	// Decimal separator of fractional seconds in the timestamps must be a
 	// comma, not a period.
 	if strings.Contains(secondLine, ".") {
