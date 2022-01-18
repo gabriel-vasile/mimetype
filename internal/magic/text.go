@@ -3,6 +3,8 @@ package magic
 import (
 	"bufio"
 	"bytes"
+	"strings"
+	"time"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
@@ -298,6 +300,59 @@ func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
 }
 
+func bytePointer(b byte) *byte {
+	return &b
+}
+
+// Srt matches a SubRip file.
+func Srt(in []byte, _ uint32) bool {
+	s := bufio.NewScanner(bytes.NewReader(in))
+	if !s.Scan() {
+		return false
+	}
+	// First line must be 1.
+	if s.Text() != "1" {
+		return false
+	}
+
+	if !s.Scan() {
+		return false
+	}
+	secondLine := s.Text()
+	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits secondLine
+	// length to exactly 29 characters.
+	if len(secondLine) != 29 {
+		return false
+	}
+	// Decimal separator of fractional seconds in the timestamps must be a
+	// comma, not a period.
+	if strings.Contains(secondLine, ".") {
+		return false
+	}
+	// For Go <1.17, comma is not recognised as a decimal separator by `time.Parse`.
+	secondLine = strings.ReplaceAll(secondLine, ",", ".")
+	// Second line must be a time range.
+	ts := strings.Split(secondLine, " --> ")
+	if len(ts) != 2 {
+		return false
+	}
+	const layout = "15:04:05.000"
+	t0, err := time.Parse(layout, ts[0])
+	if err != nil {
+		return false
+	}
+	t1, err := time.Parse(layout, ts[1])
+	if err != nil {
+		return false
+	}
+	if t0.After(t1) {
+		return false
+	}
+
+	// A third line must exist and not be empty. This is the actual subtitle text.
+	return s.Scan() && len(s.Bytes()) != 0
+}
+
 // Vtt matches a Web Video Text Tracks (WebVTT) file. See
 // <https://www.iana.org/assignments/media-types/text/vtt>.
 func Vtt(raw []byte, limit uint32) bool {
@@ -328,8 +383,4 @@ func Vtt(raw []byte, limit uint32) bool {
 		}
 	}
 	return false
-}
-
-func bytePointer(b byte) *byte {
-	return &b
 }
