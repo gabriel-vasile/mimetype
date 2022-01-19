@@ -354,7 +354,7 @@ func Srt(in []byte, _ uint32) bool {
 }
 
 // Vtt matches a Web Video Text Tracks (WebVTT) file. See
-// <https://www.iana.org/assignments/media-types/text/vtt>.
+// https://www.iana.org/assignments/media-types/text/vtt.
 func Vtt(raw []byte, limit uint32) bool {
 	sigStarts := [][]byte{
 		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}, // UTF-8 BOM and "WEBVTT"
