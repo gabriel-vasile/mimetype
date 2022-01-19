@@ -356,31 +356,24 @@ func Srt(in []byte, _ uint32) bool {
 // Vtt matches a Web Video Text Tracks (WebVTT) file. See
 // https://www.iana.org/assignments/media-types/text/vtt.
 func Vtt(raw []byte, limit uint32) bool {
-	sigStarts := [][]byte{
-		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}, // UTF-8 BOM and "WEBVTT"
-		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54},                   // "WEBVTT"
+	// Prefix match.
+	prefixes := [][]byte{
+		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0A}, // UTF-8 BOM, "WEBVTT" and a line feed
+		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0D}, // UTF-8 BOM, "WEBVTT" and a carriage return
+		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x20}, // UTF-8 BOM, "WEBVTT" and a space
+		{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x09}, // UTF-8 BOM, "WEBVTT" and a horizontal tab
+		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0A},                   // "WEBVTT" and a line feed
+		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x0D},                   // "WEBVTT" and a carriage return
+		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x20},                   // "WEBVTT" and a space
+		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x09},                   // "WEBVTT" and a horizontal tab
 	}
-	sigEnds := []*byte{
-		bytePointer(0x0A), // line feed
-		bytePointer(0x0D), // carriage return
-		bytePointer(0x20), // space
-		bytePointer(0x09), // horizontal tab
-		nil,               // EOF
-	}
-
-	for _, sigStart := range sigStarts {
-		for _, sigEnd := range sigEnds {
-			if sigEnd == nil {
-				if bytes.Equal(raw, sigStart) {
-					return true
-				}
-				continue
-			}
-			sig := append(sigStart, *sigEnd)
-			if bytes.HasPrefix(raw, sig) {
-				return true
-			}
+	for _, p := range prefixes {
+		if bytes.HasPrefix(raw, p) {
+			return true
 		}
 	}
-	return false
+
+	// Exact match.
+	return bytes.Equal(raw, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
+		bytes.Equal(raw, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
 }
