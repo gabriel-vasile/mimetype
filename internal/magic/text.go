@@ -300,10 +300,6 @@ func Svg(raw []byte, limit uint32) bool {
 	return bytes.Contains(raw, []byte("<svg"))
 }
 
-func bytePointer(b byte) *byte {
-	return &b
-}
-
 // Srt matches a SubRip file.
 func Srt(in []byte, _ uint32) bool {
 	s := bufio.NewScanner(bytes.NewReader(in))
