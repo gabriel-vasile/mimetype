@@ -18,7 +18,7 @@ var (
 	// Nes matches a Nintendo Entertainment system ROM file.
 	Nes = prefix([]byte{0x4E, 0x45, 0x53, 0x1A})
 	// TzIf matches a Time Zone Information Format (TZif) file.
-	TzIf = prefix([]byte("TZif"))
+	TzIf = prefix([]byte{0x54, 0x5A, 0x69, 0x66})
 	// SWF matches an Adobe Flash swf file.
 	SWF = prefix([]byte("CWS"), []byte("FWS"), []byte("ZWS"))
 	// Torrent has bencoded text in the beginning.
