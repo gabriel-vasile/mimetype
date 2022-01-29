@@ -190,15 +190,22 @@ func Msi(raw []byte, limit uint32) bool {
 //
 // http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
 func matchOleClsid(in []byte, clsid []byte) bool {
-	if len(in) <= 512 {
+	// Microsoft Compound files v3 have a sector length of 512, while v4 has 4096.
+	// Change sector offset depending on file version.
+	// https://www.loc.gov/preservation/digital/formats/fdd/fdd000392.shtml
+	sectorLength := 512
+	if len(in) < sectorLength {
 		return false
 	}
+	if in[26] == 0x04 && in[27] == 0x00 {
+		sectorLength = 4096
+	}
 
-	// SecID of first sector of the directory stream
+	// SecID of first sector of the directory stream.
 	firstSecID := int(binary.LittleEndian.Uint32(in[48:52]))
 
-	// Expected offset of CLSID for root storage object
-	clsidOffset := 512*(1+firstSecID) + 80
+	// Expected offset of CLSID for root storage object.
+	clsidOffset := sectorLength*(1+firstSecID) + 80
 
 	if len(in) <= clsidOffset+16 {
 		return false
