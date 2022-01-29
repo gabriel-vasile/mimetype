@@ -125,6 +125,7 @@ var files = map[string]string{
 	"mpeg.mpeg":          "video/mpeg",
 	"mqv.mqv":            "video/quicktime",
 	"mrc.mrc":            "application/marc",
+	"msi.msi":            "application/x-ms-installer",
 	"msg.msg":            "application/vnd.ms-outlook",
 	"ndjson.xl.ndjson":   "application/x-ndjson",
 	"ndjson.ndjson":      "application/x-ndjson",
