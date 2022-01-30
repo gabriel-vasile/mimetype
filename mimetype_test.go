@@ -94,6 +94,7 @@ var files = map[string]string{
 	"xpm.xpm":            "image/x-xpixmap",
 	"js.js":              "application/javascript",
 	"json.json":          "application/json",
+	"json.lowascii.json": "application/json",
 	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents, but they should not be detected as application/json. This mimics
 	// the behaviour of the file utility and seems the correct thing to do.
