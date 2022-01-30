@@ -1,0 +1,2 @@
+TZif
+This is a simple text file and it should not be detected as a Tzif file.

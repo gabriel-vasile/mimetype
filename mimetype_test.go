@@ -597,3 +597,10 @@ func TestExtend(t *testing.T) {
 		})
 	}
 }
+
+func TestTzif(t *testing.T) {
+	mtype, _ := DetectFile("testdata/tzif.txt")
+	if mtype.Is("application/tzif") {
+		t.Fatal("simple text file should not be detected as Tzif file")
+	}
+}
