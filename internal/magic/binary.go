@@ -17,8 +17,6 @@ var (
 	Elf = prefix([]byte{0x7F, 0x45, 0x4C, 0x46})
 	// Nes matches a Nintendo Entertainment system ROM file.
 	Nes = prefix([]byte{0x4E, 0x45, 0x53, 0x1A})
-	// TzIf matches a Time Zone Information Format (TZif) file.
-	TzIf = prefix([]byte{0x54, 0x5A, 0x69, 0x66})
 	// SWF matches an Adobe Flash swf file.
 	SWF = prefix([]byte("CWS"), []byte("FWS"), []byte("ZWS"))
 	// Torrent has bencoded text in the beginning.
@@ -155,3 +153,39 @@ func Marc(raw []byte, limit uint32) bool {
 // | g   l   T   F    | 1                | ...      |
 var Glb = prefix([]byte("\x67\x6C\x54\x46\x02\x00\x00\x00"),
 	[]byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
+
+// TzIf matches a Time Zone Information Format (TZif) file.
+// See more: https://tools.ietf.org/id/draft-murchison-tzdist-tzif-00.html#rfc.section.3
+// Its header structure is shown below:
+// +---------------+---+
+// |  magic    (4) | <-+-- version (1)
+// +---------------+---+---------------------------------------+
+// |           [unused - reserved for future use] (15)         |
+// +---------------+---------------+---------------+-----------+
+// |  isutccnt (4) |  isstdcnt (4) |  leapcnt  (4) |
+// +---------------+---------------+---------------+
+// |  timecnt  (4) |  typecnt  (4) |  charcnt  (4) |
+func TzIf(raw []byte, limit uint32) bool {
+	// File is at least 44 bytes (header size).
+	if len(raw) < 44 {
+		return false
+	}
+
+	if !bytes.HasPrefix(raw, []byte("TZif")) {
+		return false
+	}
+
+	// Field "typecnt" MUST not be zero.
+	if bytes.Equal(raw[36:40], []byte{0x00}) {
+		return false
+	}
+
+	// Version has to be NUL (0x00), '2' (0x32) or '3' (0x33).
+	version := raw[4:5]
+	for _, validVersion := range [][]byte{{0x00}, {0x32}, {0x33}} {
+		if bytes.Equal(version, validVersion) {
+			return true
+		}
+	}
+	return false
+}
