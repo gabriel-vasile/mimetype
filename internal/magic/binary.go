@@ -176,7 +176,7 @@ func TzIf(raw []byte, limit uint32) bool {
 	}
 
 	// Field "typecnt" MUST not be zero.
-	if bytes.Equal(raw[36:40], []byte{0x00}) {
+	if binary.BigEndian.Uint32(raw[36:40]) == 0 {
 		return false
 	}
 
