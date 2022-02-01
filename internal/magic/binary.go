@@ -181,11 +181,5 @@ func TzIf(raw []byte, limit uint32) bool {
 	}
 
 	// Version has to be NUL (0x00), '2' (0x32) or '3' (0x33).
-	version := raw[4:5]
-	for _, validVersion := range [][]byte{{0x00}, {0x32}, {0x33}} {
-		if bytes.Equal(version, validVersion) {
-			return true
-		}
-	}
-	return false
+	return raw[4] == 0x00 || raw[4] == 0x32 || raw[4] == 0x33
 }
