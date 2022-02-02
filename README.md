@@ -57,6 +57,22 @@ using magic numbers is slow, inaccurate, and non-standard. Most of the times
 protocols have methods for specifying such metadata; e.g., `Content-Type` header
 in HTTP and SMTP.
 
+## FAQ
+Q: My file is in the list of [supported MIME types](supported_mimes.md) but
+it is not correctly detected. What should I do?
+
+A: Some file formats (often Microsoft Office documents) keep their signatures
+towards the end of the file. Try increasing the number of bytes used for detection
+with:
+```go
+mimetype.SetLimit(1024*1024) // Set limit to 1MB.
+// or
+mimetype.SetLimit(0) // No limit, whole file content used.
+mimetype.DetectFile("file.doc")
+```
+If increasing the limit does not help, please
+[open an issue](https://github.com/gabriel-vasile/mimetype/issues/new?assignees=&labels=&template=mismatched-mime-type-detected.md&title=).
+
 ## Structure
 **mimetype** uses a hierarchical structure to keep the MIME type detection logic.
 This reduces the number of calls needed for detecting the file type. The reason
