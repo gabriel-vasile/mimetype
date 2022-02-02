@@ -78,14 +78,24 @@ func Aaf(raw []byte, limit uint32) bool {
 }
 
 // Doc matches a Microsoft Word 97-2003 file.
-//
-// BUG(gabriel-vasile): Doc should look for subheaders like Ppt and Xls does.
-//
-// Ole is a container for Doc, Ppt, Pub and Xls.
-// Right now, when an Ole file is detected, it is considered to be a Doc file
-// if the checks for Ppt, Pub and Xls failed.
-func Doc(raw []byte, limit uint32) bool {
-	return true
+// See: https://github.com/decalage2/oletools/blob/412ee36ae45e70f42123e835871bac956d958461/oletools/common/clsid.py
+func Doc(raw []byte, _ uint32) bool {
+	clsids := [][]byte{
+		// Microsoft Word 97-2003 Document (Word.Document.8)
+		{0x06, 0x09, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
+		// Microsoft Word 6.0-7.0 Document (Word.Document.6)
+		{0x00, 0x09, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
+		// Microsoft Word Picture (Word.Picture.8)
+		{0x07, 0x09, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
+	}
+
+	for _, clsid := range clsids {
+		if matchOleClsid(raw, clsid) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Ppt matches a Microsoft PowerPoint 97-2003 file or a PowerPoint 95 presentation.

@@ -49,7 +49,6 @@ var files = map[string]string{
 	"dcm.dcm":            "application/dicom",
 	"deb.deb":            "application/vnd.debian.binary-package",
 	"djvu.djvu":          "image/vnd.djvu",
-	"doc.1.doc":          "application/msword",
 	"doc.doc":            "application/msword",
 	"docx.1.docx":        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 	"docx.docx":          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
