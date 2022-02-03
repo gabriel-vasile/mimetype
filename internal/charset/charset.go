@@ -125,7 +125,7 @@ func latin(content []byte) string {
 
 func ascii(content []byte) bool {
 	for _, b := range content {
-		if textChars[b] != t {
+		if textChars[b] != T {
 			return false
 		}
 	}
