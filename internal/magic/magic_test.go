@@ -1,7 +1,7 @@
 package magic
 
 import (
-	"io"
+	"io/ioutil"
 	"testing"
 )
 
@@ -106,9 +106,21 @@ func TestDropLastLine(t *testing.T) {
 	}
 	for i, tt := range dropTests {
 		gotR := dropLastLine([]byte(tt.raw), tt.cutAt)
-		got, _ := io.ReadAll(gotR)
+		got, _ := ioutil.ReadAll(gotR)
 		if got := string(got); got != tt.res {
 			t.Errorf("dropLastLine %d error: expected %q; got %q", i, tt.res, got)
 		}
+	}
+}
+
+func BenchmarkSrt(b *testing.B) {
+	const subtitle = `1
+00:02:16,612 --> 00:02:19,376
+Senator, we're making
+our final approach into Coruscant.
+
+`
+	for i := 0; i < b.N; i++ {
+		Srt([]byte(subtitle), 0)
 	}
 }
