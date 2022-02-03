@@ -182,6 +182,7 @@ var files = map[string]string{
 	"svg.svg":         "image/svg+xml",
 	"swf.swf":         "application/x-shockwave-flash",
 	"tar.tar":         "application/x-tar",
+	"tar.v7.tar":      "application/x-tar",
 	"tcl.tcl":         "text/x-tcl",
 	"tcx.tcx":         "application/vnd.garmin.tcx+xml",
 	"tiff.tiff":       "image/tiff",

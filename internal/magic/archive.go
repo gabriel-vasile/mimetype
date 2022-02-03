@@ -10,8 +10,6 @@ var (
 	SevenZ = prefix([]byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 	// Gzip matches gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
 	Gzip = prefix([]byte{0x1f, 0x8b})
-	// Tar matches a (t)ape (ar)chive file.
-	Tar = offset([]byte("ustar"), 257)
 	// Fits matches an Flexible Image Transport System file.
 	Fits = prefix([]byte{
 		0x53, 0x49, 0x4D, 0x50, 0x4C, 0x45, 0x20, 0x20, 0x3D, 0x20,
@@ -65,4 +63,46 @@ func CRX(raw []byte, limit uint32) bool {
 		return false
 	}
 	return Zip(raw[zipOffset:], limit)
+}
+
+// Tar matches a (t)ape (ar)chive file.
+//
+// Signature source: https://www.nationalarchives.gov.uk/PRONOM/Format/proFormatSearch.aspx?status=detailReport&id=385&strPageToDisplay=signatures
+func Tar(raw []byte, _ uint32) bool {
+	if len(raw) < 256 {
+		return false
+	}
+
+	rules := []struct {
+		min, max uint8
+		i        int
+	}{
+		{0x21, 0xEF, 0},
+		{0x30, 0x37, 105},
+		{0x20, 0x37, 106},
+		{0x00, 0x00, 107},
+		{0x30, 0x37, 113},
+		{0x20, 0x37, 114},
+		{0x00, 0x00, 115},
+		{0x30, 0x37, 121},
+		{0x20, 0x37, 122},
+		{0x00, 0x00, 123},
+		{0x30, 0x37, 134},
+		{0x30, 0x37, 146},
+		{0x30, 0x37, 153},
+		{0x00, 0x37, 154},
+	}
+	for _, r := range rules {
+		if raw[r.i] < r.min || raw[r.i] > r.max {
+			return false
+		}
+	}
+
+	for _, i := range []uint8{135, 147, 155} {
+		if raw[i] != 0x00 && raw[i] != 0x20 {
+			return false
+		}
+	}
+
+	return true
 }
