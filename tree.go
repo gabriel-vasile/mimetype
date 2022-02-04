@@ -90,7 +90,7 @@ var (
 	js       = newMIME("application/javascript", ".js", magic.Js).
 			alias("application/x-javascript", "text/javascript")
 	srt = newMIME("application/x-subrip", ".srt", magic.Srt).
-		alias("text/x-srt", "text/x-subrip")
+		alias("application/x-srt", "text/x-srt")
 	vtt    = newMIME("text/vtt", ".vtt", magic.Vtt)
 	lua    = newMIME("text/x-lua", ".lua", magic.Lua)
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
