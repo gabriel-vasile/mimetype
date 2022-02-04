@@ -172,7 +172,7 @@ var files = map[string]string{
 	"shx.shx":            "application/octet-stream",
 	"so.so":              "application/x-sharedlib",
 	"sqlite.sqlite":      "application/vnd.sqlite3",
-	"srt.srt":            "text/x-subrip",
+	"srt.srt":            "application/x-subrip",
 	// not.srt.txt uses periods instead of commas for the decimal separators of
 	// the timestamps.
 	"not.srt.txt": "text/plain; charset=utf-8",

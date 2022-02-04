@@ -163,7 +163,7 @@ Extension | MIME type | Aliases
 **.har** | application/json | -
 **.ndjson** | application/x-ndjson | -
 **.rtf** | text/rtf | -
-**.srt** | text/x-subrip | text/x-srt, application/x-subrip
+**.srt** | application/x-subrip | text/x-srt, text/x-subrip
 **.tcl** | text/x-tcl | application/x-tcl
 **.csv** | text/csv | -
 **.tsv** | text/tab-separated-values | -
