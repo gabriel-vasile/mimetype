@@ -30,6 +30,7 @@ var files = map[string]string{
 	"amf.amf":            "application/x-amf",
 	"amr.amr":            "audio/amr",
 	"ape.ape":            "audio/ape",
+	"apng.png":           "image/vnd.mozilla.apng",
 	"asf.asf":            "video/x-ms-asf",
 	"atom.atom":          "application/atom+xml",
 	"au.au":              "audio/basic",
