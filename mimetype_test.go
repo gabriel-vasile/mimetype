@@ -191,6 +191,7 @@ var files = map[string]string{
 	"tsv.tsv":         "text/tab-separated-values",
 	"ttf.ttf":         "font/ttf",
 	"tzfile":          "application/tzif",
+	"ttc.ttc":         "font/collection",
 	"utf16bebom.txt":  "text/plain; charset=utf-16be",
 	"utf16lebom.txt":  "text/plain; charset=utf-16le",
 	"utf32bebom.txt":  "text/plain; charset=utf-32be",

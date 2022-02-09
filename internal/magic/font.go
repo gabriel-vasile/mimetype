@@ -11,6 +11,8 @@ var (
 	Woff2 = prefix([]byte("wOF2"))
 	// Otf matches an OpenType font file.
 	Otf = prefix([]byte{0x4F, 0x54, 0x54, 0x4F, 0x00})
+	// Ttf matches an TruType Collection font file.
+	Ttc = prefix([]byte("ttcf"))
 )
 
 // Ttf matches a TrueType font file.
