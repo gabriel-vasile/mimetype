@@ -189,6 +189,7 @@ var files = map[string]string{
 	"tiff.tiff":       "image/tiff",
 	"torrent.torrent": "application/x-bittorrent",
 	"tsv.tsv":         "text/tab-separated-values",
+	"ttc.ttc":         "font/collection",
 	"ttf.ttf":         "font/ttf",
 	"tzfile":          "application/tzif",
 	"utf16bebom.txt":  "text/plain; charset=utf-16be",

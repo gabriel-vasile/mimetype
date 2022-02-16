@@ -21,7 +21,7 @@ var root = newMIME("application/octet-stream", "",
 	jpm, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac,
 	midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM,
 	threeGP, threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
-	gzip, class, swf, crx, ttf, woff, woff2, otf, eot, wasm, shx, dbf, dcm, rar,
+	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
 	torrent, cpio, tzif, xcf, pat, gbr, glb, avif,
@@ -184,6 +184,7 @@ var (
 	woff    = newMIME("font/woff", ".woff", magic.Woff)
 	woff2   = newMIME("font/woff2", ".woff2", magic.Woff2)
 	otf     = newMIME("font/otf", ".otf", magic.Otf)
+	ttc     = newMIME("font/collection", ".ttc", magic.Ttc)
 	eot     = newMIME("application/vnd.ms-fontobject", ".eot", magic.Eot)
 	wasm    = newMIME("application/wasm", ".wasm", magic.Wasm)
 	shp     = newMIME("application/octet-stream", ".shp", magic.Shp)
