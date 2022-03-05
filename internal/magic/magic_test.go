@@ -113,6 +113,23 @@ func TestDropLastLine(t *testing.T) {
 	}
 }
 
+func TestLastNonWSLine(t *testing.T) {
+	tests := []struct {
+		raw []byte
+		res []byte
+	}{
+		{[]byte(""), []byte{}},
+		{[]byte("\n\n\n"), []byte{}},
+		{[]byte("a\nb\ncd \n  \t\n"), []byte("cd ")},
+	}
+	for i, tt := range tests {
+		got := lastNonWSLine(tt.raw)
+		if string(got) != string(tt.res) {
+			t.Errorf("lastNonWSLine %d error: expected %q; got %q", i, tt.res, got)
+		}
+	}
+}
+
 func BenchmarkSrt(b *testing.B) {
 	const subtitle = `1
 00:02:16,612 --> 00:02:19,376

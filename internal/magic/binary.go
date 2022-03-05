@@ -21,11 +21,6 @@ var (
 	SWF = prefix([]byte("CWS"), []byte("FWS"), []byte("ZWS"))
 	// Torrent has bencoded text in the beginning.
 	Torrent = prefix([]byte("d8:announce"))
-	// Stl matches a StereoLithography file.
-	// See more: https://docs.fileformat.com/cad/stl/
-	//           https://www.iana.org/assignments/media-types/model/stl
-	// STL is available in ASCII as well as Binary representations for compact file format.
-	Stl = prefix([]byte("solid"), bytes.Repeat([]byte{0x20}, 80))
 )
 
 // Java bytecode and Mach-O binaries share the same magic number.

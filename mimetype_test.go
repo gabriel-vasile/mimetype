@@ -152,6 +152,7 @@ var files = map[string]string{
 	"pdf.pdf":            "application/pdf",
 	"php.php":            "text/x-php",
 	"pl.pl":              "text/x-perl",
+	"ply.ply":            "application/octet-stream",
 	"png.png":            "image/png",
 	"ppt.ppt":            "application/vnd.ms-powerpoint",
 	"pptx.pptx":          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
