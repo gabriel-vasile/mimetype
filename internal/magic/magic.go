@@ -221,10 +221,10 @@ func firstLine(in []byte) []byte {
 }
 
 func lastNonWSLine(in []byte) []byte {
-	ss := bytes.Split(in, []byte("\n"))
-	for i := len(ss) - 1; i >= 0; i-- {
-		if len(trimLWS(trimRWS(ss[i]))) > 0 {
-			return ss[i]
+	s := bytes.Split(in, []byte("\n"))
+	for i := len(s) - 1; i >= 0; i-- {
+		if len(trimLWS(trimRWS(s[i]))) > 0 {
+			return s[i]
 		}
 	}
 	return []byte{}

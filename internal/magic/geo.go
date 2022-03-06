@@ -4,6 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
+	"strconv"
+	"strings"
+)
+
+var (
+	// Mtl matches a Material Library format file by Wavefront Technologies.
+	// https://www.loc.gov/preservation/digital/formats/fdd/fdd000508.shtml
+	// https://www.iana.org/assignments/media-types/model/mtl
+	Mtl = prefix([]byte("newmtl"))
 )
 
 // Shp matches a shape format file.
@@ -56,13 +65,13 @@ func Shx(raw []byte, limit uint32) bool {
 }
 
 // Stl matches a StereoLithography file.
-// See more: https://docs.fileformat.com/cad/stl/
-//           https://www.iana.org/assignments/media-types/model/stl
 // STL is available in ASCII as well as Binary representations for compact file format.
+// https://docs.fileformat.com/cad/stl/
+// https://www.iana.org/assignments/media-types/model/stl
 func Stl(raw []byte, limit uint32) bool {
 	// ASCII check.
 	if bytes.HasPrefix(raw, []byte("solid")) {
-		// If the full file content was provided, check end of file last line.
+		// If the full file content was provided, check file last line.
 		if len(raw) < int(limit) {
 			return bytes.Contains(lastNonWSLine(raw), []byte("endsolid"))
 		}
@@ -73,9 +82,28 @@ func Stl(raw []byte, limit uint32) bool {
 	return bytes.HasPrefix(raw, bytes.Repeat([]byte{0x20}, 80))
 }
 
+// Obj matches a 3D object model format by Wavefront Technologies.
+// https://www.loc.gov/preservation/digital/formats/fdd/fdd000507.shtml
+// https://www.iana.org/assignments/media-types/model/obj
+func Obj(raw []byte, limit uint32) bool {
+	s := bufio.NewScanner(bytes.NewReader(raw))
+	for s.Scan() {
+		fs := strings.Fields(s.Text())
+		// Check if match a geometric vertice format "v x y z [w]".
+		if (len(fs) == 4 || len(fs) == 5) && fs[0] == "v" {
+			for _, f := range fs[1:] {
+				if _, err := strconv.ParseFloat(f, 64); err != nil {
+					return false
+				}
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // Ply matches a Polygon File Format or the Stanford Triangle Format file.
-// See more: https://www.loc.gov/preservation/digital/formats/fdd/fdd000501.shtml
-// Ply is available in ASCII as well as Binary representations for compact file format.
+// https://www.loc.gov/preservation/digital/formats/fdd/fdd000501.shtml
 func Ply(raw []byte, limit uint32) bool {
 	s := bufio.NewScanner(bytes.NewReader(raw))
 

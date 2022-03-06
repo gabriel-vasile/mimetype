@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, stl,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, mtl, obj, stl,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -253,7 +253,8 @@ var (
 	gbr     = newMIME("image/x-gimp-gbr", ".gbr", magic.Gbr)
 	xfdf    = newMIME("application/vnd.adobe.xfdf", ".xfdf", magic.Xfdf)
 	glb     = newMIME("model/gltf-binary", ".glb", magic.Glb)
-	stl     = newMIME("model/stl", ".stl", magic.Stl).
-		alias("model/x.stl-ascii", "model/x.stl-binary")
-	ply = newMIME("application/octet-stream", ".ply", magic.Ply)
+	mtl     = newMIME("model/mtl", ".mtl", magic.Mtl)
+	obj     = newMIME("model/obj", ".obj", magic.Obj)
+	stl     = newMIME("model/stl", ".stl", magic.Stl)
+	ply     = newMIME("text/plain", ".ply", magic.Ply).alias("application/octet-stream")
 )
