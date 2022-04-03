@@ -81,6 +81,7 @@ var files = map[string]string{
 	"html.usascii.html":  "text/html; charset=us-ascii",
 	"html.utf8.html":     "text/html; charset=utf-8",
 	"html.utf8bom.html":  "text/html; charset=utf-8",
+	"html.bomws.html":    "text/html; charset=utf-8",
 	"html.withbr.html":   "text/html; charset=utf-8",
 	"ico.ico":            "image/x-icon",
 	"ics.dos.ics":        "text/calendar",
