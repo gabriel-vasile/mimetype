@@ -160,6 +160,9 @@ func fromXML(content []byte) string {
 // FromHTML returns the charset of an HTML document. It relies on the meta tag
 // <meta charset="UTF-8"> and falls back on the plain text content.
 func FromHTML(content []byte) string {
+	if cset := FromBOM(content); cset != "" {
+		return cset
+	}
 	if cset := fromHTML(content); cset != "" {
 		return cset
 	}

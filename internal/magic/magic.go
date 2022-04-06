@@ -107,7 +107,7 @@ func markup(sigs ...[]byte) Detector {
 		if bytes.HasPrefix(raw, []byte{0xEF, 0xBB, 0xBF}) {
 			// we restore BOM after stripping WS so its presence can be used
 			// in subsequent functions
-			raw = append([]byte{0xEF, 0xBB, 0xBF}, trimLWS(raw[3:])...)
+			raw = trimLWS(raw[3:])
 		} else {
 			raw = trimLWS(raw)
 		}
