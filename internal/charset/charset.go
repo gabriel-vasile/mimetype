@@ -157,8 +157,10 @@ func fromXML(content []byte) string {
 	return strings.ToLower(xmlEncoding(string(t.Inst)))
 }
 
-// FromHTML returns the charset of an HTML document. It relies on the meta tag
-// <meta charset="UTF-8"> and falls back on the plain text content.
+// FromHTML returns the charset of an HTML document. It first looks if a BOM is
+// present and if so uses it to determine the charset. If no BOM is present,
+// it relies on the meta tag <meta charset="UTF-8"> and falls back on the
+// plain text content.
 func FromHTML(content []byte) string {
 	if cset := FromBOM(content); cset != "" {
 		return cset
