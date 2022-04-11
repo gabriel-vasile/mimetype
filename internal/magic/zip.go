@@ -31,6 +31,8 @@ var (
 	Epub = offset([]byte("mimetypeapplication/epub+zip"), 30)
 	// Sxc matches an OpenOffice Spreadsheet file.
 	Sxc = offset([]byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
+	// Ora matches an OpenRaster file.
+	Ora = offset([]byte("mimetypeimage/openraster"), 30)
 )
 
 // Zip matches a zip archive.

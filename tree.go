@@ -45,7 +45,7 @@ var (
 		"application/gzip-compressed", "application/x-gzip-compressed",
 		"gzip/document")
 	sevenZ = newMIME("application/x-7z-compressed", ".7z", magic.SevenZ)
-	zip    = newMIME("application/zip", ".zip", magic.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, odc, sxc).
+	zip    = newMIME("application/zip", ".zip", magic.Zip, xlsx, docx, pptx, epub, jar, odt, ods, odp, odg, odf, odc, ora, sxc).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
@@ -126,6 +126,7 @@ var (
 	gif  = newMIME("image/gif", ".gif", magic.Gif)
 	webp = newMIME("image/webp", ".webp", magic.Webp)
 	tiff = newMIME("image/tiff", ".tiff", magic.Tiff)
+	ora  = newMIME("image/openraster", ".ora", magic.Ora)
 	bmp  = newMIME("image/bmp", ".bmp", magic.Bmp).
 		alias("image/x-bmp", "image/x-ms-bmp")
 	ico  = newMIME("image/x-icon", ".ico", magic.Ico)
