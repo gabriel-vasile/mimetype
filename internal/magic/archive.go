@@ -29,7 +29,7 @@ var (
 	}, 8)
 	// Warc matches a Web ARChive file.
 	Warc = prefix([]byte("WARC/1.0"), []byte("WARC/1.1"))
-	// Cab matches a Cabinet archive file.
+	// Cab matches a Microsoft Cabinet archive file.
 	Cab = prefix([]byte("MSCF\x00\x00\x00\x00"))
 	// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
 	Xz = prefix([]byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
@@ -41,6 +41,8 @@ var (
 	Cpio = prefix([]byte("070707"), []byte("070701"), []byte("070702"))
 	// RAR matches a RAR archive file.
 	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
+	// InstallShieldCab matches an InstallShield Cabinet archive file.
+	InstallShieldCab = prefix([]byte("ISc("))
 )
 
 // Zstd matches a Zstandard archive file.

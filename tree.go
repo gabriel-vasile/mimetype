@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -243,6 +243,7 @@ var (
 	accdb   = newMIME("application/x-msaccess", ".accdb", magic.MsAccessAce)
 	zstd    = newMIME("application/zstd", ".zst", magic.Zstd)
 	cab     = newMIME("application/vnd.ms-cab-compressed", ".cab", magic.Cab)
+	cabIS   = newMIME("application/x-installshield-cab", ".cab", magic.InstallShieldCab)
 	lzip    = newMIME("application/lzip", ".lz", magic.Lzip).alias("application/x-lzip")
 	torrent = newMIME("application/x-bittorrent", ".torrent", magic.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", magic.Cpio)
