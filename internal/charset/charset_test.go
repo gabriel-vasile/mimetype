@@ -24,6 +24,29 @@ const htmlDoc = `<!DOCTYPE html>
     <div class="container footer">さ</div>
   </body>
 </html>`
+const htmlDocWithIncorrectCharset = `<!DOCTYPE html>
+<!--
+Some comment
+
+-->
+<html dir="ltr" mozdisallowselectionprint>
+  <head>
+    <meta charset="ISO-8859-16">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="some name" content="notranslate">
+    <title>test</title>
+
+
+    <link rel="stylesheet" href="html.utf8bom.css">
+
+
+
+  </head>
+
+  <body tabindex="1">
+    <div id="printContainer"></div>
+  </body>
+</html>`
 
 func TestFromXML(t *testing.T) {
 	charset := FromXML([]byte(xmlDoc))
@@ -34,6 +57,13 @@ func TestFromXML(t *testing.T) {
 
 func TestFromHTML(t *testing.T) {
 	charset := FromHTML([]byte(htmlDoc))
+	if charset != "utf-8" {
+		t.Errorf("expected: utf-8; got: %s", charset)
+	}
+}
+
+func TestFromHTMLWithBOM(t *testing.T) {
+	charset := FromHTML(append([]byte{0xEF, 0xBB, 0xBF}, []byte(htmlDocWithIncorrectCharset)...))
 	if charset != "utf-8" {
 		t.Errorf("expected: utf-8; got: %s", charset)
 	}
