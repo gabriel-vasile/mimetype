@@ -104,7 +104,14 @@ func xmlCheck(sig xmlSig, raw []byte) bool {
 // matches the raw input.
 func markup(sigs ...[]byte) Detector {
 	return func(raw []byte, limit uint32) bool {
-		raw = trimLWS(raw)
+		if bytes.HasPrefix(raw, []byte{0xEF, 0xBB, 0xBF}) {
+			// We skip the UTF-8 BOM if present to ensure we correctly
+			// process any leading whitespace. The presence of the BOM
+			// is taken into account during charset detection in charset.go.
+			raw = trimLWS(raw[3:])
+		} else {
+			raw = trimLWS(raw)
+		}
 		if len(raw) == 0 {
 			return false
 		}

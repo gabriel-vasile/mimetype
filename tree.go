@@ -243,7 +243,7 @@ var (
 	accdb   = newMIME("application/x-msaccess", ".accdb", magic.MsAccessAce)
 	zstd    = newMIME("application/zstd", ".zst", magic.Zstd)
 	cab     = newMIME("application/vnd.ms-cab-compressed", ".cab", magic.Cab)
-	cabIS   = newMIME("application/x-installshield-cab", ".cab", magic.InstallShieldCab)
+	cabIS   = newMIME("application/x-installshield", ".cab", magic.InstallShieldCab)
 	lzip    = newMIME("application/lzip", ".lz", magic.Lzip).alias("application/x-lzip")
 	torrent = newMIME("application/x-bittorrent", ".torrent", magic.Torrent)
 	cpio    = newMIME("application/x-cpio", ".cpio", magic.Cpio)

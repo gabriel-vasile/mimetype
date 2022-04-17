@@ -41,9 +41,15 @@ var (
 	Cpio = prefix([]byte("070707"), []byte("070701"), []byte("070702"))
 	// RAR matches a RAR archive file.
 	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
-	// InstallShieldCab matches an InstallShield Cabinet archive file.
-	InstallShieldCab = prefix([]byte("ISc("))
 )
+
+// InstallShieldCab matches an InstallShield Cabinet archive file.
+func InstallShieldCab(raw []byte, _ uint32) bool {
+	return len(raw) > 7 &&
+		bytes.Equal(raw[0:4], []byte("ISc(")) &&
+		raw[6] == 0 &&
+		(raw[7] == 1 || raw[7] == 2 || raw[7] == 4)
+}
 
 // Zstd matches a Zstandard archive file.
 func Zstd(raw []byte, limit uint32) bool {

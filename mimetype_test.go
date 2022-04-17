@@ -41,7 +41,7 @@ var files = map[string]string{
 	"bpg.bpg":            "image/bpg",
 	"bz2.bz2":            "application/x-bzip2",
 	"cab.cab":            "application/vnd.ms-cab-compressed",
-	"cab.is.cab":         "application/x-installshield-cab",
+	"cab.is.cab":         "application/x-installshield",
 	"class.class":        "application/x-java-applet",
 	"crx.crx":            "application/x-chrome-extension",
 	"csv.csv":            "text/csv",
