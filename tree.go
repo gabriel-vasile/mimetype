@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, mtl, obj, stl,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -76,7 +76,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt)
+	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, ply)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2)
 	json     = newMIME("application/json", ".json", magic.JSON, geoJSON, har)
 	har      = newMIME("application/json", ".har", magic.HAR)
@@ -253,4 +253,8 @@ var (
 	gbr     = newMIME("image/x-gimp-gbr", ".gbr", magic.Gbr)
 	xfdf    = newMIME("application/vnd.adobe.xfdf", ".xfdf", magic.Xfdf)
 	glb     = newMIME("model/gltf-binary", ".glb", magic.Glb)
+	mtl     = newMIME("model/mtl", ".mtl", magic.Mtl)
+	obj     = newMIME("model/obj", ".obj", magic.Obj)
+	stl     = newMIME("model/stl", ".stl", magic.Stl)
+	ply     = newMIME("text/plain", ".ply", magic.Ply).alias("application/octet-stream")
 )
