@@ -28,7 +28,7 @@ func Detect(in []byte) *MIME {
 	}
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.match(in, l)
+	return OctetStream.match(in, l)
 }
 
 // DetectReader returns the MIME type of the provided reader.
@@ -65,7 +65,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.match(in, l), nil
+	return OctetStream.match(in, l), nil
 }
 
 // DetectFile returns the MIME type of the provided file.
@@ -111,7 +111,7 @@ func SetLimit(limit uint32) {
 // Extend adds detection for other file formats.
 // It is equivalent to calling Extend() on the root mime type "application/octet-stream".
 func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
-	root.Extend(detector, mime, extension, aliases...)
+	OctetStream.Extend(detector, mime, extension, aliases...)
 }
 
 // Lookup finds a MIME object by its string representation.
@@ -119,5 +119,5 @@ func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string
 func Lookup(mime string) *MIME {
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.lookup(mime)
+	return OctetStream.lookup(mime)
 }
