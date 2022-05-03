@@ -29,7 +29,7 @@ var (
 	}, 8)
 	// Warc matches a Web ARChive file.
 	Warc = prefix([]byte("WARC/1.0"), []byte("WARC/1.1"))
-	// Cab matches a Cabinet archive file.
+	// Cab matches a Microsoft Cabinet archive file.
 	Cab = prefix([]byte("MSCF\x00\x00\x00\x00"))
 	// Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
 	Xz = prefix([]byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
@@ -42,6 +42,14 @@ var (
 	// RAR matches a RAR archive file.
 	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
 )
+
+// InstallShieldCab matches an InstallShield Cabinet archive file.
+func InstallShieldCab(raw []byte, _ uint32) bool {
+	return len(raw) > 7 &&
+		bytes.Equal(raw[0:4], []byte("ISc(")) &&
+		raw[6] == 0 &&
+		(raw[7] == 1 || raw[7] == 2 || raw[7] == 4)
+}
 
 // Zstd matches a Zstandard archive file.
 func Zstd(raw []byte, limit uint32) bool {
