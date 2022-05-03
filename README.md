@@ -14,13 +14,13 @@
     <img alt="Build Status" src="https://travis-ci.org/gabriel-vasile/mimetype.svg?branch=master">
   </a>
   <a href="https://pkg.go.dev/github.com/gabriel-vasile/mimetype">
-    <img src="https://pkg.go.dev/badge/github.com/gabriel-vasile/mimetype.svg" alt="Go Reference">
+    <img alt="Go Reference" src="https://pkg.go.dev/badge/github.com/gabriel-vasile/mimetype.svg">
   </a>
   <a href="https://goreportcard.com/report/github.com/gabriel-vasile/mimetype">
     <img alt="Go report card" src="https://goreportcard.com/badge/github.com/gabriel-vasile/mimetype">
   </a>
-  <a href="https://coveralls.io/github/gabriel-vasile/mimetype?branch=master">
-    <img alt="Go report card" src="https://coveralls.io/repos/github/gabriel-vasile/mimetype/badge.svg?branch=master">
+  <a href="https://codecov.io/gh/gabriel-vasile/mimetype">
+    <img alt="Code coverage" src="https://codecov.io/gh/gabriel-vasile/mimetype/branch/master/graph/badge.svg?token=qcfJF1kkl2"/>
   </a>
   <a href="LICENSE">
     <img alt="License" src="https://img.shields.io/badge/License-MIT-green.svg">
