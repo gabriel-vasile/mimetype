@@ -1,6 +1,9 @@
 package magic
 
-import "bytes"
+import (
+	"bytes"
+	"regexp"
+)
 
 var (
 	// Png matches a Portable Network Graphics file.
@@ -44,6 +47,21 @@ var (
 	Hdr = prefix([]byte("#?RADIANCE\n"))
 	// Xpm matches X PixMap image data.
 	Xpm = prefix([]byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
+	// PbmAscii matches PBM ASCII image
+	// http://netpbm.sourceforge.net/doc/pbm.html
+	Pbm = re(regexp.MustCompile(`^P[14]\s+(?:#[^\n\r]*[\n\r])?\s*\d+\s+\d+\s`))
+	// PgmAscii matches PGM ASCII image
+	// http://netpbm.sourceforge.net/doc/pgm.html
+	Pgm = re(regexp.MustCompile(`^P[25]\s+(?:#[^\n\r]*[\n\r])?\s*\d+\s+\d+\s`))
+	// PpmAscii matches PPM ASCII image
+	// http://netpbm.sourceforge.net/doc/ppm.html
+	Ppm = re(regexp.MustCompile(`^P[36]\s+(?:#[^\n\r]*[\n\r])?\s*\d+\s+\d+\s`))
+	// Pam matches PAM image
+	// http://netpbm.sourceforge.net/doc/pam.html
+	Pam = re(regexp.MustCompile(`^P7[^\n]*\n(?:\s*(?:#[^\n\r]*|(?:WIDTH|HEIGHT|DEPTH|MAXVAL)\s+\d+|TUPLTYPE\s+[^\n]+)\n)+ENDHDR[\n\r]`))
+	// Pam matches PFM image
+	// http://netpbm.sourceforge.net/doc/pfm.html
+	Pfm = re(regexp.MustCompile(`^P[Ff]\s+\d+\s+\d+\s[+-]?(\d*[.])?\d+\s`))
 )
 
 func jpeg2k(sig []byte) Detector {

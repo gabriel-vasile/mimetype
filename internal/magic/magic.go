@@ -4,6 +4,7 @@ package magic
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 )
 
 type (
@@ -236,4 +237,12 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// regex creates a Detector which return true if the provided regular expression
+// matches the raw input.
+func re(re *regexp.Regexp) Detector {
+	return func(raw []byte, limit uint32) bool {
+		return re.Match(raw)
+	}
 }
