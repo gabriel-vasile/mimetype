@@ -161,7 +161,7 @@ var files = map[string]string{
 	"p7s_pem.p7s":        "application/pkcs7-signature",
 	"p7s_der.p7s":        "application/pkcs7-signature",
 	"pub.pub":            "application/vnd.ms-publisher",
-	"py.py":              "application/x-python",
+	"py.py":              "text/x-python",
 	"qcp.qcp":            "audio/qcelp",
 	"rar.rar":            "application/x-rar-compressed",
 	"rmvb.rmvb":          "application/vnd.rn-realmedia-vbr",
