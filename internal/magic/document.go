@@ -4,9 +4,9 @@ import "bytes"
 
 var (
 	// Pdf matches a Portable Document Format file.
-	Pdf = prefix([]byte{0x25, 0x50, 0x44, 0x46})
+	Pdf = prefix([]byte("%PDF-"), []byte("\x0A%PDF-"))
 	// Fdf matches a Forms Data Format file.
-	Fdf = prefix([]byte("%FDF"))
+	Fdf = prefix([]byte("%FDF-"))
 	// Mobi matches a Mobi file.
 	Mobi = offset([]byte("BOOKMOBI"), 60)
 	// Lit matches a Microsoft Lit file.
