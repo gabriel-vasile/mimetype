@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS, shp, shx,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -188,8 +188,8 @@ var (
 	ttc     = newMIME("font/collection", ".ttc", magic.Ttc)
 	eot     = newMIME("application/vnd.ms-fontobject", ".eot", magic.Eot)
 	wasm    = newMIME("application/wasm", ".wasm", magic.Wasm)
-	shp     = newMIME("application/octet-stream", ".shp", magic.Shp)
-	shx     = newMIME("application/octet-stream", ".shx", magic.Shx, shp)
+	shp     = newMIME("application/vnd.shp", ".shp", magic.Shp)
+	shx     = newMIME("application/vnd.shx", ".shx", magic.Shx, shp)
 	dbf     = newMIME("application/x-dbf", ".dbf", magic.Dbf)
 	exe     = newMIME("application/vnd.microsoft.portable-executable", ".exe", magic.Exe)
 	elf     = newMIME("application/x-elf", "", magic.Elf, elfObj, elfExe, elfLib, elfDump)
