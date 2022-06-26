@@ -94,8 +94,9 @@ var (
 	vtt    = newMIME("text/vtt", ".vtt", magic.Vtt)
 	lua    = newMIME("text/x-lua", ".lua", magic.Lua)
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
-	python = newMIME("application/x-python", ".py", magic.Python)
-	tcl    = newMIME("text/x-tcl", ".tcl", magic.Tcl).
+	python = newMIME("text/x-python", ".py", magic.Python).
+		alias("text/x-script.python", "application/x-python")
+	tcl = newMIME("text/x-tcl", ".tcl", magic.Tcl).
 		alias("application/x-tcl")
 	vCard     = newMIME("text/vcard", ".vcf", magic.VCard)
 	iCalendar = newMIME("text/calendar", ".ics", magic.ICalendar)

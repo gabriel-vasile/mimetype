@@ -160,7 +160,7 @@ Extension | MIME type | Aliases
 **.js** | application/javascript | application/x-javascript, text/javascript
 **.lua** | text/x-lua | -
 **.pl** | text/x-perl | -
-**.py** | application/x-python | -
+**.py** | text/x-python | text/x-script.python, application/x-python
 **.json** | application/json | -
 **.geojson** | application/geo+json | -
 **.har** | application/json | -
