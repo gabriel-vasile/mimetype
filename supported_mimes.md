@@ -101,8 +101,8 @@ Extension | MIME type | Aliases
 **.ttc** | font/collection | -
 **.eot** | application/vnd.ms-fontobject | -
 **.wasm** | application/wasm | -
-**.shx** | application/octet-stream | -
-**.shp** | application/octet-stream | -
+**.shx** | application/vnd.shx | -
+**.shp** | application/vnd.shp | -
 **.dbf** | application/x-dbf | -
 **.dcm** | application/dicom | -
 **.rar** | application/x-rar-compressed | application/x-rar
