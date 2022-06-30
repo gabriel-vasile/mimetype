@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"mime"
 	"os"
@@ -607,6 +608,9 @@ func TestExtend(t *testing.T) {
 // the correctness of the Detect results. Still there is value in fuzzing in
 // search for panics.
 func FuzzMimetype(f *testing.F) {
+	// Some of the more interesting file formats. Most formats are detected by
+	// checking some magic numbers in headers, but these have more complicated
+	// detection algorithms.
 	corpus := []string{
 		"testdata/mkv.mkv",
 		"testdata/webm.webm",
@@ -623,8 +627,16 @@ func FuzzMimetype(f *testing.F) {
 		}
 		f.Add(data[:100])
 	}
-	f.Fuzz(func(t *testing.T, d []byte) {
-		if m := Detect(d); m.Extension() == "" {
+	// First node is root. Remove it because it matches any input.
+	detectors := root.flatten()[1:]
+	f.Fuzz(func(t *testing.T, data []byte) {
+		matched := false
+		for _, d := range detectors {
+			if d.detector(data, math.MaxUint32) {
+				matched = true
+			}
+		}
+		if !matched {
 			t.Skip()
 		}
 	})
