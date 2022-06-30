@@ -43,9 +43,9 @@ jobs:
       run: |
         go test -fuzz=. -fuzztime=30s && \
         cd internal/charset && \
-        go test -fuzz=Plain  -fuzztime=30s && \
-        go test -fuzz=XML  -fuzztime=30s && \
-        go test -fuzz=HTML  -fuzztime=30s
+        go test -fuzz=Plain -fuzztime=30s && \
+        go test -fuzz=XML -fuzztime=30s && \
+        go test -fuzz=HTML -fuzztime=30s
 
   coverage:
     runs-on: ubuntu-latest
