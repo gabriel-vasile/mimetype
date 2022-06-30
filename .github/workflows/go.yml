@@ -39,13 +39,10 @@ jobs:
       uses: actions/checkout@v3.0.1
     - name: Run tests
       run: go test -race ./...
-    - name: Run fuzzing
-      run: |
-        go test -fuzz=. -fuzztime=30s && \
-        cd internal/charset && \
-        go test -fuzz=Plain -fuzztime=30s && \
-        go test -fuzz=XML -fuzztime=30s && \
-        go test -fuzz=HTML -fuzztime=30s
+    - run: go test -fuzz=. -fuzztime=30s
+    - run: go test -fuzz=Plain -fuzztime=30s ./internal/charset
+    - run: go test -fuzz=XML -fuzztime=30s ./internal/charset
+    - run: go test -fuzz=HTML -fuzztime=30s ./internal/charset
 
   coverage:
     runs-on: ubuntu-latest
