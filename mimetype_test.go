@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math"
 	"math/rand"
 	"mime"
 	"os"
@@ -601,4 +602,42 @@ func TestExtend(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Because of the random nature of fuzzing I don't think there is a way to test
+// the correctness of the Detect results. Still there is value in fuzzing in
+// search for panics.
+func FuzzMimetype(f *testing.F) {
+	// Some of the more interesting file formats. Most formats are detected by
+	// checking some magic numbers in headers, but these have more complicated
+	// detection algorithms.
+	corpus := []string{
+		"testdata/mkv.mkv",
+		"testdata/webm.webm",
+		"testdata/docx.docx",
+		"testdata/pptx.pptx",
+		"testdata/xlsx.xlsx",
+		"testdata/3gp.3gp",
+		"testdata/class.class",
+	}
+	for _, c := range corpus {
+		data, err := ioutil.ReadFile(c)
+		if err != nil {
+			f.Fatal(err)
+		}
+		f.Add(data[:100])
+	}
+	// First node is root. Remove it because it matches any input.
+	detectors := root.flatten()[1:]
+	f.Fuzz(func(t *testing.T, data []byte) {
+		matched := false
+		for _, d := range detectors {
+			if d.detector(data, math.MaxUint32) {
+				matched = true
+			}
+		}
+		if !matched {
+			t.Skip()
+		}
+	})
 }

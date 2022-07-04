@@ -10,27 +10,23 @@ permissions:
 
 jobs:
   lint:
-    strategy:
-      matrix:
-        go-version: ["1.18.x"]
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
       uses: actions/setup-go@v3.2.0
       with:
-        go-version: 1.16
+        go-version: "1.18.x"
     - name: Checkout code
       uses: actions/checkout@v3.0.1
     - name: Run linters
       uses: golangci/golangci-lint-action@v3.2.0
       with:
-        version: "v1.37.1"
-        go-version: ${{ matrix.go-version }}
+        version: "v1.45.2"
+        go-version: "1.18.x"
 
   test:
     strategy:
       matrix:
-        go-version: ["1.12.0", "1.18.x"]
         platform: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -38,11 +34,14 @@ jobs:
       if: success()
       uses: actions/setup-go@v3.2.0
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: "1.18.x"
     - name: Checkout code
       uses: actions/checkout@v3.0.1
-    - name: Run tests
-      run: go test -race ./...
+    - run: go test -race ./...
+    - run: go test -fuzz=. -fuzztime=30s
+    - run: go test -fuzz=Plain -fuzztime=30s ./internal/charset
+    - run: go test -fuzz=XML -fuzztime=30s ./internal/charset
+    - run: go test -fuzz=HTML -fuzztime=30s ./internal/charset
 
   coverage:
     runs-on: ubuntu-latest
