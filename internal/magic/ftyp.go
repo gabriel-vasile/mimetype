@@ -65,8 +65,9 @@ func QuickTime(raw []byte, _ uint32) bool {
 		return false
 	}
 	// First 4 bytes represent the size of the atom as unsigned int.
-	// Next 4 bytes are the type of the atom. 'ftyp' atoms.
-	// For `ftyp` atoms check if first byte in size is 0.
+	// Next 4 bytes are the type of the atom.
+	// For `ftyp` atoms check if first byte in size is 0, otherwise, a text file
+	// which happens to contain 'ftypqt  ' at index 4 will trigger a false positive.
 	if bytes.Equal(raw[4:12], []byte("ftypqt  ")) ||
 		bytes.Equal(raw[4:12], []byte("ftypmoov")) {
 		return raw[0] == 0x00
