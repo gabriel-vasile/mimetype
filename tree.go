@@ -34,7 +34,7 @@ var root = newMIME("application/octet-stream", "",
 // errMIME is same as root but it does not require locking.
 var errMIME = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return false })
 
-// mu guards access to the root MIME tree. Access to root must be synchonized with this lock.
+// mu guards access to the root MIME tree. Access to root must be synchronized with this lock.
 var mu = &sync.RWMutex{}
 
 // The list of nodes appended to the root node.
