@@ -180,12 +180,20 @@ var files = map[string]string{
 	// the timestamps.
 	"not.srt.txt": "text/plain; charset=utf-8",
 	// not.srt.2.txt does not specify milliseconds.
-	"not.srt.2.txt":   "text/plain; charset=utf-8",
-	"svg.1.svg":       "image/svg+xml",
-	"svg.svg":         "image/svg+xml",
-	"swf.swf":         "application/x-shockwave-flash",
-	"tar.tar":         "application/x-tar",
-	"tar.v7.tar":      "application/x-tar",
+	"not.srt.2.txt":  "text/plain; charset=utf-8",
+	"svg.1.svg":      "image/svg+xml",
+	"svg.svg":        "image/svg+xml",
+	"swf.swf":        "application/x-shockwave-flash",
+	"tar.tar":        "application/x-tar",
+	"tar.gnu.tar":    "application/x-tar",
+	"tar.oldgnu.tar": "application/x-tar",
+	"tar.posix.tar":  "application/x-tar",
+	// tar.star.tar was generated with star 1.6.
+	"tar.star.tar":  "application/x-tar",
+	"tar.ustar.tar": "application/x-tar",
+	"tar.v7.tar":    "application/x-tar",
+	// tar.v7-gnu.tar is a v7 tar archive generated with GNU tar 1.29.
+	"tar.v7-gnu.tar":  "application/x-tar",
 	"tcl.tcl":         "text/x-tcl",
 	"tcx.tcx":         "application/vnd.garmin.tcx+xml",
 	"tiff.tiff":       "image/tiff",
