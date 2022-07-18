@@ -2,6 +2,7 @@ package magic
 
 import (
 	"io/ioutil"
+	"regexp"
 	"testing"
 )
 
@@ -74,6 +75,18 @@ func TestMagic(t *testing.T) {
 			detector: NdJSON,
 			raw:      "{}\n{}\n{}",
 			limit:    10,
+			res:      true,
+		},
+		{
+			name:     "regexp fail test",
+			detector: re(regexp.MustCompile(`qq`)),
+			raw:      "somple string",
+			res:      false,
+		},
+		{
+			name:     "regexp pass test",
+			detector: re(regexp.MustCompile(`\ss\w+ [0-9]{2,}`)),
+			raw:      "sample string 12345",
 			res:      true,
 		},
 	}
