@@ -143,6 +143,7 @@ var files = map[string]string{
 	"ogg.oga":            "audio/ogg",
 	"ogg.ogv":            "video/ogg",
 	"ogg.spx.oga":        "audio/ogg",
+	"ora.ora":            "image/openraster",
 	"otf.otf":            "font/otf",
 	"otg.otg":            "application/vnd.oasis.opendocument.graphics-template",
 	"otp.otp":            "application/vnd.oasis.opendocument.presentation-template",

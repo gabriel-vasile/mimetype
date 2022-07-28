@@ -22,6 +22,7 @@ Extension | MIME type | Aliases
 **.otg** | application/vnd.oasis.opendocument.graphics-template | application/x-vnd.oasis.opendocument.graphics-template
 **.odf** | application/vnd.oasis.opendocument.formula | application/x-vnd.oasis.opendocument.formula
 **.odc** | application/vnd.oasis.opendocument.chart | application/x-vnd.oasis.opendocument.chart
+**.ora** | image/openraster | -
 **.sxc** | application/vnd.sun.xml.calc | -
 **.pdf** | application/pdf | application/x-pdf
 **.fdf** | application/vnd.fdf | -
