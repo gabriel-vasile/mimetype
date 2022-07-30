@@ -104,3 +104,8 @@ func Jxl(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte{0xFF, 0x0A}) ||
 		bytes.HasPrefix(raw, []byte("\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a"))
 }
+
+// Jxr matches JPEG XR image file
+func Jxr(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0xBC, 0x01})
+}
