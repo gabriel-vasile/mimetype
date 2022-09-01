@@ -44,6 +44,8 @@ var (
 	Hdr = prefix([]byte("#?RADIANCE\n"))
 	// Xpm matches X PixMap image data.
 	Xpm = prefix([]byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
+	//Jxr matched Microsoft HD JXR photo file.
+	Jxr = prefix([]byte{0x49, 0x49, 0xBC, 0x01})
 )
 
 func jpeg2k(sig []byte) Detector {
@@ -103,9 +105,4 @@ func Dwg(raw []byte, _ uint32) bool {
 func Jxl(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte{0xFF, 0x0A}) ||
 		bytes.HasPrefix(raw, []byte("\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a"))
-}
-
-// Jxr matches JPEG XR image file
-func Jxr(raw []byte, _ uint32) bool {
-	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0xBC, 0x01})
 }

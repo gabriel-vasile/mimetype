@@ -139,7 +139,7 @@ Extension | MIME type | Aliases
 **.glb** | model/gltf-binary | -
 **.avif** | image/avif | -
 **.cab** | application/x-installshield | -
-**.jxr** | image/vnd.ms-photo | -
+**.jxr** | image/jxr | image/vnd.ms-photo
 **.txt** | text/plain | -
 **.html** | text/html | -
 **.svg** | image/svg+xml | -

@@ -93,7 +93,7 @@ var files = map[string]string{
 	"jpg.jpg":            "image/jpeg",
 	"jpm.jpm":            "image/jpm",
 	"jxl.jxl":            "image/jxl",
-	"jxr.jxr":            "image/vnd.ms-photo",
+	"jxr.jxr":            "image/jxr",
 	"xpm.xpm":            "image/x-xpixmap",
 	"js.js":              "application/javascript",
 	"json.json":          "application/json",
