@@ -44,6 +44,8 @@ var (
 	Hdr = prefix([]byte("#?RADIANCE\n"))
 	// Xpm matches X PixMap image data.
 	Xpm = prefix([]byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
+	// Jxr matches Microsoft HD JXR photo file.
+	Jxr = prefix([]byte{0x49, 0x49, 0xBC, 0x01})
 )
 
 func jpeg2k(sig []byte) Detector {
