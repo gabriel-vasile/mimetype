@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
 	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
 	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS, jxr,
+	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS, jxr, jxs,
 	// Keep text last because it is the slowest check
 	text,
 )
@@ -256,4 +256,5 @@ var (
 	xfdf    = newMIME("application/vnd.adobe.xfdf", ".xfdf", magic.Xfdf)
 	glb     = newMIME("model/gltf-binary", ".glb", magic.Glb)
 	jxr     = newMIME("image/jxr", ".jxr", magic.Jxr).alias("image/vnd.ms-photo")
+	jxs     = newMIME("image/jxs", ".jxs", magic.Jxs)
 )
