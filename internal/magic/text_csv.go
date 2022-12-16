@@ -3,6 +3,7 @@ package magic
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"io"
 )
 
@@ -23,8 +24,19 @@ func sv(in []byte, comma rune, limit uint32) bool {
 	r.LazyQuotes = true
 	r.Comment = '#'
 
-	lines, err := r.ReadAll()
-	return err == nil && r.FieldsPerRecord > 1 && len(lines) > 1
+	lines := 0
+	for {
+		_, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return false
+		}
+		lines++
+	}
+
+	return r.FieldsPerRecord > 1 && lines > 1
 }
 
 // dropLastLine drops the last incomplete line from b.
