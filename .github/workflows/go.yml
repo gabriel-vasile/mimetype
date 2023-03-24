@@ -17,7 +17,7 @@ jobs:
       with:
         go-version: "1.18.x"
     - name: Checkout code
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.0
     - name: Run linters
       uses: golangci/golangci-lint-action@v3.4.0
       with:
@@ -36,7 +36,7 @@ jobs:
       with:
         go-version: "1.18.x"
     - name: Checkout code
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.0
     - run: go test -race ./...
     - run: go test -fuzz=. -fuzztime=30s
     - run: go test -fuzz=Plain -fuzztime=30s ./internal/charset
@@ -46,7 +46,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v3.5.0
     - name: Install Go
       if: success()
       uses: actions/setup-go@v3.5.0
