@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"math/rand"
 	"mime"
@@ -254,7 +253,7 @@ func TestDetect(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		data, err := ioutil.ReadAll(f)
+		data, err := io.ReadAll(f)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -360,10 +359,11 @@ func TestDetectReader(t *testing.T) {
 
 // breakReader breaks the string every breakSize characters.
 // It is like:
-//   <html><h
-//   ead><tit
-//   le>html<
-//   ...
+//
+//	<html><h
+//	ead><tit
+//	le>html<
+//	...
 type breakReader struct {
 	r         io.Reader
 	breakSize int
@@ -520,7 +520,7 @@ func BenchmarkCommon(b *testing.B) {
 	}
 	for k, v := range commonFiles {
 		b.Run(k, func(b *testing.B) {
-			f, err := ioutil.ReadFile(v)
+			f, err := os.ReadFile(v)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -636,7 +636,7 @@ func FuzzMimetype(f *testing.F) {
 		"testdata/class.class",
 	}
 	for _, c := range corpus {
-		data, err := ioutil.ReadFile(c)
+		data, err := os.ReadFile(c)
 		if err != nil {
 			f.Fatal(err)
 		}
