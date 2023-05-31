@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/gabriel-vasile/mimetype"
 )
@@ -24,7 +23,7 @@ func Example_detectReader() {
 	mtype, recycledInput, err := recycleReader(input)
 
 	// Verify recycledInput contains the original input.
-	text, _ := ioutil.ReadAll(recycledInput)
+	text, _ := io.ReadAll(recycledInput)
 	fmt.Println(mtype, bytes.Equal(testBytes, text), err)
 	// Output: text/plain; charset=utf-8 true <nil>
 }
@@ -37,6 +36,9 @@ func recycleReader(input io.Reader) (mimeType string, recycled io.Reader, err er
 
 	// After DetectReader, the data read from input is copied into header.
 	mtype, err := mimetype.DetectReader(io.TeeReader(input, header))
+	if err != nil {
+		return
+	}
 
 	// Concatenate back the header to the rest of the file.
 	// recycled now contains the complete, original data.

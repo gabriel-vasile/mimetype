@@ -1,7 +1,7 @@
 package magic
 
 import (
-	"io/ioutil"
+	"io"
 	"testing"
 )
 
@@ -106,7 +106,7 @@ func TestDropLastLine(t *testing.T) {
 	}
 	for i, tt := range dropTests {
 		gotR := dropLastLine([]byte(tt.raw), tt.cutAt)
-		got, _ := ioutil.ReadAll(gotR)
+		got, _ := io.ReadAll(gotR)
 		if got := string(got); got != tt.res {
 			t.Errorf("dropLastLine %d error: expected %q; got %q", i, tt.res, got)
 		}
