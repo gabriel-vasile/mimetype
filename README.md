@@ -48,7 +48,7 @@ fmt.Println(mtype.String(), mtype.Extension())
 ```
 See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
 
-## Usage'
+## Usage
 Only use libraries like **mimetype** as a last resort. Content type detection
 using magic numbers is slow, inaccurate, and non-standard. Most of the times
 protocols have methods for specifying such metadata; e.g., `Content-Type` header
