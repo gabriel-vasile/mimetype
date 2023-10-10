@@ -1,1 +1,0 @@
-Start Date ,Start Time,End Date,End Time,Event Title ,All Day Event,No End Time,Event Description,Contact ,Contact Email,Contact Phone,Location,Category,Mandatory,Registration,Maximum,Last Date To Register
