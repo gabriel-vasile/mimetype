@@ -189,9 +189,10 @@ var files = map[string]string{
 	"tar.oldgnu.tar": "application/x-tar",
 	"tar.posix.tar":  "application/x-tar",
 	// tar.star.tar was generated with star 1.6.
-	"tar.star.tar":  "application/x-tar",
-	"tar.ustar.tar": "application/x-tar",
-	"tar.v7.tar":    "application/x-tar",
+	"tar.star.tar":     "application/x-tar",
+	"tar.ustar.tar":    "application/x-tar",
+	"tar.v7.tar":       "application/x-tar",
+	"tar.issue464.tar": "application/x-tar",
 	// tar.v7-gnu.tar is a v7 tar archive generated with GNU tar 1.29.
 	"tar.v7-gnu.tar":  "application/x-tar",
 	"tcl.tcl":         "text/x-tcl",
