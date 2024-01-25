@@ -57,6 +57,7 @@ type zipTokenizer struct {
 // next returns the next file name from the zip headers.
 // https://web.archive.org/web/20191129114319/https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
 func (t *zipTokenizer) next() (fileName string) {
+	// When the rest length is smaller than the header size, exit.
 	if len(t.in)-t.i < 30 {
 		return ""
 	}
@@ -65,9 +66,12 @@ func (t *zipTokenizer) next() (fileName string) {
 
 	offset := 0
 
+	// Read the first 4 bytes and look for the file header signature.
+	// If it is not at the start of buf, then set the current index to
+	// the first occurrence of the first byte of the signature in buf
+	// and re-run.
 	buf := in[offset : offset+4]
 	offset += 4
-
 	if !bytes.Equal(buf, zipHeader) {
 		i := bytes.IndexByte(buf, zipHeader[0])
 		t.i += offset
