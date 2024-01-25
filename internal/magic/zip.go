@@ -33,6 +33,8 @@ var (
 	Sxc = offset([]byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
 )
 
+var zipHeader = []byte("PK\u0003\u0004")
+
 // Zip matches a zip archive.
 func Zip(raw []byte, limit uint32) bool {
 	return len(raw) > 3 &&
@@ -55,26 +57,49 @@ type zipTokenizer struct {
 // next returns the next file name from the zip headers.
 // https://web.archive.org/web/20191129114319/https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
 func (t *zipTokenizer) next() (fileName string) {
-	if t.i > len(t.in) {
-		return
-	}
-	in := t.in[t.i:]
-	// pkSig is the signature of the zip local file header.
-	pkSig := []byte("PK\003\004")
-	pkIndex := bytes.Index(in, pkSig)
-	// 30 is the offset of the file name in the header.
-	fNameOffset := pkIndex + 30
-	// end if signature not found or file name offset outside of file.
-	if pkIndex == -1 || fNameOffset > len(in) {
-		return
+	if len(t.in)-t.i < 30 {
+		return ""
 	}
 
-	fNameLen := int(binary.LittleEndian.Uint16(in[pkIndex+26 : pkIndex+28]))
-	if fNameLen <= 0 || fNameOffset+fNameLen > len(in) {
-		return
+	in := t.in[t.i:]
+
+	offset := 0
+
+	buf := in[offset : offset+4]
+	offset += 4
+
+	if !bytes.Equal(buf, zipHeader) {
+		i := bytes.IndexByte(buf, zipHeader[0])
+		t.i += offset
+		if i > 0 {
+			t.i += len(zipHeader) - i
+		}
+		return t.next()
 	}
-	t.i += fNameOffset + fNameLen
-	return string(in[fNameOffset : fNameOffset+fNameLen])
+
+	offset += 14
+
+	buf = in[offset : offset+4]
+	offset += 4
+	compressedSize := binary.LittleEndian.Uint32(buf)
+
+	offset += 4
+	buf = in[offset : offset+2]
+	offset += 2
+	fileNameLength := binary.LittleEndian.Uint16(buf)
+
+	buf = in[offset : offset+2]
+	offset += 2
+	extraFieldsLength := binary.LittleEndian.Uint16(buf)
+
+	buf = in[offset : offset+int(fileNameLength)]
+	offset += int(fileNameLength)
+
+	offset += int(extraFieldsLength) + int(compressedSize)
+
+	t.i += offset
+
+	return string(buf)
 }
 
 // zipContains returns true if the zip file headers from in contain any of the paths.
