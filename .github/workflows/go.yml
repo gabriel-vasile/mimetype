@@ -53,6 +53,6 @@ jobs:
         go-version: "1.18.x"
     - name: Generate coverage
       run: go test -race -covermode=atomic -coverprofile=coverage.out
-    - uses: codecov/codecov-action@v3.1.4
+    - uses: codecov/codecov-action@v3.1.6
       with:
         files: ./coverage.out
