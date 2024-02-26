@@ -103,6 +103,7 @@ func EqualsAny(s string, mimes ...string) bool {
 // SetLimit sets the maximum number of bytes read from input when detecting the MIME type.
 // Increasing the limit provides better detection for file formats which store
 // their magical numbers towards the end of the file: docx, pptx, xlsx, etc.
+// During detection data is read in a single block of size limit, i.e. it is not buffered.
 // A limit of 0 means the whole input file will be used.
 func SetLimit(limit uint32) {
 	// Using atomic because readLimit can be read at the same time in other goroutine.
