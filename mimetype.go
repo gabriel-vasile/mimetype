@@ -31,6 +31,23 @@ func Detect(in []byte) *MIME {
 	return root.match(in, l)
 }
 
+// Mimetype detector with it's own limit.
+type ReaderDetector struct {
+	limit uint32
+}
+
+// Creates a ReaderDetector
+func NewReaderDetector(limit uint32) ReaderDetector {
+	return ReaderDetector{limit}	
+}
+
+// Detect returns the mimetype of the provided reader.
+//
+// Same considerations of DetectReader will apply to this method.
+func (d *ReaderDetector) Detect(r io.Reader) (*MIME, error) {
+	return detectReader(r, d.limit)
+}
+
 // DetectReader returns the MIME type of the provided reader.
 //
 // The result is always a valid MIME type, with application/octet-stream
@@ -42,19 +59,23 @@ func Detect(in []byte) *MIME {
 //
 //	reader.Seek(0, io.SeekStart)
 func DetectReader(r io.Reader) (*MIME, error) {
+	// Using atomic because readLimit can be written at the same time in other goroutine.
+	limit := atomic.LoadUint32(&readLimit)
+	return detectReader(r, limit)
+}
+
+func detectReader(r io.Reader, limit uint32) (*MIME, error) {
 	var in []byte
 	var err error
 
-	// Using atomic because readLimit can be written at the same time in other goroutine.
-	l := atomic.LoadUint32(&readLimit)
-	if l == 0 {
+	if limit == 0 {
 		in, err = ioutil.ReadAll(r)
 		if err != nil {
 			return errMIME, err
 		}
 	} else {
 		var n int
-		in = make([]byte, l)
+		in = make([]byte, limit)
 		// io.UnexpectedEOF means len(r) < len(in). It is not an error in this case,
 		// it just means the input file is smaller than the allocated bytes slice.
 		n, err = io.ReadFull(r, in)
@@ -66,7 +87,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.match(in, l), nil
+	return root.match(in, limit), nil
 }
 
 // DetectFile returns the MIME type of the provided file.
