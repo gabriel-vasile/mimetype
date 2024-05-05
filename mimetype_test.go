@@ -500,22 +500,22 @@ func BenchmarkSliceRand(b *testing.B) {
 }
 
 func BenchmarkCommon(b *testing.B) {
-	commonFiles := map[string]string{
-		"tar":  "testdata/tar.tar",
-		"zip":  "testdata/zip.zip",
-		"pdf":  "testdata/pdf.pdf",
-		"jpg":  "testdata/jpg.jpg",
-		"png":  "testdata/png.png",
-		"gif":  "testdata/gif.gif",
-		"xls":  "testdata/xls.xls",
-		"webm": "testdata/webm.webm",
-		"xlsx": "testdata/xlsx.xlsx",
-		"pptx": "testdata/pptx.pptx",
-		"docx": "testdata/docx.docx",
+	commonFiles := []string{
+		"xlsx.xlsx",
+		"pptx.pptx",
+		"docx.docx",
+		"tar.tar",
+		"zip.zip",
+		"pdf.pdf",
+		"jpg.jpg",
+		"png.png",
+		"gif.gif",
+		"xls.xls",
+		"webm.webm",
 	}
-	for k, v := range commonFiles {
-		b.Run(k, func(b *testing.B) {
-			f, err := os.ReadFile(v)
+	for _, file := range commonFiles {
+		b.Run(filepath.Ext(file), func(b *testing.B) {
+			f, err := os.ReadFile(testDataDir + file)
 			if err != nil {
 				b.Fatal(err)
 			}
