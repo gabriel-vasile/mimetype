@@ -176,18 +176,13 @@ var files = map[string]string{
 	"so.so":              "application/x-sharedlib",
 	"sqlite.sqlite":      "application/vnd.sqlite3",
 	"srt.srt":            "application/x-subrip",
-	// not.srt.txt uses periods instead of commas for the decimal separators of
-	// the timestamps.
-	"not.srt.txt": "text/plain; charset=utf-8",
-	// not.srt.2.txt does not specify milliseconds.
-	"not.srt.2.txt":  "text/plain; charset=utf-8",
-	"svg.1.svg":      "image/svg+xml",
-	"svg.svg":        "image/svg+xml",
-	"swf.swf":        "application/x-shockwave-flash",
-	"tar.tar":        "application/x-tar",
-	"tar.gnu.tar":    "application/x-tar",
-	"tar.oldgnu.tar": "application/x-tar",
-	"tar.posix.tar":  "application/x-tar",
+	"svg.1.svg":          "image/svg+xml",
+	"svg.svg":            "image/svg+xml",
+	"swf.swf":            "application/x-shockwave-flash",
+	"tar.tar":            "application/x-tar",
+	"tar.gnu.tar":        "application/x-tar",
+	"tar.oldgnu.tar":     "application/x-tar",
+	"tar.posix.tar":      "application/x-tar",
 	// tar.star.tar was generated with star 1.6.
 	"tar.star.tar":     "application/x-tar",
 	"tar.ustar.tar":    "application/x-tar",
@@ -491,12 +486,31 @@ func BenchmarkSliceRand(b *testing.B) {
 	}
 
 	b.ResetTimer()
+	b.ReportAllocs()
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			Detect(data)
 		}
 	})
+}
+
+func BenchmarkAll(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	data := make([]byte, 3072)
+	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	for _, m := range root.flatten() {
+		b.Run(m.String(), func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				m.detector(data, uint32(len(data)))
+			}
+		})
+	}
+
 }
 
 func BenchmarkCommon(b *testing.B) {
@@ -512,13 +526,15 @@ func BenchmarkCommon(b *testing.B) {
 		"gif.gif",
 		"xls.xls",
 		"webm.webm",
+		"csv.csv",
 	}
 	for _, file := range commonFiles {
+		f, err := os.ReadFile(filepath.Join(testDataDir, file))
+		if err != nil {
+			b.Fatal(err)
+		}
 		b.Run(filepath.Ext(file), func(b *testing.B) {
-			f, err := os.ReadFile(testDataDir + file)
-			if err != nil {
-				b.Fatal(err)
-			}
+			b.ReportAllocs()
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				Detect(f)

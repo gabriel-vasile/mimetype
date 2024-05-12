@@ -302,19 +302,21 @@ func Svg(raw []byte, limit uint32) bool {
 
 // Srt matches a SubRip file.
 func Srt(in []byte, _ uint32) bool {
-	s := bufio.NewScanner(bytes.NewReader(in))
-	if !s.Scan() {
-		return false
-	}
-	// First line must be 1.
-	if s.Text() != "1" {
+	line, in, found := scanLine(in)
+	if !found {
 		return false
 	}
 
-	if !s.Scan() {
+	// First line must be 1.
+	if string(line) != "1" {
 		return false
 	}
-	secondLine := s.Text()
+	line, in, found = scanLine(in)
+	if !found {
+		return false
+	}
+
+	secondLine := string(line)
 	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits secondLine
 	// length to exactly 29 characters.
 	if len(secondLine) != 29 {
@@ -325,14 +327,12 @@ func Srt(in []byte, _ uint32) bool {
 	if strings.Contains(secondLine, ".") {
 		return false
 	}
-	// For Go <1.17, comma is not recognised as a decimal separator by `time.Parse`.
-	secondLine = strings.ReplaceAll(secondLine, ",", ".")
 	// Second line must be a time range.
 	ts := strings.Split(secondLine, " --> ")
 	if len(ts) != 2 {
 		return false
 	}
-	const layout = "15:04:05.000"
+	const layout = "15:04:05,000"
 	t0, err := time.Parse(layout, ts[0])
 	if err != nil {
 		return false
@@ -345,8 +345,9 @@ func Srt(in []byte, _ uint32) bool {
 		return false
 	}
 
+	line, _, found = scanLine(in)
 	// A third line must exist and not be empty. This is the actual subtitle text.
-	return s.Scan() && len(s.Bytes()) != 0
+	return found && len(line) != 0
 }
 
 // Vtt matches a Web Video Text Tracks (WebVTT) file. See
@@ -372,4 +373,17 @@ func Vtt(raw []byte, limit uint32) bool {
 	// Exact match.
 	return bytes.Equal(raw, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
 		bytes.Equal(raw, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
+}
+
+func scanLine(in []byte) (line, remainder []byte, found bool) {
+	line, remainder, found = bytes.Cut(in, []byte("\n"))
+	if !found {
+		return
+	}
+
+	// Drop off any \r before \n.
+	if lenLine := len(line); lenLine > 0 && line[lenLine-1] == '\r' {
+		line = line[:lenLine-1]
+	}
+	return
 }
