@@ -491,12 +491,31 @@ func BenchmarkSliceRand(b *testing.B) {
 	}
 
 	b.ResetTimer()
+	b.ReportAllocs()
 
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			Detect(data)
 		}
 	})
+}
+
+func BenchmarkAll(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	data := make([]byte, 3072)
+	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	for _, m := range root.flatten() {
+		b.Run(m.String(), func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				m.detector(data, uint32(len(data)))
+			}
+		})
+	}
+
 }
 
 func BenchmarkCommon(b *testing.B) {
@@ -512,13 +531,15 @@ func BenchmarkCommon(b *testing.B) {
 		"gif.gif",
 		"xls.xls",
 		"webm.webm",
+		"csv.csv",
 	}
 	for _, file := range commonFiles {
+		f, err := os.ReadFile(filepath.Join(testDataDir, file))
+		if err != nil {
+			b.Fatal(err)
+		}
 		b.Run(filepath.Ext(file), func(b *testing.B) {
-			f, err := os.ReadFile(testDataDir + file)
-			if err != nil {
-				b.Fatal(err)
-			}
+			b.ReportAllocs()
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				Detect(f)
