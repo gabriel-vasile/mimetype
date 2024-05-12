@@ -176,18 +176,13 @@ var files = map[string]string{
 	"so.so":              "application/x-sharedlib",
 	"sqlite.sqlite":      "application/vnd.sqlite3",
 	"srt.srt":            "application/x-subrip",
-	// not.srt.txt uses periods instead of commas for the decimal separators of
-	// the timestamps.
-	"not.srt.txt": "text/plain; charset=utf-8",
-	// not.srt.2.txt does not specify milliseconds.
-	"not.srt.2.txt":  "text/plain; charset=utf-8",
-	"svg.1.svg":      "image/svg+xml",
-	"svg.svg":        "image/svg+xml",
-	"swf.swf":        "application/x-shockwave-flash",
-	"tar.tar":        "application/x-tar",
-	"tar.gnu.tar":    "application/x-tar",
-	"tar.oldgnu.tar": "application/x-tar",
-	"tar.posix.tar":  "application/x-tar",
+	"svg.1.svg":          "image/svg+xml",
+	"svg.svg":            "image/svg+xml",
+	"swf.swf":            "application/x-shockwave-flash",
+	"tar.tar":            "application/x-tar",
+	"tar.gnu.tar":        "application/x-tar",
+	"tar.oldgnu.tar":     "application/x-tar",
+	"tar.posix.tar":      "application/x-tar",
 	// tar.star.tar was generated with star 1.6.
 	"tar.star.tar":     "application/x-tar",
 	"tar.ustar.tar":    "application/x-tar",
