@@ -7,7 +7,6 @@ package mimetype
 
 import (
 	"io"
-	"io/ioutil"
 	"mime"
 	"os"
 	"sync/atomic"
@@ -48,7 +47,7 @@ func DetectReader(r io.Reader) (*MIME, error) {
 	// Using atomic because readLimit can be written at the same time in other goroutine.
 	l := atomic.LoadUint32(&readLimit)
 	if l == 0 {
-		in, err = ioutil.ReadAll(r)
+		in, err = io.ReadAll(r)
 		if err != nil {
 			return errMIME, err
 		}
