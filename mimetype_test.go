@@ -495,6 +495,26 @@ func BenchmarkSliceRand(b *testing.B) {
 	})
 }
 
+func BenchmarkText(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	data := make([]byte, defaultLimit)
+	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for _, m := range text.children {
+		b.Run(m.String(), func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				m.detector(data, uint32(len(data)))
+			}
+		})
+	}
+}
+
 func BenchmarkAll(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
 	data := make([]byte, defaultLimit)
