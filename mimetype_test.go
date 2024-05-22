@@ -416,6 +416,7 @@ func TestConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
+	Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 	go func() {
 		for i := 0; i < 1000; i++ {
 			Detect([]byte("text content"))
@@ -436,8 +437,7 @@ func TestConcurrent(t *testing.T) {
 	}()
 	go func() {
 		for i := 0; i < 1000; i++ {
-			Extend(func([]byte, uint32) bool { return false }, "e", ".e")
-			Lookup("text/plain").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
+			Lookup("e").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
 		wg.Done()
 	}()
