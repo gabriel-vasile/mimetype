@@ -444,7 +444,7 @@ func TestConcurrent(t *testing.T) {
 
 	wg.Wait()
 	// Reset to original limit for benchmarks.
-	SetLimit(3072)
+	SetLimit(defaultLimit)
 }
 
 // For #162.
@@ -469,7 +469,7 @@ func TestEmptyInput(t *testing.T) {
 	if !mtype.Is(plain) {
 		t.Fatalf("0 limit, empty reader detection; expected: %s, got: %s", plain, mtype)
 	}
-	SetLimit(3072)
+	SetLimit(defaultLimit)
 }
 
 // Benchmarking a random slice of bytes is as close as possible to the real
@@ -480,7 +480,7 @@ func TestEmptyInput(t *testing.T) {
 // might be tested for zip, gzip, etc., before it is identified.
 func BenchmarkSliceRand(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
-	data := make([]byte, 3072)
+	data := make([]byte, defaultLimit)
 	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
@@ -497,7 +497,7 @@ func BenchmarkSliceRand(b *testing.B) {
 
 func BenchmarkAll(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
-	data := make([]byte, 3072)
+	data := make([]byte, defaultLimit)
 	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
@@ -510,7 +510,6 @@ func BenchmarkAll(b *testing.B) {
 			}
 		})
 	}
-
 }
 
 func BenchmarkCommon(b *testing.B) {
