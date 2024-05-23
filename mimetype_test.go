@@ -416,6 +416,7 @@ func TestConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
+	Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 	go func() {
 		for i := 0; i < 1000; i++ {
 			Detect([]byte("text content"))
@@ -436,8 +437,7 @@ func TestConcurrent(t *testing.T) {
 	}()
 	go func() {
 		for i := 0; i < 1000; i++ {
-			Extend(func([]byte, uint32) bool { return false }, "e", ".e")
-			Lookup("text/plain").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
+			Lookup("e").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
 		wg.Done()
 	}()
@@ -493,6 +493,24 @@ func BenchmarkSliceRand(b *testing.B) {
 			Detect(data)
 		}
 	})
+}
+
+func BenchmarkText(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	data := make([]byte, defaultLimit)
+	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+
+	for _, m := range text.children {
+		b.Run(m.String(), func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			for n := 0; n < b.N; n++ {
+				m.detector(data, uint32(len(data)))
+			}
+		})
+	}
 }
 
 func BenchmarkAll(b *testing.B) {

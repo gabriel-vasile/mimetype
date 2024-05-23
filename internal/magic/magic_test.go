@@ -1,7 +1,8 @@
 package magic
 
 import (
-	"io"
+	"bufio"
+	"strings"
 	"testing"
 )
 
@@ -86,6 +87,88 @@ func TestMagic(t *testing.T) {
 	}
 }
 
+func TestScanLine(t *testing.T) {
+	tcases := []struct {
+		name     string
+		input    string
+		expected []string
+	}{{
+		name:     "empty input",
+		input:    "",
+		expected: nil,
+	}, {
+		name:     "single line, no terminal nl",
+		input:    "1",
+		expected: []string{"1"},
+	}, {
+		name:     "single line, terminal nl",
+		input:    "1\n",
+		expected: []string{"1"},
+	}, {
+		name:     "two lines, no terminal nl",
+		input:    "1\n2",
+		expected: []string{"1", "2"},
+	}, {
+		name:     "two lines, with terminal nl",
+		input:    "1\n2\n",
+		expected: []string{"1", "2"},
+	}, {
+		name:     "drops final cr",
+		input:    "1\n2\r",
+		expected: []string{"1", "2"},
+	}, {
+		name:     "final empty line",
+		input:    "1\n2\n\n",
+		expected: []string{"1", "2", ""},
+	}, {
+		name:     "empty line with cr",
+		input:    "1\n2\n\r",
+		expected: []string{"1", "2", ""},
+	}, {
+		name:     "nd-json numbers and object",
+		input:    "1\n2\n3\n{}",
+		expected: []string{"1", "2", "3", "{}"},
+	},
+	}
+
+	for _, tt := range tcases {
+		t.Run(tt.name, func(t *testing.T) {
+			testScanLine(t, tt.input, tt.expected)
+			testScanLineLikeBufioScanner(t, tt.input)
+		})
+	}
+}
+
+func testScanLine(t *testing.T, text string, expectedLines []string) {
+	var l []byte
+	i, raw := 0, []byte(text)
+	for i = 0; len(raw) != 0; i++ {
+		l, raw = scanLine(raw)
+		if string(l) != expectedLines[i] {
+			t.Errorf("expected %q, got %q", expectedLines[i], l)
+		}
+	}
+	if i != len(expectedLines) {
+		t.Errorf("expected %d lines, got %d lines", len(expectedLines), i)
+	}
+}
+
+// Test that scanLine behaves exactly like bufio.Scanner.
+func testScanLineLikeBufioScanner(t *testing.T, text string) {
+	var l []byte
+	raw := []byte(text)
+	s := bufio.NewScanner(strings.NewReader(text))
+	for lineNum := 0; s.Scan(); lineNum++ {
+		l, raw = scanLine(raw)
+		if string(l) != s.Text() {
+			t.Errorf("expected: %q, got: %q", s.Text(), string(l))
+		}
+	}
+	if err := s.Err(); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestDropLastLine(t *testing.T) {
 	dropTests := []struct {
 		raw   string
@@ -105,8 +188,7 @@ func TestDropLastLine(t *testing.T) {
 		{"\nå\n", 5, "\nå\n"},
 	}
 	for i, tt := range dropTests {
-		gotR := dropLastLine([]byte(tt.raw), tt.cutAt)
-		got, _ := io.ReadAll(gotR)
+		got := dropLastLine([]byte(tt.raw), tt.cutAt)
 		if got := string(got); got != tt.res {
 			t.Errorf("dropLastLine %d error: expected %q; got %q", i, tt.res, got)
 		}
