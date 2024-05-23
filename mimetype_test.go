@@ -501,8 +501,6 @@ func BenchmarkText(b *testing.B) {
 	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
-	b.ReportAllocs()
-	b.ResetTimer()
 
 	for _, m := range text.children {
 		b.Run(m.String(), func(b *testing.B) {
