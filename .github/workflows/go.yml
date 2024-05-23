@@ -12,12 +12,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.6
     - name: Install Go
       uses: actions/setup-go@v5.0.0
       with:
         go-version-file: 'go.mod'
-    - name: Checkout code
-      uses: actions/checkout@v4.1.6
     - name: Run linters
       uses: golangci/golangci-lint-action@v6
       with:
@@ -29,13 +29,13 @@ jobs:
         platform: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.6
     - name: Install Go
       if: success()
       uses: actions/setup-go@v5.0.0
       with:
         go-version-file: 'go.mod'
-    - name: Checkout code
-      uses: actions/checkout@v4.1.6
     - run: go test -race ./...
     - run: go test -fuzz=. -fuzztime=30s
     - run: go test -fuzz=Plain -fuzztime=30s ./internal/charset
