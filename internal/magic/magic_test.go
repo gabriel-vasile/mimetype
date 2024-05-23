@@ -140,9 +140,8 @@ func TestScanLine(t *testing.T) {
 }
 
 func testScanLine(t *testing.T, text string, expectedLines []string) {
-	l, raw := []byte{}, []byte(text)
-
-	i := 0
+	var l []byte
+	i, raw := 0, []byte(text)
 	for i = 0; len(raw) != 0; i++ {
 		l, raw = scanLine(raw)
 		if string(l) != expectedLines[i] {
@@ -156,8 +155,8 @@ func testScanLine(t *testing.T, text string, expectedLines []string) {
 
 // Test that scanLine behaves exactly like bufio.Scanner.
 func testScanLineLikeBufioScanner(t *testing.T, text string) {
-	l, raw := []byte{}, []byte(text)
-
+	var l []byte
+	raw := []byte(text)
 	s := bufio.NewScanner(strings.NewReader(text))
 	for lineNum := 0; s.Scan(); lineNum++ {
 		l, raw = scanLine(raw)
