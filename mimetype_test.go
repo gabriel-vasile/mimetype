@@ -488,11 +488,9 @@ func BenchmarkSliceRand(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
 
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			Detect(data)
-		}
-	})
+	for n := 0; n < b.N; n++ {
+		Detect(data)
+	}
 }
 
 func BenchmarkText(b *testing.B) {
