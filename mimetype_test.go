@@ -488,11 +488,9 @@ func BenchmarkSliceRand(b *testing.B) {
 	b.ResetTimer()
 	b.ReportAllocs()
 
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			Detect(data)
-		}
-	})
+	for n := 0; n < b.N; n++ {
+		Detect(data)
+	}
 }
 
 func BenchmarkText(b *testing.B) {
@@ -508,6 +506,30 @@ func BenchmarkText(b *testing.B) {
 			b.ResetTimer()
 			for n := 0; n < b.N; n++ {
 				m.detector(data, uint32(len(data)))
+			}
+		})
+	}
+}
+
+// BenchmarkFiles benchmarks each detector with his coresponding file.
+func BenchmarkFiles(b *testing.B) {
+	for f, m := range files {
+		data, err := os.ReadFile(filepath.Join(testDataDir, f))
+		if err != nil {
+			b.Fatal(err)
+		}
+		if uint32(len(data)) > defaultLimit {
+			data = data[:defaultLimit]
+		}
+		b.Run(f+"/"+m, func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			parsed, _, _ := mime.ParseMediaType(m)
+			mType := Lookup(parsed)
+			for n := 0; n < b.N; n++ {
+				if !mType.detector(data, uint32(len(data))) {
+					b.Fatal("detection should never fail")
+				}
 			}
 		})
 	}
