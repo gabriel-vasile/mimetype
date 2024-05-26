@@ -513,6 +513,30 @@ func BenchmarkText(b *testing.B) {
 	}
 }
 
+// BenchmarkFiles benchmarks each detector with his coresponding file.
+func BenchmarkFiles(b *testing.B) {
+	for f, m := range files {
+		data, err := os.ReadFile(filepath.Join(testDataDir, f))
+		if err != nil {
+			b.Fatal(err)
+		}
+		if uint32(len(data)) > defaultLimit {
+			data = data[:defaultLimit]
+		}
+		b.Run(f+"/"+m, func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
+			parsed, _, _ := mime.ParseMediaType(m)
+			mType := Lookup(parsed)
+			for n := 0; n < b.N; n++ {
+				if !mType.detector(data, uint32(len(data))) {
+					b.Fatal("detection should never fail")
+				}
+			}
+		})
+	}
+}
+
 func BenchmarkAll(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
 	data := make([]byte, defaultLimit)
