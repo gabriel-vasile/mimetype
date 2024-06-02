@@ -33,6 +33,12 @@ var (
 	Sxc = offset([]byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
 )
 
+var (
+	zipHeaderSig         = []byte("PK\u0003\u0004")
+	zipFileDescriptorSig = []byte("PK\u0007\u0008")
+	zipDirectorySig      = []byte("PK\u0001\u0002")
+)
+
 // Zip matches a zip archive.
 func Zip(raw []byte, limit uint32) bool {
 	return len(raw) > 3 &&
@@ -49,32 +55,106 @@ func Jar(raw []byte, limit uint32) bool {
 // zipTokenizer holds the source zip file and scanned index.
 type zipTokenizer struct {
 	in []byte
-	i  int // current index
+}
+
+// read checks if in has a size of at least n and then returns
+// a slice of in[:n] while setting the head of in to head + n.
+//
+// If length of in is smaller than n, nil is returned.
+func (t *zipTokenizer) read(n int) []byte {
+	if n == 0 || len(t.in) < n {
+		return nil
+	}
+
+	buf := t.in[:n]
+	t.in = t.in[n:]
+
+	return buf
 }
 
 // next returns the next file name from the zip headers.
 // https://web.archive.org/web/20191129114319/https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
-func (t *zipTokenizer) next() (fileName string) {
-	if t.i > len(t.in) {
-		return
-	}
-	in := t.in[t.i:]
-	// pkSig is the signature of the zip local file header.
-	pkSig := []byte("PK\003\004")
-	pkIndex := bytes.Index(in, pkSig)
-	// 30 is the offset of the file name in the header.
-	fNameOffset := pkIndex + 30
-	// end if signature not found or file name offset outside of file.
-	if pkIndex == -1 || fNameOffset > len(in) {
-		return
+func (t *zipTokenizer) next() string {
+	// When the rest length is smaller than the minimum header size, exit.
+	if len(t.in) < 30 {
+		return ""
 	}
 
-	fNameLen := int(binary.LittleEndian.Uint16(in[pkIndex+26 : pkIndex+28]))
-	if fNameLen <= 0 || fNameOffset+fNameLen > len(in) {
-		return
+	buf := t.in[:4]
+
+	// If central directory signature is found, exit.
+	if bytes.Equal(buf, zipDirectorySig) {
+		return ""
 	}
-	t.i += fNameOffset + fNameLen
-	return string(in[fNameOffset : fNameOffset+fNameLen])
+
+	// Looking for the file header signature. If it is not at the start
+	// of buf, then look for it inside in.
+	if !bytes.Equal(buf, zipHeaderSig) {
+		i := bytes.Index(t.in, zipHeaderSig)
+		if i < 0 {
+			return ""
+		}
+		t.in = t.in[i:]
+	}
+
+	// skip header + version
+	t.read(4 + 2)
+
+	// read general purpose bit field
+	buf = t.read(2)
+	if buf == nil {
+		return ""
+	}
+	flags := binary.LittleEndian.Uint16(buf)
+	fdFlag := int(flags)&0x08 != 0
+
+	// skip compression method, last modified time and date and crc32
+	t.read(10)
+
+	buf = t.read(4)
+	if buf == nil {
+		return ""
+	}
+	compressedSize := binary.LittleEndian.Uint32(buf)
+
+	// skip uncompressed size
+	t.read(4)
+
+	buf = t.read(2)
+	if buf == nil {
+		return ""
+	}
+	fileNameLength := binary.LittleEndian.Uint16(buf)
+
+	buf = t.read(2)
+	if buf == nil {
+		return ""
+	}
+	extraFieldsLength := binary.LittleEndian.Uint16(buf)
+
+	buf = t.read(int(fileNameLength))
+	if buf == nil {
+		return ""
+	}
+
+	// skip extra fields and compressed data
+	t.read(int(extraFieldsLength) + int(compressedSize))
+
+	// If the file descriptor flag is set, search for the next occurrence
+	// of the file descriptor signature. If found, skip the field.
+	// Otherwise, look for the next occurrence of the file header by calling
+	// next recursively.
+	if fdFlag {
+		i := bytes.Index(t.in, zipFileDescriptorSig)
+		if i < 0 {
+			return t.next()
+		}
+
+		t.in = t.in[i:]
+		t.read(16)
+	}
+
+	return string(buf)
 }
 
 // zipContains returns true if the zip file headers from in contain any of the paths.
