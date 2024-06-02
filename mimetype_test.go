@@ -169,8 +169,6 @@ var files = map[string]string{
 	"rpm.rpm":            "application/x-rpm",
 	"rss.rss":            "application/rss+xml",
 	"rtf.rtf":            "text/rtf",
-	"sample32.macho":     "application/x-mach-binary",
-	"sample64.macho":     "application/x-mach-binary",
 	"shp.shp":            "application/vnd.shp",
 	"shx.shx":            "application/vnd.shx",
 	"so.so":              "application/x-sharedlib",
