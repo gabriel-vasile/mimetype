@@ -170,29 +170,4 @@
     </geometry>
   </library_geometries>
   <library_controllers/>
-  <library_visual_scenes>
-    <visual_scene id="Scene" name="Scene">
-      <node id="Camera" name="Camera" type="NODE">
-        <matrix sid="transform">0.6859207 -0.3240135 0.6515582 7.481132 0.7276763 0.3054208 -0.6141704 -6.50764 0 0.8953956 0.4452714 5.343665 0 0 0 1</matrix>
-        <instance_camera url="#Camera-camera"/>
-      </node>
-      <node id="Lamp" name="Lamp" type="NODE">
-        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
-        <instance_light url="#Lamp-light"/>
-      </node>
-      <node id="Cube" name="Cube" type="NODE">
-        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
-        <instance_geometry url="#Cube-mesh" name="Cube">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="Material-material" target="#Material-material"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
-      </node>
-    </visual_scene>
-  </library_visual_scenes>
-  <scene>
-    <instance_visual_scene url="#Scene"/>
-  </scene>
-</COLLADA>
+  <library_visual_scenes
