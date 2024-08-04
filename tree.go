@@ -18,14 +18,13 @@ import (
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
-	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3, flac,
-	midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mqv, mp4, webM,
-	threeGP, threeG2, avi, flv, mkv, asf, aac, voc, aMp4, m4a, m3u, m4v, rmvb,
-	gzip, class, swf, crx, ttf, woff, woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar,
-	djvu, mobi, lit, bpg, sqlite3, dwg, nes, lnk, macho, qcp, icns, heic,
-	heicSeq, heif, heifSeq, hdr, mrc, mdb, accdb, zstd, cab, rpm, xz, lzip,
-	torrent, cpio, tzif, xcf, pat, gbr, glb, avif, cabIS, jxr,
-	// Keep text last because it is the slowest check
+	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3,
+	flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
+	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
+	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg,
+	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
+	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr,
+	// Keep text last because it is the slowest check.
 	text,
 )
 
@@ -161,7 +160,7 @@ var (
 	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3u).
 		alias("audio/mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", magic.M4v)
-	mp4  = newMIME("video/mp4", ".mp4", magic.Mp4)
+	mp4  = newMIME("video/mp4", ".mp4", magic.Mp4, avif, threeGP, threeG2, aMp4, mqv, m4a, m4v, heic, heicSeq, heif, heifSeq)
 	webM = newMIME("video/webm", ".webm", magic.WebM).
 		alias("audio/webm")
 	mpeg      = newMIME("video/mpeg", ".mpeg", magic.Mpeg)

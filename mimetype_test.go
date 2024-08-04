@@ -564,6 +564,7 @@ func BenchmarkCommon(b *testing.B) {
 		"xls.xls",
 		"webm.webm",
 		"csv.csv",
+		"mp4.mp4",
 	}
 	for _, file := range commonFiles {
 		f, err := os.ReadFile(filepath.Join(testDataDir, file))
