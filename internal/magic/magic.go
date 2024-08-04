@@ -153,9 +153,6 @@ func ftyp(sigs ...[]byte) Detector {
 		if len(raw) < 12 {
 			return false
 		}
-		if !bytes.Equal(raw[4:8], []byte("ftyp")) {
-			return false
-		}
 		for _, s := range sigs {
 			if bytes.Equal(raw[8:12], s) {
 				return true
