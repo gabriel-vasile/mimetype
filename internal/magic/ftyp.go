@@ -45,6 +45,8 @@ var (
 	Heif = ftyp([]byte("mif1"), []byte("heim"), []byte("heis"), []byte("avic"))
 	// HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
 	HeifSequence = ftyp([]byte("msf1"), []byte("hevm"), []byte("hevs"), []byte("avcs"))
+	// Mj2 matches a Motion JPEG 2000 file: https://en.wikipedia.org/wiki/Motion_JPEG_2000.
+	Mj2 = ftyp([]byte("mj2s"), []byte("mjp2"), []byte("MFSM"), []byte("MGSV"))
 	// TODO: add support for remaining video formats at ftyps.com.
 )
 
