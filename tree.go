@@ -160,7 +160,8 @@ var (
 	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3u).
 		alias("audio/mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", magic.M4v)
-	mp4  = newMIME("video/mp4", ".mp4", magic.Mp4, avif, threeGP, threeG2, aMp4, mqv, m4a, m4v, heic, heicSeq, heif, heifSeq)
+	mj2  = newMIME("video/mj2", ".mj2", magic.Mj2)
+	mp4  = newMIME("video/mp4", ".mp4", magic.Mp4, avif, threeGP, threeG2, aMp4, mqv, m4a, m4v, heic, heicSeq, heif, heifSeq, mj2)
 	webM = newMIME("video/webm", ".webm", magic.WebM).
 		alias("audio/webm")
 	mpeg      = newMIME("video/mpeg", ".mpeg", magic.Mpeg)
