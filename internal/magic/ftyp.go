@@ -47,6 +47,15 @@ var (
 	HeifSequence = ftyp([]byte("msf1"), []byte("hevm"), []byte("hevs"), []byte("avcs"))
 	// Mj2 matches a Motion JPEG 2000 file: https://en.wikipedia.org/wiki/Motion_JPEG_2000.
 	Mj2 = ftyp([]byte("mj2s"), []byte("mjp2"), []byte("MFSM"), []byte("MGSV"))
+	// Dvb matches a Digital Video Broadcasting file: https://dvb.org.
+	// https://cconcolato.github.io/mp4ra/filetype.html
+	// https://github.com/file/file/blob/512840337ead1076519332d24fefcaa8fac36e06/magic/Magdir/animation#L135-L154
+	Dvb = ftyp(
+		[]byte("dby1"), []byte("dsms"), []byte("dts1"), []byte("dts2"),
+		[]byte("dts3"), []byte("dxo "), []byte("dmb1"), []byte("dmpf"),
+		[]byte("drc1"), []byte("dv1a"), []byte("dv1b"), []byte("dv2a"),
+		[]byte("dv2b"), []byte("dv3a"), []byte("dv3b"), []byte("dvr1"),
+		[]byte("dvt1"), []byte("emsg"))
 	// TODO: add support for remaining video formats at ftyps.com.
 )
 
