@@ -147,7 +147,7 @@ Extension | MIME type | Aliases
 **.txt** | text/plain | -
 **.html** | text/html | -
 **.svg** | image/svg+xml | -
-**.xml** | text/xml | -
+**.xml** | text/xml | application/xml
 **.rss** | application/rss+xml | text/rss
 **.atom** | application/atom+xml | -
 **.x3d** | model/x3d+xml | -
