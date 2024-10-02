@@ -104,7 +104,6 @@ var files = map[string]string{
 	"json.string.txt":    "text/plain; charset=utf-8",
 	"kml.kml":            "application/vnd.google-earth.kml+xml",
 	"lit.lit":            "application/x-ms-reader",
-	"ln":                 "application/x-executable",
 	"lua.lua":            "text/x-lua",
 	"lz.lz":              "application/lzip",
 	"m3u.m3u":            "application/vnd.apple.mpegurl",
