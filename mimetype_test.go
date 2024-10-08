@@ -52,7 +52,6 @@ var files = map[string]string{
 	"deb.deb":            "application/vnd.debian.binary-package",
 	"djvu.djvu":          "image/vnd.djvu",
 	"doc.doc":            "application/msword",
-	"docx.1.docx":        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 	"docx.docx":          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 	"drpm.rpm":           "application/x-rpm",
 	"dwg.1.dwg":          "image/vnd.dwg",
@@ -155,7 +154,6 @@ var files = map[string]string{
 	"pl.pl":              "text/x-perl",
 	"png.png":            "image/png",
 	"ppt.ppt":            "application/vnd.ms-powerpoint",
-	"pptx.pptx":          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 	"ps.ps":              "application/postscript",
 	"psd.psd":            "image/vnd.adobe.photoshop",
 	"p7s_pem.p7s":        "application/pkcs7-signature",
@@ -222,9 +220,6 @@ var files = map[string]string{
 	"xfdf.xfdf":       "application/vnd.adobe.xfdf",
 	"xlf.xlf":         "application/x-xliff+xml",
 	"xls.xls":         "application/vnd.ms-excel",
-	"xlsx.1.xlsx":     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-	"xlsx.2.xlsx":     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-	"xlsx.xlsx":       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 	"xml.xml":         "text/xml; charset=utf-8",
 	"xml.withbr.xml":  "text/xml; charset=utf-8",
 	"xz.xz":           "application/x-xz",
@@ -552,8 +547,6 @@ func BenchmarkAll(b *testing.B) {
 
 func BenchmarkCommon(b *testing.B) {
 	commonFiles := []string{
-		"xlsx.xlsx",
-		"pptx.pptx",
 		"docx.docx",
 		"tar.tar",
 		"zip.zip",
@@ -679,8 +672,6 @@ func FuzzMimetype(f *testing.F) {
 		"testdata/mkv.mkv",
 		"testdata/webm.webm",
 		"testdata/docx.docx",
-		"testdata/pptx.pptx",
-		"testdata/xlsx.xlsx",
 		"testdata/3gp.3gp",
 		"testdata/class.class",
 	}
