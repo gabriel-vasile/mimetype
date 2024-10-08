@@ -52,10 +52,6 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 		return false
 	}
 
-	if !bytes.HasPrefix(b, pk) {
-		return false
-	}
-
 	if !b.advance(0x1E) {
 		return false
 	}
