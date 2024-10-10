@@ -239,3 +239,13 @@ func min(a, b int) int {
 	}
 	return b
 }
+
+type readBuf []byte
+
+func (b *readBuf) advance(n int) bool {
+	if n < 0 || len(*b) < n {
+		return false
+	}
+	*b = (*b)[n:]
+	return true
+}
