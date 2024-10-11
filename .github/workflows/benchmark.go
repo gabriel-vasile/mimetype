@@ -6,7 +6,7 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
