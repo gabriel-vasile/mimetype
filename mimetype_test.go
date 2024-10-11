@@ -16,224 +16,231 @@ import (
 
 const testDataDir = "testdata"
 
-// test files sorted by the file name in alphabetical order.
-var files = map[string]string{
-	"3g2.3g2":            "video/3gpp2",
-	"3gp.3gp":            "video/3gpp",
-	"3mf.3mf":            "application/vnd.ms-package.3dmanufacturing-3dmodel+xml",
-	"7z.7z":              "application/x-7z-compressed",
-	"a.a":                "application/x-archive",
-	"aac.aac":            "audio/aac",
-	"aaf.aaf":            "application/octet-stream",
-	"accdb.accdb":        "application/x-msaccess",
-	"aiff.aiff":          "audio/aiff",
-	"amf.amf":            "application/x-amf",
-	"amr.amr":            "audio/amr",
-	"ape.ape":            "audio/ape",
-	"apng.png":           "image/vnd.mozilla.apng",
-	"asf.asf":            "video/x-ms-asf",
-	"atom.atom":          "application/atom+xml",
-	"au.au":              "audio/basic",
-	"avi.avi":            "video/x-msvideo",
-	"avif.avif":          "image/avif",
-	"avifsequence.avif":  "image/avif",
-	"bmp.bmp":            "image/bmp",
-	"bpg.bpg":            "image/bpg",
-	"bz2.bz2":            "application/x-bzip2",
-	"cab.cab":            "application/vnd.ms-cab-compressed",
-	"cab.is.cab":         "application/x-installshield",
-	"class.class":        "application/x-java-applet",
-	"crx.crx":            "application/x-chrome-extension",
-	"csv.csv":            "text/csv",
-	"cpio.cpio":          "application/x-cpio",
-	"dae.dae":            "model/vnd.collada+xml",
-	"dbf.dbf":            "application/x-dbf",
-	"dcm.dcm":            "application/dicom",
-	"deb.deb":            "application/vnd.debian.binary-package",
-	"djvu.djvu":          "image/vnd.djvu",
-	"doc.doc":            "application/msword",
-	"docx.docx":          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-	"drpm.rpm":           "application/x-rpm",
-	"dwg.1.dwg":          "image/vnd.dwg",
-	"dwg.dwg":            "image/vnd.dwg",
-	"eot.eot":            "application/vnd.ms-fontobject",
-	"epub.epub":          "application/epub+zip",
-	"fdf.fdf":            "application/vnd.fdf",
-	"fits.fits":          "application/fits",
-	"flac.flac":          "audio/flac",
-	"flv.flv":            "video/x-flv",
-	"gbr.gbr":            "image/x-gimp-gbr",
-	"geojson.1.geojson":  "application/geo+json",
-	"geojson.geojson":    "application/geo+json",
-	"gif.gif":            "image/gif",
-	"glb.glb":            "model/gltf-binary",
-	"gml.gml":            "application/gml+xml",
-	"gpx.gpx":            "application/gpx+xml",
-	"gz.gz":              "application/gzip",
-	"har.har":            "application/json",
-	"hdr.hdr":            "image/vnd.radiance",
-	"heic.single.heic":   "image/heic",
-	"heif.heif":          "image/heif",
-	"html.html":          "text/html; charset=utf-8",
-	"html.iso88591.html": "text/html; charset=iso-8859-1",
-	"html.svg.html":      "text/html; charset=utf-8",
-	"html.usascii.html":  "text/html; charset=us-ascii",
-	"html.utf8.html":     "text/html; charset=utf-8",
-	"html.withbr.html":   "text/html; charset=utf-8",
-	"ico.ico":            "image/x-icon",
-	"ics.dos.ics":        "text/calendar",
-	"ics.ics":            "text/calendar",
-	"iso88591.txt":       "text/plain; charset=iso-8859-1",
-	"jar.jar":            "application/jar",
-	"jp2.jp2":            "image/jp2",
-	"jpf.jpf":            "image/jpx",
-	"jpg.jpg":            "image/jpeg",
-	"jpm.jpm":            "image/jpm",
-	"jxl.jxl":            "image/jxl",
-	"jxr.jxr":            "image/jxr",
-	"xpm.xpm":            "image/x-xpixmap",
-	"js.js":              "application/javascript",
-	"json.json":          "application/json",
-	"json.lowascii.json": "application/json",
+type testcase struct {
+	file         string
+	mime         *MIME
+	expectedMIME string
+	// If bench is true, then this entry will be used in benchmarks.
+	bench bool
+}
+
+var testcases = []testcase{
+	{"3g2.3g2", threeG2, "video/3gpp2", true},
+	{"3gp.3gp", threeGP, "video/3gpp", true},
+	{"3mf.3mf", threemf, "application/vnd.ms-package.3dmanufacturing-3dmodel+xml", true},
+	{"7z.7z", sevenZ, "application/x-7z-compressed", true},
+	{"a.a", ar, "application/x-archive", true},
+	{"aac.aac", aac, "audio/aac", true},
+	{"aaf.aaf", aaf, "application/octet-stream", true},
+	{"accdb.accdb", accdb, "application/x-msaccess", true},
+	{"aiff.aiff", aiff, "audio/aiff", true},
+	{"amf.amf", amf, "application/x-amf", true},
+	{"amr.amr", amr, "audio/amr", true},
+	{"ape.ape", ape, "audio/ape", true},
+	{"apng.png", apng, "image/vnd.mozilla.apng", true},
+	{"asf.asf", asf, "video/x-ms-asf", true},
+	{"atom.atom", atom, "application/atom+xml", true},
+	{"au.au", au, "audio/basic", true},
+	{"avi.avi", avi, "video/x-msvideo", true},
+	{"avif.avif", avif, "image/avif", true},
+	{"avifsequence.avif", avif, "image/avif", false},
+	{"bmp.bmp", bmp, "image/bmp", true},
+	{"bpg.bpg", bpg, "image/bpg", true},
+	{"bz2.bz2", bz2, "application/x-bzip2", true},
+	{"cab.cab", cab, "application/vnd.ms-cab-compressed", true},
+	{"cab.is.cab", cabIS, "application/x-installshield", true},
+	{"class.class", class, "application/x-java-applet", true},
+	{"crx.crx", crx, "application/x-chrome-extension", true},
+	{"csv.csv", csv, "text/csv", true},
+	{"cpio.cpio", cpio, "application/x-cpio", true},
+	{"dae.dae", collada, "model/vnd.collada+xml", true},
+	{"dbf.dbf", dbf, "application/x-dbf", true},
+	{"dcm.dcm", dcm, "application/dicom", true},
+	{"deb.deb", deb, "application/vnd.debian.binary-package", true},
+	{"djvu.djvu", djvu, "image/vnd.djvu", true},
+	{"doc.doc", doc, "application/msword", true},
+	{"docx.docx", docx, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", true},
+	{"drpm.rpm", rpm, "application/x-rpm", true},
+	{"dwg.1.dwg", dwg, "image/vnd.dwg", false},
+	{"dwg.dwg", dwg, "image/vnd.dwg", true},
+	{"eot.eot", eot, "application/vnd.ms-fontobject", true},
+	{"epub.epub", epub, "application/epub+zip", true},
+	{"fdf.fdf", fdf, "application/vnd.fdf", true},
+	{"fits.fits", fits, "application/fits", true},
+	{"flac.flac", flac, "audio/flac", true},
+	{"flv.flv", flv, "video/x-flv", true},
+	{"gbr.gbr", gbr, "image/x-gimp-gbr", true},
+	{"geojson.1.geojson", geoJSON, "application/geo+json", false},
+	{"geojson.geojson", geoJSON, "application/geo+json", true},
+	{"gif.gif", gif, "image/gif", true},
+	{"glb.glb", glb, "model/gltf-binary", true},
+	{"gml.gml", gml, "application/gml+xml", true},
+	{"gpx.gpx", gpx, "application/gpx+xml", true},
+	{"gz.gz", gzip, "application/gzip", true},
+	{"har.har", har, "application/json", true},
+	{"hdr.hdr", hdr, "image/vnd.radiance", true},
+	{"heic.single.heic", heic, "image/heic", true},
+	{"heif.heif", heif, "image/heif", true},
+	{"html.html", html, "text/html; charset=utf-8", true},
+	{"html.iso88591.html", html, "text/html; charset=iso-8859-1", false},
+	{"html.svg.html", html, "text/html; charset=utf-8", false},
+	{"html.usascii.html", html, "text/html; charset=us-ascii", false},
+	{"html.utf8.html", html, "text/html; charset=utf-8", false},
+	{"html.withbr.html", html, "text/html; charset=utf-8", false},
+	{"ico.ico", ico, "image/x-icon", true},
+	{"ics.dos.ics", iCalendar, "text/calendar", true},
+	{"ics.ics", iCalendar, "text/calendar", false},
+	{"iso88591.txt", text, "text/plain; charset=iso-8859-1", false},
+	{"jar.jar", jar, "application/jar", true},
+	{"jp2.jp2", jp2, "image/jp2", true},
+	{"jpf.jpf", jpx, "image/jpx", true},
+	{"jpg.jpg", jpg, "image/jpeg", true},
+	{"jpm.jpm", jpm, "image/jpm", true},
+	{"jxl.jxl", jxl, "image/jxl", true},
+	{"jxr.jxr", jxr, "image/jxr", true},
+	{"xpm.xpm", xpm, "image/x-xpixmap", true},
+	{"js.js", js, "application/javascript", true},
+	{"json.json", json, "application/json", true},
+	{"json.lowascii.json", json, "application/json", false},
 	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents, but they should not be detected as application/json. This mimics
 	// the behaviour of the file utility and seems the correct thing to do.
-	"json.int.txt":       "text/plain; charset=utf-8",
-	"json.float.txt":     "text/plain; charset=utf-8",
-	"json.string.txt":    "text/plain; charset=utf-8",
-	"kml.kml":            "application/vnd.google-earth.kml+xml",
-	"lit.lit":            "application/x-ms-reader",
-	"ln":                 "application/x-executable",
-	"lua.lua":            "text/x-lua",
-	"lz.lz":              "application/lzip",
-	"m3u.m3u":            "application/vnd.apple.mpegurl",
-	"m4a.m4a":            "audio/x-m4a",
-	"audio.mp4":          "audio/mp4",
-	"lnk.lnk":            "application/x-ms-shortcut",
-	"macho.macho":        "application/x-mach-binary",
-	"mdb.mdb":            "application/x-msaccess",
-	"midi.midi":          "audio/midi",
-	"mkv.mkv":            "video/x-matroska",
-	"mobi.mobi":          "application/x-mobipocket-ebook",
-	"mov.mov":            "video/quicktime",
-	"mp3.mp3":            "audio/mpeg",
-	"mp3.v1.notag.mp3":   "audio/mpeg",
-	"mp3.v2.5.notag.mp3": "audio/mpeg",
-	"mp3.v2.notag.mp3":   "audio/mpeg",
-	"mp4.1.mp4":          "video/mp4",
-	"mp4.mp4":            "video/mp4",
-	"mpc.mpc":            "audio/musepack",
-	"mpeg.mpeg":          "video/mpeg",
-	"mqv.mqv":            "video/quicktime",
-	"mrc.mrc":            "application/marc",
-	"msi.msi":            "application/x-ms-installer",
-	"msg.msg":            "application/vnd.ms-outlook",
-	"ndjson.xl.ndjson":   "application/x-ndjson",
-	"ndjson.ndjson":      "application/x-ndjson",
-	"nes.nes":            "application/vnd.nintendo.snes.rom",
-	"elfobject":          "application/x-object",
-	"odf.odf":            "application/vnd.oasis.opendocument.formula",
-	"sxc.sxc":            "application/vnd.sun.xml.calc",
-	"odg.odg":            "application/vnd.oasis.opendocument.graphics",
-	"odp.odp":            "application/vnd.oasis.opendocument.presentation",
-	"ods.ods":            "application/vnd.oasis.opendocument.spreadsheet",
-	"odt.odt":            "application/vnd.oasis.opendocument.text",
-	"ogg.oga":            "audio/ogg",
-	"ogg.ogv":            "video/ogg",
-	"ogg.spx.oga":        "audio/ogg",
-	"otf.otf":            "font/otf",
-	"otg.otg":            "application/vnd.oasis.opendocument.graphics-template",
-	"otp.otp":            "application/vnd.oasis.opendocument.presentation-template",
-	"ots.ots":            "application/vnd.oasis.opendocument.spreadsheet-template",
-	"ott.ott":            "application/vnd.oasis.opendocument.text-template",
-	"odc.odc":            "application/vnd.oasis.opendocument.chart",
-	"owl2.owl":           "application/owl+xml",
-	"pat.pat":            "image/x-gimp-pat",
-	"pdf.pdf":            "application/pdf",
-	"php.php":            "text/x-php",
-	"pl.pl":              "text/x-perl",
-	"png.png":            "image/png",
-	"ppt.ppt":            "application/vnd.ms-powerpoint",
-	"pptx.pptx":          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-	"ps.ps":              "application/postscript",
-	"psd.psd":            "image/vnd.adobe.photoshop",
-	"p7s_pem.p7s":        "application/pkcs7-signature",
-	"p7s_der.p7s":        "application/pkcs7-signature",
-	"pub.pub":            "application/vnd.ms-publisher",
-	"py.py":              "text/x-python",
-	"qcp.qcp":            "audio/qcelp",
-	"rar.rar":            "application/x-rar-compressed",
-	"rmvb.rmvb":          "application/vnd.rn-realmedia-vbr",
-	"rpm.rpm":            "application/x-rpm",
-	"rss.rss":            "application/rss+xml",
-	"rtf.rtf":            "text/rtf",
-	"sample32.macho":     "application/x-mach-binary",
-	"sample64.macho":     "application/x-mach-binary",
-	"shp.shp":            "application/vnd.shp",
-	"shx.shx":            "application/vnd.shx",
-	"so.so":              "application/x-sharedlib",
-	"sqlite.sqlite":      "application/vnd.sqlite3",
-	"srt.srt":            "application/x-subrip",
-	"svg.1.svg":          "image/svg+xml",
-	"svg.svg":            "image/svg+xml",
-	"swf.swf":            "application/x-shockwave-flash",
-	"tar.tar":            "application/x-tar",
-	"tar.gnu.tar":        "application/x-tar",
-	"tar.oldgnu.tar":     "application/x-tar",
-	"tar.posix.tar":      "application/x-tar",
+	{"json.int.txt", text, "text/plain; charset=utf-8", false},
+	{"json.float.txt", text, "text/plain; charset=utf-8", false},
+	{"json.string.txt", text, "text/plain; charset=utf-8", false},
+	{"kml.kml", kml, "application/vnd.google-earth.kml+xml", true},
+	{"lit.lit", lit, "application/x-ms-reader", true},
+	{"ln", elfExe, "application/x-executable", true},
+	{"lua.lua", lua, "text/x-lua", true},
+	{"lz.lz", lzip, "application/lzip", true},
+	{"m3u.m3u", m3u, "application/vnd.apple.mpegurl", true},
+	{"m4a.m4a", m4a, "audio/x-m4a", true},
+	{"audio.mp4", aMp4, "audio/mp4", true},
+	{"lnk.lnk", lnk, "application/x-ms-shortcut", true},
+	{"macho.macho", macho, "application/x-mach-binary", true},
+	{"mdb.mdb", mdb, "application/x-msaccess", true},
+	{"midi.midi", midi, "audio/midi", true},
+	{"mkv.mkv", mkv, "video/x-matroska", true},
+	{"mobi.mobi", mobi, "application/x-mobipocket-ebook", true},
+	{"mov.mov", quickTime, "video/quicktime", true},
+	{"mp3.mp3", mp3, "audio/mpeg", true},
+	{"mp3.v1.notag.mp3", mp3, "audio/mpeg", false},
+	{"mp3.v2.5.notag.mp3", mp3, "audio/mpeg", false},
+	{"mp3.v2.notag.mp3", mp3, "audio/mpeg", false},
+	{"mp4.1.mp4", mp4, "video/mp4", false},
+	{"mp4.mp4", mp4, "video/mp4", true},
+	{"mpc.mpc", musePack, "audio/musepack", true},
+	{"mpeg.mpeg", mpeg, "video/mpeg", true},
+	{"mqv.mqv", mqv, "video/quicktime", true},
+	{"mrc.mrc", mrc, "application/marc", true},
+	{"msi.msi", msi, "application/x-ms-installer", true},
+	{"msg.msg", msg, "application/vnd.ms-outlook", true},
+	{"ndjson.xl.ndjson", ndJSON, "application/x-ndjson", false},
+	{"ndjson.ndjson", ndJSON, "application/x-ndjson", true},
+	{"nes.nes", nes, "application/vnd.nintendo.snes.rom", true},
+	{"elfobject", elfObj, "application/x-object", true},
+	{"odf.odf", odf, "application/vnd.oasis.opendocument.formula", true},
+	{"sxc.sxc", sxc, "application/vnd.sun.xml.calc", true},
+	{"odg.odg", odg, "application/vnd.oasis.opendocument.graphics", true},
+	{"odp.odp", odp, "application/vnd.oasis.opendocument.presentation", true},
+	{"ods.ods", ods, "application/vnd.oasis.opendocument.spreadsheet", true},
+	{"odt.odt", odt, "application/vnd.oasis.opendocument.text", true},
+	{"ogg.oga", ogg, "audio/ogg", true},
+	{"ogg.ogv", ogg, "video/ogg", true},
+	{"ogg.spx.oga", ogg, "audio/ogg", true},
+	{"otf.otf", otf, "font/otf", true},
+	{"otg.otg", otg, "application/vnd.oasis.opendocument.graphics-template", true},
+	{"otp.otp", otp, "application/vnd.oasis.opendocument.presentation-template", true},
+	{"ots.ots", ots, "application/vnd.oasis.opendocument.spreadsheet-template", true},
+	{"ott.ott", ott, "application/vnd.oasis.opendocument.text-template", true},
+	{"odc.odc", odc, "application/vnd.oasis.opendocument.chart", true},
+	{"owl2.owl", owl2, "application/owl+xml", true},
+	{"pat.pat", pat, "image/x-gimp-pat", true},
+	{"pdf.pdf", pdf, "application/pdf", true},
+	{"php.php", php, "text/x-php", true},
+	{"pl.pl", perl, "text/x-perl", true},
+	{"png.png", png, "image/png", true},
+	{"ppt.ppt", ppt, "application/vnd.ms-powerpoint", true},
+	{"pptx.pptx", pptx, "application/vnd.openxmlformats-officedocument.presentationml.presentation", true},
+	{"ps.ps", ps, "application/postscript", true},
+	{"psd.psd", psd, "image/vnd.adobe.photoshop", true},
+	{"p7s_pem.p7s", p7s, "application/pkcs7-signature", true},
+	{"p7s_der.p7s", p7s, "application/pkcs7-signature", true},
+	{"pub.pub", pub, "application/vnd.ms-publisher", true},
+	{"py.py", python, "text/x-python", true},
+	{"qcp.qcp", qcp, "audio/qcelp", true},
+	{"rar.rar", rar, "application/x-rar-compressed", true},
+	{"rmvb.rmvb", rmvb, "application/vnd.rn-realmedia-vbr", true},
+	{"rpm.rpm", rpm, "application/x-rpm", true},
+	{"rss.rss", rss, "application/rss+xml", true},
+	{"rtf.rtf", rtf, "text/rtf", true},
+	{"sample32.macho", macho, "application/x-mach-binary", false},
+	{"sample64.macho", macho, "application/x-mach-binary", false},
+	{"shp.shp", shp, "application/vnd.shp", true},
+	{"shx.shx", shx, "application/vnd.shx", true},
+	{"so.so", elfLib, "application/x-sharedlib", true},
+	{"sqlite.sqlite", sqlite3, "application/vnd.sqlite3", true},
+	{"srt.srt", srt, "application/x-subrip", true},
+	{"svg.1.svg", svg, "image/svg+xml", false},
+	{"svg.svg", svg, "image/svg+xml", true},
+	{"swf.swf", swf, "application/x-shockwave-flash", true},
+	{"tar.tar", tar, "application/x-tar", true},
+	{"tar.gnu.tar", tar, "application/x-tar", false},
+	{"tar.oldgnu.tar", tar, "application/x-tar", false},
+	{"tar.posix.tar", tar, "application/x-tar", false},
 	// tar.star.tar was generated with star 1.6.
-	"tar.star.tar":  "application/x-tar",
-	"tar.ustar.tar": "application/x-tar",
-	"tar.v7.tar":    "application/x-tar",
+	{"tar.star.tar", tar, "application/x-tar", false},
+	{"tar.ustar.tar", tar, "application/x-tar", false},
+	{"tar.v7.tar", tar, "application/x-tar", false},
 	// tar.v7-gnu.tar is a v7 tar archive generated with GNU tar 1.29.
-	"tar.v7-gnu.tar":  "application/x-tar",
-	"tcl.tcl":         "text/x-tcl",
-	"tcx.tcx":         "application/vnd.garmin.tcx+xml",
-	"tiff.tiff":       "image/tiff",
-	"torrent.torrent": "application/x-bittorrent",
-	"tsv.tsv":         "text/tab-separated-values",
-	"ttc.ttc":         "font/collection",
-	"ttf.ttf":         "font/ttf",
-	"tzfile":          "application/tzif",
-	"utf16bebom.txt":  "text/plain; charset=utf-16be",
-	"utf16lebom.txt":  "text/plain; charset=utf-16le",
-	"utf32bebom.txt":  "text/plain; charset=utf-32be",
-	"utf32lebom.txt":  "text/plain; charset=utf-32le",
-	"utf8.txt":        "text/plain; charset=utf-8",
-	"utf8ctrlchars":   "application/octet-stream",
-	"vcf.dos.vcf":     "text/vcard",
-	"vcf.vcf":         "text/vcard",
-	"voc.voc":         "audio/x-unknown",
-	"vtt.vtt":         "text/vtt",
-	"vtt.space.vtt":   "text/vtt",
-	"vtt.tab.vtt":     "text/vtt",
-	"vtt.eof.vtt":     "text/vtt",
-	"warc.warc":       "application/warc",
-	"wasm.wasm":       "application/wasm",
-	"wav.wav":         "audio/wav",
-	"webm.webm":       "video/webm",
-	"webp.webp":       "image/webp",
-	"woff.woff":       "font/woff",
-	"woff2.woff2":     "font/woff2",
-	"x3d.x3d":         "model/x3d+xml",
-	"xar.xar":         "application/x-xar",
-	"xcf.xcf":         "image/x-xcf",
-	"xfdf.xfdf":       "application/vnd.adobe.xfdf",
-	"xlf.xlf":         "application/x-xliff+xml",
-	"xls.xls":         "application/vnd.ms-excel",
-	"xlsx.xlsx":       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-	"xml.xml":         "text/xml; charset=utf-8",
-	"xml.withbr.xml":  "text/xml; charset=utf-8",
-	"xz.xz":           "application/x-xz",
-	"zip.zip":         "application/zip",
-	"zst.zst":         "application/zstd",
+	{"tar.v7-gnu.tar", tar, "application/x-tar", false},
+	{"tcl.tcl", tcl, "text/x-tcl", true},
+	{"tcx.tcx", tcx, "application/vnd.garmin.tcx+xml", true},
+	{"tiff.tiff", tiff, "image/tiff", true},
+	{"torrent.torrent", torrent, "application/x-bittorrent", true},
+	{"tsv.tsv", tsv, "text/tab-separated-values", true},
+	{"ttc.ttc", ttc, "font/collection", true},
+	{"ttf.ttf", ttf, "font/ttf", true},
+	{"tzfile", tzif, "application/tzif", true},
+	{"utf16bebom.txt", text, "text/plain; charset=utf-16be", false},
+	{"utf16lebom.txt", text, "text/plain; charset=utf-16le", false},
+	{"utf32bebom.txt", text, "text/plain; charset=utf-32be", false},
+	{"utf32lebom.txt", text, "text/plain; charset=utf-32le", false},
+	{"utf8.txt", text, "text/plain; charset=utf-8", false},
+	{"utf8ctrlchars", root, "application/octet-stream", false},
+	{"vcf.vcf", vCard, "text/vcard", true},
+	{"vcf.dos.vcf", vCard, "text/vcard", false},
+	{"voc.voc", voc, "audio/x-unknown", true},
+	{"vtt.vtt", vtt, "text/vtt", true},
+	{"vtt.space.vtt", vtt, "text/vtt", false},
+	{"vtt.tab.vtt", vtt, "text/vtt", false},
+	{"vtt.eof.vtt", vtt, "text/vtt", false},
+	{"warc.warc", warc, "application/warc", true},
+	{"wasm.wasm", wasm, "application/wasm", true},
+	{"wav.wav", wav, "audio/wav", true},
+	{"webm.webm", webM, "video/webm", true},
+	{"webp.webp", webp, "image/webp", true},
+	{"woff.woff", woff, "font/woff", true},
+	{"woff2.woff2", woff2, "font/woff2", true},
+	{"x3d.x3d", x3d, "model/x3d+xml", true},
+	{"xar.xar", xar, "application/x-xar", true},
+	{"xcf.xcf", xcf, "image/x-xcf", true},
+	{"xfdf.xfdf", xfdf, "application/vnd.adobe.xfdf", true},
+	{"xlf.xlf", xliff, "application/x-xliff+xml", true},
+	{"xls.xls", xls, "application/vnd.ms-excel", true},
+	{"xlsx.xlsx", xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", true},
+	{"xml.xml", xml, "text/xml; charset=utf-8", true},
+	{"xml.withbr.xml", xml, "text/xml; charset=utf-8", false},
+	{"xz.xz", xz, "application/x-xz", true},
+	{"zip.zip", zip, "application/zip", true},
+	{"zst.zst", zstd, "application/zstd", true},
 }
 
 func TestDetect(t *testing.T) {
 	errStr := "File: %s; Expected: %s != Detected: %s; err: %v"
 	extStr := "File: %s; ExpectedExt: %s != DetectedExt: %s"
-	for fName, expected := range files {
-		fileName := filepath.Join(testDataDir, fName)
+	for _, tc := range testcases {
+		fileName := filepath.Join(testDataDir, tc.file)
 		f, err := os.Open(fileName)
 		if err != nil {
 			t.Fatal(err)
@@ -243,23 +250,23 @@ func TestDetect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if mtype := Detect(data); mtype.String() != expected {
-			t.Errorf(errStr, fName, expected, mtype.String(), nil)
+		if mtype := Detect(data); mtype.String() != tc.expectedMIME {
+			t.Errorf(errStr, tc.file, tc.expectedMIME, mtype.String(), nil)
 		}
 
 		if _, err := f.Seek(0, io.SeekStart); err != nil {
 			t.Fatal(err)
 		}
 
-		if mtype, err := DetectReader(f); mtype.String() != expected {
-			t.Errorf(errStr, fName, expected, mtype.String(), err)
+		if mtype, err := DetectReader(f); mtype.String() != tc.expectedMIME {
+			t.Errorf(errStr, tc.file, tc.expectedMIME, mtype.String(), err)
 		}
 		f.Close()
 
-		if mtype, err := DetectFile(fileName); mtype.String() != expected {
-			t.Errorf(errStr, fName, expected, mtype.String(), err)
-		} else if mtype.Extension() != filepath.Ext(fName) {
-			t.Errorf(extStr, fName, filepath.Ext(fName), mtype.Extension())
+		if mtype, err := DetectFile(fileName); mtype.String() != tc.expectedMIME {
+			t.Errorf(errStr, tc.file, tc.expectedMIME, mtype.String(), err)
+		} else if mtype.Extension() != filepath.Ext(tc.file) {
+			t.Errorf(extStr, tc.file, filepath.Ext(tc.file), mtype.Extension())
 		}
 	}
 }
@@ -325,8 +332,8 @@ func TestEqualsAny(t *testing.T) {
 
 func TestDetectReader(t *testing.T) {
 	errStr := "File: %s; Mime: %s != DetectedMime: %s; err: %v"
-	for fName, expected := range files {
-		fileName := filepath.Join(testDataDir, fName)
+	for _, tc := range testcases {
+		fileName := filepath.Join(testDataDir, tc.file)
 		f, err := os.Open(fileName)
 		if err != nil {
 			t.Fatal(err)
@@ -335,8 +342,8 @@ func TestDetectReader(t *testing.T) {
 			r:         f,
 			breakSize: 3,
 		}
-		if mtype, err := DetectReader(&r); mtype.String() != expected {
-			t.Errorf(errStr, fName, expected, mtype.String(), err)
+		if mtype, err := DetectReader(&r); mtype.String() != tc.expectedMIME {
+			t.Errorf(errStr, tc.file, tc.expectedMIME, mtype.String(), err)
 		}
 		f.Close()
 	}
@@ -467,81 +474,32 @@ func TestEmptyInput(t *testing.T) {
 	SetLimit(defaultLimit)
 }
 
-// Benchmarking a random slice of bytes is as close as possible to the real
-// world usage. A random byte slice is almost guaranteed to fail being detected.
-//
-// When performing a detection on a file it is very likely there will be
-// multiple rules failing before finding the one that matches, ex: a jpg file
-// might be tested for zip, gzip, etc., before it is identified.
-func BenchmarkSliceRand(b *testing.B) {
+func BenchmarkAll(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
-	data := make([]byte, defaultLimit)
-	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
+	// randData is used for the negative case benchmark.
+	randData := make([]byte, defaultLimit)
+	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
 
-	b.ResetTimer()
-	b.ReportAllocs()
-
-	for n := 0; n < b.N; n++ {
-		Detect(data)
-	}
-}
-
-func BenchmarkText(b *testing.B) {
-	r := rand.New(rand.NewSource(0))
-	data := make([]byte, defaultLimit)
-	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
-		b.Fatal(err)
-	}
-
-	for _, m := range text.children {
-		b.Run(m.String(), func(b *testing.B) {
-			b.ReportAllocs()
-			b.ResetTimer()
-			for n := 0; n < b.N; n++ {
-				m.detector(data, uint32(len(data)))
-			}
-		})
-	}
-}
-
-// BenchmarkFiles benchmarks each detector with his coresponding file.
-func BenchmarkFiles(b *testing.B) {
-	for f, m := range files {
-		data, err := os.ReadFile(filepath.Join(testDataDir, f))
+	for _, tc := range testcases {
+		if !tc.bench {
+			continue
+		}
+		// data is used for the positive case benchmark.
+		data, err := os.ReadFile(filepath.Join(testDataDir, tc.file))
 		if err != nil {
 			b.Fatal(err)
 		}
-		if uint32(len(data)) > defaultLimit {
-			data = data[:defaultLimit]
-		}
-		b.Run(f+"/"+m, func(b *testing.B) {
+		b.Run(tc.file, func(b *testing.B) {
 			b.ReportAllocs()
-			b.ResetTimer()
-			parsed, _, _ := mime.ParseMediaType(m)
-			mType := Lookup(parsed)
 			for n := 0; n < b.N; n++ {
-				if !mType.detector(data, uint32(len(data))) {
-					b.Fatal("detection should never fail")
+				if !tc.mime.detector(data, defaultLimit) {
+					b.Fatalf("positive detection should never fail; file=%s", tc.file)
 				}
-			}
-		})
-	}
-}
-
-func BenchmarkAll(b *testing.B) {
-	r := rand.New(rand.NewSource(0))
-	data := make([]byte, defaultLimit)
-	if _, err := io.ReadFull(r, data); err != io.ErrUnexpectedEOF && err != nil {
-		b.Fatal(err)
-	}
-	for _, m := range root.flatten() {
-		b.Run(m.String(), func(b *testing.B) {
-			b.ReportAllocs()
-			b.ResetTimer()
-			for n := 0; n < b.N; n++ {
-				m.detector(data, uint32(len(data)))
+				if tc.mime.detector(randData, defaultLimit) {
+					b.Fatalf("negative detection should always fail; file=%s", tc.file)
+				}
 			}
 		})
 	}
