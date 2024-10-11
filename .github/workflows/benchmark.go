@@ -1,6 +1,7 @@
 name: Run benchmarks
 on:
   pull_request:
+    branches: [master]
 
 permissions:
   contents: read
