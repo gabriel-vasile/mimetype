@@ -206,7 +206,7 @@ var testcases = []testcase{
 	{"utf16lebom.txt", text, "text/plain; charset=utf-16le", false},
 	{"utf32bebom.txt", text, "text/plain; charset=utf-32be", false},
 	{"utf32lebom.txt", text, "text/plain; charset=utf-32le", false},
-	{"utf8.txt", text, "text/plain; charset=utf-8", false},
+	{"utf8.txt", text, "text/plain; charset=utf-8", true},
 	{"utf8ctrlchars", root, "application/octet-stream", false},
 	{"vcf.vcf", vCard, "text/vcard", true},
 	{"vcf.dos.vcf", vCard, "text/vcard", false},
@@ -500,37 +500,6 @@ func BenchmarkAll(b *testing.B) {
 				if tc.mime.detector(randData, defaultLimit) {
 					b.Fatalf("negative detection should always fail; file=%s", tc.file)
 				}
-			}
-		})
-	}
-}
-
-func BenchmarkCommon(b *testing.B) {
-	commonFiles := []string{
-		"xlsx.xlsx",
-		"pptx.pptx",
-		"docx.docx",
-		"tar.tar",
-		"zip.zip",
-		"pdf.pdf",
-		"jpg.jpg",
-		"png.png",
-		"gif.gif",
-		"xls.xls",
-		"webm.webm",
-		"csv.csv",
-		"mp4.mp4",
-	}
-	for _, file := range commonFiles {
-		f, err := os.ReadFile(filepath.Join(testDataDir, file))
-		if err != nil {
-			b.Fatal(err)
-		}
-		b.Run(filepath.Ext(file), func(b *testing.B) {
-			b.ReportAllocs()
-			b.ResetTimer()
-			for n := 0; n < b.N; n++ {
-				Detect(f)
 			}
 		})
 	}
