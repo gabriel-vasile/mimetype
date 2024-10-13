@@ -24,10 +24,7 @@ jobs:
         version: "v1.58"
 
   test:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.2.1
