@@ -1,0 +1,32 @@
+name: Run benchmarks
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+    # Base for comparison is master branch.
+    - name: Checkout code
+      uses: actions/checkout@v4.2.1
+      with:
+        ref: master
+    - name: Install Go
+      uses: actions/setup-go@v5.0.2
+      with:
+        go-version-file: 'go.mod'
+
+    # 30 runs with 100ms benchtime seems to result in acceptable p-values
+    # When I tried with count=10, it would be unreliable because of the actions
+    # runner is in a shared environment and CPU and mem would be affected by others. (or so I think)
+    - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/prev
+    - name: Checkout code
+      uses: actions/checkout@v4.2.1
+    - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/curr
+
+    - run: go install golang.org/x/perf/cmd/benchstat@latest
+    - run: benchstat /tmp/prev /tmp/curr
