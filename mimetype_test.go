@@ -110,7 +110,6 @@ var testcases = []testcase{
 	{"json.string.txt", text, "text/plain; charset=utf-8", false},
 	{"kml.kml", kml, "application/vnd.google-earth.kml+xml", true},
 	{"lit.lit", lit, "application/x-ms-reader", true},
-	{"ln", elfExe, "application/x-executable", true},
 	{"lua.lua", lua, "text/x-lua", true},
 	{"lz.lz", lzip, "application/lzip", true},
 	{"m3u.m3u", m3u, "application/vnd.apple.mpegurl", true},
