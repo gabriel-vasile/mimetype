@@ -2,6 +2,7 @@ package magic
 
 import (
 	"bytes"
+	"regexp"
 	"strings"
 	"time"
 
@@ -295,9 +296,17 @@ func HAR(raw []byte, limit uint32) bool {
 	return false
 }
 
+var (
+	svgComment       = regexp.MustCompile(`(?s)<!--.*?-->`)
+	svgTagRegex      = regexp.MustCompile(`(?si)\A\s*(?:(<!DOCTYPE\s+svg([\s:]+.*?>|>))\s*)*<svg\b`)
+	svgTagInXMLRegex = regexp.MustCompile(`(?si)\A<\?xml\b.*?\?>\s*(?:(<!DOCTYPE\s+svg([\s:]+.*?>|>))\s*)*<svg\b`)
+)
+
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
-	return bytes.Contains(raw, []byte("<svg"))
+	dataProcessed := svgComment.ReplaceAll(raw, nil)
+	dataProcessed = bytes.TrimSpace(dataProcessed)
+	return svgTagRegex.Match(dataProcessed) || svgTagInXMLRegex.Match(dataProcessed)
 }
 
 // Srt matches a SubRip file.
