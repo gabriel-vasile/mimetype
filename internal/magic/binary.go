@@ -23,6 +23,8 @@ var (
 	Torrent = prefix([]byte("d8:announce"))
 	// PAR1 matches a parquet file.
 	Par1 = prefix([]byte{0x50, 0x41, 0x52, 0x31})
+	// CBOR matches a Concise Binary Object Representation https://cbor.io/
+	CBOR = prefix([]byte{0xD9, 0xD9, 0xF7})
 )
 
 // Java bytecode and Mach-O binaries share the same magic number.
