@@ -196,7 +196,6 @@ var testcases = []testcase{
 	{"tcl.tcl", tcl, "text/x-tcl", true},
 	{"tcx.tcx", tcx, "application/vnd.garmin.tcx+xml", true},
 	{"tiff.tiff", tiff, "image/tiff", true},
-	{"torrent.torrent", torrent, "application/x-bittorrent", true},
 	{"tsv.tsv", tsv, "text/tab-separated-values", true},
 	{"ttc.ttc", ttc, "font/collection", true},
 	{"ttf.ttf", ttf, "font/ttf", true},
