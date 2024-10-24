@@ -158,11 +158,11 @@ func Marc(raw []byte, limit uint32) bool {
 // the GL transmission Format (glTF).
 // GLB uses little endian and its header structure is as follows:
 //
-// 	<-- 12-byte header                             -->
-// 	| magic            | version          | length   |
-// 	| (uint32)         | (uint32)         | (uint32) |
-// 	| \x67\x6C\x54\x46 | \x01\x00\x00\x00 | ...      |
-// 	| g   l   T   F    | 1                | ...      |
+//	<-- 12-byte header                             -->
+//	| magic            | version          | length   |
+//	| (uint32)         | (uint32)         | (uint32) |
+//	| \x67\x6C\x54\x46 | \x01\x00\x00\x00 | ...      |
+//	| g   l   T   F    | 1                | ...      |
 //
 // Visit [glTF specification] and [IANA glTF entry] for more details.
 //
@@ -174,14 +174,15 @@ var Glb = prefix([]byte("\x67\x6C\x54\x46\x02\x00\x00\x00"),
 // TzIf matches a Time Zone Information Format (TZif) file.
 // See more: https://tools.ietf.org/id/draft-murchison-tzdist-tzif-00.html#rfc.section.3
 // Its header structure is shown below:
-// 	+---------------+---+
-// 	|  magic    (4) | <-+-- version (1)
-// 	+---------------+---+---------------------------------------+
-// 	|           [unused - reserved for future use] (15)         |
-// 	+---------------+---------------+---------------+-----------+
-// 	|  isutccnt (4) |  isstdcnt (4) |  leapcnt  (4) |
-// 	+---------------+---------------+---------------+
-// 	|  timecnt  (4) |  typecnt  (4) |  charcnt  (4) |
+//
+//	+---------------+---+
+//	|  magic    (4) | <-+-- version (1)
+//	+---------------+---+---------------------------------------+
+//	|           [unused - reserved for future use] (15)         |
+//	+---------------+---------------+---------------+-----------+
+//	|  isutccnt (4) |  isstdcnt (4) |  leapcnt  (4) |
+//	+---------------+---------------+---------------+
+//	|  timecnt  (4) |  typecnt  (4) |  charcnt  (4) |
 func TzIf(raw []byte, limit uint32) bool {
 	// File is at least 44 bytes (header size).
 	if len(raw) < 44 {
