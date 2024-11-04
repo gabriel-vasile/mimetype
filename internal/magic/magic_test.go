@@ -13,71 +13,61 @@ func TestMagic(t *testing.T) {
 		raw      string
 		limit    uint32
 		res      bool
-	}{
-		{
-			name:     "incomplete JSON, limit 0",
-			detector: JSON,
-			raw:      `["an incomplete JSON array`,
-			limit:    0,
-			res:      false,
-		},
-		{
-			name:     "incomplete JSON, limit 10",
-			detector: JSON,
-			raw:      `["an incomplete JSON array`,
-			limit:    10,
-			res:      true,
-		},
-		{
-			name:     "basic JSON data type null",
-			detector: JSON,
-			raw:      `null`,
-			limit:    10,
-			res:      false,
-		},
-		{
-			name:     "basic JSON data type string",
-			detector: JSON,
-			raw:      `"abc"`,
-			limit:    10,
-			res:      false,
-		},
-		{
-			name:     "basic JSON data type integer",
-			detector: JSON,
-			raw:      `120`,
-			limit:    10,
-			res:      false,
-		},
-		{
-			name:     "basic JSON data type float",
-			detector: JSON,
-			raw:      `.120`,
-			limit:    10,
-			res:      false,
-		},
-		{
-			name:     "NdJSON with basic data types",
-			detector: NdJSON,
-			raw:      "1\nnull\n\"foo\"\n0.1",
-			limit:    10,
-			res:      false,
-		},
-		{
-			name:     "NdJSON with basic data types and empty object",
-			detector: NdJSON,
-			raw:      "1\n2\n3\n{}",
-			limit:    10,
-			res:      true,
-		},
-		{
-			name:     "NdJSON with empty objects types",
-			detector: NdJSON,
-			raw:      "{}\n{}\n{}",
-			limit:    10,
-			res:      true,
-		},
-	}
+	}{{
+		name:     "incomplete JSON, limit 0",
+		detector: JSON,
+		raw:      `["an incomplete JSON array`,
+		limit:    0,
+		res:      false,
+	}, {
+		name:     "incomplete JSON, limit 10",
+		detector: JSON,
+		raw:      `["an incomplete JSON array`,
+		limit:    10,
+		res:      true,
+	}, {
+		name:     "basic JSON data type null",
+		detector: JSON,
+		raw:      `null`,
+		limit:    10,
+		res:      false,
+	}, {
+		name:     "basic JSON data type string",
+		detector: JSON,
+		raw:      `"abc"`,
+		limit:    10,
+		res:      false,
+	}, {
+		name:     "basic JSON data type integer",
+		detector: JSON,
+		raw:      `120`,
+		limit:    10,
+		res:      false,
+	}, {
+		name:     "basic JSON data type float",
+		detector: JSON,
+		raw:      `.120`,
+		limit:    10,
+		res:      false,
+	}, {
+		name:     "NdJSON with basic data types",
+		detector: NdJSON,
+		raw:      "1\nnull\n\"foo\"\n0.1",
+		limit:    10,
+		res:      false,
+	}, {
+		name:     "NdJSON with basic data types and empty object",
+		detector: NdJSON,
+		raw:      "1\n2\n3\n{}",
+		limit:    10,
+		res:      true,
+	}, {
+		name:     "NdJSON with empty objects types",
+		detector: NdJSON,
+		raw:      "{}\n{}\n{}",
+		limit:    10,
+		res:      true,
+	}}
 	for _, tt := range tCases {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.detector([]byte(tt.raw), tt.limit); got != tt.res {
