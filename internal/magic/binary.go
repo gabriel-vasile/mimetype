@@ -36,7 +36,7 @@ func classOrMachOFat(in []byte) bool {
 		return false
 	}
 
-	return bytes.HasPrefix(in, []byte{0xCA, 0xFE, 0xBA, 0xBE})
+	return binary.BigEndian.Uint32(in) == macho.MagicFat
 }
 
 // Class matches a java class file.
