@@ -67,11 +67,45 @@ func TestMagic(t *testing.T) {
 		raw:      "{}\n{}\n{}",
 		limit:    10,
 		res:      true,
+	}, {
+		name:     "MachO class or Fat but last byte > \\x14",
+		detector: MachO,
+		raw:      "\xCA\xFE\xBA\xBE   \x15",
+		res:      false,
+	}, {
+		name:     "MachO class or Fat and last byte < \\x14",
+		detector: MachO,
+		raw:      "\xCA\xFE\xBA\xBE   \x13",
+		res:      true,
+	}, {
+		name:     "MachO BE Magic32",
+		detector: MachO,
+		raw:      "\xFE\xED\xFA\xCE",
+		res:      true,
+	}, {
+		name:     "MachO LE Magic32",
+		detector: MachO,
+		raw:      "\xCE\xFA\xED\xFE",
+		res:      true,
+	}, {
+		name:     "MachO BE Magic64",
+		detector: MachO,
+		raw:      "\xFE\xED\xFA\xCF",
+		res:      true,
+	}, {
+		name:     "MachO LE Magic64",
+		detector: MachO,
+		raw:      "\xCF\xFA\xED\xFE",
+		res:      true,
 	}}
 	for _, tt := range tCases {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.detector([]byte(tt.raw), tt.limit); got != tt.res {
 				t.Errorf("expected: %t; got: %t", tt.res, got)
+			}
+			// Empty inputs should not pass as anything.
+			if got := tt.detector(nil, 0); got != false {
+				t.Errorf("empty input: expected: %t; got: %t", false, got)
 			}
 		})
 	}

@@ -46,7 +46,7 @@ func Class(raw []byte, limit uint32) bool {
 
 // MachO matches Mach-O binaries format.
 func MachO(raw []byte, limit uint32) bool {
-	if classOrMachOFat(raw) && raw[7] < 20 {
+	if classOrMachOFat(raw) && raw[7] < 0x14 {
 		return true
 	}
 
