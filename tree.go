@@ -156,7 +156,7 @@ var (
 	aac  = newMIME("audio/aac", ".aac", magic.AAC)
 	voc  = newMIME("audio/x-unknown", ".voc", magic.Voc)
 	aMp4 = newMIME("audio/mp4", ".mp4", magic.AMp4).
-		alias("audio/x-m4a", "audio/x-mp4a")
+		alias("audio/x-mp4a")
 	m4a = newMIME("audio/x-m4a", ".m4a", magic.M4a)
 	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3u).
 		alias("audio/mpegurl")
