@@ -79,7 +79,7 @@ Extension | MIME type | Aliases
 **.avif** | image/avif | -
 **.3gp** | video/3gpp | video/3gp, audio/3gpp
 **.3g2** | video/3gpp2 | video/3g2, audio/3gpp2
-**.mp4** | audio/mp4 | audio/x-m4a, audio/x-mp4a
+**.mp4** | audio/mp4 | audio/x-mp4a
 **.mqv** | video/quicktime | -
 **.m4a** | audio/x-m4a | -
 **.m4v** | video/x-m4v | -
