@@ -138,7 +138,7 @@ var testcases = []testcase{
 	{"jxl 2", "\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a", "image/jxl", false},
 	{"jxr", "\x49\x49\xBC\x01", "image/jxr", true},
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", true},
-	{"js", "#!/bin/node ", "application/javascript", true},
+	{"js", "#!/bin/node ", "text/javascript", true},
 	{"json", `{"key":"val"}`, "application/json", true},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON

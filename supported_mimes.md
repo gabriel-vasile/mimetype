@@ -163,7 +163,7 @@ Extension | MIME type | Aliases
 **.xfdf** | application/vnd.adobe.xfdf | -
 **.owl** | application/owl+xml | -
 **.php** | text/x-php | -
-**.js** | application/javascript | application/x-javascript, text/javascript
+**.js** | text/javascript | application/x-javascript, application/javascript
 **.lua** | text/x-lua | -
 **.pl** | text/x-perl | -
 **.py** | text/x-python | text/x-script.python, application/x-python
