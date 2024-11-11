@@ -12,11 +12,11 @@ jobs:
     steps:
     # Base for comparison is master branch.
     - name: Checkout code
-      uses: actions/checkout@v4.2.1
+      uses: actions/checkout@v4.2.2
       with:
         ref: master
     - name: Install Go
-      uses: actions/setup-go@v5.0.2
+      uses: actions/setup-go@v5.1.0
       with:
         go-version-file: 'go.mod'
 
@@ -25,7 +25,7 @@ jobs:
     # runner is in a shared environment and CPU and mem would be affected by others. (or so I think)
     - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/prev
     - name: Checkout code
-      uses: actions/checkout@v4.2.1
+      uses: actions/checkout@v4.2.2
     - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/curr
 
     - run: go install golang.org/x/perf/cmd/benchstat@latest

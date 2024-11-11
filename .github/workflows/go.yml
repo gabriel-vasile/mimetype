@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4.2.1
+      uses: actions/checkout@v4.2.2
     - name: Install Go
-      uses: actions/setup-go@v5.0.2
+      uses: actions/setup-go@v5.1.0
       with:
         go-version-file: 'go.mod'
     - name: Run linters
@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4.2.1
+      uses: actions/checkout@v4.2.2
     - name: Install Go
       if: success()
-      uses: actions/setup-go@v5.0.2
+      uses: actions/setup-go@v5.1.0
       with:
         go-version-file: 'go.mod'
     - run: go test -race ./...
