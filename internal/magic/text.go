@@ -297,16 +297,22 @@ func HAR(raw []byte, limit uint32) bool {
 }
 
 var (
-	svgComment       = regexp.MustCompile(`(?s)<!--.*?-->`)
-	svgTagRegex      = regexp.MustCompile(`(?si)\A\s*(?:(<!DOCTYPE\s+svg([\s:]+.*?>|>))\s*)*<svg\b`)
-	svgTagInXMLRegex = regexp.MustCompile(`(?si)\A<\?xml\b.*?\?>\s*(?:(<!DOCTYPE\s+svg([\s:]+.*?>|>))\s*)*<svg\b`)
+	xmlPrefix         = []byte("<?xml version=")
+	xmlVersionRegex   = regexp.MustCompile(`['"\ \t]*[0-9.]+['"\ \t]*`)
+	svgDocumentPrefix = []byte("<!DOCTYPE svg PUBLIC")
+	svgPrefix         = []byte("<svg")
 )
 
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
-	dataProcessed := svgComment.ReplaceAll(raw, nil)
-	dataProcessed = bytes.TrimSpace(dataProcessed)
-	return svgTagRegex.Match(dataProcessed) || svgTagInXMLRegex.Match(dataProcessed)
+	if bytes.HasPrefix(raw, xmlPrefix) {
+		mlen := min(len(raw), 10+len(xmlPrefix))
+		return xmlVersionRegex.Match(raw[len(xmlPrefix):mlen]) && bytes.Contains(raw, []byte("<svg"))
+	}
+	if bytes.HasPrefix(raw, svgDocumentPrefix) {
+		return true
+	}
+	return bytes.HasPrefix(raw, svgPrefix)
 }
 
 // Srt matches a SubRip file.
