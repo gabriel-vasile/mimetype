@@ -262,6 +262,7 @@ var testcases = []testcase{
 	{"xz", "\xfd7zXZ\x00", "application/x-xz", true},
 	{"zip", "PK\x03\x04", "application/zip", true},
 	{"zst", "(\xb5/\xfd", "application/zstd", true},
+	{"zst skippable frame", "\x50\x2A\x4D\x18", "application/zstd", false},
 }
 
 func TestDetect(t *testing.T) {
