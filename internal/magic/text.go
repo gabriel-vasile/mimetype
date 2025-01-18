@@ -379,3 +379,29 @@ func scanLine(b []byte) (line, remainder []byte) {
 	line, remainder, _ = bytes.Cut(b, []byte("\n"))
 	return dropCR(line), remainder
 }
+
+// Gltf matches a GL Transmission Format (JSON) file
+// Visit [glTF specification] and [IANA glTF entry] for more details.
+//
+// [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
+// [IANA glTF (JSON) entry]: https://www.iana.org/assignments/media-types/model/gltf+json
+func Gltf(raw []byte, limit uint32) bool {
+	raw = trimLWS(raw)
+	if len(raw) == 0 || raw[0] != '{' {
+		return false
+	}
+
+	// Check for required GLTF identifiers
+	gltfIdentifiers := [][]byte{
+		[]byte(`"asset"`),
+		[]byte(`"version"`),
+	}
+
+	for _, id := range gltfIdentifiers {
+		if !bytes.Contains(raw, id) {
+			return false
+		}
+	}
+
+	return true
+}

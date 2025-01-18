@@ -167,7 +167,7 @@ func Marc(raw []byte, limit uint32) bool {
 // Visit [glTF specification] and [IANA glTF entry] for more details.
 //
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
-// [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf-binary
+// [IANA glTF (binary) entry]: https://www.iana.org/assignments/media-types/model/gltf-binary
 var Glb = prefix([]byte("\x67\x6C\x54\x46\x02\x00\x00\x00"),
 	[]byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
 
