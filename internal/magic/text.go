@@ -308,7 +308,7 @@ func Srt(raw []byte, _ uint32) bool {
 		return false
 	}
 	line, raw = scanLine(raw)
-	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits secondLine
+	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits second line
 	// length to exactly 29 characters.
 	if len(line) != 29 {
 		return false
