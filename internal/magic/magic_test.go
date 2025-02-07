@@ -226,6 +226,7 @@ Senator, we're making
 our final approach into Coruscant.
 
 `
+	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		Srt([]byte(subtitle), 0)
 	}

@@ -2,7 +2,6 @@ package magic
 
 import (
 	"bytes"
-	"strings"
 	"time"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
@@ -305,32 +304,31 @@ func Srt(raw []byte, _ uint32) bool {
 	line, raw := scanLine(raw)
 
 	// First line must be 1.
-	if string(line) != "1" {
+	if len(line) != 1 || line[0] != '1' {
 		return false
 	}
 	line, raw = scanLine(raw)
-	secondLine := string(line)
-	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits secondLine
+	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits second line
 	// length to exactly 29 characters.
-	if len(secondLine) != 29 {
+	if len(line) != 29 {
 		return false
 	}
 	// Decimal separator of fractional seconds in the timestamps must be a
 	// comma, not a period.
-	if strings.Contains(secondLine, ".") {
+	if bytes.IndexByte(line, '.') != -1 {
 		return false
 	}
-	// Second line must be a time range.
-	ts := strings.Split(secondLine, " --> ")
-	if len(ts) != 2 {
+	sep := []byte(" --> ")
+	i := bytes.Index(line, sep)
+	if i == -1 {
 		return false
 	}
 	const layout = "15:04:05,000"
-	t0, err := time.Parse(layout, ts[0])
+	t0, err := time.Parse(layout, string(line[:i]))
 	if err != nil {
 		return false
 	}
-	t1, err := time.Parse(layout, ts[1])
+	t1, err := time.Parse(layout, string(line[i+len(sep):]))
 	if err != nil {
 		return false
 	}
