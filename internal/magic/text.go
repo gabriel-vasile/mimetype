@@ -145,8 +145,10 @@ func Text(raw []byte, limit uint32) bool {
 
 // JSON matches a JavaScript Object Notation file.
 func JSON(raw []byte, limit uint32) bool {
-	originalLen := len(raw)
-	raw = trimRWS(trimLWS(raw))
+	if !json.LooksLikeObjectOrArray(raw) {
+		return false
+	}
+	lraw := len(raw)
 	parsed, inspected, firstToken, _ := json.Parse(json.ParserJSON, raw)
 	// #175 A single JSON string, number or bool is not considered JSON.
 	// JSON objects and arrays are reported as JSON.
@@ -155,7 +157,7 @@ func JSON(raw []byte, limit uint32) bool {
 	}
 
 	// If the full file content was provided, check that the whole input was parsed.
-	if limit == 0 || originalLen < int(limit) {
+	if limit == 0 || lraw < int(limit) {
 		return parsed == len(raw)
 	}
 
@@ -178,6 +180,9 @@ func Php(raw []byte, limit uint32) bool {
 // GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 func GeoJSON(raw []byte, limit uint32) bool {
+	if !json.LooksLikeObjectOrArray(raw) {
+		return false
+	}
 	lraw := len(raw)
 	parsed, inspected, firstToken, querySatisfied := json.Parse(json.ParserGeoJSON, raw)
 	if !querySatisfied || firstToken != json.TokObject {
@@ -219,6 +224,9 @@ func NdJSON(raw []byte, limit uint32) bool {
 // HAR matches a HAR Spec file.
 // Spec: http://www.softwareishard.com/blog/har-12-spec/
 func HAR(raw []byte, limit uint32) bool {
+	if !json.LooksLikeObjectOrArray(raw) {
+		return false
+	}
 	lraw := len(raw)
 	parsed, inspected, firstToken, querySatisfied := json.Parse(json.ParserHARJSON, raw)
 	if !querySatisfied || firstToken != json.TokObject {
