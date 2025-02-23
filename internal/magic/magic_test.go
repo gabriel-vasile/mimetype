@@ -238,6 +238,7 @@ func BenchmarkJSON(b *testing.B) {
 		strings.Repeat(`"fruit": {"apple": [{"red": 1}]}, "sizes": ["Large", 10, {"size": "small"}], "color": "Red",`, 1000) +
 		`"fruit": "Apple", "size": "Large", "color": "Red"}`)
 	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		if !JSON(sample, 0) {
 			b.Error("should always be true")
