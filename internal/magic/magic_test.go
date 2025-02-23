@@ -231,3 +231,16 @@ our final approach into Coruscant.
 		Srt([]byte(subtitle), 0)
 	}
 }
+
+func BenchmarkJSON(b *testing.B) {
+	var sample = []byte("{" +
+		// It's no problem to repeat the same keys. The parser does not mind.
+		strings.Repeat(`"fruit": {"apple": [{"red": 1}]}, "sizes": ["Large", 10, {"size": "small"}], "color": "Red",`, 1000) +
+		`"fruit": "Apple", "size": "Large", "color": "Red"}`)
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		if !JSON(sample, 0) {
+			b.Error("should always be true")
+		}
+	}
+}
