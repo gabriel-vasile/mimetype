@@ -96,7 +96,7 @@ var testcases = []testcase{
 	{"flac", "\x66\x4C\x61\x43\x00\x00\x00\x22", "audio/flac", true},
 	{"flv", "\x46\x4C\x56\x01", "video/x-flv", true},
 	{"gbr", offset(20, "GIMP"), "image/x-gimp-gbr", true},
-	{"geojson", `{"type":"Feature"}`, "application/geo+json", false},
+	{"geojson", `{"type":"Feature"}`, "application/geo+json", true},
 	{"gif 87", "GIF87a", "image/gif", true},
 	{"gif 89", "GIF89a", "image/gif", false},
 	{"glb 1", "\x67\x6C\x54\x46\x02\x00\x00\x00", "model/gltf-binary", true},
@@ -142,7 +142,7 @@ var testcases = []testcase{
 	{"json", `{"key":"val"}`, "application/json", true},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON
-	// documentsthey should not be detected as application/json. This mimics
+	// documents but they should not be detected as application/json. This mimics
 	// the behaviour of the file utility and seems the correct thing to do.
 	{"json.int.txt", "1", "text/plain; charset=utf-8", false},
 	{"json.float.txt", "1.5", "text/plain; charset=utf-8", false},
