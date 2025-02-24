@@ -120,6 +120,72 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf"))
+
+	// Markdown matches a Markdown document
+	// Markdown matches a Markdown document. Detection looks for multiple instances
+	// of standard Markdown syntax patterns to avoid false positives with plain text.
+	Markdown = func(raw []byte, limit uint32) bool {
+		// Skip if empty
+		if len(raw) == 0 {
+			return false
+		}
+
+		// Check first 1024 bytes for Markdown patterns
+		checkLen := 1024
+		if len(raw) < checkLen {
+			checkLen = len(raw)
+		}
+		content := raw[:checkLen]
+
+		// Lines that definitively indicate Markdown syntax when found at start or after newline
+		mdPatterns := [][]byte{
+			[]byte("# "),   // ATX heading
+			[]byte("## "),  // Level 2 heading
+			[]byte("### "), // Level 3 heading
+			[]byte("- "),   // Unordered list
+			[]byte("* "),   // Alternate unordered list
+			[]byte("1. "),  // Ordered list
+			[]byte("> "),   // Blockquote
+			[]byte("```"),  // Code fence
+		}
+
+		// Special patterns that can appear anywhere
+		mdInlinePatterns := [][]byte{
+			[]byte("]("), // Link definition
+		}
+
+		// Count how many Markdown patterns we find
+		matches := 0
+
+		// Check patterns that must be at start or after newline
+		for _, pattern := range mdPatterns {
+			// Check at start of content
+			if bytes.HasPrefix(content, pattern) {
+				matches++
+			} else {
+				// Check after newlines
+				p := append([]byte{'\n'}, pattern...)
+				if bytes.Contains(content, p) {
+					matches++
+				}
+			}
+			if matches >= 2 {
+				return true
+			}
+		}
+
+		// Check inline patterns
+		for _, pattern := range mdInlinePatterns {
+			if bytes.Contains(content, pattern) {
+				matches++
+			}
+			if matches >= 2 {
+				return true
+			}
+		}
+
+		return false
+	}
 )
 
 // Text matches a plain text file.
