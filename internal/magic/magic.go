@@ -167,8 +167,9 @@ func newXMLSig(localName, xmlns string) xmlSig {
 //
 // /usr/bin/env is the interpreter, php is the first and only argument.
 func shebang(raw []byte, sigs ...[]byte) bool {
+	firstLine := firstLine(raw)
 	for _, s := range sigs {
-		if shebangCheck(s, firstLine(raw)) {
+		if shebangCheck(s, firstLine) {
 			return true
 		}
 	}
