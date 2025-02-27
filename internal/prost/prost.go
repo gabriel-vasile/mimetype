@@ -1,8 +1,8 @@
-package magic
+package prost
 
 import "bytes"
 
-// var asd = prefixer(nil)
+var asd = prefixer(nil)
 
 func Shebang(raw []byte) bool {
 	return shebangCheck([]byte("/usr/bin/lua"), firstLine(raw))
