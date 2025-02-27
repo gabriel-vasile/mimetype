@@ -665,7 +665,8 @@ func TestMaxRecursion(t *testing.T) {
 		})
 	}
 }
-func BenchmarkStdlibDecoder(b *testing.B) {
+
+func BenchmarkJSONStdlibDecoder(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
 		d := json.NewDecoder(bytes.NewReader(sample))
@@ -677,8 +678,7 @@ func BenchmarkStdlibDecoder(b *testing.B) {
 		}
 	}
 }
-
-func BenchmarkOurParser(b *testing.B) {
+func BenchmarkJSONOurParser(b *testing.B) {
 	b.ReportAllocs()
 	d := &parserState{}
 	for i := 0; i < b.N; i++ {

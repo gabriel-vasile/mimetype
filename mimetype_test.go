@@ -493,7 +493,7 @@ func BenchmarkAll(b *testing.B) {
 		parsed, _, _ := mime.ParseMediaType(tc.expectedMIME)
 		mtype := Lookup(parsed)
 		if mtype == nil || mtype.detector == nil {
-			b.Fatalf("nu e bine %s %s", mtype, tc.expectedMIME)
+			b.Fatalf("mime should always be non-nil %s %s", mtype, tc.expectedMIME)
 		}
 		// data is used for the positive case benchmark.
 		b.Run(tc.name, func(b *testing.B) {
