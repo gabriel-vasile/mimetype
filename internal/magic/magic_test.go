@@ -210,6 +210,9 @@ func TestDropLastLine(t *testing.T) {
 		{"\na\n", 3, "\na"},
 		{"å\n\n", 5, "å\n\n"},
 		{"\nå\n", 5, "\nå\n"},
+		// JSON with new-lines inside string value.
+		{"{\"a\" : \"b\\n\\n\"}", 5, "{\"a\" : \"b\\n\\n\"}"},
+		{"{\"a\" : \"b\\n\\n\"}", 100, "{\"a\" : \"b\\n\\n\"}"},
 	}
 	for i, tt := range dropTests {
 		got := dropLastLine([]byte(tt.raw), tt.cutAt)
@@ -231,7 +234,6 @@ our final approach into Coruscant.
 		Srt([]byte(subtitle), 0)
 	}
 }
-
 func BenchmarkJSON(b *testing.B) {
 	var sample = []byte("{" +
 		// It's no problem to repeat the same keys. The parser does not mind.
