@@ -2,10 +2,10 @@ package magic
 
 import "bytes"
 
-var (
-	// Pdf matches a Portable Document Format file.
-	// https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
-	Pdf = prefix(
+// Pdf matches a Portable Document Format file.
+// https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
+func Pdf(raw []byte, _ uint32) bool {
+	return prefix(raw,
 		// usual pdf signature
 		[]byte("%PDF-"),
 		// new-line prefixed signature
@@ -13,13 +13,22 @@ var (
 		// UTF-8 BOM prefixed signature
 		[]byte("\xef\xbb\xbf%PDF-"),
 	)
-	// Fdf matches a Forms Data Format file.
-	Fdf = prefix([]byte("%FDF"))
-	// Mobi matches a Mobi file.
-	Mobi = offset([]byte("BOOKMOBI"), 60)
-	// Lit matches a Microsoft Lit file.
-	Lit = prefix([]byte("ITOLITLS"))
-)
+}
+
+// Fdf matches a Forms Data Format file.
+func Fdf(raw []byte, _ uint32) bool {
+	return prefix(raw, []byte("%FDF"))
+}
+
+// Mobi matches a Mobi file.
+func Mobi(raw []byte, _ uint32) bool {
+	return offset(raw, []byte("BOOKMOBI"), 60)
+}
+
+// Lit matches a Microsoft Lit file.
+func Lit(raw []byte, _ uint32) bool {
+	return prefix(raw, []byte("ITOLITLS"))
+}
 
 // DjVu matches a DjVu file.
 func DjVu(raw []byte, limit uint32) bool {

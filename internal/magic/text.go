@@ -8,9 +8,9 @@ import (
 	"github.com/gabriel-vasile/mimetype/internal/json"
 )
 
-var (
-	// HTML matches a Hypertext Markup Language file.
-	HTML = markup(
+// HTML matches a Hypertext Markup Language file.
+func HTML(raw []byte, _ uint32) bool {
+	return markup(raw,
 		[]byte("<!DOCTYPE HTML"),
 		[]byte("<HTML"),
 		[]byte("<HEAD"),
@@ -28,60 +28,115 @@ var (
 		[]byte("<BR"),
 		[]byte("<P"),
 	)
-	// XML matches an Extensible Markup Language file.
-	XML = markup([]byte("<?XML"))
-	// Owl2 matches an Owl ontology file.
-	Owl2 = xml(newXMLSig("Ontology", `xmlns="http://www.w3.org/2002/07/owl#"`))
-	// Rss matches a Rich Site Summary file.
-	Rss = xml(newXMLSig("rss", ""))
-	// Atom matches an Atom Syndication Format file.
-	Atom = xml(newXMLSig("feed", `xmlns="http://www.w3.org/2005/Atom"`))
-	// Kml matches a Keyhole Markup Language file.
-	Kml = xml(
+}
+
+// XML matches an Extensible Markup Language file.
+func XML(raw []byte, _ uint32) bool {
+	return markup(raw, []byte("<?XML"))
+}
+
+// Owl2 matches an Owl ontology file.
+func Owl2(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("Ontology", `xmlns="http://www.w3.org/2002/07/owl#"`))
+}
+
+// Rss matches a Rich Site Summary file.
+func Rss(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("rss", ""))
+}
+
+// Atom matches an Atom Syndication Format file.
+func Atom(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("feed", `xmlns="http://www.w3.org/2005/Atom"`))
+}
+
+// Kml matches a Keyhole Markup Language file.
+func Kml(raw []byte, _ uint32) bool {
+	return xml(raw,
 		newXMLSig("kml", `xmlns="http://www.opengis.net/kml/2.2"`),
 		newXMLSig("kml", `xmlns="http://earth.google.com/kml/2.0"`),
 		newXMLSig("kml", `xmlns="http://earth.google.com/kml/2.1"`),
 		newXMLSig("kml", `xmlns="http://earth.google.com/kml/2.2"`),
 	)
-	// Xliff matches a XML Localization Interchange File Format file.
-	Xliff = xml(newXMLSig("xliff", `xmlns="urn:oasis:names:tc:xliff:document:1.2"`))
-	// Collada matches a COLLAborative Design Activity file.
-	Collada = xml(newXMLSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`))
-	// Gml matches a Geography Markup Language file.
-	Gml = xml(
+}
+
+// Xliff matches a XML Localization Interchange File Format file.
+func Xliff(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("xliff", `xmlns="urn:oasis:names:tc:xliff:document:1.2"`))
+}
+
+// Collada matches a COLLAborative Design Activity file.
+func Collada(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("COLLADA", `xmlns="http://www.collada.org/2005/11/COLLADASchema"`))
+}
+
+// Gml matches a Geography Markup Language file.
+func Gml(raw []byte, _ uint32) bool {
+	return xml(raw,
 		newXMLSig("", `xmlns:gml="http://www.opengis.net/gml"`),
 		newXMLSig("", `xmlns:gml="http://www.opengis.net/gml/3.2"`),
 		newXMLSig("", `xmlns:gml="http://www.opengis.net/gml/3.3/exr"`),
 	)
-	// Gpx matches a GPS Exchange Format file.
-	Gpx = xml(newXMLSig("gpx", `xmlns="http://www.topografix.com/GPX/1/1"`))
-	// Tcx matches a Training Center XML file.
-	Tcx = xml(newXMLSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`))
-	// X3d matches an Extensible 3D Graphics file.
-	X3d = xml(newXMLSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`))
-	// Amf matches an Additive Manufacturing XML file.
-	Amf = xml(newXMLSig("amf", ""))
-	// Threemf matches a 3D Manufacturing Format file.
-	Threemf = xml(newXMLSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`))
-	// Xfdf matches a XML Forms Data Format file.
-	Xfdf = xml(newXMLSig("xfdf", `xmlns="http://ns.adobe.com/xfdf/"`))
-	// VCard matches a Virtual Contact File.
-	VCard = ciPrefix([]byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
-	// ICalendar matches a iCalendar file.
-	ICalendar = ciPrefix([]byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
-	phpPageF  = ciPrefix(
+}
+
+// Gpx matches a GPS Exchange Format file.
+func Gpx(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("gpx", `xmlns="http://www.topografix.com/GPX/1/1"`))
+}
+
+// Tcx matches a Training Center XML file.
+func Tcx(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("TrainingCenterDatabase", `xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`))
+}
+
+// X3d matches an Extensible 3D Graphics file.
+func X3d(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("X3D", `xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`))
+}
+
+// Amf matches an Additive Manufacturing XML file.
+func Amf(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("amf", ""))
+}
+
+// Threemf matches a 3D Manufacturing Format file.
+func Threemf(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("model", `xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`))
+}
+
+// Xfdf matches a XML Forms Data Format file.
+func Xfdf(raw []byte, _ uint32) bool {
+	return xml(raw, newXMLSig("xfdf", `xmlns="http://ns.adobe.com/xfdf/"`))
+}
+
+// VCard matches a Virtual Contact File.
+func VCard(raw []byte, _ uint32) bool {
+	return ciPrefix(raw, []byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
+}
+
+// ICalendar matches a iCalendar file.
+func ICalendar(raw []byte, _ uint32) bool {
+	return ciPrefix(raw, []byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
+}
+func phpPageF(raw []byte, _ uint32) bool {
+	return ciPrefix(raw,
 		[]byte("<?PHP"),
 		[]byte("<?\n"),
 		[]byte("<?\r"),
 		[]byte("<? "),
 	)
-	phpScriptF = shebang(
+}
+func phpScriptF(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/usr/local/bin/php"),
 		[]byte("/usr/bin/php"),
 		[]byte("/usr/bin/env php"),
 	)
-	// Js matches a Javascript file.
-	Js = shebang(
+}
+
+// Js matches a Javascript file.
+func Js(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/bin/node"),
 		[]byte("/usr/bin/node"),
 		[]byte("/bin/nodejs"),
@@ -89,25 +144,37 @@ var (
 		[]byte("/usr/bin/env node"),
 		[]byte("/usr/bin/env nodejs"),
 	)
-	// Lua matches a Lua programming language file.
-	Lua = shebang(
+}
+
+// Lua matches a Lua programming language file.
+func Lua(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/usr/bin/lua"),
 		[]byte("/usr/local/bin/lua"),
 		[]byte("/usr/bin/env lua"),
 	)
-	// Perl matches a Perl programming language file.
-	Perl = shebang(
+}
+
+// Perl matches a Perl programming language file.
+func Perl(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/usr/bin/perl"),
 		[]byte("/usr/bin/env perl"),
 	)
-	// Python matches a Python programming language file.
-	Python = shebang(
+}
+
+// Python matches a Python programming language file.
+func Python(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
 	)
-	// Tcl matches a Tcl programming language file.
-	Tcl = shebang(
+}
+
+// Tcl matches a Tcl programming language file.
+func Tcl(raw []byte, _ uint32) bool {
+	return shebang(raw,
 		[]byte("/usr/bin/tcl"),
 		[]byte("/usr/local/bin/tcl"),
 		[]byte("/usr/bin/env tcl"),
@@ -118,9 +185,12 @@ var (
 		[]byte("/usr/local/bin/wish"),
 		[]byte("/usr/bin/env wish"),
 	)
-	// Rtf matches a Rich Text Format file.
-	Rtf = prefix([]byte("{\\rtf"))
-)
+}
+
+// Rtf matches a Rich Text Format file.
+func Rtf(raw []byte, _ uint32) bool {
+	return prefix(raw, []byte("{\\rtf"))
+}
 
 // Text matches a plain text file.
 //
