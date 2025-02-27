@@ -17,7 +17,7 @@ func Pdf(raw []byte, _ uint32) bool {
 
 // Fdf matches a Forms Data Format file.
 func Fdf(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("%FDF"))
+	return bytes.HasPrefix(raw, []byte("%FDF"))
 }
 
 // Mobi matches a Mobi file.
@@ -27,7 +27,7 @@ func Mobi(raw []byte, _ uint32) bool {
 
 // Lit matches a Microsoft Lit file.
 func Lit(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("ITOLITLS"))
+	return bytes.HasPrefix(raw, []byte("ITOLITLS"))
 }
 
 // DjVu matches a DjVu file.

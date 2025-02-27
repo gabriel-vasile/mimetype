@@ -5,7 +5,7 @@ import "bytes"
 // Png matches a Portable Network Graphics file.
 // https://www.w3.org/TR/PNG/
 func Png(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
+	return bytes.HasPrefix(raw, []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
 }
 
 // Apng matches an Animated Portable Network Graphics file.
@@ -16,7 +16,7 @@ func Apng(raw []byte, _ uint32) bool {
 
 // Jpg matches a Joint Photographic Experts Group file.
 func Jpg(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0xFF, 0xD8, 0xFF})
+	return bytes.HasPrefix(raw, []byte{0xFF, 0xD8, 0xFF})
 }
 
 // Jp2 matches a JPEG 2000 Image file (ISO 15444-1).
@@ -41,17 +41,17 @@ func Gif(raw []byte, _ uint32) bool {
 
 // Bmp matches a bitmap image file.
 func Bmp(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x42, 0x4D})
+	return bytes.HasPrefix(raw, []byte{0x42, 0x4D})
 }
 
 // Ps matches a PostScript file.
 func Ps(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("%!PS-Adobe-"))
+	return bytes.HasPrefix(raw, []byte("%!PS-Adobe-"))
 }
 
 // Psd matches a Photoshop Document file.
 func Psd(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("8BPS"))
+	return bytes.HasPrefix(raw, []byte("8BPS"))
 }
 
 // Ico matches an ICO file.
@@ -61,7 +61,7 @@ func Ico(raw []byte, _ uint32) bool {
 
 // Icns matches an ICNS (Apple Icon Image format) file.
 func Icns(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("icns"))
+	return bytes.HasPrefix(raw, []byte("icns"))
 }
 
 // Tiff matches a Tagged Image File Format file.
@@ -71,12 +71,12 @@ func Tiff(raw []byte, _ uint32) bool {
 
 // Bpg matches a Better Portable Graphics file.
 func Bpg(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x42, 0x50, 0x47, 0xFB})
+	return bytes.HasPrefix(raw, []byte{0x42, 0x50, 0x47, 0xFB})
 }
 
 // Xcf matches GIMP image data.
 func Xcf(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("gimp xcf"))
+	return bytes.HasPrefix(raw, []byte("gimp xcf"))
 }
 
 // Pat matches GIMP pattern data.
@@ -92,22 +92,22 @@ func Gbr(raw []byte, _ uint32) bool {
 // Hdr matches Radiance HDR image.
 // https://web.archive.org/web/20060913152809/http://local.wasp.uwa.edu.au/~pbourke/dataformats/pic/
 func Hdr(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("#?RADIANCE\n"))
+	return bytes.HasPrefix(raw, []byte("#?RADIANCE\n"))
 }
 
 // Xpm matches X PixMap image data.
 func Xpm(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
+	return bytes.HasPrefix(raw, []byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
 }
 
 // Jxs matches a JPEG XS coded image file (ISO/IEC 21122-3).
 func Jxs(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x00, 0x00, 0x00, 0x0C, 0x4A, 0x58, 0x53, 0x20, 0x0D, 0x0A, 0x87, 0x0A})
+	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x00, 0x0C, 0x4A, 0x58, 0x53, 0x20, 0x0D, 0x0A, 0x87, 0x0A})
 }
 
 // Jxr matches Microsoft HD JXR photo file.
 func Jxr(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x49, 0x49, 0xBC, 0x01})
+	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0xBC, 0x01})
 }
 
 func jpeg2k(raw []byte, sig []byte) bool {

@@ -7,42 +7,42 @@ import (
 
 // Flac matches a Free Lossless Audio Codec file.
 func Flac(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x66\x4C\x61\x43\x00\x00\x00\x22"))
+	return bytes.HasPrefix(raw, []byte("\x66\x4C\x61\x43\x00\x00\x00\x22"))
 }
 
 // Midi matches a Musical Instrument Digital Interface file.
 func Midi(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x4D\x54\x68\x64"))
+	return bytes.HasPrefix(raw, []byte("\x4D\x54\x68\x64"))
 }
 
 // Ape matches a Monkey's Audio file.
 func Ape(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x4D\x41\x43\x20\x96\x0F\x00\x00\x34\x00\x00\x00\x18\x00\x00\x00\x90\xE3"))
+	return bytes.HasPrefix(raw, []byte("\x4D\x41\x43\x20\x96\x0F\x00\x00\x34\x00\x00\x00\x18\x00\x00\x00\x90\xE3"))
 }
 
 // MusePack matches a Musepack file.
 func MusePack(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("MPCK"))
+	return bytes.HasPrefix(raw, []byte("MPCK"))
 }
 
 // Au matches a Sun Microsystems au file.
 func Au(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x2E\x73\x6E\x64"))
+	return bytes.HasPrefix(raw, []byte("\x2E\x73\x6E\x64"))
 }
 
 // Amr matches an Adaptive Multi-Rate file.
 func Amr(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x23\x21\x41\x4D\x52"))
+	return bytes.HasPrefix(raw, []byte("\x23\x21\x41\x4D\x52"))
 }
 
 // Voc matches a Creative Voice file.
 func Voc(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("Creative Voice File"))
+	return bytes.HasPrefix(raw, []byte("Creative Voice File"))
 }
 
 // M3u matches a Playlist file.
 func M3u(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("#EXTM3U"))
+	return bytes.HasPrefix(raw, []byte("#EXTM3U"))
 }
 
 // AAC matches an Advanced Audio Coding file.

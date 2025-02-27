@@ -207,7 +207,7 @@ func Tcl(raw []byte, _ uint32) bool {
 
 // Rtf matches a Rich Text Format file.
 func Rtf(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("{\\rtf"))
+	return bytes.HasPrefix(raw, []byte("{\\rtf"))
 }
 
 // Text matches a plain text file.

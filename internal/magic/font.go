@@ -6,17 +6,17 @@ import (
 
 // Woff matches a Web Open Font Format file.
 func Woff(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("wOFF"))
+	return bytes.HasPrefix(raw, []byte("wOFF"))
 }
 
 // Woff2 matches a Web Open Font Format version 2 file.
 func Woff2(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("wOF2"))
+	return bytes.HasPrefix(raw, []byte("wOF2"))
 }
 
 // Otf matches an OpenType font file.
 func Otf(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x4F, 0x54, 0x54, 0x4F, 0x00})
+	return bytes.HasPrefix(raw, []byte{0x4F, 0x54, 0x54, 0x4F, 0x00})
 }
 
 // Ttf matches a TrueType font file.

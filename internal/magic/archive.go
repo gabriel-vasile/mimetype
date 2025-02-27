@@ -7,17 +7,17 @@ import (
 
 // SevenZ matches a 7z archive.
 func SevenZ(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
+	return bytes.HasPrefix(raw, []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 }
 
 // Gzip matches gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
 func Gzip(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x1f, 0x8b})
+	return bytes.HasPrefix(raw, []byte{0x1f, 0x8b})
 }
 
 // Fits matches an Flexible Image Transport System file.
 func Fits(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{
+	return bytes.HasPrefix(raw, []byte{
 		0x53, 0x49, 0x4D, 0x50, 0x4C, 0x45, 0x20, 0x20, 0x3D, 0x20,
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x54,
@@ -26,17 +26,17 @@ func Fits(raw []byte, _ uint32) bool {
 
 // Xar matches an eXtensible ARchive format file.
 func Xar(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x78, 0x61, 0x72, 0x21})
+	return bytes.HasPrefix(raw, []byte{0x78, 0x61, 0x72, 0x21})
 }
 
 // Bz2 matches a bzip2 file.
 func Bz2(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x42, 0x5A, 0x68})
+	return bytes.HasPrefix(raw, []byte{0x42, 0x5A, 0x68})
 }
 
 // Ar matches an ar (Unix) archive file.
 func Ar(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
+	return bytes.HasPrefix(raw, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
 }
 
 // Deb matches a Debian package file.
@@ -54,17 +54,17 @@ func Warc(raw []byte, _ uint32) bool {
 
 // Cab matches a Microsoft Cabinet archive file.
 func Cab(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("MSCF\x00\x00\x00\x00"))
+	return bytes.HasPrefix(raw, []byte("MSCF\x00\x00\x00\x00"))
 }
 
 // Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
 func Xz(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
+	return bytes.HasPrefix(raw, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 }
 
 // Lzip matches an Lzip compressed file.
 func Lzip(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x4c, 0x5a, 0x49, 0x50})
+	return bytes.HasPrefix(raw, []byte{0x4c, 0x5a, 0x49, 0x50})
 }
 
 // RPM matches an RPM or Delta RPM package file.

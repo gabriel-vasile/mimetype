@@ -8,27 +8,27 @@ import (
 
 // Lnk matches Microsoft lnk binary format.
 func Lnk(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
+	return bytes.HasPrefix(raw, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
 }
 
 // Wasm matches a web assembly File Format file.
 func Wasm(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x00, 0x61, 0x73, 0x6D})
+	return bytes.HasPrefix(raw, []byte{0x00, 0x61, 0x73, 0x6D})
 }
 
 // Exe matches a Windows/DOS executable file.
 func Exe(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x4D, 0x5A})
+	return bytes.HasPrefix(raw, []byte{0x4D, 0x5A})
 }
 
 // Elf matches an Executable and Linkable Format file.
 func Elf(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x7F, 0x45, 0x4C, 0x46})
+	return bytes.HasPrefix(raw, []byte{0x7F, 0x45, 0x4C, 0x46})
 }
 
 // Nes matches a Nintendo Entertainment system ROM file.
 func Nes(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x4E, 0x45, 0x53, 0x1A})
+	return bytes.HasPrefix(raw, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
 
 // SWF matches an Adobe Flash swf file.
@@ -38,17 +38,17 @@ func SWF(raw []byte, _ uint32) bool {
 
 // Torrent has bencoded text in the beginning.
 func Torrent(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("d8:announce"))
+	return bytes.HasPrefix(raw, []byte("d8:announce"))
 }
 
 // PAR1 matches a parquet file.
 func Par1(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x50, 0x41, 0x52, 0x31})
+	return bytes.HasPrefix(raw, []byte{0x50, 0x41, 0x52, 0x31})
 }
 
 // CBOR matches a Concise Binary Object Representation https://cbor.io/
 func CBOR(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0xD9, 0xD9, 0xF7})
+	return bytes.HasPrefix(raw, []byte{0xD9, 0xD9, 0xF7})
 }
 
 // Java bytecode and Mach-O binaries share the same magic number.
