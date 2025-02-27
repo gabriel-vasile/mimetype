@@ -36,7 +36,8 @@ func Jpm(raw []byte, _ uint32) bool {
 
 // Gif matches a Graphics Interchange Format file.
 func Gif(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("GIF87a"), []byte("GIF89a"))
+	return bytes.HasPrefix(raw, []byte("GIF87a")) ||
+		bytes.HasPrefix(raw, []byte("GIF89a"))
 }
 
 // Bmp matches a bitmap image file.
@@ -56,7 +57,8 @@ func Psd(raw []byte, _ uint32) bool {
 
 // Ico matches an ICO file.
 func Ico(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x00, 0x00, 0x01, 0x00}, []byte{0x00, 0x00, 0x02, 0x00})
+	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x01, 0x00}) ||
+		bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x02, 0x00})
 }
 
 // Icns matches an ICNS (Apple Icon Image format) file.
@@ -66,7 +68,8 @@ func Icns(raw []byte, _ uint32) bool {
 
 // Tiff matches a Tagged Image File Format file.
 func Tiff(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0x49, 0x49, 0x2A, 0x00}, []byte{0x4D, 0x4D, 0x00, 0x2A})
+	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0x2A, 0x00}) ||
+		bytes.HasPrefix(raw, []byte{0x4D, 0x4D, 0x00, 0x2A})
 }
 
 // Bpg matches a Better Portable Graphics file.

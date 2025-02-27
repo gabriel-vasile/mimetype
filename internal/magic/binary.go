@@ -33,7 +33,9 @@ func Nes(raw []byte, _ uint32) bool {
 
 // SWF matches an Adobe Flash swf file.
 func SWF(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("CWS"), []byte("FWS"), []byte("ZWS"))
+	return bytes.HasPrefix(raw, []byte("CWS")) ||
+		bytes.HasPrefix(raw, []byte("FWS")) ||
+		bytes.HasPrefix(raw, []byte("ZWS"))
 }
 
 // Torrent has bencoded text in the beginning.
@@ -193,8 +195,8 @@ func Marc(raw []byte, limit uint32) bool {
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf-binary
 func Glb(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("\x67\x6C\x54\x46\x02\x00\x00\x00"),
-		[]byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
+	return bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x02\x00\x00\x00")) ||
+		bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
 }
 
 // TzIf matches a Time Zone Information Format (TZif) file.

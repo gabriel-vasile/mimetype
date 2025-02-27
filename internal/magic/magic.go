@@ -20,17 +20,6 @@ type (
 	}
 )
 
-// prefix returns true if any of the provided signatures
-// is the prefix of the raw input.
-func prefix(raw []byte, sigs ...[]byte) bool {
-	for _, s := range sigs {
-		if bytes.HasPrefix(raw, s) {
-			return true
-		}
-	}
-	return false
-}
-
 // offset returns true if the provided signature can be
 // found at offset in the raw input.
 func offset(raw []byte, sig []byte, offset int) bool {

@@ -49,7 +49,8 @@ func Deb(raw []byte, _ uint32) bool {
 
 // Warc matches a Web ARChive file.
 func Warc(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("WARC/1.0"), []byte("WARC/1.1"))
+	return bytes.HasPrefix(raw, []byte("WARC/1.0")) ||
+		bytes.HasPrefix(raw, []byte("WARC/1.1"))
 }
 
 // Cab matches a Microsoft Cabinet archive file.
@@ -69,17 +70,21 @@ func Lzip(raw []byte, _ uint32) bool {
 
 // RPM matches an RPM or Delta RPM package file.
 func RPM(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0xed, 0xab, 0xee, 0xdb}, []byte("drpm"))
+	return bytes.HasPrefix(raw, []byte{0xed, 0xab, 0xee, 0xdb}) ||
+		bytes.HasPrefix(raw, []byte("drpm"))
 }
 
 // Cpio matches a cpio archive file.
 func Cpio(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("070707"), []byte("070701"), []byte("070702"))
+	return bytes.HasPrefix(raw, []byte("070707")) ||
+		bytes.HasPrefix(raw, []byte("070701")) ||
+		bytes.HasPrefix(raw, []byte("070702"))
 }
 
 // RAR matches a RAR archive file.
 func RAR(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
+	return bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x00")) ||
+		bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x01\x00"))
 }
 
 // InstallShieldCab matches an InstallShield Cabinet archive file.

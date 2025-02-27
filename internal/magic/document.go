@@ -5,14 +5,12 @@ import "bytes"
 // Pdf matches a Portable Document Format file.
 // https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
 func Pdf(raw []byte, _ uint32) bool {
-	return prefix(raw,
-		// usual pdf signature
-		[]byte("%PDF-"),
+	// usual pdf signature
+	return bytes.HasPrefix(raw, []byte("%PDF-")) ||
 		// new-line prefixed signature
-		[]byte("\012%PDF-"),
+		bytes.HasPrefix(raw, []byte("\012%PDF-")) ||
 		// UTF-8 BOM prefixed signature
-		[]byte("\xef\xbb\xbf%PDF-"),
-	)
+		bytes.HasPrefix(raw, []byte("\xef\xbb\xbf%PDF-"))
 }
 
 // Fdf matches a Forms Data Format file.
