@@ -47,7 +47,7 @@ func M3u(raw []byte, _ uint32) bool {
 
 // AAC matches an Advanced Audio Coding file.
 func AAC(raw []byte, _ uint32) bool {
-	return prefix(raw, []byte{0xFF, 0xF1}, []byte{0xFF, 0xF9})
+	return len(raw) > 1 && ((raw[0] == 0xFF && raw[1] == 0xF1) || (raw[0] == 0xFF && raw[1] == 0xF9))
 }
 
 // Mp3 matches an mp3 file.
