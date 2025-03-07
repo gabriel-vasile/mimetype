@@ -598,15 +598,15 @@ func TestExtend(t *testing.T) {
 }
 
 func TestSupportedMIMEs(t *testing.T) {
-	t.Run(fmt.Sprintf("listing supported MIMEs"), func(t *testing.T) {
+	t.Run("listing supported MIMEs", func(t *testing.T) {
 		mimes := SupportedMIMEs()
 		if len(mimes) < 1 {
-			t.Fatalf("failed to list supported MIMEs")
+			t.Fatal("failed to list supported MIMEs")
 		}
 
 		for _, mime := range mimes {
 			if mime.String() == "" || mime.Type() == "" {
-				t.Fatalf("listed mime has no content")
+				t.Fatal("listed mime has no content")
 			}
 		}
 	})
