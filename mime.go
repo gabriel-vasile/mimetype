@@ -123,9 +123,9 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 	return m.cloneHierarchy(ps)
 }
 
-// flatten copies and transforms a hierarchy of MIMEs into a slice of MIMEs.
+// flatten transforms an hierarchy of MIMEs into a slice of MIMEs.
 func (m *MIME) flatten() []*MIME {
-	out := []*MIME{m.clone(nil)}
+	out := []*MIME{m}
 	for _, c := range m.children {
 		out = append(out, c.flatten()...)
 	}

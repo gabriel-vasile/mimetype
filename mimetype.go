@@ -125,8 +125,13 @@ func Lookup(typ string) *MIME {
 	return root.lookup(typ)
 }
 
+// SupportedMIMEs returns a copy of all supported MIME objects.
 func SupportedMIMEs() []*MIME {
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.flatten()
+	output := []*MIME{}
+	for _, mime := range root.flatten() {
+		output = append(output, mime.clone(nil))
+	}
+	return output
 }
