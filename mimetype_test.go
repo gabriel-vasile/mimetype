@@ -325,7 +325,7 @@ Extension | MIME type | Aliases
 		if aliases == "" {
 			aliases = "-"
 		}
-		str := fmt.Sprintf("**%s** | %s | %s\n", ext, n.mime, aliases)
+		str := fmt.Sprintf("**%s** | %s | %s\n", ext, n.typ, aliases)
 		if _, err := f.WriteString(str); err != nil {
 			t.Fatal(err)
 		}
@@ -550,10 +550,10 @@ func TestLookup(t *testing.T) {
 		mime string
 		m    *MIME
 	}{
-		{root.mime, root},
-		{zip.mime, zip},
+		{string(root.typ), root},
+		{string(zip.typ), zip},
 		{zip.aliases[0], zip},
-		{xlsx.mime, xlsx},
+		{string(xlsx.typ), xlsx},
 	}
 
 	for _, tt := range data {
@@ -591,10 +591,25 @@ func TestExtend(t *testing.T) {
 				t.Fatalf("mime %s not found", tt.mime)
 			}
 			if m.parent != tt.parent {
-				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
+				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.typ, m.parent.typ)
 			}
 		})
 	}
+}
+
+func TestSupportedMIMEs(t *testing.T) {
+	t.Run("listing supported MIMEs", func(t *testing.T) {
+		mimes := SupportedMIMEs()
+		if len(mimes) < 1 {
+			t.Fatal("failed to list supported MIMEs")
+		}
+
+		for _, mime := range mimes {
+			if mime.String() == "" || mime.Type() == "" {
+				t.Fatal("listed mime has no content")
+			}
+		}
+	})
 }
 
 // Because of the random nature of fuzzing I don't think there is a way to test

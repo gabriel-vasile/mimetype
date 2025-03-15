@@ -5,13 +5,15 @@ import (
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/magic"
+	"github.com/gabriel-vasile/mimetype/types"
 )
 
 // MIME struct holds information about a file format: the string representation
 // of the MIME type, the extension and the parent file format.
 type MIME struct {
-	mime      string
+	typ       types.TYPE
 	aliases   []string
+	params    map[string]string
 	extension string
 	// detector receives the raw input and a limit for the number of bytes it is
 	// allowed to check. It returns whether the input matches a signature or not.
@@ -20,9 +22,17 @@ type MIME struct {
 	parent   *MIME
 }
 
-// String returns the string representation of the MIME type, e.g., "application/zip".
+// String returns the string representation of the MIME type including params, e.g., "text/html; charset=UTF-8".
 func (m *MIME) String() string {
-	return m.mime
+	if len(m.params) > 0 {
+		return mime.FormatMediaType(string(m.typ), m.params)
+	}
+	return string(m.typ)
+}
+
+// Type returns the string representation of the MIME type excluding params, e.g., "application/zip".
+func (m *MIME) Type() types.TYPE {
+	return m.typ
 }
 
 // Extension returns the file extension associated with the MIME type.
@@ -51,9 +61,8 @@ func (m *MIME) Is(expectedMIME string) bool {
 	// Parsing is needed because some detected MIME types contain parameters
 	// that need to be stripped for the comparison.
 	expectedMIME, _, _ = mime.ParseMediaType(expectedMIME)
-	found, _, _ := mime.ParseMediaType(m.mime)
 
-	if expectedMIME == found {
+	if expectedMIME == string(m.typ) {
 		return true
 	}
 
@@ -67,12 +76,13 @@ func (m *MIME) Is(expectedMIME string) bool {
 }
 
 func newMIME(
-	mime, extension string,
+	typ types.TYPE, extension string,
 	detector magic.Detector,
 	children ...*MIME) *MIME {
 	m := &MIME{
-		mime:      mime,
+		typ:       typ,
 		extension: extension,
+		params:    map[string]string{},
 		detector:  detector,
 		children:  children,
 	}
@@ -98,14 +108,14 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 		}
 	}
 
-	needsCharset := map[string]func([]byte) string{
-		"text/plain": charset.FromPlain,
-		"text/html":  charset.FromHTML,
-		"text/xml":   charset.FromXML,
+	needsCharset := map[types.TYPE]func([]byte) string{
+		types.TEXT: charset.FromPlain,
+		types.HTML: charset.FromHTML,
+		types.XML:  charset.FromXML,
 	}
 	// ps holds optional MIME parameters.
 	ps := map[string]string{}
-	if f, ok := needsCharset[m.mime]; ok {
+	if f, ok := needsCharset[m.typ]; ok {
 		if cset := f(in); cset != "" {
 			ps["charset"] = cset
 		}
@@ -126,16 +136,24 @@ func (m *MIME) flatten() []*MIME {
 
 // clone creates a new MIME with the provided optional MIME parameters.
 func (m *MIME) clone(ps map[string]string) *MIME {
-	clonedMIME := m.mime
-	if len(ps) > 0 {
-		clonedMIME = mime.FormatMediaType(m.mime, ps)
-	}
-
-	return &MIME{
-		mime:      clonedMIME,
+	clonedMIME := &MIME{
+		typ:       m.typ,
 		aliases:   m.aliases,
+		params:    map[string]string{},
 		extension: m.extension,
 	}
+
+	// apply params from parent
+	for k, v := range m.params {
+		clonedMIME.params[k] = v
+	}
+
+	// apply optional params
+	for k, v := range ps {
+		clonedMIME.params[k] = v
+	}
+
+	return clonedMIME
 }
 
 // cloneHierarchy creates a clone of m and all its ancestors. The optional MIME
@@ -152,15 +170,15 @@ func (m *MIME) cloneHierarchy(ps map[string]string) *MIME {
 	return ret
 }
 
-func (m *MIME) lookup(mime string) *MIME {
-	for _, n := range append(m.aliases, m.mime) {
-		if n == mime {
+func (m *MIME) lookup(typ string) *MIME {
+	for _, n := range append(m.aliases, string(m.typ)) {
+		if n == typ {
 			return m
 		}
 	}
 
 	for _, c := range m.children {
-		if m := c.lookup(mime); m != nil {
+		if m := c.lookup(typ); m != nil {
 			return m
 		}
 	}
@@ -171,9 +189,13 @@ func (m *MIME) lookup(mime string) *MIME {
 // returning true when the raw input file satisfies a signature.
 // The sub-format will be detected if all the detectors in the parent chain return true.
 // The extension should include the leading dot, as in ".html".
-func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
+func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mimestr, extension string, aliases ...string) {
+
+	typ, params, _ := mime.ParseMediaType(mimestr)
+
 	c := &MIME{
-		mime:      mime,
+		typ:       types.TYPE(typ),
+		params:    params,
 		extension: extension,
 		detector:  detector,
 		parent:    m,
