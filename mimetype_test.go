@@ -550,10 +550,10 @@ func TestLookup(t *testing.T) {
 		mime string
 		m    *MIME
 	}{
-		{root.typ, root},
-		{zip.typ, zip},
+		{string(root.typ), root},
+		{string(zip.typ), zip},
 		{zip.aliases[0], zip},
-		{xlsx.typ, xlsx},
+		{string(xlsx.typ), xlsx},
 	}
 
 	for _, tt := range data {

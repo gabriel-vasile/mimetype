@@ -5,12 +5,13 @@ import (
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/magic"
+	"github.com/gabriel-vasile/mimetype/types"
 )
 
 // MIME struct holds information about a file format: the string representation
 // of the MIME type, the extension and the parent file format.
 type MIME struct {
-	typ       string
+	typ       types.TYPE
 	aliases   []string
 	params    map[string]string
 	extension string
@@ -24,13 +25,13 @@ type MIME struct {
 // String returns the string representation of the MIME type including params, e.g., "text/html; charset=UTF-8".
 func (m *MIME) String() string {
 	if len(m.params) > 0 {
-		return mime.FormatMediaType(m.typ, m.params)
+		return mime.FormatMediaType(string(m.typ), m.params)
 	}
-	return m.typ
+	return string(m.typ)
 }
 
 // Type returns the string representation of the MIME type excluding params, e.g., "application/zip".
-func (m *MIME) Type() string {
+func (m *MIME) Type() types.TYPE {
 	return m.typ
 }
 
@@ -61,7 +62,7 @@ func (m *MIME) Is(expectedMIME string) bool {
 	// that need to be stripped for the comparison.
 	expectedMIME, _, _ = mime.ParseMediaType(expectedMIME)
 
-	if expectedMIME == m.typ {
+	if expectedMIME == string(m.typ) {
 		return true
 	}
 
@@ -75,7 +76,7 @@ func (m *MIME) Is(expectedMIME string) bool {
 }
 
 func newMIME(
-	typ, extension string,
+	typ types.TYPE, extension string,
 	detector magic.Detector,
 	children ...*MIME) *MIME {
 	m := &MIME{
@@ -107,10 +108,10 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 		}
 	}
 
-	needsCharset := map[string]func([]byte) string{
-		"text/plain": charset.FromPlain,
-		"text/html":  charset.FromHTML,
-		"text/xml":   charset.FromXML,
+	needsCharset := map[types.TYPE]func([]byte) string{
+		types.TEXT: charset.FromPlain,
+		types.HTML: charset.FromHTML,
+		types.XML:  charset.FromXML,
 	}
 	// ps holds optional MIME parameters.
 	ps := map[string]string{}
@@ -170,7 +171,7 @@ func (m *MIME) cloneHierarchy(ps map[string]string) *MIME {
 }
 
 func (m *MIME) lookup(typ string) *MIME {
-	for _, n := range append(m.aliases, m.typ) {
+	for _, n := range append(m.aliases, string(m.typ)) {
 		if n == typ {
 			return m
 		}
@@ -193,7 +194,7 @@ func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mimestr, ext
 	typ, params, _ := mime.ParseMediaType(mimestr)
 
 	c := &MIME{
-		typ:       typ,
+		typ:       types.TYPE(typ),
 		params:    params,
 		extension: extension,
 		detector:  detector,
