@@ -2,6 +2,8 @@ package magic
 
 import (
 	"bytes"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
@@ -294,9 +296,23 @@ func HAR(raw []byte, limit uint32) bool {
 	return false
 }
 
+var (
+	xmlPrefix         = []byte("<?xml version=")
+	xmlVersionRegex   = regexp.MustCompile(`['"\ \t]*[0-9.]+['"\ \t]*`)
+	svgDocumentPrefix = []byte("<!DOCTYPE svg PUBLIC")
+	svgPrefix         = []byte("<svg")
+)
+
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
-	return bytes.Contains(raw, []byte("<svg"))
+	if bytes.HasPrefix(raw, xmlPrefix) {
+		mlen := min(len(raw), 10+len(xmlPrefix))
+		return xmlVersionRegex.Match(raw[len(xmlPrefix):mlen]) && bytes.Contains(raw, []byte("<svg"))
+	}
+	if bytes.HasPrefix(raw, svgDocumentPrefix) {
+		return true
+	}
+	return bytes.HasPrefix(raw, svgPrefix)
 }
 
 // Srt matches a SubRip file.
