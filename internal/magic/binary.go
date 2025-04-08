@@ -71,7 +71,7 @@ func Dbf(raw []byte, limit uint32) bool {
 	}
 
 	// 3rd and 4th bytes contain the last update month and day of month.
-	if !(0 < raw[2] && raw[2] < 13 && 0 < raw[3] && raw[3] < 32) {
+	if raw[2] == 0 || raw[2] > 12 || raw[3] == 0 || raw[3] > 31 {
 		return false
 	}
 

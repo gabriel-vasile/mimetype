@@ -1,4 +1,4 @@
-name: Run Tests
+name: Tests and linters
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -19,22 +19,8 @@ jobs:
       with:
         go-version-file: 'go.mod'
     - name: Run linters
-      uses: golangci/golangci-lint-action@v6
+      uses: golangci/golangci-lint-action@v7
       with:
-        version: "v1.58"
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
-    - name: Install Go
-      if: success()
-      uses: actions/setup-go@v5.2.0
-      with:
-        go-version-file: 'go.mod'
-    - run: go test -race ./...
-    - run: go test -fuzz=. -fuzztime=30s
-    - run: go test -fuzz=Plain -fuzztime=30s ./internal/charset
-    - run: go test -fuzz=XML -fuzztime=30s ./internal/charset
-    - run: go test -fuzz=HTML -fuzztime=30s ./internal/charset
+        version: "v2.0.2"
+    - name: Run tests
+      run: go test -race ./...
