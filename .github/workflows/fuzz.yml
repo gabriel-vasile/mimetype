@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v4.2.2
     - name: Install Go
       if: success()
-      uses: actions/setup-go@v5.2.0
+      uses: actions/setup-go@v5.4.0
       with:
         go-version-file: 'go.mod'
     # 5m is chosen so that half of the 2000 free CI minutes offered by Github

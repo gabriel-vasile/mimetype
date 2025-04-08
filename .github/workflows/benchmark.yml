@@ -16,7 +16,7 @@ jobs:
       with:
         ref: master
     - name: Install Go
-      uses: actions/setup-go@v5.2.0
+      uses: actions/setup-go@v5.4.0
       with:
         go-version: 'stable'
     - run: go install golang.org/x/perf/cmd/benchstat@latest
