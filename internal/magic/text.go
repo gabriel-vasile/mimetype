@@ -153,145 +153,66 @@ func Php(raw []byte, limit uint32) bool {
 
 // JSON matches a JavaScript Object Notation file.
 func JSON(raw []byte, limit uint32) bool {
-	raw = trimLWS(raw)
 	// #175 A single JSON string, number or bool is not considered JSON.
 	// JSON objects and arrays are reported as JSON.
-	if len(raw) < 2 || (raw[0] != '[' && raw[0] != '{') {
-		return false
-	}
-	parsed, err := json.Scan(raw)
-	// If the full file content was provided, check there is no error.
-	if limit == 0 || len(raw) < int(limit) {
-		return err == nil
-	}
-
-	// If a section of the file was provided, check if all of it was parsed.
-	return parsed == len(raw) && len(raw) > 0
+	return jsonHelper(raw, limit, json.QueryNone, json.TokObject|json.TokArray)
 }
 
 // GeoJSON matches a RFC 7946 GeoJSON file.
 //
 // GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
-// BUG(gabriel-vasile): The "type" key should be searched for in the root object.
 func GeoJSON(raw []byte, limit uint32) bool {
-	raw = trimLWS(raw)
-	if len(raw) == 0 {
+	return jsonHelper(raw, limit, json.QueryGeoJSON, json.TokObject)
+}
+
+// HAR matches a HAR Spec file.
+// Spec: http://www.softwareishard.com/blog/har-12-spec/
+func HAR(raw []byte, limit uint32) bool {
+	return jsonHelper(raw, limit, json.QueryHARJSON, json.TokObject)
+}
+
+func jsonHelper(raw []byte, limit uint32, q string, wantTok int) bool {
+	if !json.LooksLikeObjectOrArray(raw) {
 		return false
 	}
-	// GeoJSON is always a JSON object, not a JSON array or any other JSON value.
-	if raw[0] != '{' {
+	lraw := len(raw)
+	parsed, inspected, firstToken, querySatisfied := json.Parse(q, raw)
+	if !querySatisfied || firstToken&wantTok == 0 {
 		return false
 	}
 
-	s := []byte(`"type"`)
-	si, sl := bytes.Index(raw, s), len(s)
-
-	if si == -1 {
-		return false
+	// If the full file content was provided, check that the whole input was parsed.
+	if limit == 0 || lraw < int(limit) {
+		return parsed == lraw
 	}
 
-	// If the "type" string is the suffix of the input,
-	// there is no need to search for the value of the key.
-	if si+sl == len(raw) {
-		return false
-	}
-	// Skip the "type" part.
-	raw = raw[si+sl:]
-	// Skip any whitespace before the colon.
-	raw = trimLWS(raw)
-	// Check for colon.
-	if len(raw) == 0 || raw[0] != ':' {
-		return false
-	}
-	// Skip any whitespace after the colon.
-	raw = trimLWS(raw[1:])
-
-	geoJSONTypes := [][]byte{
-		[]byte(`"Feature"`),
-		[]byte(`"FeatureCollection"`),
-		[]byte(`"Point"`),
-		[]byte(`"LineString"`),
-		[]byte(`"Polygon"`),
-		[]byte(`"MultiPoint"`),
-		[]byte(`"MultiLineString"`),
-		[]byte(`"MultiPolygon"`),
-		[]byte(`"GeometryCollection"`),
-	}
-	for _, t := range geoJSONTypes {
-		if bytes.HasPrefix(raw, t) {
-			return true
-		}
-	}
-
-	return false
+	// If a section of the file was provided, check if all of it was inspected.
+	// In other words, check that if there was a problem parsing, that problem
+	// occured at the last byte in the input.
+	return inspected == lraw && lraw > 0
 }
 
 // NdJSON matches a Newline delimited JSON file. All complete lines from raw
 // must be valid JSON documents meaning they contain one of the valid JSON data
 // types.
 func NdJSON(raw []byte, limit uint32) bool {
-	lCount, hasObjOrArr := 0, false
+	lCount, objOrArr := 0, 0
 	raw = dropLastLine(raw, limit)
 	var l []byte
 	for len(raw) != 0 {
 		l, raw = scanLine(raw)
-		// Empty lines are allowed in NDJSON.
-		if l = trimRWS(trimLWS(l)); len(l) == 0 {
-			continue
-		}
-		_, err := json.Scan(l)
-		if err != nil {
+		_, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
+		if len(l) != inspected {
 			return false
 		}
-		if l[0] == '[' || l[0] == '{' {
-			hasObjOrArr = true
+		if firstToken == json.TokArray || firstToken == json.TokObject {
+			objOrArr++
 		}
 		lCount++
 	}
 
-	return lCount > 1 && hasObjOrArr
-}
-
-// HAR matches a HAR Spec file.
-// Spec: http://www.softwareishard.com/blog/har-12-spec/
-func HAR(raw []byte, limit uint32) bool {
-	s := []byte(`"log"`)
-	si, sl := bytes.Index(raw, s), len(s)
-
-	if si == -1 {
-		return false
-	}
-
-	// If the "log" string is the suffix of the input,
-	// there is no need to search for the value of the key.
-	if si+sl == len(raw) {
-		return false
-	}
-	// Skip the "log" part.
-	raw = raw[si+sl:]
-	// Skip any whitespace before the colon.
-	raw = trimLWS(raw)
-	// Check for colon.
-	if len(raw) == 0 || raw[0] != ':' {
-		return false
-	}
-	// Skip any whitespace after the colon.
-	raw = trimLWS(raw[1:])
-
-	harJSONTypes := [][]byte{
-		[]byte(`"version"`),
-		[]byte(`"creator"`),
-		[]byte(`"entries"`),
-	}
-	for _, t := range harJSONTypes {
-		si := bytes.Index(raw, t)
-		if si > -1 {
-			return true
-		}
-	}
-
-	return false
+	return lCount > 1 && objOrArr > 0
 }
 
 // Svg matches a SVG file.
