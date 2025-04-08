@@ -97,6 +97,7 @@ var testcases = []testcase{
 	{"flv", "\x46\x4C\x56\x01", "video/x-flv", true},
 	{"gbr", offset(20, "GIMP"), "image/x-gimp-gbr", true},
 	{"geojson", `{"type":"Feature"}`, "application/geo+json", true},
+	{"geojson with space", `{ "type" : "Feature" }`, "application/geo+json", false},
 	{"gif 87", "GIF87a", "image/gif", true},
 	{"gif 89", "GIF89a", "image/gif", false},
 	{"glb 1", "\x67\x6C\x54\x46\x02\x00\x00\x00", "model/gltf-binary", true},
@@ -140,6 +141,7 @@ var testcases = []testcase{
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", true},
 	{"js", "#!/bin/node ", "text/javascript", true},
 	{"json", `{"key":"val"}`, "application/json", true},
+	{"json array", `[1,2,3]`, "application/json", false},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -181,6 +183,7 @@ var testcases = []testcase{
 	{"msi", fromDisk("msi.msi"), "application/x-ms-installer", true},
 	{"msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", true},
 	{"ndjson", `{"key":"val"}` + "\n" + `{"key":"val"}`, "application/x-ndjson", true},
+	{"ndjson spaces", `{ "key" : "val" }` + "\n" + ` { "key" : "val" }`, "application/x-ndjson", true},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", true},
 	{"elfobject", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00", "application/x-object", true},
 	{"odf", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula", true},
@@ -495,7 +498,7 @@ func BenchmarkAll(b *testing.B) {
 		parsed, _, _ := mime.ParseMediaType(tc.expectedMIME)
 		mtype := Lookup(parsed)
 		if mtype == nil || mtype.detector == nil {
-			b.Fatalf("nu e bine %s %s", mtype, tc.expectedMIME)
+			b.Fatalf("mime should always be non-nil %s %s", mtype, tc.expectedMIME)
 		}
 		// data is used for the positive case benchmark.
 		b.Run(tc.name, func(b *testing.B) {
