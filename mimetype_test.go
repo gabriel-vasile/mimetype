@@ -298,7 +298,7 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -421,35 +421,37 @@ func TestConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
+	n := 1000
 	Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Detect([]byte("text content"))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			SetLimit(5000 + uint32(i))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Lookup("text/plain")
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Lookup("e").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
 		wg.Done()
 	}()
 
 	wg.Wait()
-	// Reset to original limit for benchmarks.
+	// Reset to the original limit and MIME tree structure for benchmarks.
 	SetLimit(defaultLimit)
+	root.children = root.children[1:]
 }
 
 // For #162.
@@ -593,6 +595,8 @@ func TestExtend(t *testing.T) {
 			if m.parent != tt.parent {
 				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
 			}
+			// Revert the Extend to restore previous MIME tree structure.
+			tt.parent.children = tt.parent.children[1:]
 		})
 	}
 }
