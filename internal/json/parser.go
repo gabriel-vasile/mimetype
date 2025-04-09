@@ -7,14 +7,15 @@ import (
 
 const (
 	QueryNone    = "json"
-	QueryGeoJSON = "geo"
-	QueryHARJSON = "har"
+	QueryGeo     = "geo"
+	QueryHAR     = "har"
+	QueryGLTF    = "gltf"
 	maxRecursion = 4096
 )
 
 var queries = map[string][]query{
 	QueryNone: nil,
-	QueryGeoJSON: {{
+	QueryGeo: {{
 		SearchPath: [][]byte{[]byte("type")},
 		SearchVals: [][]byte{
 			[]byte(`"Feature"`),
@@ -28,12 +29,16 @@ var queries = map[string][]query{
 			[]byte(`"GeometryCollection"`),
 		},
 	}},
-	QueryHARJSON: {{
+	QueryHAR: {{
 		SearchPath: [][]byte{[]byte("log"), []byte("version")},
 	}, {
 		SearchPath: [][]byte{[]byte("log"), []byte("creator")},
 	}, {
 		SearchPath: [][]byte{[]byte("log"), []byte("entries")},
+	}},
+	QueryGLTF: {{
+		SearchPath: [][]byte{[]byte("asset"), []byte("version")},
+		SearchVals: [][]byte{[]byte(`"1.0"`), []byte(`"2.0"`)},
 	}},
 }
 
