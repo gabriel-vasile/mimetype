@@ -757,7 +757,7 @@ func TestStack(t *testing.T) {
 func BenchmarkParse(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_, _, _, query := Parse(QueryGeoJSON, sample)
+		_, _, _, query := Parse(QueryGeo, sample)
 		if !query {
 			b.Error("query should be satisfied")
 		}

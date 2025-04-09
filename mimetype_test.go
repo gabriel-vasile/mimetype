@@ -98,6 +98,8 @@ var testcases = []testcase{
 	{"gbr", offset(20, "GIMP"), "image/x-gimp-gbr", true},
 	{"geojson", `{"type":"Feature"}`, "application/geo+json", true},
 	{"geojson with space", `{ "type" : "Feature" }`, "application/geo+json", false},
+	{"gltf1", `{"asset":{"version":"1.0"}}`, "model/gltf+json", false},
+	{"gltf2", `{"asset":{"version":"2.0"}}`, "model/gltf+json", false},
 	{"gif 87", "GIF87a", "image/gif", true},
 	{"gif 89", "GIF89a", "image/gif", false},
 	{"glb 1", "\x67\x6C\x54\x46\x02\x00\x00\x00", "model/gltf-binary", true},

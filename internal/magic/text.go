@@ -163,13 +163,22 @@ func JSON(raw []byte, limit uint32) bool {
 // GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 func GeoJSON(raw []byte, limit uint32) bool {
-	return jsonHelper(raw, limit, json.QueryGeoJSON, json.TokObject)
+	return jsonHelper(raw, limit, json.QueryGeo, json.TokObject)
 }
 
 // HAR matches a HAR Spec file.
 // Spec: http://www.softwareishard.com/blog/har-12-spec/
 func HAR(raw []byte, limit uint32) bool {
-	return jsonHelper(raw, limit, json.QueryHARJSON, json.TokObject)
+	return jsonHelper(raw, limit, json.QueryHAR, json.TokObject)
+}
+
+// GLTF matches a GL Transmission Format (JSON) file.
+// Visit [glTF specification] and [IANA glTF entry] for more details.
+//
+// [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
+// [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf+json
+func GLTF(raw []byte, limit uint32) bool {
+	return jsonHelper(raw, limit, json.QueryGLTF, json.TokObject)
 }
 
 func jsonHelper(raw []byte, limit uint32, q string, wantTok int) bool {
