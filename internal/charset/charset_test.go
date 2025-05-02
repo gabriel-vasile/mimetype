@@ -140,3 +140,25 @@ func FuzzFromXML(f *testing.F) {
 		}
 	})
 }
+
+func BenchmarkFromHTML(b *testing.B) {
+	b.ReportAllocs()
+	doc := []byte(htmlDoc)
+	for i := 0; i < b.N; i++ {
+		FromHTML(doc)
+	}
+}
+func BenchmarkFromXML(b *testing.B) {
+	b.ReportAllocs()
+	doc := []byte(xmlDoc)
+	for i := 0; i < b.N; i++ {
+		FromXML(doc)
+	}
+}
+func BenchmarkFromPlain(b *testing.B) {
+	b.ReportAllocs()
+	doc := []byte(xmlDoc)
+	for i := 0; i < b.N; i++ {
+		FromPlain(doc)
+	}
+}
