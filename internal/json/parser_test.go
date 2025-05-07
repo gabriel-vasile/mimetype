@@ -746,7 +746,7 @@ func TestStack(t *testing.T) {
 	for _, tt := range tCases {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &parserState{}
-			p.consumeAny([]byte(tt.data), nil, 0)
+			p.consumeAny([]byte(tt.data), []query{{}}, 0)
 			if got := join(p.currPath); got != tt.expected {
 				t.Errorf("expected: %s, got: %s", tt.expected, got)
 			}
