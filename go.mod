@@ -9,7 +9,7 @@ go 1.23.0
 
 toolchain go1.23.1
 
-require golang.org/x/net v0.39.0
+require golang.org/x/net v0.40.0
 
 // v1.4.4 had a test file detected as malicious by antivirus software. #575
 retract v1.4.4
