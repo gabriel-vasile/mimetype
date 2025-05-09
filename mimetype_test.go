@@ -26,6 +26,7 @@ func offset(n int, s string) string {
 	prepend := make([]byte, n)
 	return string(prepend) + s
 }
+
 func fromDisk(path string) string {
 	data, err := os.ReadFile("testdata/" + path)
 	if err != nil {
@@ -211,6 +212,11 @@ var testcases = []testcase{
 	{"png", "\x89PNG\x0d\x0a\x1a\x0a", "image/png", true},
 	{"ppt", fromDisk("ppt.ppt"), "application/vnd.ms-powerpoint", true},
 	{"pptx", fromDisk("pptx.pptx"), "application/vnd.openxmlformats-officedocument.presentationml.presentation", true},
+	{"pbm", fromDisk("pbm.pbm"), "image/x-portable-bitmap", true},
+	{"pgm", fromDisk("pgm.pgm"), "image/x-portable-graymap", true},
+	{"ppm", fromDisk("ppm.ppm"), "image/x-portable-pixmap", true},
+	{"pfm", fromDisk("pfm.pfm"), "image/x-portable-floatmap", true},
+	{"pam", fromDisk("pam.pam"), "image/x-portable-arbitrarymap", true},
 	{"ps", "%!PS-Adobe-", "application/postscript", true},
 	{"psd", "8BPS", "image/vnd.adobe.photoshop", true},
 	{"p7s_pem", "-----BEGIN PKCS7", "application/pkcs7-signature", true},
@@ -303,7 +309,7 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		t.Fatal(err)
 	}
