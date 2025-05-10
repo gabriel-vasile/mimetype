@@ -2,11 +2,9 @@ package charset
 
 import (
 	"bytes"
-	"encoding/xml"
-	"strings"
 	"unicode/utf8"
 
-	"golang.org/x/net/html"
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 const (
@@ -141,20 +139,31 @@ func FromXML(content []byte) string {
 	}
 	return FromPlain(content)
 }
-func fromXML(content []byte) string {
-	content = trimLWS(content)
-	dec := xml.NewDecoder(bytes.NewReader(content))
-	rawT, err := dec.RawToken()
-	if err != nil {
-		return ""
+func fromXML(s scan.Bytes) string {
+	xml := []byte("<?XML")
+	lxml := len(xml)
+	for {
+		if len(s) == 0 {
+			return ""
+		}
+		for isWS(s.Peek()) {
+			s.Advance(1)
+		}
+		if len(s) <= lxml {
+			return ""
+		}
+		if !ciCheck(xml, s[:lxml]) {
+			s.Advance(1)
+			continue
+		}
+		aName, aVal, hasMore := "", "", true
+		for hasMore {
+			aName, aVal, hasMore = getAnAttribute(&s)
+			if aName == "encoding" && aVal != "" {
+				return aVal
+			}
+		}
 	}
-
-	t, ok := rawT.(xml.ProcInst)
-	if !ok {
-		return ""
-	}
-
-	return strings.ToLower(xmlEncoding(string(t.Inst)))
 }
 
 // FromHTML returns the charset of an HTML document. It first looks if a BOM is
@@ -171,139 +180,218 @@ func FromHTML(content []byte) string {
 	return FromPlain(content)
 }
 
-func fromHTML(content []byte) string {
-	z := html.NewTokenizer(bytes.NewReader(content))
-	for {
-		switch z.Next() {
-		case html.ErrorToken:
-			return ""
+// ciCheck does case insensitive check.
+func ciCheck(upperCase, anyCase []byte) bool {
+	if len(anyCase) < len(upperCase) {
+		return false
+	}
 
-		case html.StartTagToken, html.SelfClosingTagToken:
-			tagName, hasAttr := z.TagName()
-			if !bytes.Equal(tagName, []byte("meta")) {
-				continue
-			}
-			attrList := make(map[string]bool)
-			gotPragma := false
-
-			const (
-				dontKnow = iota
-				doNeedPragma
-				doNotNeedPragma
-			)
-			needPragma := dontKnow
-
-			name := ""
-			for hasAttr {
-				var key, val []byte
-				key, val, hasAttr = z.TagAttr()
-				ks := string(key)
-				if attrList[ks] {
-					continue
-				}
-				attrList[ks] = true
-				for i, c := range val {
-					if 'A' <= c && c <= 'Z' {
-						val[i] = c + 0x20
-					}
-				}
-
-				switch ks {
-				case "http-equiv":
-					if bytes.Equal(val, []byte("content-type")) {
-						gotPragma = true
-					}
-
-				case "content":
-					name = fromMetaElement(string(val))
-					if name != "" {
-						needPragma = doNeedPragma
-					}
-
-				case "charset":
-					name = string(val)
-					needPragma = doNotNeedPragma
-				}
-			}
-
-			if needPragma == dontKnow || needPragma == doNeedPragma && !gotPragma {
-				continue
-			}
-
-			if strings.HasPrefix(name, "utf-16") {
-				name = "utf-8"
-			}
-
-			return name
+	// perform case insensitive check
+	for i, b := range upperCase {
+		db := anyCase[i]
+		if 'A' <= b && b <= 'Z' {
+			db &= 0xDF
+		}
+		if b != db {
+			return false
 		}
 	}
+	return true
 }
 
-func fromMetaElement(s string) string {
-	for s != "" {
-		csLoc := strings.Index(s, "charset")
-		if csLoc == -1 {
+func fromHTML(s scan.Bytes) string {
+	const (
+		dontKnow = iota
+		doNeedPragma
+		doNotNeedPragma
+	)
+	meta := []byte("<META")
+	lmeta := len(meta)
+	for {
+		if len(s) == 0 {
 			return ""
 		}
-		s = s[csLoc+len("charset"):]
-		s = strings.TrimLeft(s, " \t\n\f\r")
-		if !strings.HasPrefix(s, "=") {
+		if bytes.HasPrefix(s, []byte("<!--")) {
+			// Offset by two (<!) because the starting and ending -- can be the same.j
+			s.Advance(2)
+			if i := bytes.Index(s, []byte("-->")); i != -1 {
+				s.Advance(i)
+			}
+		}
+		if len(s) <= lmeta {
+			return ""
+		}
+		if !ciCheck(meta, s) {
+			s.Advance(1)
 			continue
 		}
-		s = s[1:]
-		s = strings.TrimLeft(s, " \t\n\f\r")
-		if s == "" {
+		s.Advance(lmeta)
+		c := s.Pop()
+		if c == 0 || (!isWS(c) && c != '/') {
 			return ""
 		}
-		if q := s[0]; q == '"' || q == '\'' {
-			s = s[1:]
-			closeQuote := strings.IndexRune(s, rune(q))
-			if closeQuote == -1 {
-				return ""
+		attrList := make(map[string]bool)
+		gotPragma := false
+		needPragma := dontKnow
+
+		charset := ""
+		aName, aVal, hasMore := "", "", true
+		for hasMore {
+			aName, aVal, hasMore = getAnAttribute(&s)
+			if attrList[aName] {
+				continue
 			}
-			return s[:closeQuote]
+			// processing step
+			if len(aName) == 0 && len(aVal) == 0 {
+				if needPragma == dontKnow {
+					continue
+				}
+				if needPragma == doNeedPragma && !gotPragma {
+					continue
+				}
+			}
+			attrList[aName] = true
+			if aName == "http-equiv" && ciCheck([]byte("CONTENT-TYPE"), []byte(aVal)) {
+				gotPragma = true
+			} else if aName == "content" {
+				charset = string(extractCharsetFromMeta(scan.Bytes(aVal)))
+				if len(charset) != 0 {
+					needPragma = doNeedPragma
+				}
+			} else if aName == "charset" {
+				charset = aVal
+				needPragma = doNotNeedPragma
+			}
 		}
 
-		end := strings.IndexAny(s, "; \t\n\f\r")
-		if end == -1 {
-			end = len(s)
+		if needPragma == dontKnow || needPragma == doNeedPragma && !gotPragma {
+			continue
 		}
-		return s[:end]
+
+		return charset
 	}
-	return ""
 }
 
-func xmlEncoding(s string) string {
-	param := "encoding="
-	idx := strings.Index(s, param)
-	if idx == -1 {
-		return ""
+// https://html.spec.whatwg.org/multipage/urls-and-fetching.html#algorithm-for-extracting-a-character-encoding-from-a-meta-element
+func extractCharsetFromMeta(s scan.Bytes) []byte {
+	for {
+		i := bytes.Index(s, []byte("charset"))
+		if i == -1 {
+			return nil
+		}
+		s.Advance(i + len("charset"))
+		for isWS(s.Peek()) {
+			s.Advance(1)
+		}
+		if s.Pop() != '=' {
+			continue
+		}
+		for isWS(s.Peek()) {
+			s.Advance(1)
+		}
+		quote := s.Peek()
+		if quote == 0 {
+			return nil
+		}
+		if quote == '"' || quote == '\'' {
+			s.Advance(1)
+			return bytes.TrimSpace(s.PopUntil(quote))
+		}
+
+		return bytes.TrimSpace(s.PopUntil(';', '\t', '\n', '\x0c', '\r', ' '))
 	}
-	v := s[idx+len(param):]
-	if v == "" {
-		return ""
-	}
-	if v[0] != '\'' && v[0] != '"' {
-		return ""
-	}
-	idx = strings.IndexRune(v[1:], rune(v[0]))
-	if idx == -1 {
-		return ""
-	}
-	return v[1 : idx+1]
 }
 
-// trimLWS trims whitespace from beginning of the input.
-// TODO: find a way to call trimLWS once per detection instead of once in each
-// detector which needs the trimmed input.
-func trimLWS(in []byte) []byte {
-	firstNonWS := 0
-	for ; firstNonWS < len(in) && isWS(in[firstNonWS]); firstNonWS++ {
+func getAnAttribute(s *scan.Bytes) (name, val string, hasMore bool) {
+	for isWS(s.Peek()) || s.Peek() == '/' {
+		s.Advance(1)
 	}
-
-	return in[firstNonWS:]
+	if s.Peek() == '>' {
+		return "", "", false
+	}
+	// Allocate 10 to avoid resizes.
+	// Attribute names and values are continuous slices of bytes in input,
+	// so we could do without allocating and returning slices of input.
+	nameB := make([]byte, 0, 10)
+	// step 4 and 5
+	for {
+		// bap means byte at position in the specification.
+		bap := s.Pop()
+		if bap == 0 {
+			return "", "", false
+		}
+		if bap == '=' && len(nameB) > 0 {
+			val, hasMore := getAValue(s)
+			return string(nameB), string(val), hasMore
+		} else if isWS(bap) {
+			for isWS(s.Peek()) {
+				s.Advance(1)
+			}
+			if s.Peek() != '=' {
+				return string(nameB), "", true
+			}
+			s.Advance(1)
+			for isWS(s.Peek()) {
+				s.Advance(1)
+			}
+			val, hasMore := getAValue(s)
+			return string(nameB), string(val), hasMore
+		} else if bap == '/' || bap == '>' {
+			return string(nameB), "", false
+		} else if bap >= 'A' && bap <= 'Z' {
+			nameB = append(nameB, bap+0x20)
+		} else {
+			nameB = append(nameB, bap)
+		}
+	}
 }
 
-func isWS(b byte) bool {
-	return b == '\t' || b == '\n' || b == '\x0c' || b == '\r' || b == ' '
+func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
+	for isWS(s.Peek()) {
+		s.Advance(1)
+	}
+	origS, end := *s, 0
+	bap := s.Pop()
+	if bap == 0 {
+		return nil, false
+	}
+	end++
+	// Step 10
+	switch bap {
+	case '"', '\'':
+		// quote loop
+		for {
+			c := s.Pop()
+			if c == 0 {
+				return nil, false
+			}
+			if bap == c {
+				// 1 to skip the quote at the beginning
+				return origS[1:end], s.Peek() != 0 && s.Peek() != '>'
+			}
+			end++
+		}
+	case '>':
+		return nil, false
+	}
+
+	// Step 11
+	for {
+		bap = s.Pop()
+		if bap == 0 {
+			return nil, false
+		}
+		switch {
+		case isWS(bap):
+			return origS[:end], true
+		case bap == '>':
+			return origS[:end], false
+		default:
+			end++
+		}
+	}
+}
+
+func isWS(bap byte) bool {
+	return bap == '\t' || bap == '\n' || bap == '\x0c' || bap == '\r' || bap == ' '
 }
