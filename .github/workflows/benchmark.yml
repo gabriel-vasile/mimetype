@@ -20,14 +20,10 @@ jobs:
       with:
         go-version: 'stable'
     - run: go install golang.org/x/perf/cmd/benchstat@latest
-
-    # Hard to get stable results inside github actions, I think because of the shared
-    # nature of the runners. Take the results of this benchmark with a grain of salt.
-    - run: go test -run=none -bench=. -count=10 -timeout=30m ./... > /tmp/prev
-
+    - run: go test -run=none -bench=. -count=10 -benchtime=200ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
       uses: actions/checkout@v4.2.2
     # Second run of benchmarks
-    - run: go test -run=none -bench=. -count=10 -timeout=30m ./... > /tmp/curr
+    - run: go test -run=none -bench=. -count=10 -benchtime=200ms -timeout=1h ./... > /tmp/curr
 
     - run: benchstat /tmp/prev /tmp/curr
