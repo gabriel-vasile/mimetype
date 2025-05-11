@@ -45,8 +45,7 @@ fmt.Println(mtype.String(), mtype.Extension())
 ```
 See the [runnable Go Playground examples](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#pkg-overview).
 
-## Usage'
-Only use libraries like **mimetype** as a last resort. Content type detection
+Caution: only use libraries like **mimetype** as a last resort. Content type detection
 using magic numbers is slow, inaccurate, and non-standard. Most of the times
 protocols have methods for specifying such metadata; e.g., `Content-Type` header
 in HTTP and SMTP.
@@ -84,19 +83,13 @@ or from a [file](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#DetectFil
   <img alt="how project is structured" src="https://raw.githubusercontent.com/gabriel-vasile/mimetype/master/testdata/gif.gif" width="88%">
 </div>
 
-## Performance
-Thanks to the hierarchical structure, searching for common formats first,
-and limiting itself to file headers, **mimetype** matches the performance of
-stdlib `http.DetectContentType` while outperforming the alternative package.
-
-```bash
-                            mimetype  http.DetectContentType      filetype
-BenchmarkMatchTar-24       250 ns/op         400 ns/op           3778 ns/op
-BenchmarkMatchZip-24       524 ns/op         351 ns/op           4884 ns/op
-BenchmarkMatchJpeg-24      103 ns/op         228 ns/op            839 ns/op
-BenchmarkMatchGif-24       139 ns/op         202 ns/op            751 ns/op
-BenchmarkMatchPng-24       165 ns/op         221 ns/op           1176 ns/op
-```
+## Benchmarks
+Benchmarks for each file format are performed when a PR is open. The results can
+be seen on the [workflows page](https://github.com/gabriel-vasile/mimetype/actions/workflows/benchmark.yml).
+Performance improvements are welcome but correctness is prioritized.
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are unexpected but welcome. When submitting a PR for detection of
+a new file format, please make sure to add a record to the list of testcases
+from [mimetype_test.go](mimetype_test.go). For complex files a record can be added
+in the [testdata](testdata) directory.

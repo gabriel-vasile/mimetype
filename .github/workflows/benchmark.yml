@@ -20,15 +20,10 @@ jobs:
       with:
         go-version: 'stable'
     - run: go install golang.org/x/perf/cmd/benchstat@latest
-
-    # 30 runs with 100ms benchtime seems to result in acceptable p-values
-    # When I tried with count=10, it would be unreliable because of the actions
-    # runner is in a shared environment and CPU and mem would be affected by others. (or so I think)
-    - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/prev
-
+    - run: go test -run=none -bench=. -count=10 -benchtime=200ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
       uses: actions/checkout@v4.2.2
     # Second run of benchmarks
-    - run: go test -run=none -bench=. -count=30 -benchtime=100ms -timeout=20m > /tmp/curr
+    - run: go test -run=none -bench=. -count=10 -benchtime=200ms -timeout=1h ./... > /tmp/curr
 
     - run: benchstat /tmp/prev /tmp/curr
