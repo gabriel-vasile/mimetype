@@ -597,8 +597,7 @@ func TestExtend(t *testing.T) {
 			m := Lookup(tt.mime)
 			if m == nil {
 				t.Fatalf("mime %s not found", tt.mime)
-			}
-			if m.parent != tt.parent {
+			} else if m.parent != tt.parent {
 				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
 			}
 			// Revert the Extend to restore previous MIME tree structure.
