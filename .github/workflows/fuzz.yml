@@ -1,0 +1,27 @@
+name: Fuzz
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.2.2
+    - name: Install Go
+      if: success()
+      uses: actions/setup-go@v5.4.0
+      with:
+        go-version-file: 'go.mod'
+    # 5m is chosen so that half of the 2000 free CI minutes offered by Github
+    # will be used each month. The other half is reserved for tests in PRs.
+    - run: go test -fuzztime=5m -fuzz=.
+    - run: go test -fuzztime=5m -fuzz=.     ./internal/json
+    - run: go test -fuzztime=5m -fuzz=Plain ./internal/charset
+    - run: go test -fuzztime=5m -fuzz=XML   ./internal/charset
+    - run: go test -fuzztime=5m -fuzz=HTML  ./internal/charset

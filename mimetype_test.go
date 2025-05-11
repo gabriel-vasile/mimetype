@@ -98,6 +98,9 @@ var testcases = []testcase{
 	{"flv", "\x46\x4C\x56\x01", "video/x-flv", true},
 	{"gbr", offset(20, "GIMP"), "image/x-gimp-gbr", true},
 	{"geojson", `{"type":"Feature"}`, "application/geo+json", true},
+	{"geojson with space", `{ "type" : "Feature" }`, "application/geo+json", false},
+	{"gltf1", `{"asset":{"version":"1.0"}}`, "model/gltf+json", false},
+	{"gltf2", `{"asset":{"version":"2.0"}}`, "model/gltf+json", false},
 	{"gif 87", "GIF87a", "image/gif", true},
 	{"gif 89", "GIF89a", "image/gif", false},
 	{"glb 1", "\x67\x6C\x54\x46\x02\x00\x00\x00", "model/gltf-binary", true},
@@ -141,6 +144,7 @@ var testcases = []testcase{
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", true},
 	{"js", "#!/bin/node ", "text/javascript", true},
 	{"json", `{"key":"val"}`, "application/json", true},
+	{"json array", `[1,2,3]`, "application/json", false},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -182,6 +186,7 @@ var testcases = []testcase{
 	{"msi", fromDisk("msi.msi"), "application/x-ms-installer", true},
 	{"msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", true},
 	{"ndjson", `{"key":"val"}` + "\n" + `{"key":"val"}`, "application/x-ndjson", true},
+	{"ndjson spaces", `{ "key" : "val" }` + "\n" + ` { "key" : "val" }`, "application/x-ndjson", true},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", true},
 	{"elfobject", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00", "application/x-object", true},
 	{"odf", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula", true},
@@ -299,7 +304,7 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -422,35 +427,37 @@ func TestConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
+	n := 1000
 	Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Detect([]byte("text content"))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			SetLimit(5000 + uint32(i))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Lookup("text/plain")
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < n; i++ {
 			Lookup("e").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
 		wg.Done()
 	}()
 
 	wg.Wait()
-	// Reset to original limit for benchmarks.
+	// Reset to the original limit and MIME tree structure for benchmarks.
 	SetLimit(defaultLimit)
+	root.children = root.children[1:]
 }
 
 // For #162.
@@ -594,6 +601,8 @@ func TestExtend(t *testing.T) {
 			if m.parent != tt.parent {
 				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
 			}
+			// Revert the Extend to restore previous MIME tree structure.
+			tt.parent.children = tt.parent.children[1:]
 		})
 	}
 }
