@@ -359,18 +359,11 @@ func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
 	// Step 10
 	switch bap {
 	case '"', '\'':
-		// quote loop
-		for {
-			c := s.Pop()
-			if c == 0 {
-				return nil, false
-			}
-			if bap == c {
-				// 1 to skip the quote at the beginning
-				return origS[1:end], s.Peek() != 0 && s.Peek() != '>'
-			}
-			end++
+		val := s.PopUntil(bap)
+		if s.Pop() != bap {
+			return nil, false
 		}
+		return val, s.Peek() != 0 && s.Peek() != '>'
 	case '>':
 		return nil, false
 	}
