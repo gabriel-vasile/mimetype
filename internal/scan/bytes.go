@@ -1,6 +1,8 @@
 // Package scan has functions for scanning byte slices.
 package scan
 
+import "bytes"
+
 // Bytes is a byte slice with helper methods for easier scanning.
 type Bytes []byte
 
@@ -45,26 +47,31 @@ func (b *Bytes) Pop() byte {
 	return 0
 }
 
-func (b *Bytes) PopUntil(anyChar ...byte) []byte {
-	i := 0
-	for ; i < len(*b); i++ {
-		if equalsAny((*b)[i], anyChar...) {
-			break
-		}
+// PopUntil will advance b until, but not including, the first occurence of stopAt
+// character. If no occurence is found, then it will advance until the end of b.
+// The returned Bytes is a slice of all the bytes that we're advanced over.
+func (b *Bytes) PopUntil(stopAt ...byte) Bytes {
+	if len(*b) == 0 {
+		return Bytes{}
+	}
+	i := bytes.IndexAny(*b, string(stopAt))
+	if i == -1 {
+		i = len(*b)
 	}
 
 	prefix := (*b)[:i]
 	*b = (*b)[i:]
-	return prefix
+	return Bytes(prefix)
 }
 
-func equalsAny(needle byte, haystack ...byte) bool {
-	for _, c := range haystack {
-		if needle == c {
-			return true
+// Is will return true if all bytes in b are one of the allowed bytes.
+func (b *Bytes) Is(allowed []byte) bool {
+	for _, c := range *b {
+		if bytes.IndexByte(allowed, c) == -1 {
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 // First line returns the first line from b and advances b with the length of the
@@ -86,3 +93,8 @@ func (b *Bytes) FirstLine() []byte {
 func isWS(b byte) bool {
 	return b == '\t' || b == '\n' || b == '\x0c' || b == '\r' || b == ' '
 }
+
+var (
+	ASCIISpaces = []byte{' ', '\r', '\n', '\x0c', '\t'}
+	ASCIIDigits = []byte{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+)
