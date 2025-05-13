@@ -1,6 +1,8 @@
 package scan
 
 import (
+	"bufio"
+	"strings"
 	"testing"
 )
 
@@ -132,7 +134,7 @@ func TestAdvance(t *testing.T) {
 	}
 }
 
-func TestFirstLine(t *testing.T) {
+func TestLine(t *testing.T) {
 	tcases := []struct {
 		name     string
 		in       string
@@ -152,17 +154,30 @@ func TestFirstLine(t *testing.T) {
 		"two lines", "abc\ndef", "abc", "def",
 	}, {
 		"two lines with \\n", "abc\ndef\n", "abc", "def\n",
+	}, {
+		"drops final cr", "abc\r", "abc", "",
+	}, {
+		"cr inside line", "abc\rdef", "abc\rdef", "",
+	}, {
+		"nl and cr", "\n\r", "", "\r",
 	}}
 
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			b := Bytes(tc.in)
-			line := b.FirstLine()
+			line := b.Line()
 			if string(line) != tc.line {
 				t.Errorf("line: got: %s, want: %s", line, []byte(tc.line))
 			}
 			if string(b) != tc.leftover {
 				t.Errorf("leftover: got: %s, want: %s", b, []byte(tc.leftover))
+			}
+
+			// Test if it behaves like bufio.Scanner as well.
+			s := bufio.NewScanner(strings.NewReader(tc.in))
+			s.Scan()
+			if string(line) != s.Text() {
+				t.Errorf("Bytes.Line not like bufio.Scanner")
 			}
 		})
 	}
