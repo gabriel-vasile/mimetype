@@ -3,6 +3,8 @@ package magic
 import (
 	"bytes"
 	"encoding/binary"
+
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 var (
@@ -46,13 +48,13 @@ func Jar(raw []byte, limit uint32) bool {
 }
 
 func zipContains(raw, sig []byte, msoCheck bool) bool {
-	b := readBuf(raw)
+	b := scan.Bytes(raw)
 	pk := []byte("PK\003\004")
 	if len(b) < 0x1E {
 		return false
 	}
 
-	if !b.advance(0x1E) {
+	if !b.Advance(0x1E) {
 		return false
 	}
 	if bytes.HasPrefix(b, sig) {
@@ -81,12 +83,12 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 	}
 
 	searchOffset := binary.LittleEndian.Uint32(raw[18:]) + 49
-	if !b.advance(int(searchOffset)) {
+	if !b.Advance(int(searchOffset)) {
 		return false
 	}
 
 	nextHeader := bytes.Index(raw[searchOffset:], pk)
-	if !b.advance(nextHeader) {
+	if !b.Advance(nextHeader) {
 		return false
 	}
 	if bytes.HasPrefix(b, sig) {
@@ -94,14 +96,14 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 	}
 
 	for i := 0; i < 4; i++ {
-		if !b.advance(0x1A) {
+		if !b.Advance(0x1A) {
 			return false
 		}
 		nextHeader = bytes.Index(b, pk)
 		if nextHeader == -1 {
 			return false
 		}
-		if !b.advance(nextHeader + 0x1E) {
+		if !b.Advance(nextHeader + 0x1E) {
 			return false
 		}
 		if bytes.HasPrefix(b, sig) {

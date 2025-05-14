@@ -6,6 +6,7 @@ import (
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 var (
@@ -207,10 +208,12 @@ func jsonHelper(raw []byte, limit uint32, q string, wantTok int) bool {
 // types.
 func NdJSON(raw []byte, limit uint32) bool {
 	lCount, objOrArr := 0, 0
-	raw = dropLastLine(raw, limit)
-	var l []byte
-	for len(raw) != 0 {
-		l, raw = scanLine(raw)
+
+	s := scan.Bytes(raw)
+	s.DropLastLine(limit)
+	var l scan.Bytes
+	for len(s) != 0 {
+		l = s.Line()
 		_, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
 		if len(l) != inspected {
 			return false
@@ -231,13 +234,14 @@ func Svg(raw []byte, limit uint32) bool {
 
 // Srt matches a SubRip file.
 func Srt(raw []byte, _ uint32) bool {
-	line, raw := scanLine(raw)
+	s := scan.Bytes(raw)
+	line := s.Line()
 
 	// First line must be 1.
 	if len(line) != 1 || line[0] != '1' {
 		return false
 	}
-	line, raw = scanLine(raw)
+	line = s.Line()
 	// Timestamp format (e.g: 00:02:16,612 --> 00:02:19,376) limits second line
 	// length to exactly 29 characters.
 	if len(line) != 29 {
@@ -266,7 +270,7 @@ func Srt(raw []byte, _ uint32) bool {
 		return false
 	}
 
-	line, _ = scanLine(raw)
+	line = s.Line()
 	// A third line must exist and not be empty. This is the actual subtitle text.
 	return len(line) != 0
 }
@@ -294,16 +298,4 @@ func Vtt(raw []byte, limit uint32) bool {
 	// Exact match.
 	return bytes.Equal(raw, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
 		bytes.Equal(raw, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
-}
-
-// dropCR drops a terminal \r from the data.
-func dropCR(data []byte) []byte {
-	if len(data) > 0 && data[len(data)-1] == '\r' {
-		return data[0 : len(data)-1]
-	}
-	return data
-}
-func scanLine(b []byte) (line, remainder []byte) {
-	line, remainder, _ = bytes.Cut(b, []byte("\n"))
-	return dropCR(line), remainder
 }
