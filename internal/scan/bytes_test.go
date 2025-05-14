@@ -1,6 +1,8 @@
 package scan
 
 import (
+	"bufio"
+	"strings"
 	"testing"
 )
 
@@ -132,7 +134,7 @@ func TestAdvance(t *testing.T) {
 	}
 }
 
-func TestFirstLine(t *testing.T) {
+func TestLine(t *testing.T) {
 	tcases := []struct {
 		name     string
 		in       string
@@ -152,17 +154,30 @@ func TestFirstLine(t *testing.T) {
 		"two lines", "abc\ndef", "abc", "def",
 	}, {
 		"two lines with \\n", "abc\ndef\n", "abc", "def\n",
+	}, {
+		"drops final cr", "abc\r", "abc", "",
+	}, {
+		"cr inside line", "abc\rdef", "abc\rdef", "",
+	}, {
+		"nl and cr", "\n\r", "", "\r",
 	}}
 
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			b := Bytes(tc.in)
-			line := b.FirstLine()
+			line := b.Line()
 			if string(line) != tc.line {
 				t.Errorf("line: got: %s, want: %s", line, []byte(tc.line))
 			}
 			if string(b) != tc.leftover {
 				t.Errorf("leftover: got: %s, want: %s", b, []byte(tc.leftover))
+			}
+
+			// Test if it behaves like bufio.Scanner as well.
+			s := bufio.NewScanner(strings.NewReader(tc.in))
+			s.Scan()
+			if string(line) != s.Text() {
+				t.Errorf("Bytes.Line not like bufio.Scanner")
 			}
 		})
 	}
@@ -202,6 +217,41 @@ func TestPopUntil(t *testing.T) {
 			}
 			if string(b) != tc.leftover {
 				t.Errorf("leftover: got: %s, want: %s", b, []byte(tc.leftover))
+			}
+		})
+	}
+}
+
+func TestIs(t *testing.T) {
+	tcases := []struct {
+		name    string
+		in      string
+		allowed string
+		want    bool
+	}{{
+		"both empty", "", "", true,
+	}, {
+		"allowed empty", "123", "", false,
+	}, {
+		"in empty", "", "1", true,
+	}, {
+		"123 4", "123", "4", false,
+	}, {
+		"123 456", "123", "456", false,
+	}, {
+		"123 23", "123", "23", false,
+	}, {
+		"123 234", "123", "234", false,
+	}, {
+		"123 1234", "123", "1234", true,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			got := b.Is([]byte(tc.allowed))
+			if tc.want != got {
+				t.Errorf("got: %t, want: %t", got, tc.want)
 			}
 		})
 	}
