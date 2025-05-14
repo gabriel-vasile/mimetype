@@ -146,7 +146,7 @@ func fromXML(s scan.Bytes) string {
 		if len(s) == 0 {
 			return ""
 		}
-		for isWS(s.Peek()) {
+		for scan.ByteIsWS(s.Peek()) {
 			s.Advance(1)
 		}
 		if len(s) <= lxml {
@@ -227,7 +227,7 @@ func fromHTML(s scan.Bytes) string {
 		}
 		s.Advance(lmeta)
 		c := s.Pop()
-		if c == 0 || (!isWS(c) && c != '/') {
+		if c == 0 || (!scan.ByteIsWS(c) && c != '/') {
 			return ""
 		}
 		attrList := make(map[string]bool)
@@ -280,13 +280,13 @@ func extractCharsetFromMeta(s scan.Bytes) []byte {
 			return nil
 		}
 		s.Advance(i + len("charset"))
-		for isWS(s.Peek()) {
+		for scan.ByteIsWS(s.Peek()) {
 			s.Advance(1)
 		}
 		if s.Pop() != '=' {
 			continue
 		}
-		for isWS(s.Peek()) {
+		for scan.ByteIsWS(s.Peek()) {
 			s.Advance(1)
 		}
 		quote := s.Peek()
@@ -303,7 +303,7 @@ func extractCharsetFromMeta(s scan.Bytes) []byte {
 }
 
 func getAnAttribute(s *scan.Bytes) (name, val string, hasMore bool) {
-	for isWS(s.Peek()) || s.Peek() == '/' {
+	for scan.ByteIsWS(s.Peek()) || s.Peek() == '/' {
 		s.Advance(1)
 	}
 	if s.Peek() == '>' {
@@ -323,15 +323,15 @@ func getAnAttribute(s *scan.Bytes) (name, val string, hasMore bool) {
 		if bap == '=' && len(nameB) > 0 {
 			val, hasMore := getAValue(s)
 			return string(nameB), string(val), hasMore
-		} else if isWS(bap) {
-			for isWS(s.Peek()) {
+		} else if scan.ByteIsWS(bap) {
+			for scan.ByteIsWS(s.Peek()) {
 				s.Advance(1)
 			}
 			if s.Peek() != '=' {
 				return string(nameB), "", true
 			}
 			s.Advance(1)
-			for isWS(s.Peek()) {
+			for scan.ByteIsWS(s.Peek()) {
 				s.Advance(1)
 			}
 			val, hasMore := getAValue(s)
@@ -347,7 +347,7 @@ func getAnAttribute(s *scan.Bytes) (name, val string, hasMore bool) {
 }
 
 func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
-	for isWS(s.Peek()) {
+	for scan.ByteIsWS(s.Peek()) {
 		s.Advance(1)
 	}
 	origS, end := *s, 0
@@ -375,7 +375,7 @@ func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
 			return nil, false
 		}
 		switch {
-		case isWS(bap):
+		case scan.ByteIsWS(bap):
 			return origS[:end], true
 		case bap == '>':
 			return origS[:end], false
@@ -383,8 +383,4 @@ func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
 			end++
 		}
 	}
-}
-
-func isWS(bap byte) bool {
-	return bap == '\t' || bap == '\n' || bap == '\x0c' || bap == '\r' || bap == ' '
 }
