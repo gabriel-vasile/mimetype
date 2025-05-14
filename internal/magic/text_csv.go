@@ -7,6 +7,8 @@ import (
 	"errors"
 	"io"
 	"sync"
+
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 // A bufio.Reader pool to alleviate problems with memory allocations.
@@ -34,9 +36,10 @@ func Tsv(raw []byte, limit uint32) bool {
 }
 
 func sv(in []byte, comma rune, limit uint32) bool {
-	in = dropLastLine(in, limit)
+	s := scan.Bytes(in)
+	s.DropLastLine(limit)
 
-	br := newReader(bytes.NewReader(in))
+	br := newReader(bytes.NewReader(s))
 	defer readerPool.Put(br)
 	r := csv.NewReader(br)
 	r.Comma = comma
@@ -57,21 +60,4 @@ func sv(in []byte, comma rune, limit uint32) bool {
 	}
 
 	return r.FieldsPerRecord > 1 && lines > 1
-}
-
-// dropLastLine drops the last incomplete line from b.
-//
-// mimetype limits itself to ReadLimit bytes when performing a detection.
-// This means, for file formats like CSV for NDJSON, the last line of the input
-// can be an incomplete line.
-func dropLastLine(b []byte, readLimit uint32) []byte {
-	if readLimit == 0 || uint32(len(b)) < readLimit {
-		return b
-	}
-	for i := len(b) - 1; i > 0; i-- {
-		if b[i] == '\n' {
-			return b[:i]
-		}
-	}
-	return b
 }
