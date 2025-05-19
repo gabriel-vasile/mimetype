@@ -10,10 +10,7 @@ import (
 )
 
 func TestCSV(t *testing.T) {
-	a := ` 1,"HH
-a"
-a,b
-`
+	a := `1,"H,"t",3`
 	// # 1,2,3
 	// # "a","1","1",a
 	// # "aaa
@@ -36,7 +33,7 @@ a,b
 	for {
 		l, hasMore := r.ReadLine()
 		fmt.Println((l), hasMore)
-		fmt.Println()
+		fmt.Println("--------------------------")
 		if !hasMore {
 			break
 		}
