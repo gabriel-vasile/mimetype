@@ -7,7 +7,5 @@ module github.com/gabriel-vasile/mimetype
 // https://github.com/golang/go/issues/69095
 go 1.23.0
 
-toolchain go1.23.6
-
 // v1.4.4 had a test file detected as malicious by antivirus software. #575
 retract v1.4.4
