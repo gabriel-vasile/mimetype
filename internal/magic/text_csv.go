@@ -8,6 +8,7 @@ import (
 	"io"
 	"sync"
 
+	mcsv "github.com/gabriel-vasile/mimetype/internal/csv"
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
@@ -27,7 +28,31 @@ func newReader(r io.Reader) *bufio.Reader {
 
 // Csv matches a comma-separated values file.
 func Csv(raw []byte, limit uint32) bool {
-	return sv(raw, ',', limit)
+	r := mcsv.Reader{
+		Comma:   ',',
+		Comment: '#',
+		S:       scan.Bytes(raw),
+	}
+
+	headerFields, hasMore := r.ReadLine()
+	if headerFields < 2 || !hasMore {
+		return false
+	}
+	i := 0
+	csvLines := 1 // 1 for header
+	for {
+		i++
+		fields, hasMore := r.ReadLine()
+		if !hasMore && fields == 0 {
+			break
+		}
+		csvLines++
+		if fields != headerFields {
+			return false
+		}
+	}
+
+	return csvLines >= 2
 }
 
 // Tsv matches a tab-separated values file.
