@@ -6,27 +6,35 @@ import (
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
-type Reader struct {
-	Comma   byte
-	Comment byte
-	S       scan.Bytes
+type Parser struct {
+	comma   byte
+	comment byte
+	s       scan.Bytes
 }
 
-func (r *Reader) ReadLine() (fields int, hasMore bool) {
+func NewParser(comma, comment byte, s scan.Bytes) *Parser {
+	return &Parser{
+		comma:   comma,
+		comment: comment,
+		s:       s,
+	}
+}
+
+func (r *Parser) ReadLine() (fields int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
 	for {
-		line = r.S.Line()
+		line = r.s.Line()
 		if finished {
 			break
 		}
-		if len(r.S) == 0 {
+		if len(r.s) == 0 {
 			finished = true
 		}
 		if len(line) == 0 {
 			continue
 		}
-		if line[0] == r.Comment {
+		if line[0] == r.comment {
 			continue
 		}
 		break
@@ -41,7 +49,7 @@ parseField:
 			return fields, !finished
 		}
 		if len(line) == 0 || line[0] != '"' { // Non-quoted string field
-			i := bytes.IndexByte(line, r.Comma)
+			i := bytes.IndexByte(line, r.comma)
 			fields++
 			if i >= 0 {
 				line.Advance(i)
@@ -58,7 +66,7 @@ parseField:
 					switch rn := line.Peek(); {
 					case rn == '"':
 						line.Advance(1)
-					case rn == r.Comma:
+					case rn == r.comma:
 						line.Advance(1)
 						fields++
 						continue parseField
@@ -67,7 +75,7 @@ parseField:
 						break parseField
 					}
 				} else if len(line) > 0 {
-					line = r.S.Line()
+					line = r.s.Line()
 				} else {
 					fields++
 					break parseField
