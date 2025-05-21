@@ -72,7 +72,14 @@ var testcases = []testcase{
 		"application/x-chrome-extension",
 		true,
 	},
-	{"csv", "1,2,3,4\n5,6,7,8\na,b,c,d", "text/csv", true},
+	{
+		"csv",
+		`1,2
+"abc","def"
+a,"b`,
+		"text/csv",
+		true,
+	},
 	{"cpio 7", "070707", "application/x-cpio", true},
 	{"cpio 1", "070701", "application/x-cpio", false},
 	{"cpio 2", "070702", "application/x-cpio", false},
@@ -143,8 +150,7 @@ var testcases = []testcase{
 	{"jxr", "\x49\x49\xBC\x01", "image/jxr", true},
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", true},
 	{"js", "#!/bin/node ", "text/javascript", true},
-	{"json", `{"key":"val"}`, "application/json", true},
-	{"json array", `[1,2,3]`, "application/json", false},
+	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", true},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -235,7 +241,7 @@ var testcases = []testcase{
 	{"tcl", "#!/usr/bin/tcl", "text/x-tcl", true},
 	{"tcx", `<?xml version="1.0"?><TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">`, "application/vnd.garmin.tcx+xml", true},
 	{"tiff", "II*\x00", "image/tiff", true},
-	{"tsv", "a\tb\tc\n1\t2\t3", "text/tab-separated-values", true},
+	{"tsv", "a\t\"b\"\tc\n1\t2\t3", "text/tab-separated-values", true},
 	{"ttc", "ttcf\x00\x01\x00\x00", "font/collection", true},
 	{"ttf", "\x00\x01\x00\x00", "font/ttf", true},
 	{"tzfile", fromDisk("tzfile"), "application/tzif", true},

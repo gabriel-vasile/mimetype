@@ -22,6 +22,7 @@ jobs:
     # will be used each month. The other half is reserved for tests in PRs.
     - run: go test -fuzztime=5m -fuzz=.
     - run: go test -fuzztime=5m -fuzz=.     ./internal/json
+    - run: go test -fuzztime=5m -fuzz=.     ./internal/csv
     - run: go test -fuzztime=5m -fuzz=Plain ./internal/charset
     - run: go test -fuzztime=5m -fuzz=XML   ./internal/charset
     - run: go test -fuzztime=5m -fuzz=HTML  ./internal/charset

@@ -1,7 +1,10 @@
 // Package scan has functions for scanning byte slices.
 package scan
 
-import "bytes"
+import (
+	"bytes"
+	"unicode/utf8"
+)
 
 // Bytes is a byte slice with helper methods for easier scanning.
 type Bytes []byte
@@ -45,6 +48,11 @@ func (b *Bytes) Pop() byte {
 		return ret
 	}
 	return 0
+}
+
+func (b *Bytes) PeekRune() rune {
+	r, _ := utf8.DecodeRune(*b)
+	return r
 }
 
 // PopUntil will advance b until, but not including, the first occurence of stopAt

@@ -27,6 +27,7 @@
 - possibility to [extend](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#example-package-Extend) with other file formats
 - common file formats are prioritized
 - [text vs. binary files differentiation](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#example-package-TextVsBinary)
+- no external dependencies
 - safe for concurrent usage
 
 ## Install
