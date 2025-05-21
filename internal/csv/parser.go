@@ -28,9 +28,7 @@ func (r *Parser) ReadLine() (fields int, hasMore bool) {
 		if finished {
 			break
 		}
-		if len(r.s) == 0 {
-			finished = true
-		}
+		finished = len(r.s) == 0
 		if len(line) == 0 {
 			continue
 		}
@@ -48,7 +46,7 @@ parseField:
 		if len(line) == 0 {
 			return fields, !finished
 		}
-		if len(line) == 0 || line[0] != '"' { // Non-quoted string field
+		if len(line) == 0 || line[0] != '"' { // non-quoted string field
 			i := bytes.IndexByte(line, r.comma)
 			fields++
 			if i >= 0 {
@@ -76,6 +74,7 @@ parseField:
 					}
 				} else if len(line) > 0 {
 					line = r.s.Line()
+					finished = len(r.s) == 0
 				} else {
 					fields++
 					break parseField
