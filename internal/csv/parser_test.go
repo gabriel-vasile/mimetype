@@ -1,7 +1,6 @@
 package csv
 
 import (
-	"bytes"
 	"encoding/csv"
 	"io"
 	"reflect"
@@ -141,12 +140,15 @@ func stdlibLines(data string) []line {
 	return lines
 }
 
-var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
+var sample = `
+1,2,3
+"a", "b", "c"
+a,b,c`
 
 func BenchmarkCSVStdlibDecoder(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		d := csv.NewReader(bytes.NewReader(sample))
+		d := csv.NewReader(strings.NewReader(sample))
 		for {
 			_, err := d.Read()
 			if err == io.EOF {
