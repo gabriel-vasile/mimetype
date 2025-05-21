@@ -9,8 +9,6 @@ import (
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
-var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
-
 // These samples come from https://github.com/nst/JSONTestSuite.
 var positives = []struct {
 	json   string
@@ -756,6 +754,8 @@ func TestStack(t *testing.T) {
 		})
 	}
 }
+
+var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
 
 func BenchmarkParse(b *testing.B) {
 	b.ReportAllocs()

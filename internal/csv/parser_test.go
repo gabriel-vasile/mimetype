@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"bytes"
 	"encoding/csv"
 	"io"
 	"reflect"
@@ -138,4 +139,46 @@ func stdlibLines(data string) []line {
 		return []line{{}}
 	}
 	return lines
+}
+
+var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
+
+func BenchmarkCSVStdlibDecoder(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		d := csv.NewReader(bytes.NewReader(sample))
+		for {
+			_, err := d.Read()
+			if err == io.EOF {
+				break
+			}
+		}
+	}
+}
+func BenchmarkCSVOurParser(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		p := NewParser(',', '#', scan.Bytes(sample))
+		for {
+			_, hasMore := p.ReadLine()
+			if !hasMore {
+				break
+			}
+		}
+	}
+}
+
+func FuzzParser(f *testing.F) {
+	for _, p := range testcases {
+		f.Add(p.csv, byte(','), byte('#'))
+	}
+	f.Fuzz(func(t *testing.T, data string, comma, comment byte) {
+		p := NewParser(comma, comment, scan.Bytes(data))
+		for {
+			_, hasMore := p.ReadLine()
+			if !hasMore {
+				break
+			}
+		}
+	})
 }
