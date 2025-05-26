@@ -3,7 +3,6 @@ package csv
 import (
 	"encoding/csv"
 	"io"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -15,92 +14,127 @@ type line struct {
 	hasMore bool
 }
 
+func eq(l1, l2 []line) bool {
+	if len(l1) != len(l2) {
+		return false
+	}
+	for i := range l1 {
+		if l1[i].fields != l2[i].fields || l1[i].hasMore != l2[i].hasMore {
+			return false
+		}
+	}
+
+	return true
+}
+
 var testcases = []struct {
-	name string
-	csv  string
+	name    string
+	csv     string
+	comma   byte
+	comment byte
 }{{
-	"empty", "",
+	"empty", "", ',', '#',
 }, {
 	"simple",
 	`foo,bar,baz
 1,2,3
 "1","a",b`,
+	',', '#',
 }, {
 	"crlf line endings",
 	"foo,bar,baz\r\n1,2,3\r\n",
+	',', '#',
 }, {
 	"leading and trailing space",
 	`1, abc ,3`,
+	',', '#',
 }, {
 	"empty quote",
 	`1,"",3`,
+	',', '#',
 }, {
 	"quotes with comma",
 	`1,",",3`,
+	',', '#',
 }, {
 	"quotes with quote",
 	`1,""",3`,
+	',', '#',
 }, {
 	"fewer fields",
 	`foo,bar,baz
 1,2`,
+	',', '#',
 }, {
 	"more fields",
 	`1,2,3,4`,
+	',', '#',
 }, {
 	"forgot quote",
 	`1,"Forgot,3`,
+	',', '#',
 }, {
 	"unescaped quote",
 	`1,"abc"def",3`,
+	',', '#',
 }, {
 	"unescaped quote",
 	`1,"abc"def",3`,
+	',', '#',
 }, {
 	"unescaped quote2",
 	`1,abc"quote"def,3`,
+	',', '#',
 }, {
 	"escaped quote",
 	`1,abc""def,3`,
+	',', '#',
 }, {
 	"new line",
 	`1,abc
 def,3`,
+	',', '#',
 }, {
 	"new line quotes",
 	`1,"abc
 def",3`,
+	',', '#',
 }, {
 	"quoted field at end",
 	`1,"abc"`,
+	',', '#',
 }, {
 	"not ended quoted field at end",
 	`1,"abc`,
+	',', '#',
 }, {
 	"empty field",
 	`1,,3`,
+	',', '#',
 }, {
 	"unicode fields",
 	`💁,👌,🎍,😍`,
+	',', '#',
 }, {
 	"comment",
 	`#comment`,
+	',', '#',
 }}
 
 func TestParser(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			expected := stdlibLines(tc.csv)
-			got := ourLines(tc.csv)
-			if !reflect.DeepEqual(expected, got) {
+			expected := stdlibLines(tc.csv, tc.comma, tc.comment)
+			got := ourLines(tc.csv, tc.comma, tc.comment)
+			if !eq(expected, got) {
 				t.Errorf("\n%s\n expected: %v got: %v", tc.csv, expected, got)
 			}
 		})
 	}
 }
 
-func ourLines(data string) []line {
-	p := NewParser(',', '#', scan.Bytes(data))
+func ourLines(data string, comma, comment byte) []line {
+	p := NewParser(comma, comment, scan.Bytes(data))
 	lines := []line{}
 	for {
 		fields, hasMore := p.ReadLine()
