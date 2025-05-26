@@ -50,6 +50,10 @@ func (b *Bytes) Pop() byte {
 	return 0
 }
 
+func (b Bytes) String() string {
+	return string(b)
+}
+
 func (b *Bytes) PeekRune() rune {
 	r, _ := utf8.DecodeRune(*b)
 	return r
@@ -80,6 +84,22 @@ func (b *Bytes) Is(allowed []byte) bool {
 		}
 	}
 	return true
+}
+
+func (b *Bytes) ReadSlice(stopAt byte) Bytes {
+	if len(*b) == 0 {
+		return Bytes{}
+	}
+	i := bytes.IndexByte(*b, stopAt)
+	if i == -1 {
+		i = len(*b)
+	} else {
+		i++
+	}
+
+	prefix := (*b)[:i]
+	*b = (*b)[i:]
+	return Bytes(prefix)
 }
 
 // Line returns the first line from b and advances b with the length of the
