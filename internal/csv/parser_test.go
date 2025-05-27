@@ -2,9 +2,11 @@ package csv
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"strings"
 	"testing"
+	"unicode"
 
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
@@ -119,12 +121,16 @@ def",3`,
 	"comment",
 	`#comment`,
 	',', '#',
+}, {
+	"line with \\r at the end",
+	"123\r\n456\r",
+	',', '#',
 }}
 
 func TestParser(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			expected := stdlibLines(tc.csv, tc.comma, tc.comment)
+			expected, _ := stdlibLines(tc.csv, tc.comma, tc.comment)
 			got := ourLines(tc.csv, tc.comma, tc.comment)
 			if !eq(expected, got) {
 				t.Errorf("\n%s\n expected: %v got: %v", tc.csv, expected, got)
@@ -137,41 +143,44 @@ func ourLines(data string, comma, comment byte) []line {
 	p := NewParser(comma, comment, scan.Bytes(data))
 	lines := []line{}
 	for {
-		fields, hasMore := p.ReadLine()
-		lines = append(lines, line{fields, hasMore})
+		fields, hasMore := p.CountFields()
 		if !hasMore {
 			break
 		}
+		lines = append(lines, line{fields, hasMore})
 	}
 	return lines
 }
 
-func stdlibLines(data string) []line {
+// stdlibLines returns the []line records obtained using the stdlib CSV parser.
+func stdlibLines(data string, comma, comment byte) ([]line, error) {
+	if comma > unicode.MaxASCII || comment > unicode.MaxASCII {
+		return nil, fmt.Errorf("comma or comment not ASCII")
+	}
+
+	if strings.IndexByte(data, 0) != -1 {
+		return nil, fmt.Errorf("CSV contains null byte 0x00")
+	}
 	r := csv.NewReader(strings.NewReader(data))
-	r.Comma = ','
+	r.Comma = rune(comma)
 	r.ReuseRecord = true
 	r.FieldsPerRecord = -1 // we don't care about lines having same number of fields
 	r.LazyQuotes = true
-	r.Comment = '#'
+	r.Comment = rune(comment)
 
+	var err error
 	lines := []line{}
 	for {
 		l, err := r.Read()
 		if err == io.EOF {
-			// Adjust for a difference between our parser and the stdlib one.
-			// stdlib: returns EOF at an extra call to Read after there is no more input
-			// our parser: returns hasMore=false when there is no more input
-			if len(lines) > 0 {
-				lines[len(lines)-1].hasMore = false
-			}
 			break
+		}
+		if err != nil {
+			return nil, err
 		}
 		lines = append(lines, line{len(l), err != io.EOF})
 	}
-	if len(lines) == 0 {
-		return []line{{}}
-	}
-	return lines
+	return lines, err
 }
 
 var sample = `
@@ -196,7 +205,7 @@ func BenchmarkCSVOurParser(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		p := NewParser(',', '#', scan.Bytes(sample))
 		for {
-			_, hasMore := p.ReadLine()
+			_, hasMore := p.CountFields()
 			if !hasMore {
 				break
 			}
@@ -209,12 +218,16 @@ func FuzzParser(f *testing.F) {
 		f.Add(p.csv, byte(','), byte('#'))
 	}
 	f.Fuzz(func(t *testing.T, data string, comma, comment byte) {
-		p := NewParser(comma, comment, scan.Bytes(data))
-		for {
-			_, hasMore := p.ReadLine()
-			if !hasMore {
-				break
-			}
+		expected, err := stdlibLines(data, comma, comment)
+		// The sddlib CSV parser can accept UTF8 runes for comma and comment.
+		// Our parser does not need that functionality, so it returns different
+		// results for UTF8 inputs. Skip fuzzing when  the generated data is UTF8.
+		if err != nil {
+			t.Skipf("not testable: %v", err)
+		}
+		got := ourLines(data, comma, comment)
+		if !eq(got, expected) {
+			t.Errorf("input: %v, comma: %v, comment: %v\n got: %v, expected: %v", data, string(rune(comma)), string(rune(comment)), got, expected)
 		}
 	})
 }

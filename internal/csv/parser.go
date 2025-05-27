@@ -20,19 +20,36 @@ func NewParser(comma, comment byte, s scan.Bytes) *Parser {
 	}
 }
 
-func (r *Parser) ReadLine() (fields int, hasMore bool) {
+func (r *Parser) readLine() []byte {
+	line := r.s.ReadSlice('\n')
+	n := len(line)
+	if n > 0 && line[n-1] == '\r' {
+		return line[:n-1] // drop \r at end of line
+	}
+
+	// Normalize \r\n to \n on all input lines.
+	if n := len(line); n >= 2 && line[n-2] == '\r' && line[n-1] == '\n' {
+		line[n-2] = '\n'
+		return line[:n-1]
+	}
+	return line
+}
+
+func (r *Parser) CountFields() (fields int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
 	for {
-		line = r.s.Line()
+		line = r.readLine()
 		if finished {
-			break
+			return 0, false
 		}
-		finished = len(r.s) == 0
-		if len(line) == 0 {
-			continue
+		finished = len(r.s) == 0 && len(line) == 0
+		if len(line) == lengthNL(line) {
+			line = nil
+			continue // Skip empty lines
 		}
-		if line[0] == r.comment {
+		if len(line) > 0 && line[0] == r.comment {
+			line = nil
 			continue
 		}
 		break
@@ -40,18 +57,11 @@ func (r *Parser) ReadLine() (fields int, hasMore bool) {
 
 parseField:
 	for {
-		for scan.ByteIsWS(line.Peek()) {
-			line.Advance(1)
-		}
-		if len(line) == 0 {
-			return fields, !finished
-		}
 		if len(line) == 0 || line[0] != '"' { // non-quoted string field
-			i := bytes.IndexByte(line, r.comma)
 			fields++
+			i := bytes.IndexByte(line, r.comma)
 			if i >= 0 {
-				line.Advance(i)
-				line.Advance(1) // get over ending comma
+				line.Advance(i + 1) // 1 to get over ending comma
 				continue parseField
 			}
 			break parseField
@@ -73,8 +83,7 @@ parseField:
 						break parseField
 					}
 				} else if len(line) > 0 {
-					line = r.s.Line()
-					finished = len(r.s) == 0
+					line = r.readLine()
 				} else {
 					fields++
 					break parseField
@@ -83,7 +92,7 @@ parseField:
 		}
 	}
 
-	return fields, !finished
+	return fields, fields != 0
 }
 
 // lengthNL reports the number of bytes for the trailing \n.
