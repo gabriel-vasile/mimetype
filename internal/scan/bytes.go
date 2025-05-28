@@ -1,7 +1,9 @@
 // Package scan has functions for scanning byte slices.
 package scan
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // Bytes is a byte slice with helper methods for easier scanning.
 type Bytes []byte
@@ -32,12 +34,15 @@ func (b *Bytes) TrimRWS() {
 	}
 }
 
+// Peek one byte from b or 0x00 if b is empty.
 func (b *Bytes) Peek() byte {
 	if len(*b) > 0 {
 		return (*b)[0]
 	}
 	return 0
 }
+
+// Pop one byte from b or 0x00 if b is empty.
 func (b *Bytes) Pop() byte {
 	if len(*b) > 0 {
 		ret := (*b)[0]
@@ -72,6 +77,23 @@ func (b *Bytes) Is(allowed []byte) bool {
 		}
 	}
 	return true
+}
+
+// ReadSlice is the same as PopUntil, but the returned value includes stopAt as well.
+func (b *Bytes) ReadSlice(stopAt byte) Bytes {
+	if len(*b) == 0 {
+		return Bytes{}
+	}
+	i := bytes.IndexByte(*b, stopAt)
+	if i == -1 {
+		i = len(*b)
+	} else {
+		i++
+	}
+
+	prefix := (*b)[:i]
+	*b = (*b)[i:]
+	return Bytes(prefix)
 }
 
 // Line returns the first line from b and advances b with the length of the

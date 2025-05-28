@@ -256,3 +256,40 @@ func TestIs(t *testing.T) {
 		})
 	}
 }
+
+func TestReadSlice(t *testing.T) {
+	tcases := []struct {
+		name     string
+		in       string
+		stopAt   byte
+		popped   string
+		leftover string
+	}{{
+		"both empty", "", 0, "", "",
+	}, {
+		"stop at not found", "abc", 'd', "abc", "",
+	}, {
+		"stop at the end", "abc", 'c', "abc", "",
+	}, {
+		"stop at in the middle", "abcdef", 'c', "abc", "def",
+	}, {
+		"stop at the beginning", "abcdef", 'a', "a", "bcdef",
+	}, {
+		"just one char", "a", 'a', "a", "",
+	}, {
+		"same char twice", "aa", 'a', "a", "a",
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			got := b.ReadSlice(tc.stopAt)
+			if tc.popped != string(got) {
+				t.Errorf("popped got: %s, want: %s", got, tc.popped)
+			}
+			if tc.leftover != string(b) {
+				t.Errorf("leftover got: %s, want: %s", string(b), tc.leftover)
+			}
+		})
+	}
+}
