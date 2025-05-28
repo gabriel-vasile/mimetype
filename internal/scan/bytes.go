@@ -3,7 +3,6 @@ package scan
 
 import (
 	"bytes"
-	"unicode/utf8"
 )
 
 // Bytes is a byte slice with helper methods for easier scanning.
@@ -35,12 +34,15 @@ func (b *Bytes) TrimRWS() {
 	}
 }
 
+// Peek one byte from b or 0x00 if b is empty.
 func (b *Bytes) Peek() byte {
 	if len(*b) > 0 {
 		return (*b)[0]
 	}
 	return 0
 }
+
+// Pop one byte from b or 0x00 if b is empty.
 func (b *Bytes) Pop() byte {
 	if len(*b) > 0 {
 		ret := (*b)[0]
@@ -48,15 +50,6 @@ func (b *Bytes) Pop() byte {
 		return ret
 	}
 	return 0
-}
-
-func (b Bytes) String() string {
-	return string(b)
-}
-
-func (b *Bytes) PeekRune() rune {
-	r, _ := utf8.DecodeRune(*b)
-	return r
 }
 
 // PopUntil will advance b until, but not including, the first occurence of stopAt
@@ -86,6 +79,7 @@ func (b *Bytes) Is(allowed []byte) bool {
 	return true
 }
 
+// ReadSlice is the same as PopUntil, but the returned value includes stopAt as well.
 func (b *Bytes) ReadSlice(stopAt byte) Bytes {
 	if len(*b) == 0 {
 		return Bytes{}

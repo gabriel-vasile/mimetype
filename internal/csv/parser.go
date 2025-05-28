@@ -35,6 +35,8 @@ func (r *Parser) readLine() []byte {
 	return line
 }
 
+// CountFields reads on CSV line and counts how many records that line contained.
+// hasMore reports whether there are more lines in the input.
 func (r *Parser) CountFields() (fields int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
