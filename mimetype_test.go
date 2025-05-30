@@ -235,7 +235,19 @@ a,"b`,
 	{"so", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00", "application/x-sharedlib", true},
 	{"sqlite", "SQLite format 3\x00", "application/vnd.sqlite3", true},
 	{"srt", "1\n00:02:16,612 --\x3e 00:02:19,376\nS", "application/x-subrip", true},
-	{"svg", "<svg", "image/svg+xml", true},
+	{"svg no xml header", `<svg xmlns="http://www.w3.org/2000/svg"`, "image/svg+xml", true},
+	{
+		"svg xml header",
+		`
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="391" height="391" viewBox="-70.5 -70.5 391 391" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
+</svg>
+`,
+		"image/svg+xml",
+		true,
+	},
+
 	{"swf", "CWS", "application/x-shockwave-flash", true},
 	{"tar", fromDisk("tar.tar"), "application/x-tar", true},
 	{"tcl", "#!/usr/bin/tcl", "text/x-tcl", true},

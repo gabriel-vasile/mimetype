@@ -1,23 +1,11 @@
 package markup
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
-
-const svg1 = `
-<svg width="1cm" height="1cm" a	version="1.1" xmlns="http://www.w3.org/2000/svg">
-    <desc>Test SVG image</desc>
-    <rect x="0.1cm" y="0.1cm" width="0.8cm" height="0.8cm"/>
-</svg>
-`
-
-func TestSVG(t *testing.T) {
-	fmt.Println(IsSVG([]byte(svg1)))
-}
 
 var getAnAttributeTestCases = []struct {
 	in      string
