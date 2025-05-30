@@ -222,41 +222,6 @@ func TestPopUntil(t *testing.T) {
 	}
 }
 
-func TestIs(t *testing.T) {
-	tcases := []struct {
-		name    string
-		in      string
-		allowed string
-		want    bool
-	}{{
-		"both empty", "", "", true,
-	}, {
-		"allowed empty", "123", "", false,
-	}, {
-		"in empty", "", "1", true,
-	}, {
-		"123 4", "123", "4", false,
-	}, {
-		"123 456", "123", "456", false,
-	}, {
-		"123 23", "123", "23", false,
-	}, {
-		"123 234", "123", "234", false,
-	}, {
-		"123 1234", "123", "1234", true,
-	}}
-
-	for _, tc := range tcases {
-		t.Run(tc.name, func(t *testing.T) {
-			b := Bytes(tc.in)
-			got := b.Is([]byte(tc.allowed))
-			if tc.want != got {
-				t.Errorf("got: %t, want: %t", got, tc.want)
-			}
-		})
-	}
-}
-
 func TestReadSlice(t *testing.T) {
 	tcases := []struct {
 		name     string

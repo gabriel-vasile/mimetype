@@ -69,16 +69,6 @@ func (b *Bytes) PopUntil(stopAt ...byte) Bytes {
 	return Bytes(prefix)
 }
 
-// Is will return true if all bytes in b are one of the allowed bytes.
-func (b *Bytes) Is(allowed []byte) bool {
-	for _, c := range *b {
-		if bytes.IndexByte(allowed, c) == -1 {
-			return false
-		}
-	}
-	return true
-}
-
 // ReadSlice is the same as PopUntil, but the returned value includes stopAt as well.
 func (b *Bytes) ReadSlice(stopAt byte) Bytes {
 	if len(*b) == 0 {
