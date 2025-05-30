@@ -1,4 +1,4 @@
-// Package markup implements function for extracting info from
+// Package markup implements functions for extracting info from
 // HTML and XML documents.
 package markup
 
