@@ -222,36 +222,38 @@ func TestPopUntil(t *testing.T) {
 	}
 }
 
-func TestIs(t *testing.T) {
+func TestReadSlice(t *testing.T) {
 	tcases := []struct {
-		name    string
-		in      string
-		allowed string
-		want    bool
+		name     string
+		in       string
+		stopAt   byte
+		popped   string
+		leftover string
 	}{{
-		"both empty", "", "", true,
+		"both empty", "", 0, "", "",
 	}, {
-		"allowed empty", "123", "", false,
+		"stop at not found", "abc", 'd', "abc", "",
 	}, {
-		"in empty", "", "1", true,
+		"stop at the end", "abc", 'c', "abc", "",
 	}, {
-		"123 4", "123", "4", false,
+		"stop at in the middle", "abcdef", 'c', "abc", "def",
 	}, {
-		"123 456", "123", "456", false,
+		"stop at the beginning", "abcdef", 'a', "a", "bcdef",
 	}, {
-		"123 23", "123", "23", false,
+		"just one char", "a", 'a', "a", "",
 	}, {
-		"123 234", "123", "234", false,
-	}, {
-		"123 1234", "123", "1234", true,
+		"same char twice", "aa", 'a', "a", "a",
 	}}
 
 	for _, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			b := Bytes(tc.in)
-			got := b.Is([]byte(tc.allowed))
-			if tc.want != got {
-				t.Errorf("got: %t, want: %t", got, tc.want)
+			got := b.ReadSlice(tc.stopAt)
+			if tc.popped != string(got) {
+				t.Errorf("popped got: %s, want: %s", got, tc.popped)
+			}
+			if tc.leftover != string(b) {
+				t.Errorf("leftover got: %s, want: %s", string(b), tc.leftover)
 			}
 		})
 	}

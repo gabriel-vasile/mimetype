@@ -73,7 +73,14 @@ var testcases = []testcase{
 		"application/x-chrome-extension",
 		true,
 	},
-	{"csv", "1,2,3,4\n5,6,7,8\na,b,c,d", "text/csv", true},
+	{
+		"csv",
+		`1,2
+"abc","def"
+a,"b`,
+		"text/csv",
+		true,
+	},
 	{"cpio 7", "070707", "application/x-cpio", true},
 	{"cpio 1", "070701", "application/x-cpio", false},
 	{"cpio 2", "070702", "application/x-cpio", false},
@@ -144,8 +151,7 @@ var testcases = []testcase{
 	{"jxr", "\x49\x49\xBC\x01", "image/jxr", true},
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", true},
 	{"js", "#!/bin/node ", "text/javascript", true},
-	{"json", `{"key":"val"}`, "application/json", true},
-	{"json array", `[1,2,3]`, "application/json", false},
+	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", true},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", false},
 	// json.{int,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -235,13 +241,25 @@ var testcases = []testcase{
 	{"so", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00", "application/x-sharedlib", true},
 	{"sqlite", "SQLite format 3\x00", "application/vnd.sqlite3", true},
 	{"srt", "1\n00:02:16,612 --\x3e 00:02:19,376\nS", "application/x-subrip", true},
-	{"svg", "<svg", "image/svg+xml", true},
+	{"svg no xml header", `<svg xmlns="http://www.w3.org/2000/svg"`, "image/svg+xml", true},
+	{
+		"svg xml header",
+		`
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="391" height="391" viewBox="-70.5 -70.5 391 391" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
+</svg>
+`,
+		"image/svg+xml",
+		true,
+	},
+
 	{"swf", "CWS", "application/x-shockwave-flash", true},
 	{"tar", fromDisk("tar.tar"), "application/x-tar", true},
 	{"tcl", "#!/usr/bin/tcl", "text/x-tcl", true},
 	{"tcx", `<?xml version="1.0"?><TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2">`, "application/vnd.garmin.tcx+xml", true},
 	{"tiff", "II*\x00", "image/tiff", true},
-	{"tsv", "a\tb\tc\n1\t2\t3", "text/tab-separated-values", true},
+	{"tsv", "a\t\"b\"\tc\n1\t2\t3", "text/tab-separated-values", true},
 	{"ttc", "ttcf\x00\x01\x00\x00", "font/collection", true},
 	{"ttf", "\x00\x01\x00\x00", "font/ttf", true},
 	{"tzfile", fromDisk("tzfile"), "application/tzif", true},

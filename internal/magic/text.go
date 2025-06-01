@@ -6,6 +6,7 @@ import (
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
+	mkup "github.com/gabriel-vasile/mimetype/internal/markup"
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
@@ -229,7 +230,69 @@ func NdJSON(raw []byte, limit uint32) bool {
 
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
-	return bytes.Contains(raw, []byte("<svg"))
+	return svgWithoutXMLDeclaration(raw) || svgWithXMLDeclaration(raw)
+}
+
+// svgWithoutXMLDeclaration matches a SVG image that does not have an XML header.
+// Example:
+//
+//	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+//	    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
+//	</svg>
+func svgWithoutXMLDeclaration(s scan.Bytes) bool {
+	for scan.ByteIsWS(s.Peek()) {
+		s.Advance(1)
+	}
+	if !bytes.HasPrefix(s, []byte("<svg")) {
+		return false
+	}
+
+	targetName, targetVal := "xmlns", "http://www.w3.org/2000/svg"
+	aName, aVal, hasMore := "", "", true
+	for hasMore {
+		aName, aVal, hasMore = mkup.GetAnAttribute(&s)
+		if aName == targetName && aVal == targetVal {
+			return true
+		}
+		if !hasMore {
+			return false
+		}
+	}
+	return false
+}
+
+// svgWithXMLDeclaration matches a SVG image that has an XML header.
+// Example:
+//
+//	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+//	<svg width="391" height="391" viewBox="-70.5 -70.5 391 391" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+//	    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
+//	</svg>
+func svgWithXMLDeclaration(s scan.Bytes) bool {
+	for scan.ByteIsWS(s.Peek()) {
+		s.Advance(1)
+	}
+	if !bytes.HasPrefix(s, []byte("<?xml")) {
+		return false
+	}
+
+	// version is a required attribute for XML.
+	hasVersion := false
+	aName, hasMore := "", true
+	for hasMore {
+		aName, _, hasMore = mkup.GetAnAttribute(&s)
+		if aName == "version" {
+			hasVersion = true
+			break
+		}
+		if !hasMore {
+			break
+		}
+	}
+	if len(s) > 4096 {
+		s = s[:4096]
+	}
+	return hasVersion && bytes.Contains(s, []byte("<svg"))
 }
 
 // Srt matches a SubRip file.
