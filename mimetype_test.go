@@ -519,7 +519,7 @@ func BenchmarkAll(b *testing.B) {
 		parsed, _, _ := mime.ParseMediaType(tc.expectedMIME)
 		mtype := Lookup(parsed)
 		if mtype == nil || mtype.detector == nil {
-			b.Fatalf("mime should always be non-nil %s %s", mtype, tc.expectedMIME)
+			b.Fatalf("mtype not found %s", tc.expectedMIME)
 		}
 		// data is used for the positive case benchmark.
 		b.Run(tc.name, func(b *testing.B) {
@@ -615,8 +615,7 @@ func TestExtend(t *testing.T) {
 			m := Lookup(tt.mime)
 			if m == nil {
 				t.Fatalf("mime %s not found", tt.mime)
-			}
-			if m.parent != tt.parent {
+			} else if m.parent != tt.parent {
 				t.Fatalf("mime %s has wrong parent: want %s, got %s", tt.mime, tt.parent.mime, m.parent.mime)
 			}
 			// Revert the Extend to restore previous MIME tree structure.
