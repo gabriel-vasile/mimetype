@@ -12,7 +12,7 @@ Extension | MIME type | Aliases
 **.pptx** | application/vnd.openxmlformats-officedocument.presentationml.presentation | -
 **.epub** | application/epub+zip | -
 **.apk** | application/vnd.android.package-archive | -
-**.jar** | application/jar | -
+**.jar** | application/java-archive | application/jar, application/jar-archive, application/x-java-archive
 **.odt** | application/vnd.oasis.opendocument.text | application/x-vnd.oasis.opendocument.text
 **.ott** | application/vnd.oasis.opendocument.text-template | application/x-vnd.oasis.opendocument.text-template
 **.ods** | application/vnd.oasis.opendocument.spreadsheet | application/x-vnd.oasis.opendocument.spreadsheet
