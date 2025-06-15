@@ -53,7 +53,7 @@ var (
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
 	bz2 = newMIME("application/x-bzip2", ".bz2", magic.Bz2)
-	pdf = newMIME("application/pdf", ".pdf", magic.Pdf).
+	pdf = newMIME("application/pdf", ".pdf", magic.PDF).
 		alias("application/x-pdf")
 	fdf  = newMIME("application/vnd.fdf", ".fdf", magic.Fdf)
 	xlsx = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", magic.Xlsx)
