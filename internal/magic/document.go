@@ -3,16 +3,6 @@ package magic
 import "bytes"
 
 var (
-	// Pdf matches a Portable Document Format file.
-	// https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
-	Pdf = prefix(
-		// usual pdf signature
-		[]byte("%PDF-"),
-		// new-line prefixed signature
-		[]byte("\012%PDF-"),
-		// UTF-8 BOM prefixed signature
-		[]byte("\xef\xbb\xbf%PDF-"),
-	)
 	// Fdf matches a Forms Data Format file.
 	Fdf = prefix([]byte("%FDF"))
 	// Mobi matches a Mobi file.
@@ -20,6 +10,16 @@ var (
 	// Lit matches a Microsoft Lit file.
 	Lit = prefix([]byte("ITOLITLS"))
 )
+
+// PDF matches a Portable Document Format file.
+// The %PDF- header should be the first thing inside the file but many
+// implementations don't follow the rule. The PDF spec at Appendix H says the
+// signature can be prepended by anything.
+// https://bugs.astron.com/view.php?id=446
+func PDF(raw []byte, limit uint32) bool {
+	raw = raw[:min(len(raw), 1024)]
+	return bytes.Contains(raw, []byte("%PDF-"))
+}
 
 // DjVu matches a DjVu file.
 func DjVu(raw []byte, limit uint32) bool {
