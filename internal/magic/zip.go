@@ -95,7 +95,7 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 		return true
 	}
 
-	for i := 0; i < 4; i++ {
+	for {
 		if !b.Advance(0x1A) {
 			return false
 		}
@@ -110,7 +110,6 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 			return true
 		}
 	}
-	return false
 }
 
 // APK matches an Android Package Archive.
