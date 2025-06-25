@@ -20,35 +20,20 @@ func NewParser(comma, comment byte, s scan.Bytes) *Parser {
 	}
 }
 
-func (r *Parser) readLine() []byte {
-	line := r.s.ReadSlice('\n')
-	n := len(line)
-	if n > 0 && line[n-1] == '\r' {
-		return line[:n-1] // drop \r at end of line
-	}
-
-	// Normalize \r\n to \n on all input lines.
-	if n := len(line); n >= 2 && line[n-2] == '\r' && line[n-1] == '\n' {
-		line[n-2] = '\n'
-		return line[:n-1]
-	}
-	return line
-}
-
 // CountFields reads one CSV line and counts how many records that line contained.
 // hasMore reports whether there are more lines in the input.
 func (r *Parser) CountFields() (fields int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
 	for {
-		line = r.readLine()
+		line = r.s.ReadSlice('\n')
 		if finished {
 			return 0, false
 		}
 		finished = len(r.s) == 0 && len(line) == 0
 		if len(line) == lengthNL(line) {
 			line = nil
-			continue // Skip empty lines
+			continue // Skip empty lines.
 		}
 		if len(line) > 0 && line[0] == r.comment {
 			line = nil
@@ -85,7 +70,7 @@ parseField:
 						break parseField
 					}
 				} else if len(line) > 0 {
-					line = r.readLine()
+					line = r.s.ReadSlice('\n')
 				} else {
 					fields++
 					break parseField

@@ -80,6 +80,12 @@ a,"b`,
 		"text/csv",
 		true,
 	},
+	{
+		`csv with \r\n`,
+		"1,2\r\n3,4\r\na,b",
+		"text/csv",
+		false,
+	},
 	{"cpio 7", "070707", "application/x-cpio", true},
 	{"cpio 1", "070701", "application/x-cpio", false},
 	{"cpio 2", "070702", "application/x-cpio", false},
@@ -647,4 +653,17 @@ func FuzzMimetype(f *testing.F) {
 			t.Skip()
 		}
 	})
+}
+
+func TestInputIsNotMutated(t *testing.T) {
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			passedBytes := []byte(tc.data)
+			Detect(passedBytes)
+
+			if pbs := string(passedBytes); pbs != tc.data {
+				t.Errorf("input should not be mutated; before: %s, after: %s", tc.data, pbs)
+			}
+		})
+	}
 }
