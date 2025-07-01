@@ -20,13 +20,13 @@ func sv(in []byte, comma byte, limit uint32) bool {
 	s.DropLastLine(limit)
 	r := csv.NewParser(comma, '#', s)
 
-	headerFields, hasMore := r.CountFields()
+	headerFields, _, hasMore := r.CountFields(false)
 	if headerFields < 2 || !hasMore {
 		return false
 	}
 	csvLines := 1 // 1 for header
 	for {
-		fields, hasMore := r.CountFields()
+		fields, _, hasMore := r.CountFields(false)
 		if !hasMore && fields == 0 {
 			break
 		}
