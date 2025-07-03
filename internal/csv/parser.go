@@ -23,28 +23,35 @@ func NewParser(comma, comment byte, s scan.Bytes) *Parser {
 	}
 }
 
-func (r *Parser) readLine() []byte {
-	line := r.s.ReadSlice('\n')
+func (r *Parser) readLine() (line []byte, cutShort bool) {
+	line = r.s.ReadSlice('\n')
+
 	n := len(line)
 	if n > 0 && line[n-1] == '\r' {
-		return line[:n-1] // drop \r at end of line
+		return line[:n-1], false // drop \r at end of line
 	}
 
-	// Normalize \r\n to \n on all input lines.
-	if n := len(line); n >= 2 && line[n-2] == '\r' && line[n-1] == '\n' {
-		line[n-2] = '\n'
-		return line[:n-1]
+	// This line is problematic. The logic from CountFields comes from
+	// encoding/csv.Reader which relies on mutating the input bytes.
+	// https://github.com/golang/go/blob/b3251514531123d7fd007682389bce7428d159a0/src/encoding/csv/reader.go#L275-L279
+	// To avoid mutating the input, we return cutShort. #680
+	if n >= 2 && line[n-2] == '\r' && line[n-1] == '\n' {
+		return line[:n-2], true
 	}
-	return line
+	return line, false
 }
 
 // CountFields reads one CSV line and counts how many records that line contained.
 // hasMore reports whether there are more lines in the input.
+// collectIndexes makes CountFields return a list of indexes where CSV fields
+// start in the line. These indexes are used to test the correctness against the
+// encoding/csv parser.
 func (r *Parser) CountFields(collectIndexes bool) (fields int, fieldPos []int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
+	cutShort := false
 	for {
-		line = r.readLine()
+		line, cutShort = r.readLine()
 		if finished {
 			return 0, nil, false
 		}
@@ -95,8 +102,8 @@ parseField:
 						fields++
 						break parseField
 					}
-				} else if len(line) > 0 {
-					line = r.readLine()
+				} else if len(line) > 0 || cutShort {
+					line, cutShort = r.readLine()
 					originalLine = line
 				} else {
 					fields++
