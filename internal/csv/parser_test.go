@@ -202,12 +202,17 @@ func BenchmarkCSVStdlibDecoder(b *testing.B) {
 	// Reuse a single reader to prevent allocs inside the benchmark function.
 	r := strings.NewReader(sample)
 	for i := 0; i < b.N; i++ {
-		r.Seek(0, 0)
+		_, err := r.Seek(0, 0)
+		if err != nil {
+			b.Fatalf("reader cannot seek: %s", err)
+		}
 		d := csv.NewReader(r)
 		for {
 			_, err := d.Read()
 			if err == io.EOF {
 				break
+			} else if err != nil {
+				b.Fatalf("error parsing CSV: %s", err)
 			}
 		}
 	}
