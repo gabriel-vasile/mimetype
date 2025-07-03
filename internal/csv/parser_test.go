@@ -207,6 +207,9 @@ func BenchmarkCSVStdlibDecoder(b *testing.B) {
 			b.Fatalf("reader cannot seek: %s", err)
 		}
 		d := csv.NewReader(r)
+		d.ReuseRecord = true
+		d.FieldsPerRecord = -1 // we don't care about lines having same number of fields
+		d.LazyQuotes = true
 		for {
 			_, err := d.Read()
 			if err == io.EOF {
