@@ -6,6 +6,9 @@ import (
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
+// Parser is a CSV reader that only counts fields.
+// It avoids allocating/copying memory and to verify behaviour, it is tested
+// and fuzzed against encoding/csv parser.
 type Parser struct {
 	comma   byte
 	comment byte
@@ -20,15 +23,37 @@ func NewParser(comma, comment byte, s scan.Bytes) *Parser {
 	}
 }
 
+func (r *Parser) readLine() (line []byte, cutShort bool) {
+	line = r.s.ReadSlice('\n')
+
+	n := len(line)
+	if n > 0 && line[n-1] == '\r' {
+		return line[:n-1], false // drop \r at end of line
+	}
+
+	// This line is problematic. The logic from CountFields comes from
+	// encoding/csv.Reader which relies on mutating the input bytes.
+	// https://github.com/golang/go/blob/b3251514531123d7fd007682389bce7428d159a0/src/encoding/csv/reader.go#L275-L279
+	// To avoid mutating the input, we return cutShort. #680
+	if n >= 2 && line[n-2] == '\r' && line[n-1] == '\n' {
+		return line[:n-2], true
+	}
+	return line, false
+}
+
 // CountFields reads one CSV line and counts how many records that line contained.
 // hasMore reports whether there are more lines in the input.
-func (r *Parser) CountFields() (fields int, hasMore bool) {
+// collectIndexes makes CountFields return a list of indexes where CSV fields
+// start in the line. These indexes are used to test the correctness against the
+// encoding/csv parser.
+func (r *Parser) CountFields(collectIndexes bool) (fields int, fieldPos []int, hasMore bool) {
 	finished := false
 	var line scan.Bytes
+	cutShort := false
 	for {
-		line = r.s.ReadSlice('\n')
+		line, cutShort = r.readLine()
 		if finished {
-			return 0, false
+			return 0, nil, false
 		}
 		finished = len(r.s) == 0 && len(line) == 0
 		if len(line) == lengthNL(line) {
@@ -42,10 +67,15 @@ func (r *Parser) CountFields() (fields int, hasMore bool) {
 		break
 	}
 
+	indexes := []int{}
+	originalLine := line
 parseField:
 	for {
 		if len(line) == 0 || line[0] != '"' { // non-quoted string field
 			fields++
+			if collectIndexes {
+				indexes = append(indexes, len(originalLine)-len(line))
+			}
 			i := bytes.IndexByte(line, r.comma)
 			if i >= 0 {
 				line.Advance(i + 1) // 1 to get over ending comma
@@ -53,6 +83,9 @@ parseField:
 			}
 			break parseField
 		} else { // Quoted string field.
+			if collectIndexes {
+				indexes = append(indexes, len(originalLine)-len(line))
+			}
 			line.Advance(1) // get over starting quote
 			for {
 				i := bytes.IndexByte(line, '"')
@@ -69,8 +102,9 @@ parseField:
 						fields++
 						break parseField
 					}
-				} else if len(line) > 0 {
-					line = r.s.ReadSlice('\n')
+				} else if len(line) > 0 || cutShort {
+					line, cutShort = r.readLine()
+					originalLine = line
 				} else {
 					fields++
 					break parseField
@@ -79,7 +113,7 @@ parseField:
 		}
 	}
 
-	return fields, fields != 0
+	return fields, indexes, fields != 0
 }
 
 // lengthNL reports the number of bytes for the trailing \n.
