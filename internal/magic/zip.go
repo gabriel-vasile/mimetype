@@ -95,7 +95,13 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 		return true
 	}
 
-	for i := 0; i < 4; i++ {
+	// Previously i was 4 at max, but #679 reported zip files where signatures
+	// occur later than 4. Because mimetype only looks at the file header, this
+	// for loop might as well be unbounded, ie: until the input bytes are all
+	// consumed. But users can call SetLimit(0) to make mimetype analyze whole
+	// files. So keep max 100 just in case. The reason I initially made it 4
+	// was because FILE(1) had this limit.
+	for i := 0; i < 100; i++ {
 		if !b.Advance(0x1A) {
 			return false
 		}
