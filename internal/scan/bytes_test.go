@@ -258,3 +258,33 @@ func TestReadSlice(t *testing.T) {
 		})
 	}
 }
+
+func TestUint16(t *testing.T) {
+	tcases := []struct {
+		name string
+		in   []byte
+		res  uint16
+		ok   bool
+	}{{
+		"empty", nil, 0, false,
+	}, {
+		"too short", []byte{0}, 0, false,
+	}, {
+		"just enough", []byte{1, 0}, 1, true,
+	}, {
+		"longer", []byte{1, 0, 2}, 1, true,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			res, ok := b.Uint16()
+			if res != tc.res {
+				t.Errorf("got: %d, want: %d", res, tc.res)
+			}
+			if ok != tc.ok {
+				t.Errorf("ok: got: %t, want: %t", ok, tc.ok)
+			}
+		})
+	}
+}

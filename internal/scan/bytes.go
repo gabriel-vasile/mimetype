@@ -3,6 +3,7 @@ package scan
 
 import (
 	"bytes"
+	"encoding/binary"
 )
 
 // Bytes is a byte slice with helper methods for easier scanning.
@@ -116,6 +117,15 @@ func (b *Bytes) DropLastLine(readLimit uint32) {
 			return
 		}
 	}
+}
+
+func (b *Bytes) Uint16() (uint16, bool) {
+	if len(*b) < 2 {
+		return 0, false
+	}
+	v := binary.LittleEndian.Uint16(*b)
+	*b = (*b)[2:]
+	return v, true
 }
 
 func ByteIsWS(b byte) bool {
