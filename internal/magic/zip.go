@@ -44,10 +44,15 @@ func Zip(raw []byte, limit uint32) bool {
 
 // Jar matches a Java archive file.
 func Jar(raw []byte, limit uint32) bool {
-	return zipContains(raw, []byte("META-INF/MANIFEST.MF"), false)
+	return zipContains(raw, []byte("META-INF/MANIFEST.MF"), false, 1) ||
+		zipContains(raw, []byte("META-INF/"), false, 1)
+
 }
 
-func zipContains(raw, sig []byte, msoCheck bool) bool {
+// zipContains goes over entries inside the raw zip and checks if any of them are
+// equal to sig. msoCheck makes it look for additional entries and checkLength
+// makes the lookAt limits the number of entries to look for.
+func zipContains(raw, sig []byte, msoCheck bool, lookAt int) bool {
 	b := scan.Bytes(raw)
 	pk := []byte("PK\003\004")
 	if len(b) < 0x1E {
@@ -91,7 +96,8 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 	if !b.Advance(nextHeader) {
 		return false
 	}
-	if bytes.HasPrefix(b, sig) {
+	// This is the second entry in zip.
+	if lookAt > 1 && bytes.HasPrefix(b, sig) {
 		return true
 	}
 
@@ -101,7 +107,7 @@ func zipContains(raw, sig []byte, msoCheck bool) bool {
 	// consumed. But users can call SetLimit(0) to make mimetype analyze whole
 	// files. So keep max 100 just in case. The reason I initially made it 4
 	// was because FILE(1) had this limit.
-	for i := 0; i < 100; i++ {
+	for i := 3; i < lookAt; i++ {
 		if !b.Advance(0x1A) {
 			return false
 		}
