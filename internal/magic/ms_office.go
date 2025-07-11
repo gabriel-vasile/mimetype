@@ -7,17 +7,17 @@ import (
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(raw []byte, limit uint32) bool {
-	return zipContains(raw, []byte("xl/"), true)
+	return zipContains(raw, []byte("xl/"), true, 100)
 }
 
 // Docx matches a Microsoft Word 2007 file.
 func Docx(raw []byte, limit uint32) bool {
-	return zipContains(raw, []byte("word/"), true)
+	return zipContains(raw, []byte("word/"), true, 100)
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(raw []byte, limit uint32) bool {
-	return zipContains(raw, []byte("ppt/"), true)
+	return zipContains(raw, []byte("ppt/"), true, 100)
 }
 
 // Ole matches an Open Linking and Embedding file.
