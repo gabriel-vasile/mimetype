@@ -7,9 +7,9 @@ Extension | MIME type | Aliases
 **.xpm** | image/x-xpixmap | -
 **.7z** | application/x-7z-compressed | -
 **.zip** | application/zip | application/x-zip, application/x-zip-compressed
-**.xlsx** | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | -
 **.docx** | application/vnd.openxmlformats-officedocument.wordprocessingml.document | -
 **.pptx** | application/vnd.openxmlformats-officedocument.presentationml.presentation | -
+**.xlsx** | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet | -
 **.epub** | application/epub+zip | -
 **.apk** | application/vnd.android.package-archive | -
 **.jar** | application/java-archive | application/jar, application/jar-archive, application/x-java-archive
