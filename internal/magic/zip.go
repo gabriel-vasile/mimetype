@@ -42,11 +42,35 @@ func Zip(raw []byte, limit uint32) bool {
 		(raw[3] == 0x4 || raw[3] == 0x6 || raw[3] == 0x8)
 }
 
-// Jar matches a Java archive file.
+// Jar matches a Java archive file. There are two types of Jar files:
+// 1. the ones that can be opened with jexec and have 0xCAFE optional flag
+// https://stackoverflow.com/tags/executable-jar/info
+// 2. regular jars, same as above, just without the executable flag
+// https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=262278#c0
+// There is an argument to only check for manifest, since it's the common nominator
+// for both executable and non-executable versions. But zipContains is unreliable
+// because it does linear search for signatures (instead of relying on offsets
+// told by the file.)
 func Jar(raw []byte, limit uint32) bool {
-	return zipContains(raw, []byte("META-INF/MANIFEST.MF"), false, 1) ||
+	return executableJar(raw) ||
+		zipContains(raw, []byte("META-INF/MANIFEST.MF"), false, 1) ||
 		zipContains(raw, []byte("META-INF/"), false, 1)
 
+}
+
+// An executable Jar has a 0xCAFE flag enabled in the first zip entry.
+// The rule from file/file is:
+// >(26.s+30)	leshort	0xcafe		Java archive data (JAR)
+func executableJar(b scan.Bytes) bool {
+	b.Advance(0x1A)
+	offset, ok := b.Uint16()
+	if !ok {
+		return false
+	}
+	b.Advance(int(offset) + 2)
+
+	cafe, ok := b.Uint16()
+	return ok && cafe == 0xCAFE
 }
 
 // zipContains goes over entries inside the raw zip and checks if any of them are
@@ -136,7 +160,7 @@ func APK(raw []byte, _ uint32) bool {
 		[]byte("res/drawable"),
 	}
 	for _, sig := range apkSignatures {
-		if zipContains(raw, sig, false) {
+		if zipContains(raw, sig, false, 100) {
 			return true
 		}
 	}
