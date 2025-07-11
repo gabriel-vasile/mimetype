@@ -73,6 +73,8 @@ func executableJar(b scan.Bytes) bool {
 	return ok && cafe == 0xCAFE
 }
 
+=======
+>>>>>>> 2dbb446 (zip: make zip_contains take a parameter to limit how many entries it)
 // zipContains goes over entries inside the raw zip and checks if any of them are
 // equal to sig. msoCheck makes it look for additional entries and checkLength
 // makes the lookAt limits the number of entries to look for.
