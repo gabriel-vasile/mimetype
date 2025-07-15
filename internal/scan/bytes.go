@@ -53,6 +53,16 @@ func (b *Bytes) Pop() byte {
 	return 0
 }
 
+// PopN pops n bytes from b or nil if b is empty.
+func (b *Bytes) PopN(n int) []byte {
+	if len(*b) >= n {
+		ret := (*b)[:n]
+		*b = (*b)[n:]
+		return ret
+	}
+	return nil
+}
+
 // PopUntil will advance b until, but not including, the first occurence of stopAt
 // character. If no occurence is found, then it will advance until the end of b.
 // The returned Bytes is a slice of all the bytes that we're advanced over.
