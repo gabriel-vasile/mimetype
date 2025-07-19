@@ -124,14 +124,14 @@ func msoxml(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
 		if searchFor.match(f) {
 			return true
 		}
-		// If the first is not one of the next usually expected entries, then
-		// abort this check.
+		// If the first is not one of the next usually expected entries, 
+		// then abort this check.
 		if i == 0 {
-			if !(bytes.Equal(f, []byte("[Content_Types].xml")) ||
-				bytes.Equal(f, []byte("_rels/.rels")) ||
-				bytes.Equal(f, []byte("docProps")) ||
-				bytes.Equal(f, []byte("customXml")) ||
-				bytes.Equal(f, []byte("[trash]"))) {
+			if !bytes.Equal(f, []byte("[Content_Types].xml")) &&
+				!bytes.Equal(f, []byte("_rels/.rels")) &&
+				!bytes.Equal(f, []byte("docProps")) &&
+				!bytes.Equal(f, []byte("customXml")) &&
+				!bytes.Equal(f, []byte("[trash]")) {
 				return false
 			}
 		}
