@@ -12,7 +12,11 @@ import (
 	"sync"
 	"testing"
 )
-
+// testcases are used for correctness and benchmarks.
+// testcase data is provided as a string for convenience,
+// but that makes benchmarks allocate more. It can be observed
+// for testcases that call fromDisk. Those allocate more because
+// they read a lot from disk.
 type testcase struct {
 	name         string
 	data         string
