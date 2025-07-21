@@ -13,6 +13,11 @@ import (
 	"testing"
 )
 
+// testcases are used for correctness and benchmarks.
+// testcase data is provided as a string for convenience,
+// but that makes benchmarks allocate more. It can be observed
+// for testcases that call fromDisk. Those allocate more because
+// they read a lot from disk.
 type testcase struct {
 	name         string
 	data         string
@@ -133,7 +138,8 @@ a,"b`,
 	{"ics dos", "BEGIN:VCALENDAR\r\n00", "text/calendar", none},
 	{"txt iso88591", "\x0a\xe6\xf8\xe6\xf8\xe5\xe6\xf8\xe5\xe5\x0a", "text/plain; charset=iso-8859-1", none},
 	{"jar", fromDisk("jar.jar"), "application/java-archive", all},
-	{"executable jar", "PK\x03\x04" + offset(0x1A, string([]byte{0xFE, 0xCA})), "application/java-archive", none},
+	{"jar executable", "PK\x03\x04" + offset(0x1A, string([]byte{0xFE, 0xCA})), "application/java-archive", none},
+	{"jar in zip #639", fromDisk("jar_in_zip.zip"), "application/zip", none},
 	{"jp2", "\x00\x00\x00\x0c\x6a\x50\x20\x20\x0d\x0a\x87\x0a\x00\x00\x00\x14\x66\x74\x79\x70\x6a\x70\x32\x20", "image/jp2", one},
 	{"jpf", "\x00\x00\x00\x0c\x6a\x50\x20\x20\x0d\x0a\x87\x0a\x00\x00\x00\x1c\x66\x74\x79\x70\x6a\x70\x78\x20", "image/jpx", one},
 	{"jpg", "\xFF\xD8\xFF", "image/jpeg", one},

@@ -65,6 +65,7 @@ func TestZeroZip(t *testing.T) {
 	}, {
 		name:  "customXml, and other files, but word/ is the 7th file", // we only check until 6th file
 		files: []string{"customXml", "1", "2", "3", "4", "5", "word/"},
+		docx:  true,
 	}, {
 		name:  "customXml, word/ xl/ pptx/ after 5 files",
 		files: []string{"1", "2", "3", "4", "5", "customXml", "word/", "xl/", "ppt/"},
@@ -123,7 +124,7 @@ func TestZeroZip(t *testing.T) {
 		pptx: true,
 	}}
 
-	for _, tc := range tcases {
+	for i, tc := range tcases {
 		t.Run(tc.name, func(t *testing.T) {
 			buf, err := createZip(tc.files)
 			if err != nil {
@@ -136,8 +137,10 @@ func TestZeroZip(t *testing.T) {
 			jar := Jar(buf.Bytes(), 0)
 
 			if tc.docx != docx || tc.xlsx != xlsx || tc.pptx != pptx || tc.jar != jar {
-				t.Errorf(`expected %t %t %t %t;
-                got %t %t %t %t`, tc.docx, tc.xlsx, tc.pptx, tc.jar, docx, xlsx, pptx, jar)
+				t.Errorf(`
+         docx	xlsx	pptx	jar %d
+expected %t	%t	%t	%t;
+     got %t	%t	%t	%t`, i, tc.docx, tc.xlsx, tc.pptx, tc.jar, docx, xlsx, pptx, jar)
 			}
 
 			// #400 - xlsx, docx, pptx put as is (compression lvl 0) inside a zip
@@ -153,8 +156,10 @@ func TestZeroZip(t *testing.T) {
 			jar = Jar(uncompressedZip.Bytes(), 0)
 
 			if docx || xlsx || pptx || jar {
-				t.Errorf(`uncompressedZip: expected false, false, false;
-                got %t %t %t %t`, docx, xlsx, pptx, jar)
+				t.Errorf(`
+uncompressedZip: docx	xlsx	pptx	jar %d
+        expected false	false	false	false
+             got %t	%t	%t	%t`, i, docx, xlsx, pptx, jar)
 			}
 		})
 	}

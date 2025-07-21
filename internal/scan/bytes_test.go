@@ -56,6 +56,47 @@ func TestPop(t *testing.T) {
 		})
 	}
 }
+
+func TestPopN(t *testing.T) {
+	tcases := []struct {
+		name   string
+		in     string
+		n      int
+		popped string
+		left   string
+	}{{
+		"empty", "", 0, "", "",
+	}, {
+		"1,0", "1", 0, "", "1",
+	}, {
+		"12,0", "12", 0, "", "12",
+	}, {
+		"1,1", "1", 1, "1", "",
+	}, {
+		"12,1", "12", 1, "1", "2",
+	}, {
+		"123,1", "123", 1, "1", "23",
+	}, {
+		"123,2", "123", 2, "12", "3",
+	}, {
+		"123,3", "123", 3, "123", "",
+	}, {
+		"123,4", "123", 4, "", "123",
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			popped := b.PopN(tc.n)
+			if string(b) != tc.left {
+				t.Errorf("left: got: %s, want: %s", string(b), tc.left)
+			}
+			if string(popped) != tc.popped {
+				t.Errorf("popped: got: %s, want: %s", string(popped), tc.popped)
+			}
+		})
+	}
+}
 func TestTrim(t *testing.T) {
 	tcases := []struct {
 		name  string
