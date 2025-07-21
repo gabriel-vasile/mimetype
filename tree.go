@@ -81,7 +81,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, html, svg, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2).
 			alias("application/xml")
 	json    = newMIME("application/json", ".json", magic.JSON, geoJSON, har, gltf)

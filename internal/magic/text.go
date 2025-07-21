@@ -29,6 +29,7 @@ var (
 		[]byte("<BODY"),
 		[]byte("<BR"),
 		[]byte("<P"),
+		[]byte("<!--"),
 	)
 	// XML matches an Extensible Markup Language file.
 	XML = markup([]byte("<?XML"))
@@ -236,12 +237,15 @@ func Svg(raw []byte, limit uint32) bool {
 // svgWithoutXMLDeclaration matches a SVG image that does not have an XML header.
 // Example:
 //
+//	<!-- xml comment ignored -->
 //	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 //	    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
 //	</svg>
 func svgWithoutXMLDeclaration(s scan.Bytes) bool {
 	for scan.ByteIsWS(s.Peek()) {
 		s.Advance(1)
+	}
+	for mkup.SkipAComment(&s) {
 	}
 	if !bytes.HasPrefix(s, []byte("<svg")) {
 		return false

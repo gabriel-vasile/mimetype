@@ -3,6 +3,8 @@
 package markup
 
 import (
+	"bytes"
+
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
@@ -87,4 +89,15 @@ func getAValue(s *scan.Bytes) (_ []byte, hasMore bool) {
 			end++
 		}
 	}
+}
+
+func SkipAComment(s *scan.Bytes) (skipped bool) {
+	if bytes.HasPrefix(*s, []byte("<!--")) {
+		// Offset by 2 len(<!) because the starting and ending -- can be the same.
+		if i := bytes.Index((*s)[2:], []byte("-->")); i != -1 {
+			s.Advance(i + 2 + 3) // 2 comes from len(<!) and 3 comes from len(-->).
+			return true
+		}
+	}
+	return false
 }
