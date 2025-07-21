@@ -209,15 +209,8 @@ func fromHTML(s scan.Bytes) string {
 	meta := []byte("<META")
 	lmeta := len(meta)
 	for {
-		if len(s) == 0 {
-			return ""
-		}
-		if bytes.HasPrefix(s, []byte("<!--")) {
-			// Offset by two (<!) because the starting and ending -- can be the same.j
-			s.Advance(2)
-			if i := bytes.Index(s, []byte("-->")); i != -1 {
-				s.Advance(i)
-			}
+		if markup.SkipAComment(&s) {
+			continue
 		}
 		if len(s) <= lmeta {
 			return ""

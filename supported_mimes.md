@@ -147,8 +147,8 @@ Extension | MIME type | Aliases
 **.jxr** | image/jxr | image/vnd.ms-photo
 **.parquet** | application/vnd.apache.parquet | application/x-parquet
 **.txt** | text/plain | -
-**.html** | text/html | -
 **.svg** | image/svg+xml | -
+**.html** | text/html | -
 **.xml** | text/xml | application/xml
 **.rss** | application/rss+xml | text/rss
 **.atom** | application/atom+xml | -
