@@ -138,6 +138,70 @@ func (b *Bytes) Uint16() (uint16, bool) {
 	return v, true
 }
 
+const (
+	CompactWS = 1 << iota
+	IgnoreCase
+)
+
+// Search for occurences of pattern p inside b.
+func (b Bytes) Search(p []byte, flags int) int {
+	if flags == 0 {
+		return bytes.Index(b, p)
+	}
+
+	lb, lp := len(b), len(p)
+	for i := range b {
+		if lb-i < lp {
+			return -1
+		}
+		if b[i:].search(p, flags) {
+			return i
+		}
+	}
+
+	return 0
+}
+
+func (b Bytes) search(p []byte, flags int) bool {
+	for len(b) > 0 {
+		// If we finished all we we're looking for from p.
+		if len(p) == 0 {
+			return true
+		}
+		if flags&IgnoreCase > 0 && isUpper(p[0]) {
+			if upper(b[0]) != p[0] {
+				return false
+			}
+			b, p = b[1:], p[1:]
+		} else if flags&CompactWS > 0 && ByteIsWS(p[0]) {
+			p = p[1:]
+			if !ByteIsWS(b[0]) {
+				return false
+			}
+			b = b[1:]
+			if !ByteIsWS(p[0]) {
+				b.TrimLWS()
+			}
+		} else {
+			if b[0] != p[0] {
+				return false
+			}
+			b, p = b[1:], p[1:]
+		}
+	}
+	return true
+}
+
+func isUpper(c byte) bool {
+	return c >= 'A' && c <= 'Z'
+}
+func upper(c byte) byte {
+	if c >= 'a' && c <= 'z' {
+		return c - ('a' - 'A')
+	}
+	return c
+}
+
 func ByteIsWS(b byte) bool {
 	return b == '\t' || b == '\n' || b == '\x0c' || b == '\r' || b == ' '
 }

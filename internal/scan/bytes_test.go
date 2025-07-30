@@ -329,3 +329,55 @@ func TestUint16(t *testing.T) {
 		})
 	}
 }
+
+var searchTestcases = []struct {
+	name     string
+	haystack string
+	needle   string
+	flags    int
+	expect   int
+}{{
+	"empty", "", "", 0, 0,
+}, {
+	"empty compact ws", "", "", CompactWS, 0,
+}, {
+	"empty ignore case", "", "", IgnoreCase, 0,
+}, {
+	"simple", "abc", "abc", 0, 0,
+}, {
+	"simple compact ws", "abc", "abc", CompactWS, 0,
+}, {
+	"simple ignore case", "abc", "abc", IgnoreCase, 0,
+}, {
+	"ignore case 1 upper", "aBc", "ABC", IgnoreCase, 0,
+}, {
+	"ignore case prefixed", "aaBcß", "ABC", IgnoreCase, 1,
+}, {
+	"ignore case prefixed utf8", "ßaBcß", "ABC", IgnoreCase, 2, // 2 because ß is 2 bytes long
+}, {
+	"simple compact ws and ignore case", "  a", " A", CompactWS | IgnoreCase, 0,
+}, {
+	"simple compact ws and ignore prefix", "a  a", " A", CompactWS | IgnoreCase, 1,
+}}
+
+func TestSearch(t *testing.T) {
+	for _, tc := range searchTestcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.haystack)
+			i := b.Search([]byte(tc.needle), tc.flags)
+			if i != tc.expect {
+				t.Errorf("got: %d, want: %d", i, tc.expect)
+			}
+		})
+	}
+}
+
+func FuzzSearch(f *testing.F) {
+	for _, tc := range searchTestcases {
+		f.Add([]byte(tc.haystack), []byte(tc.needle), tc.flags)
+	}
+	f.Fuzz(func(t *testing.T, haystack, needle []byte, flags int) {
+		b := Bytes(haystack)
+		b.Search(needle, flags%CompactWS|IgnoreCase)
+	})
+}
