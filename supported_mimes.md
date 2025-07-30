@@ -61,7 +61,7 @@ Extension | MIME type | Aliases
 **.tar** | application/x-tar | -
 **.xar** | application/x-xar | -
 **.bz2** | application/x-bzip2 | -
-**.fits** | application/fits | -
+**.fits** | application/fits | image/fits
 **.tiff** | image/tiff | -
 **.bmp** | image/bmp | image/x-bmp, image/x-ms-bmp
 **.ico** | image/x-icon | -

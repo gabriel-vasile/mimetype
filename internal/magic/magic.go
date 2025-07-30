@@ -142,7 +142,7 @@ func markupCheck(sig, raw []byte) bool {
 		}
 	}
 	// Next byte must be space or right angle bracket.
-	if db := raw[len(sig)]; db != ' ' && db != '>' {
+	if db := raw[len(sig)]; !scan.ByteIsWS(db) && db != '>' {
 		return false
 	}
 
