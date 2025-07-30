@@ -146,6 +146,14 @@ func Text(raw []byte, limit uint32) bool {
 	return true
 }
 
+// XHTML matches an XHTML file. This check depends on the XML check to have passed.
+func XHTML(raw []byte, limit uint32) bool {
+	raw = raw[:min(len(raw), 4096)]
+	b := scan.Bytes(raw)
+	return b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase) != -1 ||
+		b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase) != -1
+}
+
 // Php matches a PHP: Hypertext Preprocessor file.
 func Php(raw []byte, limit uint32) bool {
 	if res := phpPageF(raw, limit); res {
