@@ -34,6 +34,9 @@ func sv(in []byte, comma byte, limit uint32) bool {
 		if fields != headerFields {
 			return false
 		}
+		if csvLines >= 10 {
+			return true
+		}
 	}
 
 	return csvLines >= 2

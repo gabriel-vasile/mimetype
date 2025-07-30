@@ -76,7 +76,7 @@ var (
 		alias("application/msexcel")
 	msg  = newMIME("application/vnd.ms-outlook", ".msg", magic.Msg)
 	ps   = newMIME("application/postscript", ".ps", magic.Ps)
-	fits = newMIME("application/fits", ".fits", magic.Fits)
+	fits = newMIME("application/fits", ".fits", magic.Fits).alias("image/fits")
 	ogg  = newMIME("application/ogg", ".ogg", magic.Ogg, oggAudio, oggVideo).
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
