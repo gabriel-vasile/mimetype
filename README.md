@@ -67,6 +67,18 @@ mimetype.DetectFile("file.doc")
 If increasing the limit does not help, please
 [open an issue](https://github.com/gabriel-vasile/mimetype/issues/new?assignees=&labels=&template=mismatched-mime-type-detected.md&title=).
 
+## Tests
+In addition to unit tests,
+[mimetype_tests](https://github.com/gabriel-vasile/mimetype_tests) compares the
+library with the [Unix file utility](https://en.wikipedia.org/wiki/File_(command))
+for around 50 000 sample files. Check the latest comparison results
+[here](https://github.com/gabriel-vasile/mimetype_tests/actions).
+
+## Benchmarks
+Benchmarks for each file format are performed when a PR is open. The results can
+be seen on the [workflows page](https://github.com/gabriel-vasile/mimetype/actions/workflows/benchmark.yml).
+Performance improvements are welcome but correctness is prioritized.
+
 ## Structure
 **mimetype** uses a hierarchical structure to keep the MIME type detection logic.
 This reduces the number of calls needed for detecting the file type. The reason
@@ -83,11 +95,6 @@ or from a [file](https://pkg.go.dev/github.com/gabriel-vasile/mimetype#DetectFil
 <div align="center">
   <img alt="how project is structured" src="https://raw.githubusercontent.com/gabriel-vasile/mimetype/master/testdata/gif.gif" width="88%">
 </div>
-
-## Benchmarks
-Benchmarks for each file format are performed when a PR is open. The results can
-be seen on the [workflows page](https://github.com/gabriel-vasile/mimetype/actions/workflows/benchmark.yml).
-Performance improvements are welcome but correctness is prioritized.
 
 ## Contributing
 Contributions are unexpected but welcome. When submitting a PR for detection of
