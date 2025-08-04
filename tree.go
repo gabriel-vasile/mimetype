@@ -48,7 +48,7 @@ var (
 	// This means APK should be a child of JAR detector, but in practice,
 	// the decisive signature for JAR might be located at the end of the file
 	// and not reachable because of library readLimit.
-	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc).
+	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc, kmz).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
@@ -114,6 +114,7 @@ var (
 	atom    = newMIME("application/atom+xml", ".atom", magic.Atom)
 	x3d     = newMIME("model/x3d+xml", ".x3d", magic.X3d)
 	kml     = newMIME("application/vnd.google-earth.kml+xml", ".kml", magic.Kml)
+	kmz     = newMIME("application/vnd.google-earth.kmz", ".kmz", magic.Kmz)
 	xliff   = newMIME("application/x-xliff+xml", ".xlf", magic.Xliff)
 	collada = newMIME("model/vnd.collada+xml", ".dae", magic.Collada)
 	gml     = newMIME("application/gml+xml", ".gml", magic.Gml)
