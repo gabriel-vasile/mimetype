@@ -81,7 +81,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -103,6 +103,8 @@ var (
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
 	python = newMIME("text/x-python", ".py", magic.Python).
 		alias("text/x-script.python", "application/x-python")
+	shell = newMIME("text/x-shellscript", ".sh", magic.Shell).
+		alias("text/x-sh", "application/x-shellscript", "application/x-sh")
 	tcl = newMIME("text/x-tcl", ".tcl", magic.Tcl).
 		alias("application/x-tcl")
 	vCard     = newMIME("text/vcard", ".vcf", magic.VCard)
