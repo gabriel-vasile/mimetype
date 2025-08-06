@@ -1,6 +1,9 @@
 package magic
 
-import "bytes"
+import (
+	"bytes"
+	"encoding/binary"
+)
 
 var (
 	// Fdf matches a Forms Data Format file.
@@ -59,4 +62,17 @@ func P7s(raw []byte, limit uint32) bool {
 	}
 
 	return false
+}
+
+// Lotus123 matches a Lotus 1-2-3 spreadsheet document.
+func Lotus123(raw []byte, limit uint32) bool {
+	if len(raw) <= 20 {
+		return false
+	}
+	version := binary.BigEndian.Uint32(raw)
+	if version == 0x00000200 {
+		return raw[6] != 0 && raw[7] == 0
+	}
+
+	return version == 0x00001a00 && raw[20] > 0 && raw[20] < 32
 }
