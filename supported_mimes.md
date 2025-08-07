@@ -185,3 +185,4 @@ Extension | MIME type | Aliases
 **.ics** | text/calendar | -
 **.warc** | application/warc | -
 **.vtt** | text/vtt | -
+**.sh** | text/x-shellscript | text/x-sh, application/x-shellscript, application/x-sh
