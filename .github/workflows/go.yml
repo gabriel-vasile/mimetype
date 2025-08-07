@@ -21,6 +21,6 @@ jobs:
     - name: Run linters
       uses: golangci/golangci-lint-action@v8
       with:
-        version: "v2.0.2"
+        version: "v2.3.1"
     - name: Run tests
       run: go test -race ./...
