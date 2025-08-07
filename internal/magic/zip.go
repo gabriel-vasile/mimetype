@@ -59,8 +59,7 @@ func Jar(raw []byte, limit uint32) bool {
 		}}, 1)
 }
 
-// Kmz matches a zipped KML file, which should be "doc.kml" by convention but it
-// should be enough if extension matches.
+// Kmz matches a zipped KML file, which is "doc.kml" by convention.
 func Kmz(raw []byte, _ uint32) bool {
 	iter := zipIterator{raw}
 	for {
@@ -68,7 +67,7 @@ func Kmz(raw []byte, _ uint32) bool {
 		if len(f) == 0 {
 			break
 		}
-		if bytes.HasSuffix(f, []byte(".kml")) {
+		if bytes.Equal(f, []byte("doc.kml")) {
 			return true
 		}
 	}
