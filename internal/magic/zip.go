@@ -59,8 +59,8 @@ func Jar(raw []byte, limit uint32) bool {
 		}}, 1)
 }
 
-// Kmz matches a zipped KML file, which is "doc.kml" by convention.
-func Kmz(raw []byte, _ uint32) bool {
+// KMZ matches a zipped KML file, which is "doc.kml" by convention.
+func KMZ(raw []byte, _ uint32) bool {
 	iter := zipIterator{raw}
 	for {
 		f := iter.next()

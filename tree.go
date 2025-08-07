@@ -114,7 +114,7 @@ var (
 	atom    = newMIME("application/atom+xml", ".atom", magic.Atom)
 	x3d     = newMIME("model/x3d+xml", ".x3d", magic.X3d)
 	kml     = newMIME("application/vnd.google-earth.kml+xml", ".kml", magic.Kml)
-	kmz     = newMIME("application/vnd.google-earth.kmz", ".kmz", magic.Kmz)
+	kmz     = newMIME("application/vnd.google-earth.kmz", ".kmz", magic.KMZ)
 	xliff   = newMIME("application/x-xliff+xml", ".xlf", magic.Xliff)
 	collada = newMIME("model/vnd.collada+xml", ".dae", magic.Collada)
 	gml     = newMIME("application/gml+xml", ".gml", magic.Gml)
