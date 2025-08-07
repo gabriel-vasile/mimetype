@@ -18,8 +18,8 @@ import (
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
-	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, ico, mp3,
-	flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
+	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
+	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
 	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
@@ -138,9 +138,12 @@ var (
 	tiff = newMIME("image/tiff", ".tiff", magic.Tiff)
 	bmp  = newMIME("image/bmp", ".bmp", magic.Bmp).
 		alias("image/x-bmp", "image/x-ms-bmp")
-	ico  = newMIME("image/x-icon", ".ico", magic.Ico)
-	icns = newMIME("image/x-icns", ".icns", magic.Icns)
-	psd  = newMIME("image/vnd.adobe.photoshop", ".psd", magic.Psd).
+	// lotus check must be done before ico because some ico detection is a bit
+	// relaxed and some lotus files are wrongfully identified as ico otherwise.
+	lotus = newMIME("application/vnd.lotus-1-2-3", ".123", magic.Lotus123)
+	ico   = newMIME("image/x-icon", ".ico", magic.Ico)
+	icns  = newMIME("image/x-icns", ".icns", magic.Icns)
+	psd   = newMIME("image/vnd.adobe.photoshop", ".psd", magic.Psd).
 		alias("image/x-psd", "application/photoshop")
 	heic    = newMIME("image/heic", ".heic", magic.Heic)
 	heicSeq = newMIME("image/heic-sequence", ".heic", magic.HeicSequence)

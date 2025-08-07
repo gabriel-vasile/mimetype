@@ -65,6 +65,7 @@ Extension | MIME type | Aliases
 **.fits** | application/fits | image/fits
 **.tiff** | image/tiff | -
 **.bmp** | image/bmp | image/x-bmp, image/x-ms-bmp
+**.123** | application/vnd.lotus-1-2-3 | -
 **.ico** | image/x-icon | -
 **.mp3** | audio/mpeg | audio/x-mpeg, audio/mp3
 **.flac** | audio/flac | -
