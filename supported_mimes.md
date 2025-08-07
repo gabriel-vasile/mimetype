@@ -24,6 +24,7 @@ Extension | MIME type | Aliases
 **.odf** | application/vnd.oasis.opendocument.formula | application/x-vnd.oasis.opendocument.formula
 **.odc** | application/vnd.oasis.opendocument.chart | application/x-vnd.oasis.opendocument.chart
 **.sxc** | application/vnd.sun.xml.calc | -
+**.kmz** | application/vnd.google-earth.kmz | -
 **.pdf** | application/pdf | application/x-pdf
 **.fdf** | application/vnd.fdf | -
 **n/a** | application/x-ole-storage | -
