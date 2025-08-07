@@ -48,7 +48,7 @@ var (
 	// This means APK should be a child of JAR detector, but in practice,
 	// the decisive signature for JAR might be located at the end of the file
 	// and not reachable because of library readLimit.
-	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc).
+	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc, kmz).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
@@ -81,7 +81,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -103,6 +103,8 @@ var (
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
 	python = newMIME("text/x-python", ".py", magic.Python).
 		alias("text/x-script.python", "application/x-python")
+	shell = newMIME("text/x-shellscript", ".sh", magic.Shell).
+		alias("text/x-sh", "application/x-shellscript", "application/x-sh")
 	tcl = newMIME("text/x-tcl", ".tcl", magic.Tcl).
 		alias("application/x-tcl")
 	vCard     = newMIME("text/vcard", ".vcf", magic.VCard)
@@ -114,6 +116,7 @@ var (
 	atom    = newMIME("application/atom+xml", ".atom", magic.Atom)
 	x3d     = newMIME("model/x3d+xml", ".x3d", magic.X3d)
 	kml     = newMIME("application/vnd.google-earth.kml+xml", ".kml", magic.Kml)
+	kmz     = newMIME("application/vnd.google-earth.kmz", ".kmz", magic.KMZ)
 	xliff   = newMIME("application/x-xliff+xml", ".xlf", magic.Xliff)
 	collada = newMIME("model/vnd.collada+xml", ".dae", magic.Collada)
 	gml     = newMIME("application/gml+xml", ".gml", magic.Gml)

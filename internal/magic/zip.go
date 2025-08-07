@@ -59,6 +59,22 @@ func Jar(raw []byte, limit uint32) bool {
 		}}, 1)
 }
 
+// KMZ matches a zipped KML file, which is "doc.kml" by convention.
+func KMZ(raw []byte, _ uint32) bool {
+	iter := zipIterator{raw}
+	for {
+		f := iter.next()
+		if len(f) == 0 {
+			break
+		}
+		if bytes.Equal(f, []byte("doc.kml")) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // An executable Jar has a 0xCAFE flag enabled in the first zip entry.
 // The rule from file/file is:
 // >(26.s+30)	leshort	0xcafe		Java archive data (JAR)
@@ -124,7 +140,7 @@ func msoxml(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
 		if searchFor.match(f) {
 			return true
 		}
-		// If the first is not one of the next usually expected entries, 
+		// If the first is not one of the next usually expected entries,
 		// then abort this check.
 		if i == 0 {
 			if !bytes.Equal(f, []byte("[Content_Types].xml")) &&

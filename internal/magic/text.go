@@ -123,6 +123,28 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf"))
+	// Shell matches a shell script file.
+	Shell = shebang(
+		[]byte("/bin/sh"),
+		[]byte("/bin/bash"),
+		[]byte("/usr/local/bin/bash"),
+		[]byte("/usr/bin/env bash"),
+		[]byte("/bin/csh"),
+		[]byte("/usr/local/bin/csh"),
+		[]byte("/usr/bin/env csh"),
+		[]byte("/bin/dash"),
+		[]byte("/usr/local/bin/dash"),
+		[]byte("/usr/bin/env dash"),
+		[]byte("/bin/ksh"),
+		[]byte("/usr/local/bin/ksh"),
+		[]byte("/usr/bin/env ksh"),
+		[]byte("/bin/tcsh"),
+		[]byte("/usr/local/bin/tcsh"),
+		[]byte("/usr/bin/env tcsh"),
+		[]byte("/bin/zsh"),
+		[]byte("/usr/local/bin/zsh"),
+		[]byte("/usr/bin/env zsh"),
+	)
 )
 
 // Text matches a plain text file.
