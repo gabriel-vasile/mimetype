@@ -210,10 +210,3 @@ func shebangCheck(sig []byte, raw scan.Bytes) bool {
 	raw.TrimRWS()
 	return bytes.Equal(raw, sig)
 }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

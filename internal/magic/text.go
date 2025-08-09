@@ -151,13 +151,14 @@ var (
 //
 // TODO: This function does not parse BOM-less UTF16 and UTF32 files. Not really
 // sure it should. Linux file utility also requires a BOM for UTF16 and UTF32.
-func Text(raw []byte, limit uint32) bool {
+func Text(raw []byte, _ uint32) bool {
 	// First look for BOM.
 	if cset := charset.FromBOM(raw); cset != "" {
 		return true
 	}
 	// Binary data bytes as defined here: https://mimesniff.spec.whatwg.org/#binary-data-byte
-	for _, b := range raw {
+	for i := 0; i < min(len(raw), 4096); i++ {
+		b := raw[i]
 		if b <= 0x08 ||
 			b == 0x0B ||
 			0x0E <= b && b <= 0x1A ||
