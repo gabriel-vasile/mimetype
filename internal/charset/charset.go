@@ -153,8 +153,8 @@ func fromXML(s scan.Bytes) string {
 		if len(s) <= lxml {
 			return ""
 		}
-		if !ciCheck(xml, s[:lxml]) {
-			s.Advance(1)
+		if !s.Match(xml, scan.IgnoreCase) {
+			s = s[1:] // safe to slice instead of s.Advance(1) because bounds are checked
 			continue
 		}
 		aName, aVal, hasMore := "", "", true
@@ -181,25 +181,6 @@ func FromHTML(content []byte) string {
 	return FromPlain(content)
 }
 
-// ciCheck does case insensitive check.
-func ciCheck(upperCase, anyCase []byte) bool {
-	if len(anyCase) < len(upperCase) {
-		return false
-	}
-
-	// perform case insensitive check
-	for i, b := range upperCase {
-		db := anyCase[i]
-		if 'A' <= b && b <= 'Z' {
-			db &= 0xDF
-		}
-		if b != db {
-			return false
-		}
-	}
-	return true
-}
-
 func fromHTML(s scan.Bytes) string {
 	const (
 		dontKnow = iota
@@ -207,6 +188,7 @@ func fromHTML(s scan.Bytes) string {
 		doNotNeedPragma
 	)
 	meta := []byte("<META")
+	body := []byte("<BODY")
 	lmeta := len(meta)
 	for {
 		if markup.SkipAComment(&s) {
@@ -215,11 +197,15 @@ func fromHTML(s scan.Bytes) string {
 		if len(s) <= lmeta {
 			return ""
 		}
-		if !ciCheck(meta, s) {
-			s.Advance(1)
+		// Abort when <body is reached.
+		if s.Match(body, scan.IgnoreCase) {
+			return ""
+		}
+		if !s.Match(meta, scan.IgnoreCase) {
+			s = s[1:] // safe to slice instead of s.Advance(1) because bounds are checked
 			continue
 		}
-		s.Advance(lmeta)
+		s = s[lmeta:]
 		c := s.Pop()
 		if c == 0 || (!scan.ByteIsWS(c) && c != '/') {
 			return ""
@@ -245,7 +231,7 @@ func fromHTML(s scan.Bytes) string {
 				}
 			}
 			attrList[aName] = true
-			if aName == "http-equiv" && ciCheck([]byte("CONTENT-TYPE"), []byte(aVal)) {
+			if aName == "http-equiv" && scan.Bytes(aVal).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) {
 				gotPragma = true
 			} else if aName == "content" {
 				charset = string(extractCharsetFromMeta(scan.Bytes(aVal)))
