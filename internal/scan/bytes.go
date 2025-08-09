@@ -143,7 +143,7 @@ const (
 	IgnoreCase
 )
 
-// Search for occurences of pattern p inside b.
+// Search for occurences of pattern p inside b at any index.
 func (b Bytes) Search(p []byte, flags int) int {
 	if flags == 0 {
 		return bytes.Index(b, p)
@@ -154,7 +154,7 @@ func (b Bytes) Search(p []byte, flags int) int {
 		if lb-i < lp {
 			return -1
 		}
-		if b[i:].search(p, flags) {
+		if b[i:].Match(p, flags) {
 			return i
 		}
 	}
@@ -162,7 +162,8 @@ func (b Bytes) Search(p []byte, flags int) int {
 	return 0
 }
 
-func (b Bytes) search(p []byte, flags int) bool {
+// Match pattern p at index 0 of b.
+func (b Bytes) Match(p []byte, flags int) bool {
 	for len(b) > 0 {
 		// If we finished all we we're looking for from p.
 		if len(p) == 0 {
