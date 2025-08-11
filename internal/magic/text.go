@@ -109,6 +109,12 @@ var (
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
 	)
+	// Ruby matches a Ruby programming language file.
+	Ruby = shebang(
+		[]byte("/usr/bin/ruby"),
+		[]byte("/usr/local/bin/ruby"),
+		[]byte("/usr/bin/env ruby"),
+	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
 		[]byte("/usr/bin/tcl"),
