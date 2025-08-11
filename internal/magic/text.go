@@ -108,6 +108,12 @@ var (
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
+		[]byte("/usr/bin/python2"),
+		[]byte("/usr/local/bin/python2"),
+		[]byte("/usr/bin/env python2"),
+		[]byte("/usr/bin/python3"),
+		[]byte("/usr/local/bin/python3"),
+		[]byte("/usr/bin/env python3"),
 	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
