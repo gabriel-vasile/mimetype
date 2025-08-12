@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@v5.0.0
     - name: Install Go
       if: success()
-      uses: actions/setup-go@v5.4.0
+      uses: actions/setup-go@v5.5.0
       with:
         go-version-file: 'go.mod'
     # 3m is chosen so that half of the 2000 free CI minutes offered by Github
