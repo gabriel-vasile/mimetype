@@ -29,6 +29,14 @@ func Pptx(raw []byte, limit uint32) bool {
 	}}, 100)
 }
 
+// Visio matches a Microsoft Visio 2013+ file.
+func Visio(raw []byte, limit uint32) bool {
+	return msoxml(raw, zipEntries{{
+		name: []byte("visio/"),
+		dir:  true,
+	}}, 100)
+}
+
 // Ole matches an Open Linking and Embedding file.
 //
 // https://en.wikipedia.org/wiki/Object_Linking_and_Embedding
