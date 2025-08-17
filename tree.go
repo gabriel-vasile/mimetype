@@ -24,6 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
+	oneNote,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -278,5 +279,6 @@ var (
 	jxr     = newMIME("image/jxr", ".jxr", magic.Jxr).alias("image/vnd.ms-photo")
 	parquet = newMIME("application/vnd.apache.parquet", ".parquet", magic.Par1).
 		alias("application/x-parquet")
-	cbor = newMIME("application/cbor", ".cbor", magic.CBOR)
+	cbor    = newMIME("application/cbor", ".cbor", magic.CBOR)
+	oneNote = newMIME("application/onenote", ".one", magic.One)
 )

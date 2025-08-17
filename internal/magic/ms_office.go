@@ -174,6 +174,14 @@ func Msi(raw []byte, limit uint32) bool {
 	})
 }
 
+// One matches a Microsoft OneNote file.
+func One(raw []byte, limit uint32) bool {
+	return bytes.HasPrefix(raw, []byte{
+		0xe4, 0x52, 0x5c, 0x7b, 0x8c, 0xd8, 0xa7, 0x4d,
+		0xae, 0xb1, 0x53, 0x78, 0xd0, 0x29, 0x96, 0xd3,
+	})
+}
+
 // Helper to match by a specific CLSID of a compound file.
 //
 // http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
