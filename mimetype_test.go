@@ -56,6 +56,7 @@ var testcases = []testcase{
 	{"bz2", "\x42\x5A\x68", "application/x-bzip2", one},
 	{"cab", "MSCF\x00\x00\x00\x00", "application/vnd.ms-cab-compressed", one},
 	{"cab.is", "ISc(\x00\x00\x00\x01", "application/x-installshield", one},
+	{"chm", "ITSF\003\000\000\000\x60\000\000\000", "application/vnd.ms-htmlhelp", one},
 	{"class", "\xCA\xFE\xBA\xBE\x00\x00\x00\xFF", "application/x-java-applet", one},
 	{
 		"crx",
