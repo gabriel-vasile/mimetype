@@ -142,7 +142,7 @@ func markupCheck(sig, raw []byte) bool {
 		}
 	}
 	// Next byte must be space or right angle bracket.
-	if db := raw[len(sig)]; db != ' ' && db != '>' {
+	if db := raw[len(sig)]; !scan.ByteIsWS(db) && db != '>' {
 		return false
 	}
 
@@ -209,11 +209,4 @@ func shebangCheck(sig []byte, raw scan.Bytes) bool {
 	raw.TrimLWS()
 	raw.TrimRWS()
 	return bytes.Equal(raw, sig)
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

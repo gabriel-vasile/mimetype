@@ -755,6 +755,25 @@ func TestStack(t *testing.T) {
 	}
 }
 
+func TestCurrPathBounded(t *testing.T) {
+	// currPath is bounded to 128.
+	count := 129
+	// input has to be an incomplete json, so that currPath does not get popped.
+	input := []byte(strings.Repeat("[", count))
+
+	for i := 0; i < 100; i++ {
+		Parse(QueryGeo, input)
+		// It's not guaranteed that p is the same parser object used by the
+		// Parse call above. Reason: go runs tests packages concurrently. If
+		// another package calls Parse in tests, that can interfere with parserPool.
+		// Running the test several times in loop mitigates that.
+		p := parserPool.Get().(*parserState)
+		if len(p.currPath) > 128 {
+			t.Errorf("expected currPath be purged if >128")
+		}
+	}
+}
+
 var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
 
 func BenchmarkParse(b *testing.B) {

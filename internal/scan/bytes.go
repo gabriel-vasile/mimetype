@@ -3,6 +3,7 @@ package scan
 
 import (
 	"bytes"
+	"encoding/binary"
 )
 
 // Bytes is a byte slice with helper methods for easier scanning.
@@ -50,6 +51,16 @@ func (b *Bytes) Pop() byte {
 		return ret
 	}
 	return 0
+}
+
+// PopN pops n bytes from b or nil if b is empty.
+func (b *Bytes) PopN(n int) []byte {
+	if len(*b) >= n {
+		ret := (*b)[:n]
+		*b = (*b)[n:]
+		return ret
+	}
+	return nil
 }
 
 // PopUntil will advance b until, but not including, the first occurence of stopAt
@@ -116,6 +127,80 @@ func (b *Bytes) DropLastLine(readLimit uint32) {
 			return
 		}
 	}
+}
+
+func (b *Bytes) Uint16() (uint16, bool) {
+	if len(*b) < 2 {
+		return 0, false
+	}
+	v := binary.LittleEndian.Uint16(*b)
+	*b = (*b)[2:]
+	return v, true
+}
+
+const (
+	CompactWS = 1 << iota
+	IgnoreCase
+)
+
+// Search for occurences of pattern p inside b at any index.
+func (b Bytes) Search(p []byte, flags int) int {
+	if flags == 0 {
+		return bytes.Index(b, p)
+	}
+
+	lb, lp := len(b), len(p)
+	for i := range b {
+		if lb-i < lp {
+			return -1
+		}
+		if b[i:].Match(p, flags) {
+			return i
+		}
+	}
+
+	return 0
+}
+
+// Match pattern p at index 0 of b.
+func (b Bytes) Match(p []byte, flags int) bool {
+	for len(b) > 0 {
+		// If we finished all we we're looking for from p.
+		if len(p) == 0 {
+			return true
+		}
+		if flags&IgnoreCase > 0 && isUpper(p[0]) {
+			if upper(b[0]) != p[0] {
+				return false
+			}
+			b, p = b[1:], p[1:]
+		} else if flags&CompactWS > 0 && ByteIsWS(p[0]) {
+			p = p[1:]
+			if !ByteIsWS(b[0]) {
+				return false
+			}
+			b = b[1:]
+			if !ByteIsWS(p[0]) {
+				b.TrimLWS()
+			}
+		} else {
+			if b[0] != p[0] {
+				return false
+			}
+			b, p = b[1:], p[1:]
+		}
+	}
+	return true
+}
+
+func isUpper(c byte) bool {
+	return c >= 'A' && c <= 'Z'
+}
+func upper(c byte) byte {
+	if c >= 'a' && c <= 'z' {
+		return c - ('a' - 'A')
+	}
+	return c
 }
 
 func ByteIsWS(b byte) bool {

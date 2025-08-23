@@ -229,3 +229,33 @@ func TestGetAllAttributes(t *testing.T) {
 		})
 	}
 }
+
+func TestSkipAComment(t *testing.T) {
+	tcases := []struct {
+		in      string
+		out     string
+		skipped bool
+	}{{
+		"", "", false,
+	}, {
+		"abc", "abc", false,
+	}, {
+		"<!--", "<!--", false, // not ending comment
+	}, {
+		"<!-- abc -->", "", true, // regular comment
+	}, {
+		"<!-->", "", true, // the beginning and ending -- are the same chars
+	}}
+	for _, tc := range tcases {
+		t.Run(tc.in, func(t *testing.T) {
+			s := scan.Bytes(tc.in)
+			skipped := SkipAComment(&s)
+			if tc.skipped != skipped {
+				t.Errorf("skipped got: %v, want: %v", skipped, tc.skipped)
+			}
+			if string(s) != tc.out {
+				t.Errorf("got: %v, want: %v", string(s), tc.out)
+			}
+		})
+	}
+}

@@ -29,6 +29,7 @@ var (
 		[]byte("<BODY"),
 		[]byte("<BR"),
 		[]byte("<P"),
+		[]byte("<!--"),
 	)
 	// XML matches an Extensible Markup Language file.
 	XML = markup([]byte("<?XML"))
@@ -107,6 +108,18 @@ var (
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
+		[]byte("/usr/bin/python2"),
+		[]byte("/usr/local/bin/python2"),
+		[]byte("/usr/bin/env python2"),
+		[]byte("/usr/bin/python3"),
+		[]byte("/usr/local/bin/python3"),
+		[]byte("/usr/bin/env python3"),
+	)
+	// Ruby matches a Ruby programming language file.
+	Ruby = shebang(
+		[]byte("/usr/bin/ruby"),
+		[]byte("/usr/local/bin/ruby"),
+		[]byte("/usr/bin/env ruby"),
 	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
@@ -122,19 +135,42 @@ var (
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf"))
+	// Shell matches a shell script file.
+	Shell = shebang(
+		[]byte("/bin/sh"),
+		[]byte("/bin/bash"),
+		[]byte("/usr/local/bin/bash"),
+		[]byte("/usr/bin/env bash"),
+		[]byte("/bin/csh"),
+		[]byte("/usr/local/bin/csh"),
+		[]byte("/usr/bin/env csh"),
+		[]byte("/bin/dash"),
+		[]byte("/usr/local/bin/dash"),
+		[]byte("/usr/bin/env dash"),
+		[]byte("/bin/ksh"),
+		[]byte("/usr/local/bin/ksh"),
+		[]byte("/usr/bin/env ksh"),
+		[]byte("/bin/tcsh"),
+		[]byte("/usr/local/bin/tcsh"),
+		[]byte("/usr/bin/env tcsh"),
+		[]byte("/bin/zsh"),
+		[]byte("/usr/local/bin/zsh"),
+		[]byte("/usr/bin/env zsh"),
+	)
 )
 
 // Text matches a plain text file.
 //
 // TODO: This function does not parse BOM-less UTF16 and UTF32 files. Not really
 // sure it should. Linux file utility also requires a BOM for UTF16 and UTF32.
-func Text(raw []byte, limit uint32) bool {
+func Text(raw []byte, _ uint32) bool {
 	// First look for BOM.
 	if cset := charset.FromBOM(raw); cset != "" {
 		return true
 	}
 	// Binary data bytes as defined here: https://mimesniff.spec.whatwg.org/#binary-data-byte
-	for _, b := range raw {
+	for i := 0; i < min(len(raw), 4096); i++ {
+		b := raw[i]
 		if b <= 0x08 ||
 			b == 0x0B ||
 			0x0E <= b && b <= 0x1A ||
@@ -143,6 +179,14 @@ func Text(raw []byte, limit uint32) bool {
 		}
 	}
 	return true
+}
+
+// XHTML matches an XHTML file. This check depends on the XML check to have passed.
+func XHTML(raw []byte, limit uint32) bool {
+	raw = raw[:min(len(raw), 4096)]
+	b := scan.Bytes(raw)
+	return b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase) != -1 ||
+		b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase) != -1
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.
@@ -236,12 +280,15 @@ func Svg(raw []byte, limit uint32) bool {
 // svgWithoutXMLDeclaration matches a SVG image that does not have an XML header.
 // Example:
 //
+//	<!-- xml comment ignored -->
 //	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 //	    <rect fill="#fff" stroke="#000" x="-70" y="-70" width="390" height="390"/>
 //	</svg>
 func svgWithoutXMLDeclaration(s scan.Bytes) bool {
 	for scan.ByteIsWS(s.Peek()) {
 		s.Advance(1)
+	}
+	for mkup.SkipAComment(&s) {
 	}
 	if !bytes.HasPrefix(s, []byte("<svg")) {
 		return false

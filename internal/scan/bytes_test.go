@@ -56,6 +56,47 @@ func TestPop(t *testing.T) {
 		})
 	}
 }
+
+func TestPopN(t *testing.T) {
+	tcases := []struct {
+		name   string
+		in     string
+		n      int
+		popped string
+		left   string
+	}{{
+		"empty", "", 0, "", "",
+	}, {
+		"1,0", "1", 0, "", "1",
+	}, {
+		"12,0", "12", 0, "", "12",
+	}, {
+		"1,1", "1", 1, "1", "",
+	}, {
+		"12,1", "12", 1, "1", "2",
+	}, {
+		"123,1", "123", 1, "1", "23",
+	}, {
+		"123,2", "123", 2, "12", "3",
+	}, {
+		"123,3", "123", 3, "123", "",
+	}, {
+		"123,4", "123", 4, "", "123",
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			popped := b.PopN(tc.n)
+			if string(b) != tc.left {
+				t.Errorf("left: got: %s, want: %s", string(b), tc.left)
+			}
+			if string(popped) != tc.popped {
+				t.Errorf("popped: got: %s, want: %s", string(popped), tc.popped)
+			}
+		})
+	}
+}
 func TestTrim(t *testing.T) {
 	tcases := []struct {
 		name  string
@@ -257,4 +298,86 @@ func TestReadSlice(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUint16(t *testing.T) {
+	tcases := []struct {
+		name string
+		in   []byte
+		res  uint16
+		ok   bool
+	}{{
+		"empty", nil, 0, false,
+	}, {
+		"too short", []byte{0}, 0, false,
+	}, {
+		"just enough", []byte{1, 0}, 1, true,
+	}, {
+		"longer", []byte{1, 0, 2}, 1, true,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			res, ok := b.Uint16()
+			if res != tc.res {
+				t.Errorf("got: %d, want: %d", res, tc.res)
+			}
+			if ok != tc.ok {
+				t.Errorf("ok: got: %t, want: %t", ok, tc.ok)
+			}
+		})
+	}
+}
+
+var searchTestcases = []struct {
+	name     string
+	haystack string
+	needle   string
+	flags    int
+	expect   int
+}{{
+	"empty", "", "", 0, 0,
+}, {
+	"empty compact ws", "", "", CompactWS, 0,
+}, {
+	"empty ignore case", "", "", IgnoreCase, 0,
+}, {
+	"simple", "abc", "abc", 0, 0,
+}, {
+	"simple compact ws", "abc", "abc", CompactWS, 0,
+}, {
+	"simple ignore case", "abc", "abc", IgnoreCase, 0,
+}, {
+	"ignore case 1 upper", "aBc", "ABC", IgnoreCase, 0,
+}, {
+	"ignore case prefixed", "aaBcß", "ABC", IgnoreCase, 1,
+}, {
+	"ignore case prefixed utf8", "ßaBcß", "ABC", IgnoreCase, 2, // 2 because ß is 2 bytes long
+}, {
+	"simple compact ws and ignore case", "  a", " A", CompactWS | IgnoreCase, 0,
+}, {
+	"simple compact ws and ignore prefix", "a  a", " A", CompactWS | IgnoreCase, 1,
+}}
+
+func TestSearch(t *testing.T) {
+	for _, tc := range searchTestcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.haystack)
+			i := b.Search([]byte(tc.needle), tc.flags)
+			if i != tc.expect {
+				t.Errorf("got: %d, want: %d", i, tc.expect)
+			}
+		})
+	}
+}
+
+func FuzzSearch(f *testing.F) {
+	for _, tc := range searchTestcases {
+		f.Add([]byte(tc.haystack), []byte(tc.needle), tc.flags)
+	}
+	f.Fuzz(func(t *testing.T, haystack, needle []byte, flags int) {
+		b := Bytes(haystack)
+		b.Search(needle, flags%CompactWS|IgnoreCase)
+	})
 }
