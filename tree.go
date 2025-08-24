@@ -83,7 +83,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -279,6 +279,10 @@ var (
 	jxr     = newMIME("image/jxr", ".jxr", magic.Jxr).alias("image/vnd.ms-photo")
 	parquet = newMIME("application/vnd.apache.parquet", ".parquet", magic.Par1).
 		alias("application/x-parquet")
+	netpbm  = newMIME("image/x-portable-bitmap", ".pbm", magic.NetPBM)
+	netpgm  = newMIME("image/x-portable-graymap", ".pgm", magic.NetPGM)
+	netppm  = newMIME("image/x-portable-pixmap", ".ppm", magic.NetPPM)
+	netpam  = newMIME("image/x-portable-arbitrarymap", ".pam", magic.NetPAM)
 	cbor    = newMIME("application/cbor", ".cbor", magic.CBOR)
 	oneNote = newMIME("application/onenote", ".one", magic.One)
 	chm     = newMIME("application/vnd.ms-htmlhelp", ".chm", magic.CHM)

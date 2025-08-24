@@ -228,6 +228,21 @@ a,"b`,
 	{"png", "\x89PNG\x0d\x0a\x1a\x0a", "image/png", all},
 	{"ppt", fromDisk("ppt.ppt"), "application/vnd.ms-powerpoint", all},
 	{"pptx", fromDisk("pptx.pptx"), "application/vnd.openxmlformats-officedocument.presentationml.presentation", all},
+	{"pbm", "P1\n# comment\n\n6 10", "image/x-portable-bitmap", one},
+	{"pgm", "P2\n# comment\n\n6 10", "image/x-portable-graymap", one},
+	{"ppm", "P3\n# comment\n\n6 10", "image/x-portable-pixmap", one},
+	{
+		"pam",
+		`P7
+WIDTH 4
+HEIGHT 2
+DEPTH 4
+MAXVAL 255
+TUPLTYPE RGB_ALPHA
+ENDHDR`,
+		"image/x-portable-arbitrarymap",
+		one,
+	},
 	{"ps", "%!PS-Adobe-", "application/postscript", one},
 	{"psd", "8BPS", "image/vnd.adobe.photoshop", all},
 	{"p7s_pem", "-----BEGIN PKCS7", "application/pkcs7-signature", one},
@@ -344,7 +359,7 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -674,7 +689,7 @@ func TestExtend(t *testing.T) {
 // search for panics.
 func FuzzMimetype(f *testing.F) {
 	for _, tc := range testcases {
-		if len(tc.data) < 100 {
+		if len(tc.data) < 100 && tc.bench == one {
 			f.Add([]byte(tc.data))
 		}
 	}
