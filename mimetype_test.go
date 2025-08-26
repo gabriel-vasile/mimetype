@@ -584,11 +584,12 @@ func BenchmarkAll(b *testing.B) {
 		if tc.bench != all {
 			continue
 		}
+		data := []byte(tc.data)
 		b.Run(tc.name, func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
 				// Benchmark both positive and negative.
-				Detect([]byte(tc.data))
+				Detect(data)
 				Detect(randData)
 			}
 		})
@@ -708,6 +709,7 @@ func FuzzMimetype(f *testing.F) {
 	})
 }
 
+// For #680.
 func TestInputIsNotMutated(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
