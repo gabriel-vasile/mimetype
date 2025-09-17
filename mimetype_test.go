@@ -597,10 +597,21 @@ func BenchmarkAll(b *testing.B) {
 	}
 }
 
-// Check there are no panics for nil inputs.
+// Check there are no panics for nil inputs and for truncated inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
-	for _, n := range root.flatten() {
-		n.detector(nil, 1<<10)
+	nodes := root.flatten()
+	testAtEachIndex := func(t *testing.T, in []byte) {
+		for _, n := range nodes {
+			for i := 0; i < len(in); i++ {
+				n.detector(in[:i], 1<<10)
+			}
+		}
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			testAtEachIndex(t, []byte(tc.data))
+		})
 	}
 }
 

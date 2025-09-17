@@ -212,7 +212,7 @@ func matchOleClsid(in []byte, clsid []byte) bool {
 
 // WPD matches a WordPerfect document.
 func WPD(raw []byte, _ uint32) bool {
-	if len(raw) < 8 {
+	if len(raw) < 10 {
 		return false
 	}
 	if !bytes.HasPrefix(raw, []byte("\xffWPC")) {
