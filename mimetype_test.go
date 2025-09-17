@@ -309,6 +309,7 @@ ENDHDR`,
 	{"webp", "RIFFhv\x00\x00WEBPV", "image/webp", all},
 	{"woff", "wOFF", "font/woff", one},
 	{"woff2", "wOF2", "font/woff2", one},
+	{"wpd", "\xffWPC____\x01\x0a", "application/vnd.wordperfect", one},
 	{"x3d", `<?xml version="1.0"?><X3D xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance">`, "model/x3d+xml", one},
 	{"xar", "xar!", "application/x-xar", one},
 	{"xcf", "gimp xcf", "image/x-xcf", one},
@@ -596,10 +597,21 @@ func BenchmarkAll(b *testing.B) {
 	}
 }
 
-// Check there are no panics for nil inputs.
+// Check there are no panics for nil inputs and for truncated inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
-	for _, n := range root.flatten() {
-		n.detector(nil, 1<<10)
+	nodes := root.flatten()
+	testAtEachIndex := func(t *testing.T, in []byte) {
+		for _, n := range nodes {
+			for i := 0; i < len(in); i++ {
+				n.detector(in[:i], 1<<10)
+			}
+		}
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			testAtEachIndex(t, []byte(tc.data))
+		})
 	}
 }
 

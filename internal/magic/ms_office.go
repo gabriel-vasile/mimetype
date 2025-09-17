@@ -209,3 +209,14 @@ func matchOleClsid(in []byte, clsid []byte) bool {
 
 	return bytes.HasPrefix(in[clsidOffset:], clsid)
 }
+
+// WPD matches a WordPerfect document.
+func WPD(raw []byte, _ uint32) bool {
+	if len(raw) < 10 {
+		return false
+	}
+	if !bytes.HasPrefix(raw, []byte("\xffWPC")) {
+		return false
+	}
+	return raw[8] == 1 && raw[9] == 10
+}
