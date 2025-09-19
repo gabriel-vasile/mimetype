@@ -38,7 +38,7 @@ var (
 	// RPM matches an RPM or Delta RPM package file.
 	RPM = prefix([]byte{0xed, 0xab, 0xee, 0xdb}, []byte("drpm"))
 	// Cpio matches a cpio archive file.
-	Cpio = prefix([]byte("070707"), []byte("070701"), []byte("070702"))
+	Cpio = prefix([]byte{0x07, 0x07, 0x07}, []byte{0x07, 0x07, 0x01}, []byte{0x07, 0x07, 0x02})
 	// RAR matches a RAR archive file.
 	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
 )
