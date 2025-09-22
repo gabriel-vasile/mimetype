@@ -37,8 +37,6 @@ var (
 	Lzip = prefix([]byte{0x4c, 0x5a, 0x49, 0x50})
 	// RPM matches an RPM or Delta RPM package file.
 	RPM = prefix([]byte{0xed, 0xab, 0xee, 0xdb}, []byte("drpm"))
-	// Cpio matches a cpio archive file.
-	Cpio = prefix([]byte("070707"), []byte("070701"), []byte("070702"))
 	// RAR matches a RAR archive file.
 	RAR = prefix([]byte("Rar!\x1A\x07\x00"), []byte("Rar!\x1A\x07\x01\x00"))
 )
@@ -76,6 +74,17 @@ func CRX(raw []byte, limit uint32) bool {
 		return false
 	}
 	return Zip(raw[zipOffset:], limit)
+}
+
+// Cpio matches a cpio archive file.
+func Cpio(raw []byte, _ uint32) bool {
+	if len(raw) < 6 {
+		return false
+	}
+	return binary.LittleEndian.Uint16(raw) == 070707 || // binary cpio
+		bytes.HasPrefix(raw, []byte("070707")) || // portable ASCII cpios
+		bytes.HasPrefix(raw, []byte("070701")) ||
+		bytes.HasPrefix(raw, []byte("070702"))
 }
 
 // Tar matches a (t)ape (ar)chive file.
