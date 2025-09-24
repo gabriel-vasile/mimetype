@@ -56,6 +56,7 @@ var testcases = []testcase{
 	{"bz2", "\x42\x5A\x68", "application/x-bzip2", one},
 	{"cab", "MSCF\x00\x00\x00\x00", "application/vnd.ms-cab-compressed", one},
 	{"cab.is", "ISc(\x00\x00\x00\x01", "application/x-installshield", one},
+	{"chm", "ITSF\003\000\000\000\x60\000\000\000", "application/vnd.ms-htmlhelp", one},
 	{"class", "\xCA\xFE\xBA\xBE\x00\x00\x00\xFF", "application/x-java-applet", one},
 	{
 		"crx",
@@ -80,6 +81,7 @@ a,"b`,
 	{"cpio 7", "070707", "application/x-cpio", one},
 	{"cpio 1", "070701", "application/x-cpio", none},
 	{"cpio 2", "070702", "application/x-cpio", none},
+	{"cpio bin", "\xC7\x71____", "application/x-cpio", none},
 	{"dae", `<?xml version="1.0"?><COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema">`, "model/vnd.collada+xml", one},
 	{"dbf", "\x03\x5f\x07\x1a\x96\x0f\x00\x00\xc1\x00\xa3\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x6f\x73\x6d\x5f\x69\x64\x00\x00\x00\x00\x00\x43\x00\x00\x00\x00\x0a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x63\x6f\x64\x65", "application/x-dbf", one},
 	{"dcm", offset(128, "\x44\x49\x43\x4D"), "application/dicom", one},
@@ -212,6 +214,7 @@ a,"b`,
 	{"ogg", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\xce\xc6AI\x00\x00\x00\x00py\xf3\x3d\x01\x1e\x01vorbis\x00\x00", "audio/ogg", one},
 	{"ogg", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbc\x81_\x00\x00\x00\x00\xd0\xfbP\x84\x01@fishead\x00\x03", "video/ogg", one},
 	{"ogg spx oga", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\xc7w\xaa\x15\x00\x00\x00\x00V&\x88\x89\x01PSpeex   1", "audio/ogg", one},
+	{"one", "\xe4\x52\x5c\x7b\x8c\xd8\xa7\x4d\xae\xb1\x53\x78\xd0\x29\x96\xd3", "application/onenote", one},
 	{"otf", "OTTO\x00", "font/otf", one},
 	{"otg", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xd1Y\xa8N\xdf%\xad\xe94\x00\x00\x004\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.graphics-template", "application/vnd.oasis.opendocument.graphics-template", one},
 	{"otp", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xc4X\xa8N\xef\n\x14:8\x00\x00\x008\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.presentation-template", "application/vnd.oasis.opendocument.presentation-template", one},
@@ -226,14 +229,31 @@ a,"b`,
 	{"png", "\x89PNG\x0d\x0a\x1a\x0a", "image/png", all},
 	{"ppt", fromDisk("ppt.ppt"), "application/vnd.ms-powerpoint", all},
 	{"pptx", fromDisk("pptx.pptx"), "application/vnd.openxmlformats-officedocument.presentationml.presentation", all},
+	{"pbm", "P1\n# comment\n\n6 10", "image/x-portable-bitmap", one},
+	{"pgm", "P2\n# comment\n\n6 10", "image/x-portable-graymap", one},
+	{"ppm", "P3\n# comment\n\n6 10", "image/x-portable-pixmap", one},
+	{
+		"pam",
+		`P7
+WIDTH 4
+HEIGHT 2
+DEPTH 4
+MAXVAL 255
+TUPLTYPE RGB_ALPHA
+ENDHDR`,
+		"image/x-portable-arbitrarymap",
+		one,
+	},
 	{"ps", "%!PS-Adobe-", "application/postscript", one},
 	{"psd", "8BPS", "image/vnd.adobe.photoshop", all},
 	{"p7s_pem", "-----BEGIN PKCS7", "application/pkcs7-signature", one},
 	{"p7s_der", "\x30\x82\x01\x26\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0\x82\x01\x17\x30", "application/pkcs7-signature", one},
 	{"pub", fromDisk("pub.pub"), "application/vnd.ms-publisher", one},
 	{"py", "#!/usr/bin/python", "text/x-python", one},
+	{"py3", "#!/usr/bin/env python3", "text/x-python", one},
 	{"qcp", "RIFF\xc0\xcf\x00\x00QLCMf", "audio/qcelp", one},
 	{"rar", "Rar!\x1a\x07\x01\x00", "application/x-rar-compressed", all},
+	{"rb", "#!/usr/local/bin/ruby", "text/x-ruby", one},
 	{"rmvb", ".RMF", "application/vnd.rn-realmedia-vbr", one},
 	{"rpm", "\xed\xab\xee\xdb", "application/x-rpm", one},
 	{"rss", "\x3c\x3f\x78\x6d\x6c\x20\x76\x65\x72\x73\x69\x6f\x6e\x3d\x22\x31\x2e\x30\x22\x20\x65\x6e\x63\x6f\x64\x69\x6e\x67\x3d\x22\x55\x54\x46\x2d\x38\x22\x3f\x3e\x0a\x3c\x72\x73\x73", "application/rss+xml", one},
@@ -280,6 +300,7 @@ a,"b`,
 	{"utf8ctrlchars", "\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\x10", "application/octet-stream", none},
 	{"vcf", "BEGIN:VCARD\nV", "text/vcard", one},
 	{"vcf dos", "BEGIN:VCARD\r\nV", "text/vcard", none},
+	{"visio", "\x50\x4b\x03\x04\x14\x00\x00\x00\x00\x00\x83\x93\x11\x5b\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06\x00\x20\x00visio/", "application/vnd.ms-visio.drawing.main+xml", one},
 	{"voc", "Creative Voice File", "audio/x-unknown", one},
 	{"vtt", "WEBVTT", "text/vtt", one},
 	{"warc", "WARC/1.1", "application/warc", one},
@@ -289,6 +310,7 @@ a,"b`,
 	{"webp", "RIFFhv\x00\x00WEBPV", "image/webp", all},
 	{"woff", "wOFF", "font/woff", one},
 	{"woff2", "wOF2", "font/woff2", one},
+	{"wpd", "\xffWPC____\x01\x0a", "application/vnd.wordperfect", one},
 	{"x3d", `<?xml version="1.0"?><X3D xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance">`, "model/x3d+xml", one},
 	{"xar", "xar!", "application/x-xar", one},
 	{"xcf", "gimp xcf", "image/x-xcf", one},
@@ -339,7 +361,7 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0644)
+	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -564,21 +586,33 @@ func BenchmarkAll(b *testing.B) {
 		if tc.bench != all {
 			continue
 		}
+		data := []byte(tc.data)
 		b.Run(tc.name, func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
 				// Benchmark both positive and negative.
-				Detect([]byte(tc.data))
+				Detect(data)
 				Detect(randData)
 			}
 		})
 	}
 }
 
-// Check there are no panics for nil inputs.
+// Check there are no panics for nil inputs and for truncated inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
-	for _, n := range root.flatten() {
-		n.detector(nil, 1<<10)
+	nodes := root.flatten()
+	testAtEachIndex := func(t *testing.T, in []byte) {
+		for _, n := range nodes {
+			for i := 0; i < len(in); i++ {
+				n.detector(in[:i], 1<<10)
+			}
+		}
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			testAtEachIndex(t, []byte(tc.data))
+		})
 	}
 }
 
@@ -669,7 +703,7 @@ func TestExtend(t *testing.T) {
 // search for panics.
 func FuzzMimetype(f *testing.F) {
 	for _, tc := range testcases {
-		if len(tc.data) < 100 {
+		if len(tc.data) < 100 && tc.bench == one {
 			f.Add([]byte(tc.data))
 		}
 	}
@@ -688,6 +722,7 @@ func FuzzMimetype(f *testing.F) {
 	})
 }
 
+// For #680.
 func TestInputIsNotMutated(t *testing.T) {
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {

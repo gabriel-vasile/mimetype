@@ -24,6 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
+	oneNote, chm, wpd,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -48,19 +49,20 @@ var (
 	// This means APK should be a child of JAR detector, but in practice,
 	// the decisive signature for JAR might be located at the end of the file
 	// and not reachable because of library readLimit.
-	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc, kmz).
+	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc, kmz, visio).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
 	bz2 = newMIME("application/x-bzip2", ".bz2", magic.Bz2)
 	pdf = newMIME("application/pdf", ".pdf", magic.PDF).
 		alias("application/x-pdf")
-	fdf  = newMIME("application/vnd.fdf", ".fdf", magic.Fdf)
-	xlsx = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", magic.Xlsx)
-	docx = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", magic.Docx)
-	pptx = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", magic.Pptx)
-	epub = newMIME("application/epub+zip", ".epub", magic.Epub)
-	jar  = newMIME("application/java-archive", ".jar", magic.Jar).
+	fdf   = newMIME("application/vnd.fdf", ".fdf", magic.Fdf)
+	xlsx  = newMIME("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx", magic.Xlsx)
+	docx  = newMIME("application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx", magic.Docx)
+	pptx  = newMIME("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx", magic.Pptx)
+	visio = newMIME("application/vnd.ms-visio.drawing.main+xml", ".vsdx", magic.Visio)
+	epub  = newMIME("application/epub+zip", ".epub", magic.Epub)
+	jar   = newMIME("application/java-archive", ".jar", magic.Jar).
 		alias("application/jar", "application/jar-archive", "application/x-java-archive")
 	apk = newMIME("application/vnd.android.package-archive", ".apk", magic.APK)
 	ole = newMIME("application/x-ole-storage", "", magic.Ole, msi, aaf, msg, xls, pub, ppt, doc)
@@ -81,7 +83,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -103,6 +105,8 @@ var (
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
 	python = newMIME("text/x-python", ".py", magic.Python).
 		alias("text/x-script.python", "application/x-python")
+	ruby = newMIME("text/x-ruby", ".rb", magic.Ruby).
+		alias("application/x-ruby")
 	shell = newMIME("text/x-shellscript", ".sh", magic.Shell).
 		alias("text/x-sh", "application/x-shellscript", "application/x-sh")
 	tcl = newMIME("text/x-tcl", ".tcl", magic.Tcl).
@@ -275,5 +279,12 @@ var (
 	jxr     = newMIME("image/jxr", ".jxr", magic.Jxr).alias("image/vnd.ms-photo")
 	parquet = newMIME("application/vnd.apache.parquet", ".parquet", magic.Par1).
 		alias("application/x-parquet")
-	cbor = newMIME("application/cbor", ".cbor", magic.CBOR)
+	netpbm  = newMIME("image/x-portable-bitmap", ".pbm", magic.NetPBM)
+	netpgm  = newMIME("image/x-portable-graymap", ".pgm", magic.NetPGM)
+	netppm  = newMIME("image/x-portable-pixmap", ".ppm", magic.NetPPM)
+	netpam  = newMIME("image/x-portable-arbitrarymap", ".pam", magic.NetPAM)
+	cbor    = newMIME("application/cbor", ".cbor", magic.CBOR)
+	oneNote = newMIME("application/onenote", ".one", magic.One)
+	chm     = newMIME("application/vnd.ms-htmlhelp", ".chm", magic.CHM)
+	wpd     = newMIME("application/vnd.wordperfect", ".wpd", magic.WPD)
 )
