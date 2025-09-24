@@ -207,6 +207,11 @@ func shebangCheck(sig []byte, raw scan.Bytes) bool {
 
 	raw.Advance(2) // skip #! we checked above
 	raw.TrimLWS()
-	raw.TrimRWS()
-	return bytes.Equal(raw, sig)
+	if bytes.Equal(raw, sig) {
+		return true
+	}
+	if bytes.HasPrefix(raw, sig) && scan.ByteIsWS(raw[len(sig)]) {
+		return true
+	}
+	return false
 }
