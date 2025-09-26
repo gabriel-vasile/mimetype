@@ -2,8 +2,6 @@ package magic
 
 import (
 	"testing"
-
-	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 func TestShebangCheck(t *testing.T) {
@@ -72,6 +70,12 @@ func TestShebangCheck(t *testing.T) {
 			name:     "valid env/python shebang with arguments",
 			sig:      []byte("/usr/bin/env python"),
 			input:    "#!/usr/bin/env python -u",
+			expected: true,
+		},
+		{
+			name:     "valid env/python shebang with arguments and trailing ws",
+			sig:      []byte("/usr/bin/env python"),
+			input:    "#!/usr/bin/env python -u \n",
 			expected: true,
 		},
 
@@ -184,11 +188,10 @@ func TestShebangCheck(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			raw := scan.Bytes([]byte(tt.input))
-			line := raw.Line()
-			result := shebangCheck(tt.sig, line)
+			d := shebang(tt.sig)
+			result := d([]byte(tt.input), 0)
 			if result != tt.expected {
-				t.Errorf("shebangCheck(%q, %q) = %v, want %v", tt.sig, tt.input, result, tt.expected)
+				t.Errorf("shebang(%q, %q) = %v, want %v", tt.sig, tt.input, result, tt.expected)
 			}
 		})
 	}
