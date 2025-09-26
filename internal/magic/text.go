@@ -185,8 +185,12 @@ func Text(raw []byte, _ uint32) bool {
 func XHTML(raw []byte, limit uint32) bool {
 	raw = raw[:min(len(raw), 4096)]
 	b := scan.Bytes(raw)
-	return b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase) != -1 ||
-		b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase) != -1
+	i, _ := b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase)
+	if i != -1 {
+		return true
+	}
+	i, _ = b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase)
+	return i != -1
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.

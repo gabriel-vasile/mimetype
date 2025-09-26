@@ -144,40 +144,67 @@ const (
 )
 
 // Search for occurences of pattern p inside b at any index.
-func (b Bytes) Search(p []byte, flags int) int {
+// It returns the index where p was found in b and how many bytes were needed
+// for matching the pattern.
+func (b Bytes) Search(p []byte, flags int) (i int, l int) {
+	lb, lp := len(b), len(p)
+	if lp == 0 {
+		return 0, 0
+	}
+	if lb == 0 {
+		return -1, 0
+	}
 	if flags == 0 {
-		return bytes.Index(b, p)
+		if i = bytes.Index(b, p); i == -1 {
+			return -1, 0
+		} else {
+			return i, lp
+		}
 	}
 
-	lb, lp := len(b), len(p)
 	for i := range b {
 		if lb-i < lp {
-			return -1
+			return -1, 0
 		}
-		if b[i:].Match(p, flags) {
-			return i
+		if l = b[i:].Match(p, flags); l != -1 {
+			return i, l
 		}
 	}
 
-	return 0
+	return -1, 0
 }
 
-// Match pattern p at index 0 of b.
-func (b Bytes) Match(p []byte, flags int) bool {
+// Match returns how many bytes were needed to match pattern p.
+// It returns -1 if p does not match b.
+func (b Bytes) Match(p []byte, flags int) int {
+	l := len(b)
+	if len(p) == 0 {
+		return 0
+	}
+	if l == 0 {
+		return -1
+	}
+	// If no flags, do a fast HasPrefix check.
+	if flags == 0 {
+		if bytes.HasPrefix(b, p) {
+			return len(p)
+		}
+		return -1
+	}
 	for len(b) > 0 {
 		// If we finished all we we're looking for from p.
 		if len(p) == 0 {
-			return true
+			return l - len(b)
 		}
 		if flags&IgnoreCase > 0 && isUpper(p[0]) {
 			if upper(b[0]) != p[0] {
-				return false
+				return -1
 			}
 			b, p = b[1:], p[1:]
 		} else if flags&CompactWS > 0 && ByteIsWS(p[0]) {
 			p = p[1:]
 			if !ByteIsWS(b[0]) {
-				return false
+				return -1
 			}
 			b = b[1:]
 			if !ByteIsWS(p[0]) {
@@ -185,12 +212,16 @@ func (b Bytes) Match(p []byte, flags int) bool {
 			}
 		} else {
 			if b[0] != p[0] {
-				return false
+				return -1
 			}
 			b, p = b[1:], p[1:]
 		}
 	}
-	return true
+	// If p still has leftover characters, it means it didn't fully match b.
+	if len(p) > 0 {
+		return -1
+	}
+	return l - len(b)
 }
 
 func isUpper(c byte) bool {

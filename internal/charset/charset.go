@@ -153,7 +153,7 @@ func fromXML(s scan.Bytes) string {
 		if len(s) <= lxml {
 			return ""
 		}
-		if !s.Match(xml, scan.IgnoreCase) {
+		if s.Match(xml, scan.IgnoreCase) == -1 {
 			s = s[1:] // safe to slice instead of s.Advance(1) because bounds are checked
 			continue
 		}
@@ -198,10 +198,10 @@ func fromHTML(s scan.Bytes) string {
 			return ""
 		}
 		// Abort when <body is reached.
-		if s.Match(body, scan.IgnoreCase) {
+		if s.Match(body, scan.IgnoreCase) != -1 {
 			return ""
 		}
-		if !s.Match(meta, scan.IgnoreCase) {
+		if s.Match(meta, scan.IgnoreCase) == -1 {
 			s = s[1:] // safe to slice instead of s.Advance(1) because bounds are checked
 			continue
 		}
@@ -231,8 +231,10 @@ func fromHTML(s scan.Bytes) string {
 				}
 			}
 			attrList[aName] = true
-			if aName == "http-equiv" && scan.Bytes(aVal).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) {
-				gotPragma = true
+			if aName == "http-equiv" {
+				if scan.Bytes(aVal).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) != -1 {
+					gotPragma = true
+				}
 			} else if aName == "content" {
 				charset = string(extractCharsetFromMeta(scan.Bytes(aVal)))
 				if len(charset) != 0 {
