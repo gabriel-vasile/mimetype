@@ -231,16 +231,17 @@ func fromHTML(s scan.Bytes) string {
 				}
 			}
 			attrList[aName] = true
-			if aName == "http-equiv" {
+			switch aName {
+			case "http-equiv":
 				if scan.Bytes(aVal).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) != -1 {
 					gotPragma = true
 				}
-			} else if aName == "content" {
+			case "content":
 				charset = string(extractCharsetFromMeta(scan.Bytes(aVal)))
 				if len(charset) != 0 {
 					needPragma = doNeedPragma
 				}
-			} else if aName == "charset" {
+			case "charset":
 				charset = aVal
 				needPragma = doNotNeedPragma
 			}
