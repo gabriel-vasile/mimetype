@@ -79,12 +79,14 @@ var (
 		[]byte("<? "),
 	)
 	phpScriptF = shebang(
+		scan.CompactWS,
 		[]byte("/usr/local/bin/php"),
 		[]byte("/usr/bin/php"),
 		[]byte("/usr/bin/env php"),
 	)
 	// Js matches a Javascript file.
 	Js = shebang(
+		scan.CompactWS,
 		[]byte("/bin/node"),
 		[]byte("/usr/bin/node"),
 		[]byte("/bin/nodejs"),
@@ -94,17 +96,20 @@ var (
 	)
 	// Lua matches a Lua programming language file.
 	Lua = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/lua"),
 		[]byte("/usr/local/bin/lua"),
 		[]byte("/usr/bin/env lua"),
 	)
 	// Perl matches a Perl programming language file.
 	Perl = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/perl"),
 		[]byte("/usr/bin/env perl"),
 	)
 	// Python matches a Python programming language file.
 	Python = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
@@ -117,12 +122,14 @@ var (
 	)
 	// Ruby matches a Ruby programming language file.
 	Ruby = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/ruby"),
 		[]byte("/usr/local/bin/ruby"),
 		[]byte("/usr/bin/env ruby"),
 	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/tcl"),
 		[]byte("/usr/local/bin/tcl"),
 		[]byte("/usr/bin/env tcl"),
@@ -137,6 +144,7 @@ var (
 	Rtf = prefix([]byte("{\\rtf"))
 	// Shell matches a shell script file.
 	Shell = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/bin/sh"),
 		[]byte("/bin/bash"),
 		[]byte("/usr/local/bin/bash"),

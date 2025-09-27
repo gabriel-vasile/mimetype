@@ -184,7 +184,7 @@ func newXMLSig(localName, xmlns string) xmlSig {
 //	#! /usr/bin/env php
 //
 // /usr/bin/env is the interpreter, php is the first and only argument.
-func shebang(sigs ...[]byte) Detector {
+func shebang(matchFlags scan.Flags, sigs ...[]byte) Detector {
 	return func(raw []byte, limit uint32) bool {
 		b := scan.Bytes(raw)
 		line := b.Line()
@@ -196,13 +196,7 @@ func shebang(sigs ...[]byte) Detector {
 		for _, s := range sigs {
 			// Make a copy of line because code inside this loop mutates the line
 			l := line
-			i := l.Match(s, scan.CompactWS)
-			if i == -1 {
-				continue
-			}
-			l.Advance(i)
-			// If we reached the end of a line or whitespace follows.
-			if len(l) == 0 || scan.ByteIsWS(l.Peek()) {
+			if l.Match(s, matchFlags) != -1 {
 				return true
 			}
 		}
