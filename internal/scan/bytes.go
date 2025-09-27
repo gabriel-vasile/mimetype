@@ -138,15 +138,18 @@ func (b *Bytes) Uint16() (uint16, bool) {
 	return v, true
 }
 
+type Flags int
+
 const (
-	CompactWS = 1 << iota
+	CompactWS Flags = 1 << iota
 	IgnoreCase
+	FullWord
 )
 
 // Search for occurences of pattern p inside b at any index.
 // It returns the index where p was found in b and how many bytes were needed
 // for matching the pattern.
-func (b Bytes) Search(p []byte, flags int) (i int, l int) {
+func (b Bytes) Search(p []byte, flags Flags) (i int, l int) {
 	lb, lp := len(b), len(p)
 	if lp == 0 {
 		return 0, 0
@@ -176,7 +179,7 @@ func (b Bytes) Search(p []byte, flags int) (i int, l int) {
 
 // Match returns how many bytes were needed to match pattern p.
 // It returns -1 if p does not match b.
-func (b Bytes) Match(p []byte, flags int) int {
+func (b Bytes) Match(p []byte, flags Flags) int {
 	l := len(b)
 	if len(p) == 0 {
 		return 0
@@ -184,17 +187,21 @@ func (b Bytes) Match(p []byte, flags int) int {
 	if l == 0 {
 		return -1
 	}
-	// If no flags, do a fast HasPrefix check.
-	if flags == 0 {
+	// If no flags, or scanning for full word at the end of pattern then
+	// do a fast HasPrefix check.
+	// For other flags it's not possible to use HasPrefix.
+	if flags == 0 || flags&FullWord > 0 {
 		if bytes.HasPrefix(b, p) {
-			return len(p)
+			b = b[len(p):]
+			p = p[len(p):]
+			goto out
 		}
 		return -1
 	}
 	for len(b) > 0 {
 		// If we finished all we we're looking for from p.
 		if len(p) == 0 {
-			return l - len(b)
+			goto out
 		}
 		if flags&IgnoreCase > 0 && isUpper(p[0]) {
 			if upper(b[0]) != p[0] {
@@ -217,9 +224,15 @@ func (b Bytes) Match(p []byte, flags int) int {
 			b, p = b[1:], p[1:]
 		}
 	}
+out:
 	// If p still has leftover characters, it means it didn't fully match b.
 	if len(p) > 0 {
 		return -1
+	}
+	if flags&FullWord > 0 {
+		if len(b) > 0 && !ByteIsWS(b[0]) {
+			return -1
+		}
 	}
 	return l - len(b)
 }

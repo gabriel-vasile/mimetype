@@ -338,7 +338,7 @@ var searchTestcases = []struct {
 	name      string
 	haystack  string
 	needle    string
-	flags     int
+	flags     Flags
 	expectIdx int
 	expectLen int
 }{{
@@ -347,6 +347,18 @@ var searchTestcases = []struct {
 	"empty cws", "", "", CompactWS, 0, 0,
 }, {
 	"empty ic", "", "", IgnoreCase, 0, 0,
+}, {
+	"just haystack", "abc", "", 0, 0, 0,
+}, {
+	"just haystack cws", "abc", "", CompactWS, 0, 0,
+}, {
+	"just haystack ic", "abc", "", IgnoreCase, 0, 0,
+}, {
+	"just needle", "", "abc", 0, -1, 0,
+}, {
+	"just needle cws", "", "abc", CompactWS, -1, 0,
+}, {
+	"just needle ic", "", "abc", IgnoreCase, -1, 0,
 }, {
 	"simple", "abc", "abc", 0, 0, 3,
 }, {
@@ -370,7 +382,7 @@ var searchTestcases = []struct {
 }, {
 	"empty haystack with needle cws|ic", "", "abc", CompactWS | IgnoreCase, -1, 0,
 }, {
-	"empty haystack with needle cws", "", "/bin/bash", CompactWS, -1, 0,
+	"empty haystack with needle cws", "", "abc", CompactWS, -1, 0,
 }}
 
 func TestSearch(t *testing.T) {
@@ -387,11 +399,11 @@ func TestSearch(t *testing.T) {
 
 func FuzzSearch(f *testing.F) {
 	for _, tc := range searchTestcases {
-		f.Add([]byte(tc.haystack), []byte(tc.needle), tc.flags)
+		f.Add([]byte(tc.haystack), []byte(tc.needle), int(tc.flags))
 	}
 	f.Fuzz(func(t *testing.T, haystack, needle []byte, flags int) {
 		b := Bytes(haystack)
-		b.Search(needle, flags%CompactWS|IgnoreCase)
+		b.Search(needle, Flags(flags)%CompactWS|IgnoreCase|FullWord)
 	})
 }
 
@@ -399,7 +411,7 @@ var matchTestcases = []struct {
 	name      string
 	b         string
 	p         string
-	flags     int
+	flags     Flags
 	expectLen int
 }{{
 	"empty", "", "", 0, 0,
@@ -433,6 +445,12 @@ var matchTestcases = []struct {
 	"empty b with p", "", "/bin/bash", CompactWS, -1,
 }, {
 	"failing", "asd", "asdf", IgnoreCase, -1,
+}, {
+	"exact fw", "abc", "abc", FullWord, 3,
+}, {
+	"success fw", "abc ", "abc", FullWord, 3,
+}, {
+	"fail fw", "abcd", "abc", FullWord, -1,
 }}
 
 func TestMatch1(t *testing.T) {
@@ -452,10 +470,10 @@ func TestMatch(t *testing.T) {
 
 func FuzzMatch(f *testing.F) {
 	for _, tc := range matchTestcases {
-		f.Add([]byte(tc.b), []byte(tc.p), tc.flags)
+		f.Add([]byte(tc.b), []byte(tc.p), int(tc.flags))
 	}
 	f.Fuzz(func(t *testing.T, b, p []byte, flags int) {
-		Bytes(b).Match(p, flags%CompactWS|IgnoreCase)
+		Bytes(b).Match(p, Flags(flags)%CompactWS|IgnoreCase|FullWord)
 	})
 }
 
@@ -465,7 +483,17 @@ func BenchmarkMatch(b *testing.B) {
 	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
-	for _, f := range []int{0, CompactWS, IgnoreCase, CompactWS | IgnoreCase} {
+	// Benchmark all possible permutations of flags.
+	for _, f := range []Flags{
+		0,
+		CompactWS,
+		IgnoreCase,
+		FullWord,
+		CompactWS | IgnoreCase,
+		IgnoreCase | FullWord,
+		CompactWS | FullWord,
+		CompactWS | IgnoreCase | FullWord,
+	} {
 		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
