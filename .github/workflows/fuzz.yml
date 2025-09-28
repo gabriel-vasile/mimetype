@@ -19,11 +19,15 @@ jobs:
         go-version-file: 'go.mod'
     # 3m is chosen so that half of the 2000 free CI minutes offered by Github
     # will be used each month. The other half is reserved for tests in PRs.
-    - run: go test -fuzztime=3m -fuzz=.
-    - run: go test -fuzztime=3m -fuzz=.     ./internal/json
-    - run: go test -fuzztime=3m -fuzz=.     ./internal/csv
-    - run: go test -fuzztime=3m -fuzz=.     ./internal/scan
-    - run: go test -fuzztime=3m -fuzz=Plain ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=XML   ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=HTML  ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=HTML  ./internal/charset
+    # TODO: Find a way to select all fuzz tests, without listing them individually.
+    - run: go test -fuzztime=3m -fuzz=Mimetype        ./
+    - run: go test -fuzztime=3m -fuzz=Search          ./internal/scan
+    - run: go test -fuzztime=3m -fuzz=Match           ./internal/scan
+    - run: go test -fuzztime=3m -fuzz=Json            ./internal/json
+    - run: go test -fuzztime=3m -fuzz=Parser          ./internal/csv
+    - run: go test -fuzztime=3m -fuzz=Plain           ./internal/charset
+    - run: go test -fuzztime=3m -fuzz=XML             ./internal/charset
+    - run: go test -fuzztime=3m -fuzz=HTML            ./internal/charset
+    - run: go test -fuzztime=3m -fuzz=Meta            ./internal/charset
+    - run: go test -fuzztime=3m -fuzz=GetAnAttribute  ./internal/markup
+    - run: go test -fuzztime=3m -fuzz=GetAValue       ./internal/markup

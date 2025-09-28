@@ -23,7 +23,7 @@ var getAnAttributeTestCases = []struct {
 }, {
 	"1>", "1", "", false,
 }, {
-	"A>", "a", "", false,
+	"A>", "A", "", false,
 }, {
 	"a>", "a", "", false,
 }, {
@@ -47,6 +47,8 @@ var getAnAttributeTestCases = []struct {
 	" meta6 =' meta '>", "meta6", " meta ", false,
 }, {
 	` meta7 =' "meta '>`, "meta7", ` "meta `, false,
+}, {
+	` mEtA7 =' "meta '>`, "mEtA7", ` "meta `, false,
 	// / as attribute ender
 }, {
 	// when the value is unquoted / right after is a parse warning
@@ -213,10 +215,10 @@ func TestGetAllAttributes(t *testing.T) {
 		ret := [][2]string{}
 		for {
 			name, value, _ := GetAnAttribute(&s)
-			if name == "" {
+			if len(name) == 0 {
 				return ret
 			}
-			ret = append(ret, [2]string{name, value})
+			ret = append(ret, [2]string{string(name), string(value)})
 		}
 	}
 

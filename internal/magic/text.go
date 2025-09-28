@@ -79,12 +79,14 @@ var (
 		[]byte("<? "),
 	)
 	phpScriptF = shebang(
+		scan.CompactWS,
 		[]byte("/usr/local/bin/php"),
 		[]byte("/usr/bin/php"),
 		[]byte("/usr/bin/env php"),
 	)
 	// Js matches a Javascript file.
 	Js = shebang(
+		scan.CompactWS,
 		[]byte("/bin/node"),
 		[]byte("/usr/bin/node"),
 		[]byte("/bin/nodejs"),
@@ -94,17 +96,20 @@ var (
 	)
 	// Lua matches a Lua programming language file.
 	Lua = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/lua"),
 		[]byte("/usr/local/bin/lua"),
 		[]byte("/usr/bin/env lua"),
 	)
 	// Perl matches a Perl programming language file.
 	Perl = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/perl"),
 		[]byte("/usr/bin/env perl"),
 	)
 	// Python matches a Python programming language file.
 	Python = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
@@ -117,12 +122,14 @@ var (
 	)
 	// Ruby matches a Ruby programming language file.
 	Ruby = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/ruby"),
 		[]byte("/usr/local/bin/ruby"),
 		[]byte("/usr/bin/env ruby"),
 	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
+		scan.CompactWS,
 		[]byte("/usr/bin/tcl"),
 		[]byte("/usr/local/bin/tcl"),
 		[]byte("/usr/bin/env tcl"),
@@ -137,6 +144,7 @@ var (
 	Rtf = prefix([]byte("{\\rtf"))
 	// Shell matches a shell script file.
 	Shell = shebang(
+		scan.CompactWS|scan.FullWord,
 		[]byte("/bin/sh"),
 		[]byte("/bin/bash"),
 		[]byte("/usr/local/bin/bash"),
@@ -183,10 +191,14 @@ func Text(raw []byte, _ uint32) bool {
 
 // XHTML matches an XHTML file. This check depends on the XML check to have passed.
 func XHTML(raw []byte, limit uint32) bool {
-	raw = raw[:min(len(raw), 4096)]
+	raw = raw[:min(len(raw), 1024)]
 	b := scan.Bytes(raw)
-	return b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase) != -1 ||
-		b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase) != -1
+	i, _ := b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase)
+	if i != -1 {
+		return true
+	}
+	i, _ = b.Search([]byte("<HTML XMLNS="), scan.CompactWS|scan.IgnoreCase)
+	return i != -1
 }
 
 // Php matches a PHP: Hypertext Preprocessor file.
@@ -294,11 +306,12 @@ func svgWithoutXMLDeclaration(s scan.Bytes) bool {
 		return false
 	}
 
-	targetName, targetVal := "xmlns", "http://www.w3.org/2000/svg"
-	aName, aVal, hasMore := "", "", true
+	targetName, targetVal := []byte("xmlns"), []byte("http://www.w3.org/2000/svg")
+	var aName, aVal []byte
+	hasMore := true
 	for hasMore {
 		aName, aVal, hasMore = mkup.GetAnAttribute(&s)
-		if aName == targetName && aVal == targetVal {
+		if bytes.Equal(aName, targetName) && bytes.Equal(aVal, targetVal) {
 			return true
 		}
 		if !hasMore {
@@ -325,10 +338,11 @@ func svgWithXMLDeclaration(s scan.Bytes) bool {
 
 	// version is a required attribute for XML.
 	hasVersion := false
-	aName, hasMore := "", true
+	var aName []byte
+	hasMore := true
 	for hasMore {
 		aName, _, hasMore = mkup.GetAnAttribute(&s)
-		if aName == "version" {
+		if bytes.Equal(aName, []byte("version")) {
 			hasVersion = true
 			break
 		}

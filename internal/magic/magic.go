@@ -184,34 +184,22 @@ func newXMLSig(localName, xmlns string) xmlSig {
 //	#! /usr/bin/env php
 //
 // /usr/bin/env is the interpreter, php is the first and only argument.
-func shebang(sigs ...[]byte) Detector {
+func shebang(matchFlags scan.Flags, sigs ...[]byte) Detector {
 	return func(raw []byte, limit uint32) bool {
 		b := scan.Bytes(raw)
 		line := b.Line()
+		if len(line) < 2 || line[0] != '#' || line[1] != '!' {
+			return false
+		}
+		line = line[2:]
+		line.TrimLWS()
 		for _, s := range sigs {
-			if shebangCheck(s, line) {
+			// Make a copy of line because code inside this loop mutates the line
+			l := line
+			if l.Match(s, matchFlags) != -1 {
 				return true
 			}
 		}
 		return false
 	}
-}
-
-func shebangCheck(sig []byte, raw scan.Bytes) bool {
-	if len(raw) < len(sig)+2 {
-		return false
-	}
-	if raw[0] != '#' || raw[1] != '!' {
-		return false
-	}
-
-	raw.Advance(2) // skip #! we checked above
-	raw.TrimLWS()
-	if bytes.Equal(raw, sig) {
-		return true
-	}
-	if bytes.HasPrefix(raw, sig) && scan.ByteIsWS(raw[len(sig)]) {
-		return true
-	}
-	return false
 }
