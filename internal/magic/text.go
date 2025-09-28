@@ -306,11 +306,12 @@ func svgWithoutXMLDeclaration(s scan.Bytes) bool {
 		return false
 	}
 
-	targetName, targetVal := "xmlns", "http://www.w3.org/2000/svg"
-	aName, aVal, hasMore := "", "", true
+	targetName, targetVal := []byte("xmlns"), []byte("http://www.w3.org/2000/svg")
+	var aName, aVal []byte
+	hasMore := true
 	for hasMore {
 		aName, aVal, hasMore = mkup.GetAnAttribute(&s)
-		if aName == targetName && aVal == targetVal {
+		if bytes.Equal(aName, targetName) && bytes.Equal(aVal, targetVal) {
 			return true
 		}
 		if !hasMore {
@@ -337,10 +338,11 @@ func svgWithXMLDeclaration(s scan.Bytes) bool {
 
 	// version is a required attribute for XML.
 	hasVersion := false
-	aName, hasMore := "", true
+	var aName []byte
+	hasMore := true
 	for hasMore {
 		aName, _, hasMore = mkup.GetAnAttribute(&s)
-		if aName == "version" {
+		if bytes.Equal(aName, []byte("version")) {
 			hasVersion = true
 			break
 		}

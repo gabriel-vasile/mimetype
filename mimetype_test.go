@@ -130,7 +130,7 @@ a,"b`,
 	{"line ending before html", "\r\n<html>...", "text/html; charset=utf-8", none},
 	{
 		"html with encoding",
-		`<html><head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">`,
+		`<html><head><Meta Http-Equiv="Content-Type" content="text/html; Charset=iso-8859-1">`,
 		"text/html; charset=iso-8859-1",
 		none,
 	},
