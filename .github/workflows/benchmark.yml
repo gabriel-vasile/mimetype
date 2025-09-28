@@ -13,6 +13,8 @@ jobs:
     # Base for comparison is master branch.
     - name: Checkout code
       uses: actions/checkout@v5.0.0
+      with:
+        ref: master
     - name: Install Go
       uses: actions/setup-go@v6.0.0
       with:
