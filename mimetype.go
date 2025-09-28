@@ -120,6 +120,8 @@ func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string
 // Lookup finds a MIME object by its string representation.
 // The representation can be the main mime type, or any of its aliases.
 func Lookup(mime string) *MIME {
+	// TODO: should this function call mime.ParseMediaType to strip away addition MIME parameters?
+	// Those MIME parameters can make Lookup fail because comparison is done on plain strings.
 	mu.RLock()
 	defer mu.RUnlock()
 	return root.lookup(mime)
