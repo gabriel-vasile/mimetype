@@ -155,7 +155,10 @@ func (m *MIME) cloneHierarchy(charset string) *MIME {
 }
 
 func (m *MIME) lookup(mime string) *MIME {
-	for _, n := range append(m.aliases, m.mime) {
+	if m.mime == mime {
+		return m
+	}
+	for _, n := range m.aliases {
 		if n == mime {
 			return m
 		}
