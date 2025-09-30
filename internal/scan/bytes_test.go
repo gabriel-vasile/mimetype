@@ -2,8 +2,12 @@ package scan
 
 import (
 	"bufio"
+	"fmt"
+	"io"
 	"strings"
 	"testing"
+
+	"math/rand"
 )
 
 func TestPeek(t *testing.T) {
@@ -331,42 +335,63 @@ func TestUint16(t *testing.T) {
 }
 
 var searchTestcases = []struct {
-	name     string
-	haystack string
-	needle   string
-	flags    int
-	expect   int
+	name      string
+	haystack  string
+	needle    string
+	flags     Flags
+	expectIdx int
+	expectLen int
 }{{
-	"empty", "", "", 0, 0,
+	"empty", "", "", 0, 0, 0,
 }, {
-	"empty compact ws", "", "", CompactWS, 0,
+	"empty cws", "", "", CompactWS, 0, 0,
 }, {
-	"empty ignore case", "", "", IgnoreCase, 0,
+	"empty ic", "", "", IgnoreCase, 0, 0,
 }, {
-	"simple", "abc", "abc", 0, 0,
+	"just haystack", "abc", "", 0, 0, 0,
 }, {
-	"simple compact ws", "abc", "abc", CompactWS, 0,
+	"just haystack cws", "abc", "", CompactWS, 0, 0,
 }, {
-	"simple ignore case", "abc", "abc", IgnoreCase, 0,
+	"just haystack ic", "abc", "", IgnoreCase, 0, 0,
 }, {
-	"ignore case 1 upper", "aBc", "ABC", IgnoreCase, 0,
+	"just needle", "", "abc", 0, -1, 0,
 }, {
-	"ignore case prefixed", "aaBcß", "ABC", IgnoreCase, 1,
+	"just needle cws", "", "abc", CompactWS, -1, 0,
 }, {
-	"ignore case prefixed utf8", "ßaBcß", "ABC", IgnoreCase, 2, // 2 because ß is 2 bytes long
+	"just needle ic", "", "abc", IgnoreCase, -1, 0,
 }, {
-	"simple compact ws and ignore case", "  a", " A", CompactWS | IgnoreCase, 0,
+	"simple", "abc", "abc", 0, 0, 3,
 }, {
-	"simple compact ws and ignore prefix", "a  a", " A", CompactWS | IgnoreCase, 1,
+	"not found", "abc", "def", 0, -1, 0,
+}, {
+	"simple cws", "abc", "abc", CompactWS, 0, 3,
+}, {
+	"simple ic", "abc", "abc", IgnoreCase, 0, 3,
+}, {
+	"ic 1 upper", "aBc", "ABC", IgnoreCase, 0, 3,
+}, {
+	"ic prefixed", "aaBcß", "ABC", IgnoreCase, 1, 3,
+}, {
+	"ic prefixed utf8", "ßaBcß", "ABC", IgnoreCase, 2, 3, // 2 because ß is 2 bytes long
+}, {
+	"simple cws|ic", "  a", " A", CompactWS | IgnoreCase, 0, 3,
+}, {
+	"simple cws|ic with suffix and prefix", "a  ab", " A", CompactWS | IgnoreCase, 1, 3,
+}, {
+	"trailing space in input", "a  a ", " A", CompactWS | IgnoreCase, 1, 3,
+}, {
+	"empty haystack with needle cws|ic", "", "abc", CompactWS | IgnoreCase, -1, 0,
+}, {
+	"empty haystack with needle cws", "", "abc", CompactWS, -1, 0,
 }}
 
 func TestSearch(t *testing.T) {
 	for _, tc := range searchTestcases {
 		t.Run(tc.name, func(t *testing.T) {
 			b := Bytes(tc.haystack)
-			i := b.Search([]byte(tc.needle), tc.flags)
-			if i != tc.expect {
-				t.Errorf("got: %d, want: %d", i, tc.expect)
+			i, l := b.Search([]byte(tc.needle), tc.flags)
+			if i != tc.expectIdx || l != tc.expectLen {
+				t.Errorf("want: %d,%d got: %d,%d", tc.expectIdx, tc.expectLen, i, l)
 			}
 		})
 	}
@@ -374,10 +399,106 @@ func TestSearch(t *testing.T) {
 
 func FuzzSearch(f *testing.F) {
 	for _, tc := range searchTestcases {
-		f.Add([]byte(tc.haystack), []byte(tc.needle), tc.flags)
+		f.Add([]byte(tc.haystack), []byte(tc.needle), int(tc.flags))
 	}
 	f.Fuzz(func(t *testing.T, haystack, needle []byte, flags int) {
 		b := Bytes(haystack)
-		b.Search(needle, flags%CompactWS|IgnoreCase)
+		b.Search(needle, Flags(flags)%CompactWS|IgnoreCase|FullWord)
 	})
+}
+
+var matchTestcases = []struct {
+	name      string
+	b         string
+	p         string
+	flags     Flags
+	expectLen int
+}{{
+	"empty", "", "", 0, 0,
+}, {
+	"empty compact ws", "", "", CompactWS, 0,
+}, {
+	"empty ic", "", "", IgnoreCase, 0,
+}, {
+	"empty cws|ic", "", "", CompactWS | IgnoreCase, 0,
+}, {
+	"simple", "abc", "abc", 0, 3,
+}, {
+	"simple cws|ic", "abc", "abc", CompactWS | IgnoreCase, 3,
+}, {
+	"not found", "abc", "def", 0, -1,
+}, {
+	"simple cws", "abc", "abc", CompactWS, 3,
+}, {
+	"simple ic", "abc", "abc", IgnoreCase, 3,
+}, {
+	"ic 1 upper", "aBc", "ABC", IgnoreCase, 3,
+}, {
+	"ic prefixed", "aaBcß", "ABC", IgnoreCase, -1,
+}, {
+	"ic prefixed utf8", "ßaBcß", "ABC", IgnoreCase, -1,
+}, {
+	"simple cws|ic with space", "  a", " A", CompactWS | IgnoreCase, 3,
+}, {
+	"trailing space in input", "a  a ", " A", CompactWS | IgnoreCase, -1,
+}, {
+	"empty b with p", "", "/bin/bash", CompactWS, -1,
+}, {
+	"failing", "asd", "asdf", IgnoreCase, -1,
+}, {
+	"exact fw", "abc", "abc", FullWord, 3,
+}, {
+	"success fw", "abc ", "abc", FullWord, 3,
+}, {
+	"fail fw", "abcd", "abc", FullWord, -1,
+}}
+
+func TestMatch1(t *testing.T) {
+	fmt.Println(Bytes("ad").Match([]byte("adf"), CompactWS))
+}
+func TestMatch(t *testing.T) {
+	for _, tc := range matchTestcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.b)
+			l := b.Match([]byte(tc.p), tc.flags)
+			if l != tc.expectLen {
+				t.Errorf("want: %d got: %d", tc.expectLen, l)
+			}
+		})
+	}
+}
+
+func FuzzMatch(f *testing.F) {
+	for _, tc := range matchTestcases {
+		f.Add([]byte(tc.b), []byte(tc.p), int(tc.flags))
+	}
+	f.Fuzz(func(t *testing.T, b, p []byte, flags int) {
+		Bytes(b).Match(p, Flags(flags)%CompactWS|IgnoreCase|FullWord)
+	})
+}
+
+func BenchmarkMatch(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	randData := make([]byte, 1024)
+	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	// Benchmark all possible permutations of flags.
+	for _, f := range []Flags{
+		0,
+		CompactWS,
+		IgnoreCase,
+		FullWord,
+		CompactWS | IgnoreCase,
+		IgnoreCase | FullWord,
+		CompactWS | FullWord,
+		CompactWS | IgnoreCase | FullWord,
+	} {
+		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				Bytes(randData).Match(randData, f)
+			}
+		})
+	}
 }
