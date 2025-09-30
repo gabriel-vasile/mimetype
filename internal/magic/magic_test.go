@@ -83,9 +83,9 @@ func TestShebangCheck(t *testing.T) {
 			sig:      []byte("/usr/bin/env -S python"),
 			input:    "#!/usr/bin/env -S python -u",
 			flags:    scan.CompactWS,
-      expected: true,
-    },
-    {
+			expected: true,
+		},
+		{
 			name:     "valid env/python shebang with arguments",
 			sig:      []byte("/usr/bin/env python"),
 			input:    "#!/usr/bin/env python -u",

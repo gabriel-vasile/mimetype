@@ -199,7 +199,7 @@ func (b Bytes) Match(p []byte, flags Flags) int {
 		return -1
 	}
 	for len(b) > 0 {
-		// If we finished all we we're looking for from p.
+		// If we finished all we were looking for from p.
 		if len(p) == 0 {
 			goto out
 		}

@@ -251,6 +251,7 @@ ENDHDR`,
 	{"pub", fromDisk("pub.pub"), "application/vnd.ms-publisher", one},
 	{"py", "#!/usr/bin/python", "text/x-python", one},
 	{"py3", "#!/usr/bin/env python3", "text/x-python", one},
+	{"py3 with code", "#!/usr/bin/env -S python3\nprint(1)", "text/x-python", none},
 	{"qcp", "RIFF\xc0\xcf\x00\x00QLCMf", "audio/qcelp", one},
 	{"rar", "Rar!\x1a\x07\x01\x00", "application/x-rar-compressed", all},
 	{"rb", "#!/usr/local/bin/ruby", "text/x-ruby", one},
@@ -481,6 +482,9 @@ func TestHierarchy(t *testing.T) {
 }
 
 func TestConcurrent(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
@@ -600,6 +604,9 @@ func BenchmarkAll(b *testing.B) {
 
 // Check there are no panics for nil inputs and for truncated inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
 	nodes := root.flatten()
 	testAtEachIndex := func(t *testing.T, in []byte) {
 		for _, n := range nodes {

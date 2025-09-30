@@ -453,9 +453,6 @@ var matchTestcases = []struct {
 	"fail fw", "abcd", "abc", FullWord, -1,
 }}
 
-func TestMatch1(t *testing.T) {
-	fmt.Println(Bytes("ad").Match([]byte("adf"), CompactWS))
-}
 func TestMatch(t *testing.T) {
 	for _, tc := range matchTestcases {
 		t.Run(tc.name, func(t *testing.T) {
