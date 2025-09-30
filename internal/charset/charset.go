@@ -2,6 +2,7 @@ package charset
 
 import (
 	"bytes"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/gabriel-vasile/mimetype/internal/markup"
@@ -151,11 +152,12 @@ func fromXML(s scan.Bytes) string {
 
 		i, k := s.Search(xml, scan.IgnoreCase)
 		s.Advance(i + k)
-		aName, aVal, hasMore := "", "", true
+		var aName, aVal []byte
+		hasMore := true
 		for hasMore {
 			aName, aVal, hasMore = markup.GetAnAttribute(&s)
-			if aName == "encoding" && aVal != "" {
-				return aVal
+			if scan.Bytes(aName).Match([]byte("encoding"), scan.IgnoreCase) != -1 && len(aVal) != 0 {
+				return string(aVal)
 			}
 		}
 	}
@@ -209,14 +211,16 @@ func fromHTML(s scan.Bytes) string {
 		needPragma := dontKnow
 
 		charset := ""
-		aName, aVal, hasMore := "", "", true
+		var aNameB, aValB []byte
+		hasMore := true
 		for hasMore {
-			aName, aVal, hasMore = markup.GetAnAttribute(&s)
+			aNameB, aValB, hasMore = markup.GetAnAttribute(&s)
+			aName := strings.ToLower(string(aNameB))
 			if attrList[aName] {
 				continue
 			}
 			// processing step
-			if len(aName) == 0 && len(aVal) == 0 {
+			if len(aName) == 0 && len(aValB) == 0 {
 				if needPragma == dontKnow {
 					continue
 				}
@@ -227,16 +231,16 @@ func fromHTML(s scan.Bytes) string {
 			attrList[aName] = true
 			switch aName {
 			case "http-equiv":
-				if scan.Bytes(aVal).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) != -1 {
+				if scan.Bytes(aValB).Match([]byte("CONTENT-TYPE"), scan.IgnoreCase) != -1 {
 					gotPragma = true
 				}
 			case "content":
-				charset = string(extractCharsetFromMeta(scan.Bytes(aVal)))
+				charset = string(extractCharsetFromMeta(scan.Bytes(aValB)))
 				if len(charset) != 0 {
 					needPragma = doNeedPragma
 				}
 			case "charset":
-				charset = aVal
+				charset = string(aValB)
 				needPragma = doNotNeedPragma
 			}
 		}
