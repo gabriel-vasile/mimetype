@@ -83,6 +83,7 @@ var (
 		[]byte("/usr/local/bin/php"),
 		[]byte("/usr/bin/php"),
 		[]byte("/usr/bin/env php"),
+		[]byte("/usr/bin/env -S php"),
 	)
 	// Js matches a Javascript file.
 	Js = shebang(
@@ -92,7 +93,9 @@ var (
 		[]byte("/bin/nodejs"),
 		[]byte("/usr/bin/nodejs"),
 		[]byte("/usr/bin/env node"),
+		[]byte("/usr/bin/env -S node"),
 		[]byte("/usr/bin/env nodejs"),
+		[]byte("/usr/bin/env -S nodejs"),
 	)
 	// Lua matches a Lua programming language file.
 	Lua = shebang(
@@ -100,12 +103,14 @@ var (
 		[]byte("/usr/bin/lua"),
 		[]byte("/usr/local/bin/lua"),
 		[]byte("/usr/bin/env lua"),
+		[]byte("/usr/bin/env -S lua"),
 	)
 	// Perl matches a Perl programming language file.
 	Perl = shebang(
 		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/perl"),
 		[]byte("/usr/bin/env perl"),
+		[]byte("/usr/bin/env -S perl"),
 	)
 	// Python matches a Python programming language file.
 	Python = shebang(
@@ -113,12 +118,15 @@ var (
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
 		[]byte("/usr/bin/env python"),
+		[]byte("/usr/bin/env -S python"),
 		[]byte("/usr/bin/python2"),
 		[]byte("/usr/local/bin/python2"),
 		[]byte("/usr/bin/env python2"),
+		[]byte("/usr/bin/env -S python2"),
 		[]byte("/usr/bin/python3"),
 		[]byte("/usr/local/bin/python3"),
 		[]byte("/usr/bin/env python3"),
+		[]byte("/usr/bin/env -S python3"),
 	)
 	// Ruby matches a Ruby programming language file.
 	Ruby = shebang(
@@ -126,6 +134,7 @@ var (
 		[]byte("/usr/bin/ruby"),
 		[]byte("/usr/local/bin/ruby"),
 		[]byte("/usr/bin/env ruby"),
+		[]byte("/usr/bin/env -S ruby"),
 	)
 	// Tcl matches a Tcl programming language file.
 	Tcl = shebang(
@@ -133,12 +142,15 @@ var (
 		[]byte("/usr/bin/tcl"),
 		[]byte("/usr/local/bin/tcl"),
 		[]byte("/usr/bin/env tcl"),
+		[]byte("/usr/bin/env -S tcl"),
 		[]byte("/usr/bin/tclsh"),
 		[]byte("/usr/local/bin/tclsh"),
 		[]byte("/usr/bin/env tclsh"),
+		[]byte("/usr/bin/env -S tclsh"),
 		[]byte("/usr/bin/wish"),
 		[]byte("/usr/local/bin/wish"),
 		[]byte("/usr/bin/env wish"),
+		[]byte("/usr/bin/env -S wish"),
 	)
 	// Rtf matches a Rich Text Format file.
 	Rtf = prefix([]byte("{\\rtf"))
@@ -149,21 +161,27 @@ var (
 		[]byte("/bin/bash"),
 		[]byte("/usr/local/bin/bash"),
 		[]byte("/usr/bin/env bash"),
+		[]byte("/usr/bin/env -S bash"),
 		[]byte("/bin/csh"),
 		[]byte("/usr/local/bin/csh"),
 		[]byte("/usr/bin/env csh"),
+		[]byte("/usr/bin/env -S csh"),
 		[]byte("/bin/dash"),
 		[]byte("/usr/local/bin/dash"),
 		[]byte("/usr/bin/env dash"),
+		[]byte("/usr/bin/env -S dash"),
 		[]byte("/bin/ksh"),
 		[]byte("/usr/local/bin/ksh"),
 		[]byte("/usr/bin/env ksh"),
+		[]byte("/usr/bin/env -S ksh"),
 		[]byte("/bin/tcsh"),
 		[]byte("/usr/local/bin/tcsh"),
 		[]byte("/usr/bin/env tcsh"),
+		[]byte("/usr/bin/env -S tcsh"),
 		[]byte("/bin/zsh"),
 		[]byte("/usr/local/bin/zsh"),
 		[]byte("/usr/bin/env zsh"),
+		[]byte("/usr/bin/env -S zsh"),
 	)
 )
 
