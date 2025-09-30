@@ -144,19 +144,13 @@ func fromXML(s scan.Bytes) string {
 	xml := []byte("<?XML")
 	lxml := len(xml)
 	for {
-		if len(s) == 0 {
-			return ""
-		}
-		for scan.ByteIsWS(s.Peek()) {
-			s.Advance(1)
-		}
+		s.TrimLWS()
 		if len(s) <= lxml {
 			return ""
 		}
-		if s.Match(xml, scan.IgnoreCase) == -1 {
-			s = s[1:] // safe to slice instead of s.Advance(1) because bounds are checked
-			continue
-		}
+
+		i, k := s.Search(xml, scan.IgnoreCase)
+		s.Advance(i + k)
 		aName, aVal, hasMore := "", "", true
 		for hasMore {
 			aName, aVal, hasMore = markup.GetAnAttribute(&s)
