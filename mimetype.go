@@ -112,15 +112,18 @@ func SetLimit(limit uint32) {
 }
 
 // Extend adds detection for other file formats.
-// It is equivalent to calling Extend() on the root mime type "application/octet-stream".
+// It is equivalent to calling Extend() on the root MIME type "application/octet-stream".
 func Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
 	root.Extend(detector, mime, extension, aliases...)
 }
 
 // Lookup finds a MIME object by its string representation.
-// The representation can be the main mime type, or any of its aliases.
-func Lookup(mime string) *MIME {
+// The representation can be the main MIME type, or any of its aliases.
+func Lookup(m string) *MIME {
+	// We store the MIME types without optional params, so
+	// perform parsing to extract the target MIME type without optional params.
+	m, _, _ = mime.ParseMediaType(m)
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.lookup(mime)
+	return root.lookup(m)
 }
