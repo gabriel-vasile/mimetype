@@ -141,8 +141,13 @@ func (b *Bytes) Uint16() (uint16, bool) {
 type Flags int
 
 const (
+	// CompactWS will make one whitespace from pattern to match one or more spaces from input.
 	CompactWS Flags = 1 << iota
+	// IgnoreCase will match lower case from pattern with lower case from input.
+	// IgnoreCase will match upper case from pattern with both lower and upper case from input.
+	// This flag is not really well named,
 	IgnoreCase
+	// FullWord ensures the input ends with a full word (it's followed by spaces.)
 	FullWord
 )
 

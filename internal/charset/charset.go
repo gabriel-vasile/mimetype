@@ -142,7 +142,7 @@ func FromXML(content []byte) string {
 	return FromPlain(content)
 }
 func fromXML(s scan.Bytes) string {
-	xml := []byte("<?XML")
+	xml := []byte("<?xml")
 	lxml := len(xml)
 	for {
 		s.TrimLWS()
@@ -150,13 +150,16 @@ func fromXML(s scan.Bytes) string {
 			return ""
 		}
 
-		i, k := s.Search(xml, scan.IgnoreCase)
+		i, k := s.Search(xml, 0)
+		if i == -1 {
+			return ""
+		}
 		s.Advance(i + k)
 		var aName, aVal []byte
 		hasMore := true
 		for hasMore {
 			aName, aVal, hasMore = markup.GetAnAttribute(&s)
-			if scan.Bytes(aName).Match([]byte("encoding"), scan.IgnoreCase) != -1 && len(aVal) != 0 {
+			if scan.Bytes(aName).Match([]byte("encoding"), 0) != -1 && len(aVal) != 0 {
 				return string(aVal)
 			}
 		}
