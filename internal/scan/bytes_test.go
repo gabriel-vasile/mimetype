@@ -480,19 +480,14 @@ func BenchmarkMatch(b *testing.B) {
 	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
-	// Benchmark all possible permutations of flags.
+	b.ReportAllocs()
 	for _, f := range []Flags{
 		0,
 		CompactWS,
 		IgnoreCase,
 		FullWord,
-		CompactWS | IgnoreCase,
-		IgnoreCase | FullWord,
-		CompactWS | FullWord,
-		CompactWS | IgnoreCase | FullWord,
 	} {
 		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
-			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				Bytes(randData).Match(randData, f)
 			}
