@@ -209,7 +209,7 @@ func Text(raw []byte, _ uint32) bool {
 
 // XHTML matches an XHTML file. This check depends on the XML check to have passed.
 func XHTML(raw []byte, limit uint32) bool {
-	raw = raw[:min(len(raw), 4096)]
+	raw = raw[:min(len(raw), 1024)]
 	b := scan.Bytes(raw)
 	i, _ := b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase)
 	if i != -1 {
