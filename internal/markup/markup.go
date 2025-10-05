@@ -48,9 +48,7 @@ func GetAnAttribute(s *scan.Bytes) (name, val []byte, hasMore bool) {
 			return origS[:end], val, hasMore
 		} else if bap == '/' || bap == '>' {
 			return origS[:end], nil, false
-		} else if bap >= 'A' && bap <= 'Z' {
-			end++
-		} else {
+		} else { // for any ASCII, non-ASCII, just advance
 			end++
 		}
 	}
