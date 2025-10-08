@@ -108,3 +108,20 @@ func Jxl(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte{0xFF, 0x0A}) ||
 		bytes.HasPrefix(raw, []byte("\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a"))
 }
+
+// DXF matches Drawing Exchange Format AutoCAD file.
+// There does not seem to be a clear specification and the files in the wild
+// differ wildly.
+// https://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf
+//
+// I collected these signatures by downloading a few dozen files from
+// http://cd.textfiles.com/amigaenv/DXF/OBJEKTE/ and
+// https://sembiance.com/fileFormatSamples/poly/dxf/ and then
+// xxd -l 16 {} | sort | uniq.
+// These signatures are only for the ASCII version of DXF. There is a binary version too.
+func DXF(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("  0\x0ASECTION\x0A")) ||
+		bytes.HasPrefix(raw, []byte("  0\x0D\x0ASECTION\x0D\x0A")) ||
+		bytes.HasPrefix(raw, []byte("0\x0ASECTION\x0A")) ||
+		bytes.HasPrefix(raw, []byte("0\x0D\x0ASECTION\x0D\x0A"))
+}
