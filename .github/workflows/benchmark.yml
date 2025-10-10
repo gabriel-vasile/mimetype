@@ -20,10 +20,10 @@ jobs:
       with:
         go-version: 'stable'
     - run: go install golang.org/x/perf/cmd/benchstat@latest
-    - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/prev
+    - run: go test -run=none -bench=. -count=6 -benchtime=400ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
       uses: actions/checkout@v5.0.0
     # Second run of benchmarks
-    - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/curr
+    - run: go test -run=none -bench=. -count=6 -benchtime=400ms -timeout=1h ./... > /tmp/curr
 
     - run: benchstat /tmp/prev /tmp/curr

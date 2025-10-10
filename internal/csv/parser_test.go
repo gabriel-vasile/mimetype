@@ -201,7 +201,7 @@ func BenchmarkCSVStdlibDecoder(b *testing.B) {
 	b.ReportAllocs()
 	// Reuse a single reader to prevent allocs inside the benchmark function.
 	r := strings.NewReader(sample)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := r.Seek(0, 0)
 		if err != nil {
 			b.Fatalf("reader cannot seek: %s", err)
@@ -225,7 +225,7 @@ func BenchmarkCSVOurParser(b *testing.B) {
 	// Reuse a single reader to prevent allocs inside the benchmark function.
 	r := scan.Bytes(sample)
 	p := NewParser(',', '#', r)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		p.s = r
 		for {
 			_, _, hasMore := p.CountFields(false)

@@ -210,21 +210,21 @@ const htmlDoc = `<!DOCTYPE html>
 func BenchmarkFromHTML(b *testing.B) {
 	b.ReportAllocs()
 	doc := []byte(htmlDoc)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		FromHTML(doc)
 	}
 }
 func BenchmarkFromXML(b *testing.B) {
 	b.ReportAllocs()
 	doc := []byte(xmlDoc)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		FromXML(doc)
 	}
 }
 func BenchmarkFromPlain(b *testing.B) {
 	b.ReportAllocs()
 	doc := []byte(xmlDoc)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		FromPlain(doc)
 	}
 }

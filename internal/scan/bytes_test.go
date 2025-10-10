@@ -488,7 +488,7 @@ func BenchmarkMatch(b *testing.B) {
 		FullWord,
 	} {
 		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				Bytes(randData).Match(randData, f)
 			}
 		})
