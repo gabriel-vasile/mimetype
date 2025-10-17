@@ -366,6 +366,9 @@ func TestDetectBreakReader(t *testing.T) {
 
 // This test generates the doc file containing the table with the supported MIMEs.
 func TestGenerateSupportedFormats(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
 	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		t.Fatal(err)
@@ -389,10 +392,6 @@ Extension | MIME type <br> Aliases | Hierarchy
 			ext = "n/a"
 		}
 
-		aliases := strings.Join(n.aliases, ", ")
-		if aliases == "" {
-			aliases = "-"
-		}
 		mimeColum := fmt.Sprintf("**%s**", n.mime)
 		if len(n.aliases) > 0 {
 			mimeColum = fmt.Sprintf("**%s** <br> %s", n.mime, strings.Join(n.aliases, ", "))
