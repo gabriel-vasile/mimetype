@@ -606,6 +606,27 @@ func BenchmarkAll(b *testing.B) {
 	}
 }
 
+func BenchmarkAllTogether(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	// randData is used for the negative case benchmark.
+	randData := make([]byte, defaultLimit)
+	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	datas := [][]byte{}
+	for _, tc := range testcases {
+		datas = append(datas, []byte(tc.data))
+	}
+	b.ResetTimer()
+	b.ReportAllocs()
+	for n := 0; n < b.N; n++ {
+		for _, d := range datas {
+			Detect(d)
+			Detect(randData)
+		}
+	}
+}
+
 // Check there are no panics for nil inputs and for truncated inputs.
 func TestIndexOutOfRangePanic(t *testing.T) {
 	if testing.Short() {
