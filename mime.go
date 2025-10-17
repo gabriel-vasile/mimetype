@@ -2,6 +2,7 @@ package mimetype
 
 import (
 	"mime"
+	"strings"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/magic"
@@ -124,6 +125,30 @@ func (m *MIME) flatten() []*MIME {
 	}
 
 	return out
+}
+
+// hierarchy returns an easy to read list of ancestors for m.
+// For example, application/json would return json>txt>root.
+func (m *MIME) hierarchy() string {
+	if m.Is("application/octet-stream") {
+		return "This is root."
+	}
+	h := ""
+	for m := m; m != nil; m = m.Parent() {
+		e := strings.TrimPrefix(m.Extension(), ".")
+		if e == "" {
+			// There are some MIME without extensions. When generating the hierarchy,
+			// it would be confusing to use empty string as extension.
+			// Use the subtype instead; ex: application/x-executable -> x-executable.
+			e = strings.Split(m.String(), "/")[1]
+			if m.Is("application/octet-stream") {
+				// for octet-stream use root, because it's short and used in many places
+				e = "root"
+			}
+		}
+		h += ">" + e
+	}
+	return strings.TrimPrefix(h, ">")
 }
 
 // clone creates a new MIME with the provided optional MIME parameters.
