@@ -369,7 +369,7 @@ func TestGenerateSupportedFormats(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-	f, err := os.OpenFile("supported_mimes.md", os.O_WRONLY|os.O_TRUNC, 0o644)
+	f, err := os.Create("supported_mimes.md")
 	if err != nil {
 		t.Fatal(err)
 	}
