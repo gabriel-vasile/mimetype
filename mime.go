@@ -109,7 +109,7 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 		// Limit the number of bytes searched for to 1024.
 		charset = f(in[:min(len(in), 1024)])
 	}
-	if m == root {
+	if m == root || charset == "" {
 		return m
 	}
 
