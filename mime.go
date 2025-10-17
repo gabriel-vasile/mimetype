@@ -130,9 +130,6 @@ func (m *MIME) flatten() []*MIME {
 // hierarchy returns an easy to read list of ancestors for m.
 // For example, application/json would return json>txt>root.
 func (m *MIME) hierarchy() string {
-	if m.Is("application/octet-stream") {
-		return "This is root."
-	}
 	h := ""
 	for m := m; m != nil; m = m.Parent() {
 		e := strings.TrimPrefix(m.Extension(), ".")

@@ -65,10 +65,9 @@ var (
 	jar   = newMIME("application/java-archive", ".jar", magic.Jar).
 		alias("application/jar", "application/jar-archive", "application/x-java-archive")
 	apk = newMIME("application/vnd.android.package-archive", ".apk", magic.APK)
-	ole = newMIME("application/x-ole-storage", "", magic.Ole, msi, aaf, msg, xls, pub, ppt, doc)
+	ole = newMIME("application/x-ole-storage", "", magic.Ole, msi, msg, xls, pub, ppt, doc)
 	msi = newMIME("application/x-ms-installer", ".msi", magic.Msi).
 		alias("application/x-windows-installer", "application/x-msi")
-	aaf = newMIME("application/octet-stream", ".aaf", magic.Aaf)
 	doc = newMIME("application/msword", ".doc", magic.Doc).
 		alias("application/vnd.ms-word")
 	ppt = newMIME("application/vnd.ms-powerpoint", ".ppt", magic.Ppt).
