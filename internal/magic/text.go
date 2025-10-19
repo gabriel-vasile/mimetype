@@ -326,7 +326,7 @@ func Php(f *File) bool {
 func JSON(f *File) bool {
 	// #175 A single JSON string, number or bool is not considered JSON.
 	// JSON objects and arrays are reported as JSON.
-	return jsonHelper(f, json.QueryNone, json.TokObject|json.TokArray)
+	return jsonHelper(f)
 }
 
 // GeoJSON matches a RFC 7946 GeoJSON file.
@@ -334,13 +334,13 @@ func JSON(f *File) bool {
 // GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 func GeoJSON(f *File) bool {
-	return jsonHelper(f, json.QueryGeo, json.TokObject)
+	return f.geo
 }
 
 // HAR matches a HAR Spec file.
 // Spec: http://www.softwareishard.com/blog/har-12-spec/
 func HAR(f *File) bool {
-	return jsonHelper(f, json.QueryHAR, json.TokObject)
+	return f.har
 }
 
 // GLTF matches a GL Transmission Format (JSON) file.
@@ -349,17 +349,22 @@ func HAR(f *File) bool {
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf+json
 func GLTF(f *File) bool {
-	return jsonHelper(f, json.QueryGLTF, json.TokObject)
+	return f.gltf
 }
 
-func jsonHelper(f *File, q string, wantTok int) bool {
+func jsonHelper(f *File) bool {
 	if !json.LooksLikeObjectOrArray(f.Head) {
 		return false
 	}
 	lHead := len(f.Head)
-	parsed, inspected, firstToken, querySatisfied := json.Parse(q, f.Head)
-	if !querySatisfied || firstToken&wantTok == 0 {
-		return false
+	parsed, inspected, _, querySatisfied := json.Parse(f.Head, true)
+	switch querySatisfied {
+	case json.QueryGeo:
+		f.geo = true
+	case json.QueryHAR:
+		f.har = true
+	case json.QueryGLTF:
+		f.gltf = true
 	}
 
 	// If the full file content was provided, check that the whole input was parsed.
@@ -384,7 +389,7 @@ func NdJSON(f *File) bool {
 	var l scan.Bytes
 	for len(s) != 0 {
 		l = s.Line()
-		_, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
+		_, inspected, firstToken, _ := json.Parse(l, false)
 		if len(l) != inspected {
 			return false
 		}

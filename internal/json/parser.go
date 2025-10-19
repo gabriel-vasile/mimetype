@@ -6,41 +6,43 @@ import (
 )
 
 const (
-	QueryNone    = "json"
-	QueryGeo     = "geo"
-	QueryHAR     = "har"
-	QueryGLTF    = "gltf"
-	maxRecursion = 4096
+	QueryGeo int8 = iota + 1
+	QueryHAR
+	QueryGLTF
 )
 
-var queries = map[string][]query{
-	QueryNone: nil,
-	QueryGeo: {{
-		SearchPath: [][]byte{[]byte("type")},
-		SearchVals: [][]byte{
-			[]byte(`"Feature"`),
-			[]byte(`"FeatureCollection"`),
-			[]byte(`"Point"`),
-			[]byte(`"LineString"`),
-			[]byte(`"Polygon"`),
-			[]byte(`"MultiPoint"`),
-			[]byte(`"MultiLineString"`),
-			[]byte(`"MultiPolygon"`),
-			[]byte(`"GeometryCollection"`),
-		},
-	}},
-	QueryHAR: {{
-		SearchPath: [][]byte{[]byte("log"), []byte("version")},
-	}, {
-		SearchPath: [][]byte{[]byte("log"), []byte("creator")},
-	}, {
-		SearchPath: [][]byte{[]byte("log"), []byte("entries")},
-	}},
-	QueryGLTF: {{
-		SearchPath: [][]byte{[]byte("asset"), []byte("version")},
-		SearchVals: [][]byte{[]byte(`"1.0"`), []byte(`"2.0"`)},
-	}},
-}
+const maxRecursion = 4096
+
+// queries holds the paths and values we want to find at those paths in the input
+// for a JSON subtype.
+var queries = []query{{
+	typ:        QueryGeo,
+	searchPath: [][]byte{[]byte("type")},
+	searchVals: [][]byte{
+		[]byte(`"Feature"`),
+		[]byte(`"FeatureCollection"`),
+		[]byte(`"Point"`),
+		[]byte(`"LineString"`),
+		[]byte(`"Polygon"`),
+		[]byte(`"MultiPoint"`),
+		[]byte(`"MultiLineString"`),
+		[]byte(`"MultiPolygon"`),
+		[]byte(`"GeometryCollection"`),
+	},
+}, {
+	typ:        QueryHAR,
+	searchPath: [][]byte{[]byte("log"), []byte("version")},
+}, {
+	typ:        QueryHAR,
+	searchPath: [][]byte{[]byte("log"), []byte("creator")},
+}, {
+	typ:        QueryHAR,
+	searchPath: [][]byte{[]byte("log"), []byte("entries")},
+}, {
+	typ:        QueryGLTF,
+	searchPath: [][]byte{[]byte("asset"), []byte("version")},
+	searchVals: [][]byte{[]byte(`"1.0"`), []byte(`"2.0"`)},
+}}
 
 var parserPool = sync.Pool{
 	New: func() any {
@@ -66,20 +68,22 @@ type parserState struct {
 	// TODO: performance would be better if we would stop parsing as soon
 	// as we see that first token is not what we are interested in.
 	firstToken int
-	// querySatisfied is true if both path and value of any queries passed to
-	// consumeAny are satisfied.
-	querySatisfied bool
+	// querySatisfied contains the type of query that was satisfied while parsing
+	// or an empty string if none were successful.
+	querySatisfied int8
 }
 
 // query holds information about a combination of {"key": "val"} that we're trying
 // to search for inside the JSON.
 type query struct {
-	// SearchPath represents the whole path to look for inside the JSON.
+	// searchPath represents the whole path to look for inside the JSON.
 	// ex: [][]byte{[]byte("foo"), []byte("bar")} matches {"foo": {"bar": "baz"}}
-	SearchPath [][]byte
-	// SearchVals represents values to look for when the SearchPath is found.
+	searchPath [][]byte
+	// searchVals represents values to look for when the searchPath is found.
 	// Each SearchVal element is tried until one of them matches (logical OR.)
-	SearchVals [][]byte
+	searchVals [][]byte
+
+	typ int8
 }
 
 func eq(path1, path2 [][]byte) bool {
@@ -109,8 +113,9 @@ func LooksLikeObjectOrArray(raw []byte) bool {
 }
 
 // Parse will take out a parser from the pool depending on queryType and tries
-// to parse raw bytes as JSON.
-func Parse(queryType string, raw []byte) (parsed, inspected, firstToken int, querySatisfied bool) {
+// to parse raw bytes as JSON. applyQueries dictates whether to search for
+// JSON subtypes while parsing the input.
+func Parse(raw []byte, applyQueries bool) (parsed, inspected, firstToken int, querySatisfied int8) {
 	p := parserPool.Get().(*parserState)
 	defer func() {
 		// Avoid hanging on to too much memory in extreme input cases.
@@ -121,7 +126,10 @@ func Parse(queryType string, raw []byte) (parsed, inspected, firstToken int, que
 	}()
 	p.reset()
 
-	qs := queries[queryType]
+	var qs []query
+	if applyQueries {
+		qs = queries
+	}
 	got := p.consumeAny(raw, qs, 0)
 	return got, p.ib, p.firstToken, p.querySatisfied
 }
@@ -130,7 +138,7 @@ func (p *parserState) reset() {
 	p.ib = 0
 	p.currPath = p.currPath[0:0]
 	p.firstToken = TokInvalid
-	p.querySatisfied = false
+	p.querySatisfied = 0
 }
 
 func (p *parserState) consumeSpace(b []byte) (n int) {
@@ -298,7 +306,7 @@ func (p *parserState) consumeArray(b []byte, qs []query, lvl int) (n int) {
 
 func queryPathMatch(qs []query, path [][]byte) int {
 	for i := range qs {
-		if eq(qs[i].SearchPath, path) {
+		if eq(qs[i].searchPath, path) {
 			return i
 		}
 	}
@@ -341,7 +349,7 @@ func (p *parserState) consumeObject(b []byte, qs []query, lvl int) (n int) {
 			return 0
 		} else {
 			p.appendPath(b[n:n+keyLen-1], qs)
-			if !p.querySatisfied {
+			if p.querySatisfied == 0 {
 				queryMatched = queryPathMatch(qs, p.currPath)
 			}
 			n += keyLen
@@ -366,12 +374,12 @@ func (p *parserState) consumeObject(b []byte, qs []query, lvl int) (n int) {
 		} else {
 			if queryMatched != -1 {
 				q := qs[queryMatched]
-				if len(q.SearchVals) == 0 {
-					p.querySatisfied = true
+				if len(q.searchVals) == 0 {
+					p.querySatisfied = q.typ
 				}
-				for _, val := range q.SearchVals {
+				for _, val := range q.searchVals {
 					if bytes.Equal(val, bytes.TrimSpace(b[n:n+valLen])) {
-						p.querySatisfied = true
+						p.querySatisfied = q.typ
 					}
 				}
 			}
@@ -401,9 +409,6 @@ func (p *parserState) consumeAny(b []byte, qs []query, lvl int) (n int) {
 	// Avoid too much recursion.
 	if p.maxRecursion != 0 && lvl > p.maxRecursion {
 		return 0
-	}
-	if len(qs) == 0 {
-		p.querySatisfied = true
 	}
 	n += p.consumeSpace(b)
 	if len(b[n:]) == 0 {

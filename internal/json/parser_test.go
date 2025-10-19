@@ -473,71 +473,82 @@ func TestConsumeArray(t *testing.T) {
 
 func TestQueryObject(t *testing.T) {
 	tCases := []struct {
-		json         string
-		query        query
-		expectedFind bool
+		json  string
+		query query
+		// query type
+		expectedFind int8
 	}{{
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("fool")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("fool")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("afoo")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("afoo")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte(""), []byte("foo")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte(""), []byte("foo")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("bar"), []byte("foo")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("bar"), []byte("foo")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "foo"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("bar"), []byte("foo")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("bar"), []byte("foo")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `[{"foo": {"bar": "baz"}}]`,
 		query: query{
-			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("foo"), []byte("bar")},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("foo"), []byte("bar")},
 		},
-		expectedFind: true,
+		expectedFind: QueryGeo,
 	}, {
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
-			SearchVals: [][]byte{[]byte(`"baz"`)},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("foo"), []byte("bar")},
+			searchVals: [][]byte{[]byte(`"baz"`)},
 		},
-		expectedFind: true,
+		expectedFind: QueryGeo,
 	}, {
 		json: `{"foo": {"foo": {"bar": "baz"}}}`,
 		query: query{
-			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
-			SearchVals: [][]byte{[]byte(`"baz"`)},
+			typ:        QueryGeo,
+			searchPath: [][]byte{[]byte("foo"), []byte("bar")},
+			searchVals: [][]byte{[]byte(`"baz"`)},
 		},
-		expectedFind: false,
+		expectedFind: 0,
 	}}
 
 	for _, tt := range tCases {
@@ -762,7 +773,7 @@ func TestCurrPathBounded(t *testing.T) {
 	input := []byte(strings.Repeat("[", count))
 
 	for i := 0; i < 100; i++ {
-		Parse(QueryGeo, input)
+		Parse(input, true)
 		// It's not guaranteed that p is the same parser object used by the
 		// Parse call above. Reason: go runs tests packages concurrently. If
 		// another package calls Parse in tests, that can interfere with parserPool.
@@ -776,12 +787,21 @@ func TestCurrPathBounded(t *testing.T) {
 
 var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
 
-func BenchmarkParse(b *testing.B) {
+func BenchmarkParseNoQueries(b *testing.B) {
 	b.ReportAllocs()
 	for i := 0; i < b.N; i++ {
-		_, _, _, query := Parse(QueryGeo, sample)
-		if !query {
-			b.Error("query should be satisfied")
+		parsed, _, _, _ := Parse(sample, false)
+		if parsed == 0 {
+			b.Error("parsed should not be zero")
+		}
+	}
+}
+func BenchmarkParseQueries(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		parsed, _, _, _ := Parse(sample, true)
+		if parsed == 0 {
+			b.Error("parsed should not be zero")
 		}
 	}
 }

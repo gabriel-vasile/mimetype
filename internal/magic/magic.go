@@ -17,10 +17,8 @@ type File struct {
 	// Tail represents the content following Head.
 	Tail io.Reader
 
-	// Many file formats have their signature in the first line of text.
-	// Cache FirstLine to avoid having to extract it in several places.
-	FirstLine scan.Bytes
-	ReadLimit uint32
+	ReadLimit      uint32
+	geo, har, gltf bool
 }
 
 // Detector functions exist for each file format. They report whether the file
