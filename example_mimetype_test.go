@@ -61,7 +61,7 @@ func Example_whitelist() {
 // https://github.com/file/file/tree/master/magic/Magdir
 // have signatures for a multitude of file formats.
 func Example_extend() {
-	foobarDetector := func(f *File) bool {
+	foobarDetector := func(raw []byte, limit uint32) bool {
 		return bytes.HasPrefix(raw, []byte("foobar"))
 	}
 

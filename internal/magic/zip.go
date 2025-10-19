@@ -8,70 +8,70 @@ import (
 
 // Odt matches an OpenDocument Text file.
 func Odt(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.text"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.text"), 30)
 }
 
 // Ott matches an OpenDocument Text Template file.
 func Ott(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.text-template"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.text-template"), 30)
 }
 
 // Ods matches an OpenDocument Spreadsheet file.
 func Ods(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet"), 30)
 }
 
 // Ots matches an OpenDocument Spreadsheet Template file.
 func Ots(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet-template"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet-template"), 30)
 }
 
 // Odp matches an OpenDocument Presentation file.
 func Odp(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation"), 30)
 }
 
 // Otp matches an OpenDocument Presentation Template file.
 func Otp(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation-template"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation-template"), 30)
 }
 
-// Odg matches an OpenDocument Drawing file.
+// Odg matches an OpenDocument Df.Heading file.
 func Odg(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics"), 30)
 }
 
-// Otg matches an OpenDocument Drawing Template file.
+// Otg matches an OpenDocument Df.Heading Template file.
 func Otg(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics-template"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics-template"), 30)
 }
 
 // Odf matches an OpenDocument Formula file.
 func Odf(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.formula"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.formula"), 30)
 }
 
 // Odc matches an OpenDocument Chart file.
 func Odc(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.chart"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.oasis.opendocument.chart"), 30)
 }
 
 // Epub matches an EPUB file.
 func Epub(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/epub+zip"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/epub+zip"), 30)
 }
 
 // Sxc matches an OpenOffice Spreadsheet file.
 func Sxc(f *File) bool {
-	return offset(raw, []byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
+	return offset(f.Head, []byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
 }
 
 // Zip matches a zip archive.
 func Zip(f *File) bool {
-	return len(raw) > 3 &&
-		raw[0] == 0x50 && raw[1] == 0x4B &&
-		(raw[2] == 0x3 || raw[2] == 0x5 || raw[2] == 0x7) &&
-		(raw[3] == 0x4 || raw[3] == 0x6 || raw[3] == 0x8)
+	return len(f.Head) > 3 &&
+		f.Head[0] == 0x50 && f.Head[1] == 0x4B &&
+		(f.Head[2] == 0x3 || f.Head[2] == 0x5 || f.Head[2] == 0x7) &&
+		(f.Head[3] == 0x4 || f.Head[3] == 0x6 || f.Head[3] == 0x8)
 }
 
 // Jar matches a Java archive file. There are two types of Jar files:
@@ -84,8 +84,8 @@ func Zip(f *File) bool {
 // is unreliable because it does linear search for signatures
 // (instead of relying on offsets told by the file.)
 func Jar(f *File) bool {
-	return executableJar(raw) ||
-		zipHas(raw, zipEntries{{
+	return executableJar(f.Head) ||
+		zipHas(f.Head, zipEntries{{
 			name: []byte("META-INF/MANIFEST.MF"),
 		}, {
 			name: []byte("META-INF/"),
@@ -94,7 +94,7 @@ func Jar(f *File) bool {
 
 // KMZ matches a zipped KML file, which is "doc.kml" by convention.
 func KMZ(f *File) bool {
-	return zipHas(raw, zipEntries{{
+	return zipHas(f.Head, zipEntries{{
 		name: []byte("doc.kml"),
 	}}, 100)
 }
@@ -137,8 +137,8 @@ func (z zipEntries) match(file []byte) bool {
 	return false
 }
 
-func zipHas(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
-	iter := zipIterator{raw}
+func zipHas(head scan.Bytes, searchFor zipEntries, stopAfter int) bool {
+	iter := zipIterator{head}
 	for i := 0; i < stopAfter; i++ {
 		f := iter.next()
 		if len(f) == 0 {
@@ -154,8 +154,8 @@ func zipHas(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
 
 // msoxml behaves like zipHas, but it puts restrictions on what the first zip
 // entry can be.
-func msoxml(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
-	iter := zipIterator{raw}
+func msoxml(head scan.Bytes, searchFor zipEntries, stopAfter int) bool {
+	iter := zipIterator{head}
 	for i := 0; i < stopAfter; i++ {
 		f := iter.next()
 		if len(f) == 0 {
@@ -208,7 +208,7 @@ func (i *zipIterator) next() []byte {
 // APK matches an Android Package Archive.
 // The source of signatures is https://github.com/file/file/blob/1778642b8ba3d947a779a36fcd81f8e807220a19/magic/Magdir/archive#L1820-L1887
 func APK(f *File) bool {
-	return zipHas(raw, zipEntries{{
+	return zipHas(f.Head, zipEntries{{
 		name: []byte("AndroidManifest.xml"),
 	}, {
 		name: []byte("META-INF/com/android/build/gradle/app-metadata.properties"),
@@ -217,6 +217,6 @@ func APK(f *File) bool {
 	}, {
 		name: []byte("resources.arsc"),
 	}, {
-		name: []byte("res/drawable"),
+		name: []byte("res/df.Headable"),
 	}}, 100)
 }

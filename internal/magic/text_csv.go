@@ -7,12 +7,12 @@ import (
 
 // CSV matches a comma-separated values file.
 func CSV(f *File) bool {
-	return sv(f.Head, ',', limit)
+	return sv(f.Head, ',', f.ReadLimit)
 }
 
 // TSV matches a tab-separated values file.
 func TSV(f *File) bool {
-	return sv(f.Head, '\t', limit)
+	return sv(f.Head, '\t', f.ReadLimit)
 }
 
 func sv(in []byte, comma byte, limit uint32) bool {

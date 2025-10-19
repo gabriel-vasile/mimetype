@@ -8,17 +8,17 @@ import (
 // Shp matches a shape format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
 func Shp(f *File) bool {
-	if len(raw) < 112 {
+	if len(f.Head) < 112 {
 		return false
 	}
 
-	if binary.BigEndian.Uint32(raw[0:4]) != 9994 ||
-		binary.BigEndian.Uint32(raw[4:8]) != 0 ||
-		binary.BigEndian.Uint32(raw[8:12]) != 0 ||
-		binary.BigEndian.Uint32(raw[12:16]) != 0 ||
-		binary.BigEndian.Uint32(raw[16:20]) != 0 ||
-		binary.BigEndian.Uint32(raw[20:24]) != 0 ||
-		binary.LittleEndian.Uint32(raw[28:32]) != 1000 {
+	if binary.BigEndian.Uint32(f.Head[0:4]) != 9994 ||
+		binary.BigEndian.Uint32(f.Head[4:8]) != 0 ||
+		binary.BigEndian.Uint32(f.Head[8:12]) != 0 ||
+		binary.BigEndian.Uint32(f.Head[12:16]) != 0 ||
+		binary.BigEndian.Uint32(f.Head[16:20]) != 0 ||
+		binary.BigEndian.Uint32(f.Head[20:24]) != 0 ||
+		binary.LittleEndian.Uint32(f.Head[28:32]) != 1000 {
 		return false
 	}
 
@@ -40,7 +40,7 @@ func Shp(f *File) bool {
 	}
 
 	for _, st := range shapeTypes {
-		if st == int(binary.LittleEndian.Uint32(raw[108:112])) {
+		if st == int(binary.LittleEndian.Uint32(f.Head[108:112])) {
 			return true
 		}
 	}
@@ -51,5 +51,5 @@ func Shp(f *File) bool {
 // Shx matches a shape index format file.
 // https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf
 func Shx(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x27, 0x0A})
+	return bytes.HasPrefix(f.Head, []byte{0x00, 0x00, 0x27, 0x0A})
 }

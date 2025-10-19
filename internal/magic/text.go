@@ -12,7 +12,7 @@ import (
 
 // HTML matches a Hypertext Markup Language file.
 func HTML(f *File) bool {
-	return markup(raw,
+	return markup(f.Head,
 		[]byte("<!DOCTYPE HTML"),
 		[]byte("<HTML"),
 		[]byte("<HEAD"),
@@ -35,33 +35,33 @@ func HTML(f *File) bool {
 
 // XML matches an Extensible Markup Language file.
 func XML(f *File) bool {
-	return markup(raw, []byte("<?XML"))
+	return markup(f.Head, []byte("<?XML"))
 }
 
 // Owl2 matches an Owl ontology file.
 func Owl2(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<Ontology"), []byte(`xmlns="http://www.w3.org/2002/07/owl#"`)},
 	)
 }
 
 // Rss matches a Rich Site Summary file.
 func Rss(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<rss"), []byte{}},
 	)
 }
 
 // Atom matches an Atom Syndication Format file.
 func Atom(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<feed"), []byte(`xmlns="http://www.w3.org/2005/Atom"`)},
 	)
 }
 
 // Kml matches a Keyhole Markup Language file.
 func Kml(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<kml"), []byte(`xmlns="http://www.opengis.net/kml/2.2"`)},
 		xmlSig{[]byte("<kml"), []byte(`xmlns="http://earth.google.com/kml/2.0"`)},
 		xmlSig{[]byte("<kml"), []byte(`xmlns="http://earth.google.com/kml/2.1"`)},
@@ -71,21 +71,21 @@ func Kml(f *File) bool {
 
 // Xliff matches a XML Localization Interchange File Format file.
 func Xliff(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<xliff"), []byte(`xmlns="urn:oasis:names:tc:xliff:document:1.2"`)},
 	)
 }
 
 // Collada matches a COLLAborative Design Activity file.
 func Collada(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<COLLADA"), []byte(`xmlns="http://www.collada.org/2005/11/COLLADASchema"`)},
 	)
 }
 
 // Gml matches a Geography Markup Language file.
 func Gml(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml"`)},
 		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml/3.2"`)},
 		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml/3.3/exr"`)},
@@ -94,53 +94,53 @@ func Gml(f *File) bool {
 
 // Gpx matches a GPS Exchange Format file.
 func Gpx(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<gpx"), []byte(`xmlns="http://www.topografix.com/GPX/1/1"`)},
 	)
 }
 
 // Tcx matches a Training Center XML file.
 func Tcx(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<TrainingCenterDatabase"), []byte(`xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`)},
 	)
 }
 
 // X3d matches an Extensible 3D Graphics file.
 func X3d(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<X3D"), []byte(`xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`)},
 	)
 }
 
 // Amf matches an Additive Manufacturing XML file.
 func Amf(f *File) bool {
-	return xml(raw, xmlSig{[]byte("<amf"), []byte{}})
+	return xml(f.Head, xmlSig{[]byte("<amf"), []byte{}})
 }
 
 // Threemf matches a 3D Manufacturing Format file.
 func Threemf(f *File) bool {
-	return xml(raw,
+	return xml(f.Head,
 		xmlSig{[]byte("<model"), []byte(`xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`)},
 	)
 }
 
 // Xfdf matches a XML Forms Data Format file.
 func Xfdf(f *File) bool {
-	return xml(raw, xmlSig{[]byte("<xfdf"), []byte(`xmlns="http://ns.adobe.com/xfdf/"`)})
+	return xml(f.Head, xmlSig{[]byte("<xfdf"), []byte(`xmlns="http://ns.adobe.com/xfdf/"`)})
 }
 
 // VCard matches a Virtual Contact File.
 func VCard(f *File) bool {
-	return ciPrefix(raw, []byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
+	return ciPrefix(f.Head, []byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
 }
 
 // ICalendar matches a iCalendar file.
 func ICalendar(f *File) bool {
-	return ciPrefix(raw, []byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
+	return ciPrefix(f.Head, []byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
 }
 func phpPageF(f *File) bool {
-	return ciPrefix(raw,
+	return ciPrefix(f.Head,
 		[]byte("<?PHP"),
 		[]byte("<?\n"),
 		[]byte("<?\r"),
@@ -148,7 +148,7 @@ func phpPageF(f *File) bool {
 	)
 }
 func phpScriptF(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS,
 		[]byte("/usr/local/bin/php"),
 		[]byte("/usr/bin/php"),
@@ -159,7 +159,7 @@ func phpScriptF(f *File) bool {
 
 // Js matches a Javascript file.
 func Js(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS,
 		[]byte("/bin/node"),
 		[]byte("/usr/bin/node"),
@@ -174,7 +174,7 @@ func Js(f *File) bool {
 
 // Lua matches a Lua programming language file.
 func Lua(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/lua"),
 		[]byte("/usr/local/bin/lua"),
@@ -185,7 +185,7 @@ func Lua(f *File) bool {
 
 // Perl matches a Perl programming language file.
 func Perl(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS|scan.FullWord,
 		[]byte("/usr/bin/perl"),
 		[]byte("/usr/bin/env perl"),
@@ -195,7 +195,7 @@ func Perl(f *File) bool {
 
 // Python matches a Python programming language file.
 func Python(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS,
 		[]byte("/usr/bin/python"),
 		[]byte("/usr/local/bin/python"),
@@ -215,7 +215,7 @@ func Python(f *File) bool {
 
 // Ruby matches a Ruby programming language file.
 func Ruby(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS,
 		[]byte("/usr/bin/ruby"),
 		[]byte("/usr/local/bin/ruby"),
@@ -226,7 +226,7 @@ func Ruby(f *File) bool {
 
 // Tcl matches a Tcl programming language file.
 func Tcl(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS,
 		[]byte("/usr/bin/tcl"),
 		[]byte("/usr/local/bin/tcl"),
@@ -245,12 +245,12 @@ func Tcl(f *File) bool {
 
 // Rtf matches a Rich Text Format file.
 func Rtf(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("{\\rtf"))
+	return bytes.HasPrefix(f.Head, []byte("{\\rtf"))
 }
 
 // Shell matches a shell script file.
 func Shell(f *File) bool {
-	return shebang(raw,
+	return shebang(f.Head,
 		scan.CompactWS|scan.FullWord,
 		[]byte("/bin/sh"),
 		[]byte("/bin/bash"),
@@ -286,12 +286,12 @@ func Shell(f *File) bool {
 // sure it should. Linux file utility also requires a BOM for UTF16 and UTF32.
 func Text(f *File) bool {
 	// First look for BOM.
-	if cset := charset.FromBOM(raw); cset != "" {
+	if cset := charset.FromBOM(f.Head); cset != "" {
 		return true
 	}
 	// Binary data bytes as defined here: https://mimesniff.spec.whatwg.org/#binary-data-byte
-	for i := 0; i < min(len(raw), 4096); i++ {
-		b := raw[i]
+	for i := 0; i < min(len(f.Head), 4096); i++ {
+		b := f.Head[i]
 		if b <= 0x08 ||
 			b == 0x0B ||
 			0x0E <= b && b <= 0x1A ||
@@ -304,8 +304,8 @@ func Text(f *File) bool {
 
 // XHTML matches an XHTML file. This check depends on the XML check to have passed.
 func XHTML(f *File) bool {
-	raw = raw[:min(len(raw), 1024)]
-	b := scan.Bytes(raw)
+	f.Head = f.Head[:min(len(f.Head), 1024)]
+	b := scan.Bytes(f.Head)
 	i, _ := b.Search([]byte("<!DOCTYPE HTML"), scan.CompactWS|scan.IgnoreCase)
 	if i != -1 {
 		return true
@@ -316,17 +316,17 @@ func XHTML(f *File) bool {
 
 // Php matches a PHP: Hypertext Preprocessor file.
 func Php(f *File) bool {
-	if res := phpPageF(raw, limit); res {
+	if res := phpPageF(f); res {
 		return res
 	}
-	return phpScriptF(raw, limit)
+	return phpScriptF(f)
 }
 
 // JSON matches a JavaScript Object Notation file.
 func JSON(f *File) bool {
 	// #175 A single JSON string, number or bool is not considered JSON.
 	// JSON objects and arrays are reported as JSON.
-	return jsonHelper(raw, limit, json.QueryNone, json.TokObject|json.TokArray)
+	return jsonHelper(f, json.QueryNone, json.TokObject|json.TokArray)
 }
 
 // GeoJSON matches a RFC 7946 GeoJSON file.
@@ -334,13 +334,13 @@ func JSON(f *File) bool {
 // GeoJSON detection implies searching for key:value pairs like: `"type": "Feature"`
 // in the input.
 func GeoJSON(f *File) bool {
-	return jsonHelper(raw, limit, json.QueryGeo, json.TokObject)
+	return jsonHelper(f, json.QueryGeo, json.TokObject)
 }
 
 // HAR matches a HAR Spec file.
 // Spec: http://www.softwareishard.com/blog/har-12-spec/
 func HAR(f *File) bool {
-	return jsonHelper(raw, limit, json.QueryHAR, json.TokObject)
+	return jsonHelper(f, json.QueryHAR, json.TokObject)
 }
 
 // GLTF matches a GL Transmission Format (JSON) file.
@@ -349,38 +349,38 @@ func HAR(f *File) bool {
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf+json
 func GLTF(f *File) bool {
-	return jsonHelper(raw, limit, json.QueryGLTF, json.TokObject)
+	return jsonHelper(f, json.QueryGLTF, json.TokObject)
 }
 
 func jsonHelper(f *File, q string, wantTok int) bool {
-	if !json.LooksLikeObjectOrArray(raw) {
+	if !json.LooksLikeObjectOrArray(f.Head) {
 		return false
 	}
-	lraw := len(raw)
-	parsed, inspected, firstToken, querySatisfied := json.Parse(q, raw)
+	lHead := len(f.Head)
+	parsed, inspected, firstToken, querySatisfied := json.Parse(q, f.Head)
 	if !querySatisfied || firstToken&wantTok == 0 {
 		return false
 	}
 
 	// If the full file content was provided, check that the whole input was parsed.
-	if limit == 0 || lraw < int(limit) {
-		return parsed == lraw
+	if f.ReadLimit == 0 || lHead < int(f.ReadLimit) {
+		return parsed == lHead
 	}
 
 	// If a section of the file was provided, check if all of it was inspected.
 	// In other words, check that if there was a problem parsing, that problem
 	// occured at the last byte in the input.
-	return inspected == lraw && lraw > 0
+	return inspected == lHead && lHead > 0
 }
 
-// NdJSON matches a Newline delimited JSON file. All complete lines from raw
+// NdJSON matches a Newline delimited JSON file. All complete lines from f.Head
 // must be valid JSON documents meaning they contain one of the valid JSON data
 // types.
 func NdJSON(f *File) bool {
 	lCount, objOrArr := 0, 0
 
-	s := scan.Bytes(raw)
-	s.DropLastLine(limit)
+	s := scan.Bytes(f.Head)
+	s.DropLastLine(f.ReadLimit)
 	var l scan.Bytes
 	for len(s) != 0 {
 		l = s.Line()
@@ -399,7 +399,7 @@ func NdJSON(f *File) bool {
 
 // Svg matches a SVG file.
 func Svg(f *File) bool {
-	return svgWithoutXMLDeclaration(raw) || svgWithXMLDeclaration(raw)
+	return svgWithoutXMLDeclaration(f.Head) || svgWithXMLDeclaration(f.Head)
 }
 
 // svgWithoutXMLDeclaration matches a SVG image that does not have an XML header.
@@ -471,7 +471,7 @@ func svgWithXMLDeclaration(s scan.Bytes) bool {
 
 // Srt matches a SubRip file.
 func Srt(f *File) bool {
-	s := scan.Bytes(raw)
+	s := scan.Bytes(f.Head)
 	line := s.Line()
 
 	// First line must be 1.
@@ -527,12 +527,12 @@ func Vtt(f *File) bool {
 		{0x57, 0x45, 0x42, 0x56, 0x54, 0x54, 0x09},                   // "WEBVTT" and a horizontal tab
 	}
 	for _, p := range prefixes {
-		if bytes.HasPrefix(raw, p) {
+		if bytes.HasPrefix(f.Head, p) {
 			return true
 		}
 	}
 
 	// Exact match.
-	return bytes.Equal(raw, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
-		bytes.Equal(raw, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
+	return bytes.Equal(f.Head, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
+		bytes.Equal(f.Head, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
 }

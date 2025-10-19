@@ -7,17 +7,17 @@ import (
 
 // SevenZ matches a 7z archive.
 func SevenZ(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
+	return bytes.HasPrefix(f.Head, []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 }
 
 // Gzip matches gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
 func Gzip(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x1f, 0x8b})
+	return bytes.HasPrefix(f.Head, []byte{0x1f, 0x8b})
 }
 
 // Fits matches an Flexible Image Transport System file.
 func Fits(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{
+	return bytes.HasPrefix(f.Head, []byte{
 		0x53, 0x49, 0x4D, 0x50, 0x4C, 0x45, 0x20, 0x20, 0x3D, 0x20,
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x54,
@@ -26,22 +26,22 @@ func Fits(f *File) bool {
 
 // Xar matches an eXtensible ARchive format file.
 func Xar(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x78, 0x61, 0x72, 0x21})
+	return bytes.HasPrefix(f.Head, []byte{0x78, 0x61, 0x72, 0x21})
 }
 
 // Bz2 matches a bzip2 file.
 func Bz2(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x42, 0x5A, 0x68})
+	return bytes.HasPrefix(f.Head, []byte{0x42, 0x5A, 0x68})
 }
 
 // Ar matches an ar (Unix) archive file.
 func Ar(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
+	return bytes.HasPrefix(f.Head, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
 }
 
 // Deb matches a Debian package file.
 func Deb(f *File) bool {
-	return offset(raw, []byte{
+	return offset(f.Head, []byte{
 		0x64, 0x65, 0x62, 0x69, 0x61, 0x6E, 0x2D,
 		0x62, 0x69, 0x6E, 0x61, 0x72, 0x79,
 	}, 8)
@@ -49,52 +49,52 @@ func Deb(f *File) bool {
 
 // Warc matches a Web ARChive file.
 func Warc(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("WARC/1.0")) ||
-		bytes.HasPrefix(raw, []byte("WARC/1.1"))
+	return bytes.HasPrefix(f.Head, []byte("WARC/1.0")) ||
+		bytes.HasPrefix(f.Head, []byte("WARC/1.1"))
 }
 
 // Cab matches a Microsoft Cabinet archive file.
 func Cab(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("MSCF\x00\x00\x00\x00"))
+	return bytes.HasPrefix(f.Head, []byte("MSCF\x00\x00\x00\x00"))
 }
 
 // Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
 func Xz(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
+	return bytes.HasPrefix(f.Head, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 }
 
 // Lzip matches an Lzip compressed file.
 func Lzip(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x4c, 0x5a, 0x49, 0x50})
+	return bytes.HasPrefix(f.Head, []byte{0x4c, 0x5a, 0x49, 0x50})
 }
 
 // RPM matches an RPM or Delta RPM package file.
 func RPM(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0xed, 0xab, 0xee, 0xdb}) ||
-		bytes.HasPrefix(raw, []byte("drpm"))
+	return bytes.HasPrefix(f.Head, []byte{0xed, 0xab, 0xee, 0xdb}) ||
+		bytes.HasPrefix(f.Head, []byte("drpm"))
 }
 
 // RAR matches a RAR archive file.
 func RAR(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x00")) ||
-		bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x01\x00"))
+	return bytes.HasPrefix(f.Head, []byte("Rar!\x1A\x07\x00")) ||
+		bytes.HasPrefix(f.Head, []byte("Rar!\x1A\x07\x01\x00"))
 }
 
 // InstallShieldCab matches an InstallShield Cabinet archive file.
 func InstallShieldCab(f *File) bool {
-	return len(raw) > 7 &&
-		bytes.Equal(raw[0:4], []byte("ISc(")) &&
-		raw[6] == 0 &&
-		(raw[7] == 1 || raw[7] == 2 || raw[7] == 4)
+	return len(f.Head) > 7 &&
+		bytes.Equal(f.Head[0:4], []byte("ISc(")) &&
+		f.Head[6] == 0 &&
+		(f.Head[7] == 1 || f.Head[7] == 2 || f.Head[7] == 4)
 }
 
 // Zstd matches a Zstandard archive file.
 // https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md
 func Zstd(f *File) bool {
-	if len(raw) < 4 {
+	if len(f.Head) < 4 {
 		return false
 	}
-	sig := binary.LittleEndian.Uint32(raw)
+	sig := binary.LittleEndian.Uint32(f.Head)
 	// Check for Zstandard frames and skippable frames.
 	return (sig >= 0xFD2FB522 && sig <= 0xFD2FB528) ||
 		(sig >= 0x184D2A50 && sig <= 0x184D2A5F)
@@ -103,33 +103,34 @@ func Zstd(f *File) bool {
 // CRX matches a Chrome extension file: a zip archive prepended by a package header.
 func CRX(f *File) bool {
 	const minHeaderLen = 16
-	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
+	if len(f.Head) < minHeaderLen || !bytes.HasPrefix(f.Head, []byte("Cr24")) {
 		return false
 	}
-	pubkeyLen := binary.LittleEndian.Uint32(raw[8:12])
-	sigLen := binary.LittleEndian.Uint32(raw[12:16])
+	pubkeyLen := binary.LittleEndian.Uint32(f.Head[8:12])
+	sigLen := binary.LittleEndian.Uint32(f.Head[12:16])
 	zipOffset := minHeaderLen + pubkeyLen + sigLen
-	if uint32(len(raw)) < zipOffset {
+	if uint32(len(f.Head)) < zipOffset {
 		return false
 	}
-	return Zip(raw[zipOffset:], limit)
+	return Zip(&File{Head: f.Head[zipOffset:], ReadLimit: f.ReadLimit})
 }
 
 // Cpio matches a cpio archive file.
 func Cpio(f *File) bool {
-	if len(raw) < 6 {
+	if len(f.Head) < 6 {
 		return false
 	}
-	return binary.LittleEndian.Uint16(raw) == 070707 || // binary cpio
-		bytes.HasPrefix(raw, []byte("070707")) || // portable ASCII cpios
-		bytes.HasPrefix(raw, []byte("070701")) ||
-		bytes.HasPrefix(raw, []byte("070702"))
+	return binary.LittleEndian.Uint16(f.Head) == 070707 || // binary cpio
+		bytes.HasPrefix(f.Head, []byte("070707")) || // portable ASCII cpios
+		bytes.HasPrefix(f.Head, []byte("070701")) ||
+		bytes.HasPrefix(f.Head, []byte("070702"))
 }
 
 // Tar matches a (t)ape (ar)chive file.
 // Tar files are divided into 512 bytes records. First record contains a 257
 // bytes header padded with NUL.
 func Tar(f *File) bool {
+	head := f.Head
 	const sizeRecord = 512
 
 	// The structure of a tar header:
@@ -150,23 +151,23 @@ func Tar(f *File) bool {
 	// 	Devminor [8]byte
 	// }
 
-	if len(raw) < sizeRecord {
+	if len(head) < sizeRecord {
 		return false
 	}
-	raw = raw[:sizeRecord]
+	head = head[:sizeRecord]
 
 	// First 100 bytes of the header represent the file name.
 	// Check if file looks like Gentoo GLEP binary package.
-	if bytes.Contains(raw[:100], []byte("/gpkg-1\x00")) {
+	if bytes.Contains(head[:100], []byte("/gpkg-1\x00")) {
 		return false
 	}
 
 	// Get the checksum recorded into the file.
-	recsum := tarParseOctal(raw[148:156])
+	recsum := tarParseOctal(head[148:156])
 	if recsum == -1 {
 		return false
 	}
-	sum1, sum2 := tarChksum(raw)
+	sum1, sum2 := tarChksum(head)
 	return recsum == sum1 || recsum == sum2
 }
 

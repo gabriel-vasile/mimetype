@@ -92,10 +92,10 @@ func (m *MIME) alias(aliases ...string) *MIME {
 
 // match does a depth-first search on the signature tree. It returns the deepest
 // successful node for which all the children detection functions fail.
-func (m *MIME) match(in []byte, readLimit uint32) *MIME {
+func (m *MIME) match(f *magic.File) *MIME {
 	for _, c := range m.children {
-		if c.detector(in, readLimit) {
-			return c.match(in, readLimit)
+		if c.detector(f) {
+			return c.match(f)
 		}
 	}
 
@@ -105,10 +105,10 @@ func (m *MIME) match(in []byte, readLimit uint32) *MIME {
 		"text/xml":   charset.FromXML,
 	}
 	charset := ""
-	if f, ok := needsCharset[m.mime]; ok {
+	if fn, ok := needsCharset[m.mime]; ok {
 		// The charset comes from BOM, from HTML headers, from XML headers.
 		// Limit the number of bytes searched for to 1024.
-		charset = f(in[:min(len(in), 1024)])
+		charset = fn(f.Head[:min(len(f.Head), 1024)])
 	}
 	if m == root || charset == "" {
 		return m
@@ -199,10 +199,19 @@ func (m *MIME) lookup(mime string) *MIME {
 // The sub-format will be detected if all the detectors in the parent chain return true.
 // The extension should include the leading dot, as in ".html".
 func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
+	// Initially, the detection functions had the following signature:
+	//	func([]byte, uint32) bool
+	// To be able to pass file facts between detectors, it was changed to:
+	//	func(*magic.File) bool
+	// For backwards compatibility, the Extend function translates the old
+	// signature to the new one.
+	det := func(f *magic.File) bool {
+		return detector(f.Head, f.ReadLimit)
+	}
 	c := &MIME{
 		mime:      mime,
 		extension: extension,
-		detector:  detector,
+		detector:  det,
 		parent:    m,
 		aliases:   aliases,
 	}

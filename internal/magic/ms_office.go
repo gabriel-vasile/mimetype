@@ -7,7 +7,7 @@ import (
 
 // Xlsx matches a Microsoft Excel 2007 file.
 func Xlsx(f *File) bool {
-	return msoxml(raw, zipEntries{{
+	return msoxml(f.Head, zipEntries{{
 		name: []byte("xl/"),
 		dir:  true,
 	}}, 100)
@@ -15,7 +15,7 @@ func Xlsx(f *File) bool {
 
 // Docx matches a Microsoft Word 2007 file.
 func Docx(f *File) bool {
-	return msoxml(raw, zipEntries{{
+	return msoxml(f.Head, zipEntries{{
 		name: []byte("word/"),
 		dir:  true,
 	}}, 100)
@@ -23,7 +23,7 @@ func Docx(f *File) bool {
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
 func Pptx(f *File) bool {
-	return msoxml(raw, zipEntries{{
+	return msoxml(f.Head, zipEntries{{
 		name: []byte("ppt/"),
 		dir:  true,
 	}}, 100)
@@ -31,7 +31,7 @@ func Pptx(f *File) bool {
 
 // Visio matches a Microsoft Visio 2013+ file.
 func Visio(f *File) bool {
-	return msoxml(raw, zipEntries{{
+	return msoxml(f.Head, zipEntries{{
 		name: []byte("visio/"),
 		dir:  true,
 	}}, 100)
@@ -41,7 +41,7 @@ func Visio(f *File) bool {
 //
 // https://en.wikipedia.org/wiki/Object_Linking_and_Embedding
 func Ole(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
+	return bytes.HasPrefix(f.Head, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
 // Doc matches a Microsoft Word 97-2003 file.
@@ -57,7 +57,7 @@ func Doc(f *File) bool {
 	}
 
 	for _, clsid := range clsids {
-		if matchOleClsid(raw, clsid) {
+		if matchOleClsid(f.Head, clsid) {
 			return true
 		}
 	}
@@ -69,17 +69,17 @@ func Doc(f *File) bool {
 func Ppt(f *File) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
-	if matchOleClsid(raw, []byte{
+	if matchOleClsid(f.Head, []byte{
 		0x10, 0x8d, 0x81, 0x64, 0x9b, 0x4f, 0xcf, 0x11,
 		0x86, 0xea, 0x00, 0xaa, 0x00, 0xb9, 0x29, 0xe8,
-	}) || matchOleClsid(raw, []byte{
+	}) || matchOleClsid(f.Head, []byte{
 		0x70, 0xae, 0x7b, 0xea, 0x3b, 0xfb, 0xcd, 0x11,
 		0xa9, 0x03, 0x00, 0xaa, 0x00, 0x51, 0x0e, 0xa3,
 	}) {
 		return true
 	}
 
-	lin := len(raw)
+	lin := len(f.Head)
 	if lin < 520 {
 		return false
 	}
@@ -89,17 +89,17 @@ func Ppt(f *File) bool {
 		{0x0F, 0x00, 0xE8, 0x03},
 	}
 	for _, h := range pptSubHeaders {
-		if bytes.HasPrefix(raw[512:], h) {
+		if bytes.HasPrefix(f.Head[512:], h) {
 			return true
 		}
 	}
 
-	if bytes.HasPrefix(raw[512:], []byte{0xFD, 0xFF, 0xFF, 0xFF}) &&
-		raw[518] == 0x00 && raw[519] == 0x00 {
+	if bytes.HasPrefix(f.Head[512:], []byte{0xFD, 0xFF, 0xFF, 0xFF}) &&
+		f.Head[518] == 0x00 && f.Head[519] == 0x00 {
 		return true
 	}
 
-	return lin > 1152 && bytes.Contains(raw[1152:min(4096, lin)],
+	return lin > 1152 && bytes.Contains(f.Head[1152:min(4096, lin)],
 		[]byte("P\x00o\x00w\x00e\x00r\x00P\x00o\x00i\x00n\x00t\x00 D\x00o\x00c\x00u\x00m\x00e\x00n\x00t"))
 }
 
@@ -107,15 +107,15 @@ func Ppt(f *File) bool {
 func Xls(f *File) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
-	if matchOleClsid(raw, []byte{
+	if matchOleClsid(f.Head, []byte{
 		0x10, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-	}) || matchOleClsid(raw, []byte{
+	}) || matchOleClsid(f.Head, []byte{
 		0x20, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 	}) {
 		return true
 	}
 
-	lin := len(raw)
+	lin := len(f.Head)
 	if lin < 520 {
 		return false
 	}
@@ -129,18 +129,18 @@ func Xls(f *File) bool {
 		{0xFD, 0xFF, 0xFF, 0xFF, 0x29},
 	}
 	for _, h := range xlsSubHeaders {
-		if bytes.HasPrefix(raw[512:], h) {
+		if bytes.HasPrefix(f.Head[512:], h) {
 			return true
 		}
 	}
 
-	return lin > 1152 && bytes.Contains(raw[1152:min(4096, lin)],
+	return lin > 1152 && bytes.Contains(f.Head[1152:min(4096, lin)],
 		[]byte("W\x00k\x00s\x00S\x00S\x00W\x00o\x00r\x00k\x00B\x00o\x00o\x00k"))
 }
 
 // Pub matches a Microsoft Publisher file.
 func Pub(f *File) bool {
-	return matchOleClsid(raw, []byte{
+	return matchOleClsid(f.Head, []byte{
 		0x01, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
 	})
@@ -148,7 +148,7 @@ func Pub(f *File) bool {
 
 // Msg matches a Microsoft Outlook email file.
 func Msg(f *File) bool {
-	return matchOleClsid(raw, []byte{
+	return matchOleClsid(f.Head, []byte{
 		0x0B, 0x0D, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
 	})
@@ -157,7 +157,7 @@ func Msg(f *File) bool {
 // Msi matches a Microsoft Windows Installer file.
 // http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
 func Msi(f *File) bool {
-	return matchOleClsid(raw, []byte{
+	return matchOleClsid(f.Head, []byte{
 		0x84, 0x10, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
 	})
@@ -165,7 +165,7 @@ func Msi(f *File) bool {
 
 // One matches a Microsoft OneNote file.
 func One(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{
+	return bytes.HasPrefix(f.Head, []byte{
 		0xe4, 0x52, 0x5c, 0x7b, 0x8c, 0xd8, 0xa7, 0x4d,
 		0xae, 0xb1, 0x53, 0x78, 0xd0, 0x29, 0x96, 0xd3,
 	})
@@ -201,11 +201,11 @@ func matchOleClsid(in []byte, clsid []byte) bool {
 
 // WPD matches a WordPerfect document.
 func WPD(f *File) bool {
-	if len(raw) < 10 {
+	if len(f.Head) < 10 {
 		return false
 	}
-	if !bytes.HasPrefix(raw, []byte("\xffWPC")) {
+	if !bytes.HasPrefix(f.Head, []byte("\xffWPC")) {
 		return false
 	}
-	return raw[8] == 1 && raw[9] == 10
+	return f.Head[8] == 1 && f.Head[9] == 10
 }

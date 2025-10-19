@@ -131,10 +131,11 @@ func TestZeroZip(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			docx := Docx(buf.Bytes(), 0)
-			xlsx := Xlsx(buf.Bytes(), 0)
-			pptx := Pptx(buf.Bytes(), 0)
-			jar := Jar(buf.Bytes(), 0)
+			f := File{Head: buf.Bytes()}
+			docx := Docx(&f)
+			xlsx := Xlsx(&f)
+			pptx := Pptx(&f)
+			jar := Jar(&f)
 
 			if tc.docx != docx || tc.xlsx != xlsx || tc.pptx != pptx || tc.jar != jar {
 				t.Errorf(`
@@ -150,10 +151,11 @@ expected %t	%t	%t	%t;
 				t.Fatal(err)
 			}
 
-			docx = Docx(uncompressedZip.Bytes(), 0)
-			xlsx = Xlsx(uncompressedZip.Bytes(), 0)
-			pptx = Pptx(uncompressedZip.Bytes(), 0)
-			jar = Jar(uncompressedZip.Bytes(), 0)
+			f = File{Head: uncompressedZip.Bytes()}
+			docx = Docx(&f)
+			xlsx = Xlsx(&f)
+			pptx = Pptx(&f)
+			jar = Jar(&f)
 
 			if docx || xlsx || pptx || jar {
 				t.Errorf(`

@@ -6,12 +6,12 @@ import (
 
 // Flv matches a Flash video file.
 func Flv(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("\x46\x4C\x56\x01"))
+	return bytes.HasPrefix(f.Head, []byte("\x46\x4C\x56\x01"))
 }
 
 // Asf matches an Advanced Systems Format file.
 func Asf(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{
+	return bytes.HasPrefix(f.Head, []byte{
 		0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
 		0xA6, 0xD9, 0x00, 0xAA, 0x00, 0x62, 0xCE, 0x6C,
 	})
@@ -19,17 +19,17 @@ func Asf(f *File) bool {
 
 // Rmvb matches a RealMedia Variable Bitrate file.
 func Rmvb(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x2E, 0x52, 0x4D, 0x46})
+	return bytes.HasPrefix(f.Head, []byte{0x2E, 0x52, 0x4D, 0x46})
 }
 
 // WebM matches a WebM file.
 func WebM(f *File) bool {
-	return isMatroskaFileTypeMatched(raw, "webm")
+	return isMatroskaFileTypeMatched(f.Head, "webm")
 }
 
 // Mkv matches a mkv file.
 func Mkv(f *File) bool {
-	return isMatroskaFileTypeMatched(raw, "matroska")
+	return isMatroskaFileTypeMatched(f.Head, "matroska")
 }
 
 // isMatroskaFileTypeMatched is used for webm and mkv file matching.
@@ -79,13 +79,13 @@ func vintWidth(v int) int {
 
 // Mpeg matches a Moving Picture Experts Group file.
 func Mpeg(f *File) bool {
-	return len(raw) > 3 && bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x01}) &&
-		raw[3] >= 0xB0 && raw[3] <= 0xBF
+	return len(f.Head) > 3 && bytes.HasPrefix(f.Head, []byte{0x00, 0x00, 0x01}) &&
+		f.Head[3] >= 0xB0 && f.Head[3] <= 0xBF
 }
 
 // Avi matches an Audio Video Interleaved file.
 func Avi(f *File) bool {
-	return len(raw) > 16 &&
-		bytes.Equal(raw[:4], []byte("RIFF")) &&
-		bytes.Equal(raw[8:16], []byte("AVI LIST"))
+	return len(f.Head) > 16 &&
+		bytes.Equal(f.Head[:4], []byte("RIFF")) &&
+		bytes.Equal(f.Head[8:16], []byte("AVI LIST"))
 }

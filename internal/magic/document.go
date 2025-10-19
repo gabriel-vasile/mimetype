@@ -5,30 +5,19 @@ import (
 	"encoding/binary"
 )
 
-// Pdf matches a Portable Document Format file.
-// https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
-func Pdf(f *File) bool {
-	// usual pdf signature
-	return bytes.HasPrefix(raw, []byte("%PDF-")) ||
-		// new-line prefixed signature
-		bytes.HasPrefix(raw, []byte("\012%PDF-")) ||
-		// UTF-8 BOM prefixed signature
-		bytes.HasPrefix(raw, []byte("\xef\xbb\xbf%PDF-"))
-}
-
 // Fdf matches a Forms Data Format file.
 func Fdf(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("%FDF"))
+	return bytes.HasPrefix(f.Head, []byte("%FDF"))
 }
 
 // Mobi matches a Mobi file.
 func Mobi(f *File) bool {
-	return offset(raw, []byte("BOOKMOBI"), 60)
+	return offset(f.Head, []byte("BOOKMOBI"), 60)
 }
 
 // Lit matches a Microsoft Lit file.
 func Lit(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("ITOLITLS"))
+	return bytes.HasPrefix(f.Head, []byte("ITOLITLS"))
 }
 
 // PDF matches a Portable Document Format file.
@@ -37,32 +26,31 @@ func Lit(f *File) bool {
 // signature can be prepended by anything.
 // https://bugs.astron.com/view.php?id=446
 func PDF(f *File) bool {
-	raw = raw[:min(len(raw), 1024)]
-	return bytes.Contains(raw, []byte("%PDF-"))
+	return bytes.Contains(f.Head[:min(len(f.Head), 1024)], []byte("%PDF-"))
 }
 
 // DjVu matches a DjVu file.
 func DjVu(f *File) bool {
-	if len(raw) < 12 {
+	if len(f.Head) < 12 {
 		return false
 	}
-	if !bytes.HasPrefix(raw, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
+	if !bytes.HasPrefix(f.Head, []byte{0x41, 0x54, 0x26, 0x54, 0x46, 0x4F, 0x52, 0x4D}) {
 		return false
 	}
-	return bytes.HasPrefix(raw[12:], []byte("DJVM")) ||
-		bytes.HasPrefix(raw[12:], []byte("DJVU")) ||
-		bytes.HasPrefix(raw[12:], []byte("DJVI")) ||
-		bytes.HasPrefix(raw[12:], []byte("THUM"))
+	return bytes.HasPrefix(f.Head[12:], []byte("DJVM")) ||
+		bytes.HasPrefix(f.Head[12:], []byte("DJVU")) ||
+		bytes.HasPrefix(f.Head[12:], []byte("DJVI")) ||
+		bytes.HasPrefix(f.Head[12:], []byte("THUM"))
 }
 
 // P7s matches an .p7s signature File (PEM, Base64).
 func P7s(f *File) bool {
 	// Check for PEM Encoding.
-	if bytes.HasPrefix(raw, []byte("-----BEGIN PKCS7")) {
+	if bytes.HasPrefix(f.Head, []byte("-----BEGIN PKCS7")) {
 		return true
 	}
 	// Check if DER Encoding is long enough.
-	if len(raw) < 20 {
+	if len(f.Head) < 20 {
 		return false
 	}
 	// Magic Bytes for the signedData ASN.1 encoding.
@@ -71,8 +59,8 @@ func P7s(f *File) bool {
 	// Check if Header is correct. There are multiple valid headers.
 	for i, match := range startHeader {
 		// If first bytes match, then check for ASN.1 Object Type.
-		if bytes.HasPrefix(raw, match) {
-			if bytes.HasPrefix(raw[i+2:], signedDataMatch) {
+		if bytes.HasPrefix(f.Head, match) {
+			if bytes.HasPrefix(f.Head[i+2:], signedDataMatch) {
 				return true
 			}
 		}
@@ -83,18 +71,18 @@ func P7s(f *File) bool {
 
 // Lotus123 matches a Lotus 1-2-3 spreadsheet document.
 func Lotus123(f *File) bool {
-	if len(raw) <= 20 {
+	if len(f.Head) <= 20 {
 		return false
 	}
-	version := binary.BigEndian.Uint32(raw)
+	version := binary.BigEndian.Uint32(f.Head)
 	if version == 0x00000200 {
-		return raw[6] != 0 && raw[7] == 0
+		return f.Head[6] != 0 && f.Head[7] == 0
 	}
 
-	return version == 0x00001a00 && raw[20] > 0 && raw[20] < 32
+	return version == 0x00001a00 && f.Head[20] > 0 && f.Head[20] < 32
 }
 
 // CHM matches a Microsoft Compiled HTML Help file.
 func CHM(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("ITSF\003\000\000\000\x60\000\000\000"))
+	return bytes.HasPrefix(f.Head, []byte("ITSF\003\000\000\000\x60\000\000\000"))
 }

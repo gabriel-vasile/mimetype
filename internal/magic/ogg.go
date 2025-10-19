@@ -23,20 +23,20 @@ import (
 
 // Ogg matches an Ogg file.
 func Ogg(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("\x4F\x67\x67\x53\x00"))
+	return bytes.HasPrefix(f.Head, []byte("\x4F\x67\x67\x53\x00"))
 }
 
 // OggAudio matches an audio ogg file.
 func OggAudio(f *File) bool {
-	return len(raw) >= 37 && (bytes.HasPrefix(raw[28:], []byte("\x7fFLAC")) ||
-		bytes.HasPrefix(raw[28:], []byte("\x01vorbis")) ||
-		bytes.HasPrefix(raw[28:], []byte("OpusHead")) ||
-		bytes.HasPrefix(raw[28:], []byte("Speex\x20\x20\x20")))
+	return len(f.Head) >= 37 && (bytes.HasPrefix(f.Head[28:], []byte("\x7fFLAC")) ||
+		bytes.HasPrefix(f.Head[28:], []byte("\x01vorbis")) ||
+		bytes.HasPrefix(f.Head[28:], []byte("OpusHead")) ||
+		bytes.HasPrefix(f.Head[28:], []byte("Speex\x20\x20\x20")))
 }
 
 // OggVideo matches a video ogg file.
 func OggVideo(f *File) bool {
-	return len(raw) >= 37 && (bytes.HasPrefix(raw[28:], []byte("\x80theora")) ||
-		bytes.HasPrefix(raw[28:], []byte("fishead\x00")) ||
-		bytes.HasPrefix(raw[28:], []byte("\x01video\x00\x00\x00"))) // OGM video
+	return len(f.Head) >= 37 && (bytes.HasPrefix(f.Head[28:], []byte("\x80theora")) ||
+		bytes.HasPrefix(f.Head[28:], []byte("fishead\x00")) ||
+		bytes.HasPrefix(f.Head[28:], []byte("\x01video\x00\x00\x00"))) // OGM video
 }

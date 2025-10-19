@@ -16,7 +16,7 @@ import (
 // When a detector passes the check, the children detectors
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "",
-	func([]byte, uint32) bool { return true },
+	func(*magic.File) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
 	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
 	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
@@ -32,7 +32,7 @@ var root = newMIME("application/octet-stream", "",
 // errMIME is returned from Detect functions when err is not nil.
 // Detect could return root for erroneous cases, but it needs to lock mu in order to do so.
 // errMIME is same as root but it does not require locking.
-var errMIME = newMIME("application/octet-stream", "", func([]byte, uint32) bool { return false })
+var errMIME = newMIME("application/octet-stream", "", func(*magic.File) bool { return false })
 
 // mu guards access to the root MIME tree. Access to root must be synchronized with this lock.
 var mu = &sync.RWMutex{}

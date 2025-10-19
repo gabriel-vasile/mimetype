@@ -8,49 +8,49 @@ import (
 
 // Lnk matches Microsoft lnk binary format.
 func Lnk(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
+	return bytes.HasPrefix(f.Head, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
 }
 
 // Wasm matches a web assembly File Format file.
 func Wasm(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x00, 0x61, 0x73, 0x6D})
+	return bytes.HasPrefix(f.Head, []byte{0x00, 0x61, 0x73, 0x6D})
 }
 
 // Exe matches a Windows/DOS executable file.
 func Exe(f *File) bool {
-	return len(raw) > 1 && raw[0] == 0x4D && raw[1] == 0x5A
+	return len(f.Head) > 1 && f.Head[0] == 0x4D && f.Head[1] == 0x5A
 }
 
 // Elf matches an Executable and Linkable Format file.
 func Elf(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x7F, 0x45, 0x4C, 0x46})
+	return bytes.HasPrefix(f.Head, []byte{0x7F, 0x45, 0x4C, 0x46})
 }
 
 // Nes matches a Nintendo Entertainment system ROM file.
 func Nes(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x4E, 0x45, 0x53, 0x1A})
+	return bytes.HasPrefix(f.Head, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
 
 // SWF matches an Adobe Flash swf file.
 func SWF(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("CWS")) ||
-		bytes.HasPrefix(raw, []byte("FWS")) ||
-		bytes.HasPrefix(raw, []byte("ZWS"))
+	return bytes.HasPrefix(f.Head, []byte("CWS")) ||
+		bytes.HasPrefix(f.Head, []byte("FWS")) ||
+		bytes.HasPrefix(f.Head, []byte("ZWS"))
 }
 
 // Torrent has bencoded text in the beginning.
 func Torrent(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("d8:announce"))
+	return bytes.HasPrefix(f.Head, []byte("d8:announce"))
 }
 
 // PAR1 matches a parquet file.
 func Par1(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0x50, 0x41, 0x52, 0x31})
+	return bytes.HasPrefix(f.Head, []byte{0x50, 0x41, 0x52, 0x31})
 }
 
 // CBOR matches a Concise Binary Object Representation https://cbor.io/
 func CBOR(f *File) bool {
-	return bytes.HasPrefix(raw, []byte{0xD9, 0xD9, 0xF7})
+	return bytes.HasPrefix(f.Head, []byte{0xD9, 0xD9, 0xF7})
 }
 
 // Java bytecode and Mach-O binaries share the same magic number.
@@ -67,21 +67,21 @@ func classOrMachOFat(in []byte) bool {
 
 // Class matches a java class file.
 func Class(f *File) bool {
-	return classOrMachOFat(raw) && raw[7] > 30
+	return classOrMachOFat(f.Head) && f.Head[7] > 30
 }
 
 // MachO matches Mach-O binaries format.
 func MachO(f *File) bool {
-	if classOrMachOFat(raw) && raw[7] < 0x14 {
+	if classOrMachOFat(f.Head) && f.Head[7] < 0x14 {
 		return true
 	}
 
-	if len(raw) < 4 {
+	if len(f.Head) < 4 {
 		return false
 	}
 
-	be := binary.BigEndian.Uint32(raw)
-	le := binary.LittleEndian.Uint32(raw)
+	be := binary.BigEndian.Uint32(f.Head)
+	le := binary.LittleEndian.Uint32(f.Head)
 
 	return be == macho.Magic32 ||
 		le == macho.Magic32 ||
@@ -92,23 +92,23 @@ func MachO(f *File) bool {
 // Dbf matches a dBase file.
 // https://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
 func Dbf(f *File) bool {
-	if len(raw) < 68 {
+	if len(f.Head) < 68 {
 		return false
 	}
 
 	// 3rd and 4th bytes contain the last update month and day of month.
-	if raw[2] == 0 || raw[2] > 12 || raw[3] == 0 || raw[3] > 31 {
+	if f.Head[2] == 0 || f.Head[2] > 12 || f.Head[3] == 0 || f.Head[3] > 31 {
 		return false
 	}
 
 	// 12, 13, 30, 31 are reserved bytes and always filled with 0x00.
-	if raw[12] != 0x00 || raw[13] != 0x00 || raw[30] != 0x00 || raw[31] != 0x00 {
+	if f.Head[12] != 0x00 || f.Head[13] != 0x00 || f.Head[30] != 0x00 || f.Head[31] != 0x00 {
 		return false
 	}
 	// Production MDX flag;
 	// 0x01 if a production .MDX file exists for this table;
 	// 0x00 if no .MDX file exists.
-	if raw[28] > 0x01 {
+	if f.Head[28] > 0x01 {
 		return false
 	}
 
@@ -118,7 +118,7 @@ func Dbf(f *File) bool {
 		0x83, 0x87, 0x8A, 0x8B, 0x8E, 0xB3, 0xCB, 0xE5, 0xF5, 0xF4, 0xFB,
 	}
 	for _, b := range dbfTypes {
-		if raw[0] == b {
+		if f.Head[0] == b {
 			return true
 		}
 	}
@@ -128,55 +128,55 @@ func Dbf(f *File) bool {
 
 // ElfObj matches an object file.
 func ElfObj(f *File) bool {
-	return len(raw) > 17 && ((raw[16] == 0x01 && raw[17] == 0x00) ||
-		(raw[16] == 0x00 && raw[17] == 0x01))
+	return len(f.Head) > 17 && ((f.Head[16] == 0x01 && f.Head[17] == 0x00) ||
+		(f.Head[16] == 0x00 && f.Head[17] == 0x01))
 }
 
 // ElfExe matches an executable file.
 func ElfExe(f *File) bool {
-	return len(raw) > 17 && ((raw[16] == 0x02 && raw[17] == 0x00) ||
-		(raw[16] == 0x00 && raw[17] == 0x02))
+	return len(f.Head) > 17 && ((f.Head[16] == 0x02 && f.Head[17] == 0x00) ||
+		(f.Head[16] == 0x00 && f.Head[17] == 0x02))
 }
 
 // ElfLib matches a shared library file.
 func ElfLib(f *File) bool {
-	return len(raw) > 17 && ((raw[16] == 0x03 && raw[17] == 0x00) ||
-		(raw[16] == 0x00 && raw[17] == 0x03))
+	return len(f.Head) > 17 && ((f.Head[16] == 0x03 && f.Head[17] == 0x00) ||
+		(f.Head[16] == 0x00 && f.Head[17] == 0x03))
 }
 
 // ElfDump matches a core dump file.
 func ElfDump(f *File) bool {
-	return len(raw) > 17 && ((raw[16] == 0x04 && raw[17] == 0x00) ||
-		(raw[16] == 0x00 && raw[17] == 0x04))
+	return len(f.Head) > 17 && ((f.Head[16] == 0x04 && f.Head[17] == 0x00) ||
+		(f.Head[16] == 0x00 && f.Head[17] == 0x04))
 }
 
 // Dcm matches a DICOM medical format file.
 func Dcm(f *File) bool {
-	return len(raw) > 131 &&
-		bytes.Equal(raw[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
+	return len(f.Head) > 131 &&
+		bytes.Equal(f.Head[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
 }
 
 // Marc matches a MARC21 (MAchine-Readable Cataloging) file.
 func Marc(f *File) bool {
 	// File is at least 24 bytes ("leader" field size).
-	if len(raw) < 24 {
+	if len(f.Head) < 24 {
 		return false
 	}
 
 	// Fixed bytes at offset 20.
-	if !bytes.Equal(raw[20:24], []byte("4500")) {
+	if !bytes.Equal(f.Head[20:24], []byte("4500")) {
 		return false
 	}
 
 	// First 5 bytes are ASCII digits.
 	for i := 0; i < 5; i++ {
-		if raw[i] < '0' || raw[i] > '9' {
+		if f.Head[i] < '0' || f.Head[i] > '9' {
 			return false
 		}
 	}
 
 	// Field terminator is present in first 2048 bytes.
-	return bytes.Contains(raw[:min(2048, len(raw))], []byte{0x1E})
+	return bytes.Contains(f.Head[:min(2048, len(f.Head))], []byte{0x1E})
 }
 
 // GLB matches a glTF model format file.
@@ -195,8 +195,8 @@ func Marc(f *File) bool {
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf-binary
 func GLB(f *File) bool {
-	return bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x02\x00\x00\x00")) ||
-		bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
+	return bytes.HasPrefix(f.Head, []byte("\x67\x6C\x54\x46\x02\x00\x00\x00")) ||
+		bytes.HasPrefix(f.Head, []byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
 }
 
 // TzIf matches a Time Zone Information Format (TZif) file.
@@ -213,19 +213,19 @@ func GLB(f *File) bool {
 //	|  timecnt  (4) |  typecnt  (4) |  charcnt  (4) |
 func TzIf(f *File) bool {
 	// File is at least 44 bytes (header size).
-	if len(raw) < 44 {
+	if len(f.Head) < 44 {
 		return false
 	}
 
-	if !bytes.HasPrefix(raw, []byte("TZif")) {
+	if !bytes.HasPrefix(f.Head, []byte("TZif")) {
 		return false
 	}
 
 	// Field "typecnt" MUST not be zero.
-	if binary.BigEndian.Uint32(raw[36:40]) == 0 {
+	if binary.BigEndian.Uint32(f.Head[36:40]) == 0 {
 		return false
 	}
 
 	// Version has to be NUL (0x00), '2' (0x32) or '3' (0x33).
-	return raw[4] == 0x00 || raw[4] == 0x32 || raw[4] == 0x33
+	return f.Head[4] == 0x00 || f.Head[4] == 0x32 || f.Head[4] == 0x33
 }

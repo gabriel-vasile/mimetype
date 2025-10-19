@@ -10,6 +10,8 @@ import (
 	"mime"
 	"os"
 	"sync/atomic"
+
+	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
 const defaultLimit uint32 = 3072
@@ -29,7 +31,10 @@ func Detect(in []byte) *MIME {
 	}
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.match(in, l)
+	return root.match(&magic.File{
+		Head:      in,
+		ReadLimit: l,
+	})
 }
 
 // DetectReader returns the MIME type of the provided reader.
@@ -67,7 +72,10 @@ func DetectReader(r io.Reader) (*MIME, error) {
 
 	mu.RLock()
 	defer mu.RUnlock()
-	return root.match(in, l), nil
+	return root.match(&magic.File{
+		Head:      in,
+		ReadLimit: l,
+	}), nil
 }
 
 // DetectFile returns the MIME type of the provided file.

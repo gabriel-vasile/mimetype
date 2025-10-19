@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/gabriel-vasile/mimetype/internal/magic"
 )
 
 // testcases are used for correctness and benchmarks.
@@ -575,10 +577,10 @@ func BenchmarkOne(b *testing.B) {
 		b.Run(tc.name, func(b *testing.B) {
 			b.ReportAllocs()
 			for n := 0; n < b.N; n++ {
-				if !mtype.detector(data, defaultLimit) {
+				if !mtype.detector(&magic.File{Head: data, ReadLimit: defaultLimit}) {
 					b.Fatalf("positive detection should never fail")
 				}
-				if mtype.detector(randData, defaultLimit) {
+				if mtype.detector(&magic.File{Head: randData, ReadLimit: defaultLimit}) {
 					b.Fatalf("negative detection should always fail")
 				}
 			}
@@ -639,7 +641,7 @@ func TestIndexOutOfRangePanic(t *testing.T) {
 	testAtEachIndex := func(t *testing.T, in []byte) {
 		for _, n := range nodes {
 			for i := 0; i < len(in); i++ {
-				n.detector(in[:i], 1<<10)
+				n.detector(&magic.File{Head: in[:i], ReadLimit: 1 << 10})
 			}
 		}
 	}
@@ -747,7 +749,7 @@ func FuzzMimetype(f *testing.F) {
 	f.Fuzz(func(t *testing.T, data []byte) {
 		matched := false
 		for _, d := range detectors {
-			if d.detector(data, math.MaxUint32) {
+			if d.detector(&magic.File{Head: data, ReadLimit: math.MaxUint32}) {
 				matched = true
 			}
 		}

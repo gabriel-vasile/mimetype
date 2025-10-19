@@ -26,7 +26,7 @@ type File struct {
 // Detector functions exist for each file format. They report whether the file
 // looks like a specific format. Additionally, they collect file facts and
 // cache them in f for other Detectors to use.
-type Detector func(f File) bool
+type Detector func(f *File) bool
 type xmlSig struct {
 	// the local name of the root tag
 	localName []byte
