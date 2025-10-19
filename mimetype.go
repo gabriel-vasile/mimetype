@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 )
 
-var defaultLimit uint32 = 3072
+const defaultLimit uint32 = 3072
 
 // readLimit is the maximum number of bytes from the input used when detecting.
 var readLimit uint32 = defaultLimit
