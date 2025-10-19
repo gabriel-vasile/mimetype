@@ -3,7 +3,6 @@ package magic
 
 import (
 	"bytes"
-	"io"
 
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
@@ -14,8 +13,6 @@ import (
 type File struct {
 	// Head is the first bytes from the file (up to readLimit length)
 	Head scan.Bytes
-	// Tail represents the content following Head.
-	Tail io.Reader
 
 	ReadLimit      uint32
 	geo, har, gltf bool
