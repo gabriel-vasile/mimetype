@@ -4,112 +4,112 @@ import "bytes"
 
 // Png matches a Portable Network Graphics file.
 // https://www.w3.org/TR/PNG/
-func Png(raw []byte, _ uint32) bool {
+func Png(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A})
 }
 
 // Apng matches an Animated Portable Network Graphics file.
 // https://wiki.mozilla.org/APNG_Specification
-func Apng(raw []byte, _ uint32) bool {
+func Apng(f *File) bool {
 	return offset(raw, []byte("acTL"), 37)
 }
 
 // Jpg matches a Joint Photographic Experts Group file.
-func Jpg(raw []byte, _ uint32) bool {
+func Jpg(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xFF, 0xD8, 0xFF})
 }
 
 // Jp2 matches a JPEG 2000 Image file (ISO 15444-1).
-func Jp2(raw []byte, _ uint32) bool {
+func Jp2(f *File) bool {
 	return jpeg2k(raw, []byte{0x6a, 0x70, 0x32, 0x20})
 }
 
 // Jpx matches a JPEG 2000 Image file (ISO 15444-2).
-func Jpx(raw []byte, _ uint32) bool {
+func Jpx(f *File) bool {
 	return jpeg2k(raw, []byte{0x6a, 0x70, 0x78, 0x20})
 }
 
 // Jpm matches a JPEG 2000 Image file (ISO 15444-6).
-func Jpm(raw []byte, _ uint32) bool {
+func Jpm(f *File) bool {
 	return jpeg2k(raw, []byte{0x6a, 0x70, 0x6D, 0x20})
 }
 
 // Gif matches a Graphics Interchange Format file.
-func Gif(raw []byte, _ uint32) bool {
+func Gif(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("GIF87a")) ||
 		bytes.HasPrefix(raw, []byte("GIF89a"))
 }
 
 // Bmp matches a bitmap image file.
-func Bmp(raw []byte, _ uint32) bool {
+func Bmp(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x42, 0x4D})
 }
 
 // Ps matches a PostScript file.
-func Ps(raw []byte, _ uint32) bool {
+func Ps(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("%!PS-Adobe-"))
 }
 
 // Psd matches a Photoshop Document file.
-func Psd(raw []byte, _ uint32) bool {
+func Psd(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("8BPS"))
 }
 
 // Ico matches an ICO file.
-func Ico(raw []byte, _ uint32) bool {
+func Ico(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x01, 0x00}) ||
 		bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x02, 0x00})
 }
 
 // Icns matches an ICNS (Apple Icon Image format) file.
-func Icns(raw []byte, _ uint32) bool {
+func Icns(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("icns"))
 }
 
 // Tiff matches a Tagged Image File Format file.
-func Tiff(raw []byte, _ uint32) bool {
+func Tiff(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0x2A, 0x00}) ||
 		bytes.HasPrefix(raw, []byte{0x4D, 0x4D, 0x00, 0x2A})
 }
 
 // Bpg matches a Better Portable Graphics file.
-func Bpg(raw []byte, _ uint32) bool {
+func Bpg(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x42, 0x50, 0x47, 0xFB})
 }
 
 // Xcf matches GIMP image data.
-func Xcf(raw []byte, _ uint32) bool {
+func Xcf(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("gimp xcf"))
 }
 
 // Pat matches GIMP pattern data.
-func Pat(raw []byte, _ uint32) bool {
+func Pat(f *File) bool {
 	return offset(raw, []byte("GPAT"), 20)
 }
 
 // Gbr matches GIMP brush data.
-func Gbr(raw []byte, _ uint32) bool {
+func Gbr(f *File) bool {
 	return offset(raw, []byte("GIMP"), 20)
 }
 
 // Hdr matches Radiance HDR image.
 // https://web.archive.org/web/20060913152809/http://local.wasp.uwa.edu.au/~pbourke/dataformats/pic/
-func Hdr(raw []byte, _ uint32) bool {
+func Hdr(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("#?RADIANCE\n"))
 }
 
 // Xpm matches X PixMap image data.
-func Xpm(raw []byte, _ uint32) bool {
+func Xpm(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x2F, 0x2A, 0x20, 0x58, 0x50, 0x4D, 0x20, 0x2A, 0x2F})
 }
 
 // Jxs matches a JPEG XS coded image file (ISO/IEC 21122-3).
-func Jxs(raw []byte, _ uint32) bool {
+func Jxs(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x00, 0x0C, 0x4A, 0x58, 0x53, 0x20, 0x0D, 0x0A, 0x87, 0x0A})
 }
 
 // Jxr matches Microsoft HD JXR photo file.
-func Jxr(raw []byte, _ uint32) bool {
+func Jxr(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x49, 0x49, 0xBC, 0x01})
 }
 
@@ -126,14 +126,14 @@ func jpeg2k(raw []byte, sig []byte) bool {
 }
 
 // Webp matches a WebP file.
-func Webp(raw []byte, _ uint32) bool {
+func Webp(f *File) bool {
 	return len(raw) > 12 &&
 		bytes.Equal(raw[0:4], []byte("RIFF")) &&
 		bytes.Equal(raw[8:12], []byte{0x57, 0x45, 0x42, 0x50})
 }
 
 // Dwg matches a CAD drawing file.
-func Dwg(raw []byte, _ uint32) bool {
+func Dwg(f *File) bool {
 	if len(raw) < 6 || raw[0] != 0x41 || raw[1] != 0x43 {
 		return false
 	}
@@ -165,7 +165,7 @@ func Dwg(raw []byte, _ uint32) bool {
 }
 
 // Jxl matches JPEG XL image file.
-func Jxl(raw []byte, _ uint32) bool {
+func Jxl(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xFF, 0x0A}) ||
 		bytes.HasPrefix(raw, []byte("\x00\x00\x00\x0cJXL\x20\x0d\x0a\x87\x0a"))
 }
@@ -180,7 +180,7 @@ func Jxl(raw []byte, _ uint32) bool {
 // https://sembiance.com/fileFormatSamples/poly/dxf/ and then
 // xxd -l 16 {} | sort | uniq.
 // These signatures are only for the ASCII version of DXF. There is a binary version too.
-func DXF(raw []byte, _ uint32) bool {
+func DXF(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("  0\x0ASECTION\x0A")) ||
 		bytes.HasPrefix(raw, []byte("  0\x0D\x0ASECTION\x0D\x0A")) ||
 		bytes.HasPrefix(raw, []byte("0\x0ASECTION\x0A")) ||

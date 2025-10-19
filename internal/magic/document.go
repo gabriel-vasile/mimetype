@@ -7,7 +7,7 @@ import (
 
 // Pdf matches a Portable Document Format file.
 // https://github.com/file/file/blob/11010cc805546a3e35597e67e1129a481aed40e8/magic/Magdir/pdf
-func Pdf(raw []byte, _ uint32) bool {
+func Pdf(f *File) bool {
 	// usual pdf signature
 	return bytes.HasPrefix(raw, []byte("%PDF-")) ||
 		// new-line prefixed signature
@@ -17,17 +17,17 @@ func Pdf(raw []byte, _ uint32) bool {
 }
 
 // Fdf matches a Forms Data Format file.
-func Fdf(raw []byte, _ uint32) bool {
+func Fdf(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("%FDF"))
 }
 
 // Mobi matches a Mobi file.
-func Mobi(raw []byte, _ uint32) bool {
+func Mobi(f *File) bool {
 	return offset(raw, []byte("BOOKMOBI"), 60)
 }
 
 // Lit matches a Microsoft Lit file.
-func Lit(raw []byte, _ uint32) bool {
+func Lit(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("ITOLITLS"))
 }
 
@@ -36,13 +36,13 @@ func Lit(raw []byte, _ uint32) bool {
 // implementations don't follow the rule. The PDF spec at Appendix H says the
 // signature can be prepended by anything.
 // https://bugs.astron.com/view.php?id=446
-func PDF(raw []byte, _ uint32) bool {
+func PDF(f *File) bool {
 	raw = raw[:min(len(raw), 1024)]
 	return bytes.Contains(raw, []byte("%PDF-"))
 }
 
 // DjVu matches a DjVu file.
-func DjVu(raw []byte, _ uint32) bool {
+func DjVu(f *File) bool {
 	if len(raw) < 12 {
 		return false
 	}
@@ -56,7 +56,7 @@ func DjVu(raw []byte, _ uint32) bool {
 }
 
 // P7s matches an .p7s signature File (PEM, Base64).
-func P7s(raw []byte, _ uint32) bool {
+func P7s(f *File) bool {
 	// Check for PEM Encoding.
 	if bytes.HasPrefix(raw, []byte("-----BEGIN PKCS7")) {
 		return true
@@ -82,7 +82,7 @@ func P7s(raw []byte, _ uint32) bool {
 }
 
 // Lotus123 matches a Lotus 1-2-3 spreadsheet document.
-func Lotus123(raw []byte, _ uint32) bool {
+func Lotus123(f *File) bool {
 	if len(raw) <= 20 {
 		return false
 	}
@@ -95,6 +95,6 @@ func Lotus123(raw []byte, _ uint32) bool {
 }
 
 // CHM matches a Microsoft Compiled HTML Help file.
-func CHM(raw []byte, _ uint32) bool {
+func CHM(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("ITSF\003\000\000\000\x60\000\000\000"))
 }

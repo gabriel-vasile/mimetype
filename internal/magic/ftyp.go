@@ -7,12 +7,12 @@ import (
 // AVIF matches an AV1 Image File Format still or animated.
 // Wikipedia page seems outdated listing image/avif-sequence for animations.
 // https://github.com/AOMediaCodec/av1-avif/issues/59
-func AVIF(raw []byte, _ uint32) bool {
+func AVIF(f *File) bool {
 	return ftyp(raw, []byte("avif"), []byte("avis"))
 }
 
 // ThreeGP matches a 3GPP file.
-func ThreeGP(raw []byte, _ uint32) bool {
+func ThreeGP(f *File) bool {
 	return ftyp(raw,
 		[]byte("3gp1"), []byte("3gp2"), []byte("3gp3"), []byte("3gp4"),
 		[]byte("3gp5"), []byte("3gp6"), []byte("3gp7"), []byte("3gs7"),
@@ -21,7 +21,7 @@ func ThreeGP(raw []byte, _ uint32) bool {
 }
 
 // ThreeG2 matches a 3GPP2 file.
-func ThreeG2(raw []byte, _ uint32) bool {
+func ThreeG2(f *File) bool {
 	return ftyp(raw,
 		[]byte("3g24"), []byte("3g25"), []byte("3g26"), []byte("3g2a"),
 		[]byte("3g2b"), []byte("3g2c"), []byte("KDDI"),
@@ -29,7 +29,7 @@ func ThreeG2(raw []byte, _ uint32) bool {
 }
 
 // AMp4 matches an audio MP4 file.
-func AMp4(raw []byte, _ uint32) bool {
+func AMp4(f *File) bool {
 	return ftyp(raw,
 		// audio for Adobe Flash Player 9+
 		[]byte("F4A "), []byte("F4B "),
@@ -43,49 +43,49 @@ func AMp4(raw []byte, _ uint32) bool {
 }
 
 // Mqv matches a Sony / Mobile QuickTime  file.
-func Mqv(raw []byte, _ uint32) bool {
+func Mqv(f *File) bool {
 	return ftyp(raw, []byte("mqt "))
 }
 
 // M4a matches an audio M4A file.
-func M4a(raw []byte, _ uint32) bool {
+func M4a(f *File) bool {
 	return ftyp(raw, []byte("M4A "))
 }
 
 // M4v matches an Appl4 M4V video file.
-func M4v(raw []byte, _ uint32) bool {
+func M4v(f *File) bool {
 	return ftyp(raw, []byte("M4V "), []byte("M4VH"), []byte("M4VP"))
 }
 
 // Heic matches a High Efficiency Image Coding (HEIC) file.
-func Heic(raw []byte, _ uint32) bool {
+func Heic(f *File) bool {
 	return ftyp(raw, []byte("heic"), []byte("heix"))
 }
 
 // HeicSequence matches a High Efficiency Image Coding (HEIC) file sequence.
-func HeicSequence(raw []byte, _ uint32) bool {
+func HeicSequence(f *File) bool {
 	return ftyp(raw, []byte("hevc"), []byte("hevx"))
 }
 
 // Heif matches a High Efficiency Image File Format (HEIF) file.
-func Heif(raw []byte, _ uint32) bool {
+func Heif(f *File) bool {
 	return ftyp(raw, []byte("mif1"), []byte("heim"), []byte("heis"), []byte("avic"))
 }
 
 // HeifSequence matches a High Efficiency Image File Format (HEIF) file sequence.
-func HeifSequence(raw []byte, _ uint32) bool {
+func HeifSequence(f *File) bool {
 	return ftyp(raw, []byte("msf1"), []byte("hevm"), []byte("hevs"), []byte("avcs"))
 }
 
 // Mj2 matches a Motion JPEG 2000 file: https://en.wikipedia.org/wiki/Motion_JPEG_2000.
-func Mj2(raw []byte, _ uint32) bool {
+func Mj2(f *File) bool {
 	return ftyp(raw, []byte("mj2s"), []byte("mjp2"), []byte("MFSM"), []byte("MGSV"))
 }
 
 // Dvb matches a Digital Video Broadcasting file: https://dvb.org.
 // https://cconcolato.github.io/mp4ra/filetype.html
 // https://github.com/file/file/blob/512840337ead1076519332d24fefcaa8fac36e06/magic/Magdir/animation#L135-L154
-func Dvb(raw []byte, _ uint32) bool {
+func Dvb(f *File) bool {
 	return ftyp(raw,
 		[]byte("dby1"), []byte("dsms"), []byte("dts1"), []byte("dts2"),
 		[]byte("dts3"), []byte("dxo "), []byte("dmb1"), []byte("dmpf"),
@@ -100,7 +100,7 @@ func Dvb(raw []byte, _ uint32) bool {
 // https://www.loc.gov/preservation/digital/formats/fdd/fdd000052.shtml
 // https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html#//apple_ref/doc/uid/TP40000939-CH203-38190
 // https://github.com/apache/tika/blob/0f5570691133c75ac4472c3340354a6c4080b104/tika-core/src/main/resources/org/apache/tika/mime/tika-mimetypes.xml#L7758-L7777
-func QuickTime(raw []byte, _ uint32) bool {
+func QuickTime(f *File) bool {
 	if len(raw) < 12 {
 		return false
 	}
@@ -131,7 +131,7 @@ func QuickTime(raw []byte, _ uint32) bool {
 // Mp4 has many registered and unregistered code points so it's hard to keep track
 // of all. Detection will default on video/mp4 for all ftyp files.
 // ISO_IEC_14496-12 is the specification for the iso container.
-func Mp4(raw []byte, _ uint32) bool {
+func Mp4(f *File) bool {
 	if len(raw) < 12 {
 		return false
 	}

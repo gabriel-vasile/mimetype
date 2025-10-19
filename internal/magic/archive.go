@@ -6,17 +6,17 @@ import (
 )
 
 // SevenZ matches a 7z archive.
-func SevenZ(raw []byte, _ uint32) bool {
+func SevenZ(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C})
 }
 
 // Gzip matches gzip files based on http://www.zlib.org/rfc-gzip.html#header-trailer.
-func Gzip(raw []byte, _ uint32) bool {
+func Gzip(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x1f, 0x8b})
 }
 
 // Fits matches an Flexible Image Transport System file.
-func Fits(raw []byte, _ uint32) bool {
+func Fits(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{
 		0x53, 0x49, 0x4D, 0x50, 0x4C, 0x45, 0x20, 0x20, 0x3D, 0x20,
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -25,22 +25,22 @@ func Fits(raw []byte, _ uint32) bool {
 }
 
 // Xar matches an eXtensible ARchive format file.
-func Xar(raw []byte, _ uint32) bool {
+func Xar(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x78, 0x61, 0x72, 0x21})
 }
 
 // Bz2 matches a bzip2 file.
-func Bz2(raw []byte, _ uint32) bool {
+func Bz2(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x42, 0x5A, 0x68})
 }
 
 // Ar matches an ar (Unix) archive file.
-func Ar(raw []byte, _ uint32) bool {
+func Ar(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x21, 0x3C, 0x61, 0x72, 0x63, 0x68, 0x3E})
 }
 
 // Deb matches a Debian package file.
-func Deb(raw []byte, _ uint32) bool {
+func Deb(f *File) bool {
 	return offset(raw, []byte{
 		0x64, 0x65, 0x62, 0x69, 0x61, 0x6E, 0x2D,
 		0x62, 0x69, 0x6E, 0x61, 0x72, 0x79,
@@ -48,40 +48,40 @@ func Deb(raw []byte, _ uint32) bool {
 }
 
 // Warc matches a Web ARChive file.
-func Warc(raw []byte, _ uint32) bool {
+func Warc(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("WARC/1.0")) ||
 		bytes.HasPrefix(raw, []byte("WARC/1.1"))
 }
 
 // Cab matches a Microsoft Cabinet archive file.
-func Cab(raw []byte, _ uint32) bool {
+func Cab(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("MSCF\x00\x00\x00\x00"))
 }
 
 // Xz matches an xz compressed stream based on https://tukaani.org/xz/xz-file-format.txt.
-func Xz(raw []byte, _ uint32) bool {
+func Xz(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xFD, 0x37, 0x7A, 0x58, 0x5A, 0x00})
 }
 
 // Lzip matches an Lzip compressed file.
-func Lzip(raw []byte, _ uint32) bool {
+func Lzip(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x4c, 0x5a, 0x49, 0x50})
 }
 
 // RPM matches an RPM or Delta RPM package file.
-func RPM(raw []byte, _ uint32) bool {
+func RPM(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xed, 0xab, 0xee, 0xdb}) ||
 		bytes.HasPrefix(raw, []byte("drpm"))
 }
 
 // RAR matches a RAR archive file.
-func RAR(raw []byte, _ uint32) bool {
+func RAR(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x00")) ||
 		bytes.HasPrefix(raw, []byte("Rar!\x1A\x07\x01\x00"))
 }
 
 // InstallShieldCab matches an InstallShield Cabinet archive file.
-func InstallShieldCab(raw []byte, _ uint32) bool {
+func InstallShieldCab(f *File) bool {
 	return len(raw) > 7 &&
 		bytes.Equal(raw[0:4], []byte("ISc(")) &&
 		raw[6] == 0 &&
@@ -90,7 +90,7 @@ func InstallShieldCab(raw []byte, _ uint32) bool {
 
 // Zstd matches a Zstandard archive file.
 // https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md
-func Zstd(raw []byte, limit uint32) bool {
+func Zstd(f *File) bool {
 	if len(raw) < 4 {
 		return false
 	}
@@ -101,7 +101,7 @@ func Zstd(raw []byte, limit uint32) bool {
 }
 
 // CRX matches a Chrome extension file: a zip archive prepended by a package header.
-func CRX(raw []byte, limit uint32) bool {
+func CRX(f *File) bool {
 	const minHeaderLen = 16
 	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
 		return false
@@ -116,7 +116,7 @@ func CRX(raw []byte, limit uint32) bool {
 }
 
 // Cpio matches a cpio archive file.
-func Cpio(raw []byte, _ uint32) bool {
+func Cpio(f *File) bool {
 	if len(raw) < 6 {
 		return false
 	}
@@ -129,7 +129,7 @@ func Cpio(raw []byte, _ uint32) bool {
 // Tar matches a (t)ape (ar)chive file.
 // Tar files are divided into 512 bytes records. First record contains a 257
 // bytes header padded with NUL.
-func Tar(raw []byte, _ uint32) bool {
+func Tar(f *File) bool {
 	const sizeRecord = 512
 
 	// The structure of a tar header:

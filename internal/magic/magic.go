@@ -3,23 +3,36 @@ package magic
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
-type (
-	// Detector receiveѕ the raw data of a file and returns whether the data
-	// meets any conditions. The limit parameter is an upper limit to the number
-	// of bytes received and is used to tell if the byte slice represents the
-	// whole file or is just the header of a file: len(raw) < limit or len(raw)>limit.
-	Detector func(raw []byte, limit uint32) bool
-	xmlSig   struct {
-		// the local name of the root tag
-		localName []byte
-		// the namespace of the XML document
-		xmlns []byte
-	}
-)
+// File represents the input file and all the details we gathered about it.
+// Facts about the input are shared between detection functions through the File
+// struct.
+type File struct {
+	// Head is the first bytes from the file (up to readLimit length)
+	Head scan.Bytes
+	// Tail represents the content following Head.
+	Tail io.Reader
+
+	// Many file formats have their signature in the first line of text.
+	// Cache FirstLine to avoid having to extract it in several places.
+	FirstLine scan.Bytes
+	ReadLimit uint32
+}
+
+// Detector functions exist for each file format. They report whether the file
+// looks like a specific format. Additionally, they collect file facts and
+// cache them in f for other Detectors to use.
+type Detector func(f File) bool
+type xmlSig struct {
+	// the local name of the root tag
+	localName []byte
+	// the namespace of the XML document
+	xmlns []byte
+}
 
 // offset returns true if the provided signature can be
 // found at offset in the raw input.

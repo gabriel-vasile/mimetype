@@ -7,49 +7,49 @@ import (
 )
 
 // Lnk matches Microsoft lnk binary format.
-func Lnk(raw []byte, _ uint32) bool {
+func Lnk(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x4C, 0x00, 0x00, 0x00, 0x01, 0x14, 0x02, 0x00})
 }
 
 // Wasm matches a web assembly File Format file.
-func Wasm(raw []byte, _ uint32) bool {
+func Wasm(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x00, 0x61, 0x73, 0x6D})
 }
 
 // Exe matches a Windows/DOS executable file.
-func Exe(raw []byte, _ uint32) bool {
+func Exe(f *File) bool {
 	return len(raw) > 1 && raw[0] == 0x4D && raw[1] == 0x5A
 }
 
 // Elf matches an Executable and Linkable Format file.
-func Elf(raw []byte, _ uint32) bool {
+func Elf(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x7F, 0x45, 0x4C, 0x46})
 }
 
 // Nes matches a Nintendo Entertainment system ROM file.
-func Nes(raw []byte, _ uint32) bool {
+func Nes(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x4E, 0x45, 0x53, 0x1A})
 }
 
 // SWF matches an Adobe Flash swf file.
-func SWF(raw []byte, _ uint32) bool {
+func SWF(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("CWS")) ||
 		bytes.HasPrefix(raw, []byte("FWS")) ||
 		bytes.HasPrefix(raw, []byte("ZWS"))
 }
 
 // Torrent has bencoded text in the beginning.
-func Torrent(raw []byte, _ uint32) bool {
+func Torrent(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("d8:announce"))
 }
 
 // PAR1 matches a parquet file.
-func Par1(raw []byte, _ uint32) bool {
+func Par1(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0x50, 0x41, 0x52, 0x31})
 }
 
 // CBOR matches a Concise Binary Object Representation https://cbor.io/
-func CBOR(raw []byte, _ uint32) bool {
+func CBOR(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xD9, 0xD9, 0xF7})
 }
 
@@ -66,12 +66,12 @@ func classOrMachOFat(in []byte) bool {
 }
 
 // Class matches a java class file.
-func Class(raw []byte, limit uint32) bool {
+func Class(f *File) bool {
 	return classOrMachOFat(raw) && raw[7] > 30
 }
 
 // MachO matches Mach-O binaries format.
-func MachO(raw []byte, limit uint32) bool {
+func MachO(f *File) bool {
 	if classOrMachOFat(raw) && raw[7] < 0x14 {
 		return true
 	}
@@ -91,7 +91,7 @@ func MachO(raw []byte, limit uint32) bool {
 
 // Dbf matches a dBase file.
 // https://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm
-func Dbf(raw []byte, limit uint32) bool {
+func Dbf(f *File) bool {
 	if len(raw) < 68 {
 		return false
 	}
@@ -127,37 +127,37 @@ func Dbf(raw []byte, limit uint32) bool {
 }
 
 // ElfObj matches an object file.
-func ElfObj(raw []byte, limit uint32) bool {
+func ElfObj(f *File) bool {
 	return len(raw) > 17 && ((raw[16] == 0x01 && raw[17] == 0x00) ||
 		(raw[16] == 0x00 && raw[17] == 0x01))
 }
 
 // ElfExe matches an executable file.
-func ElfExe(raw []byte, limit uint32) bool {
+func ElfExe(f *File) bool {
 	return len(raw) > 17 && ((raw[16] == 0x02 && raw[17] == 0x00) ||
 		(raw[16] == 0x00 && raw[17] == 0x02))
 }
 
 // ElfLib matches a shared library file.
-func ElfLib(raw []byte, limit uint32) bool {
+func ElfLib(f *File) bool {
 	return len(raw) > 17 && ((raw[16] == 0x03 && raw[17] == 0x00) ||
 		(raw[16] == 0x00 && raw[17] == 0x03))
 }
 
 // ElfDump matches a core dump file.
-func ElfDump(raw []byte, limit uint32) bool {
+func ElfDump(f *File) bool {
 	return len(raw) > 17 && ((raw[16] == 0x04 && raw[17] == 0x00) ||
 		(raw[16] == 0x00 && raw[17] == 0x04))
 }
 
 // Dcm matches a DICOM medical format file.
-func Dcm(raw []byte, limit uint32) bool {
+func Dcm(f *File) bool {
 	return len(raw) > 131 &&
 		bytes.Equal(raw[128:132], []byte{0x44, 0x49, 0x43, 0x4D})
 }
 
 // Marc matches a MARC21 (MAchine-Readable Cataloging) file.
-func Marc(raw []byte, limit uint32) bool {
+func Marc(f *File) bool {
 	// File is at least 24 bytes ("leader" field size).
 	if len(raw) < 24 {
 		return false
@@ -194,7 +194,7 @@ func Marc(raw []byte, limit uint32) bool {
 //
 // [glTF specification]: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf-binary
-func GLB(raw []byte, _ uint32) bool {
+func GLB(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x02\x00\x00\x00")) ||
 		bytes.HasPrefix(raw, []byte("\x67\x6C\x54\x46\x01\x00\x00\x00"))
 }
@@ -211,7 +211,7 @@ func GLB(raw []byte, _ uint32) bool {
 //	|  isutccnt (4) |  isstdcnt (4) |  leapcnt  (4) |
 //	+---------------+---------------+---------------+
 //	|  timecnt  (4) |  typecnt  (4) |  charcnt  (4) |
-func TzIf(raw []byte, limit uint32) bool {
+func TzIf(f *File) bool {
 	// File is at least 44 bytes (header size).
 	if len(raw) < 44 {
 		return false

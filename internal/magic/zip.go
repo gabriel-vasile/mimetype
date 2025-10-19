@@ -7,67 +7,67 @@ import (
 )
 
 // Odt matches an OpenDocument Text file.
-func Odt(raw []byte, _ uint32) bool {
+func Odt(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.text"), 30)
 }
 
 // Ott matches an OpenDocument Text Template file.
-func Ott(raw []byte, _ uint32) bool {
+func Ott(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.text-template"), 30)
 }
 
 // Ods matches an OpenDocument Spreadsheet file.
-func Ods(raw []byte, _ uint32) bool {
+func Ods(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet"), 30)
 }
 
 // Ots matches an OpenDocument Spreadsheet Template file.
-func Ots(raw []byte, _ uint32) bool {
+func Ots(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.spreadsheet-template"), 30)
 }
 
 // Odp matches an OpenDocument Presentation file.
-func Odp(raw []byte, _ uint32) bool {
+func Odp(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation"), 30)
 }
 
 // Otp matches an OpenDocument Presentation Template file.
-func Otp(raw []byte, _ uint32) bool {
+func Otp(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.presentation-template"), 30)
 }
 
 // Odg matches an OpenDocument Drawing file.
-func Odg(raw []byte, _ uint32) bool {
+func Odg(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics"), 30)
 }
 
 // Otg matches an OpenDocument Drawing Template file.
-func Otg(raw []byte, _ uint32) bool {
+func Otg(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.graphics-template"), 30)
 }
 
 // Odf matches an OpenDocument Formula file.
-func Odf(raw []byte, _ uint32) bool {
+func Odf(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.formula"), 30)
 }
 
 // Odc matches an OpenDocument Chart file.
-func Odc(raw []byte, _ uint32) bool {
+func Odc(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.oasis.opendocument.chart"), 30)
 }
 
 // Epub matches an EPUB file.
-func Epub(raw []byte, _ uint32) bool {
+func Epub(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/epub+zip"), 30)
 }
 
 // Sxc matches an OpenOffice Spreadsheet file.
-func Sxc(raw []byte, _ uint32) bool {
+func Sxc(f *File) bool {
 	return offset(raw, []byte("mimetypeapplication/vnd.sun.xml.calc"), 30)
 }
 
 // Zip matches a zip archive.
-func Zip(raw []byte, limit uint32) bool {
+func Zip(f *File) bool {
 	return len(raw) > 3 &&
 		raw[0] == 0x50 && raw[1] == 0x4B &&
 		(raw[2] == 0x3 || raw[2] == 0x5 || raw[2] == 0x7) &&
@@ -83,7 +83,7 @@ func Zip(raw []byte, limit uint32) bool {
 // for both executable and non-executable versions. But the traversing zip entries
 // is unreliable because it does linear search for signatures
 // (instead of relying on offsets told by the file.)
-func Jar(raw []byte, limit uint32) bool {
+func Jar(f *File) bool {
 	return executableJar(raw) ||
 		zipHas(raw, zipEntries{{
 			name: []byte("META-INF/MANIFEST.MF"),
@@ -93,7 +93,7 @@ func Jar(raw []byte, limit uint32) bool {
 }
 
 // KMZ matches a zipped KML file, which is "doc.kml" by convention.
-func KMZ(raw []byte, _ uint32) bool {
+func KMZ(f *File) bool {
 	return zipHas(raw, zipEntries{{
 		name: []byte("doc.kml"),
 	}}, 100)
@@ -207,7 +207,7 @@ func (i *zipIterator) next() []byte {
 
 // APK matches an Android Package Archive.
 // The source of signatures is https://github.com/file/file/blob/1778642b8ba3d947a779a36fcd81f8e807220a19/magic/Magdir/archive#L1820-L1887
-func APK(raw []byte, _ uint32) bool {
+func APK(f *File) bool {
 	return zipHas(raw, zipEntries{{
 		name: []byte("AndroidManifest.xml"),
 	}, {

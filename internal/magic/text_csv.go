@@ -6,13 +6,13 @@ import (
 )
 
 // CSV matches a comma-separated values file.
-func CSV(raw []byte, limit uint32) bool {
-	return sv(raw, ',', limit)
+func CSV(f *File) bool {
+	return sv(f.Head, ',', limit)
 }
 
 // TSV matches a tab-separated values file.
-func TSV(raw []byte, limit uint32) bool {
-	return sv(raw, '\t', limit)
+func TSV(f *File) bool {
+	return sv(f.Head, '\t', limit)
 }
 
 func sv(in []byte, comma byte, limit uint32) bool {

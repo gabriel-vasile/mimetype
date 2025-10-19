@@ -22,12 +22,12 @@ import (
 */
 
 // Ogg matches an Ogg file.
-func Ogg(raw []byte, limit uint32) bool {
+func Ogg(f *File) bool {
 	return bytes.HasPrefix(raw, []byte("\x4F\x67\x67\x53\x00"))
 }
 
 // OggAudio matches an audio ogg file.
-func OggAudio(raw []byte, limit uint32) bool {
+func OggAudio(f *File) bool {
 	return len(raw) >= 37 && (bytes.HasPrefix(raw[28:], []byte("\x7fFLAC")) ||
 		bytes.HasPrefix(raw[28:], []byte("\x01vorbis")) ||
 		bytes.HasPrefix(raw[28:], []byte("OpusHead")) ||
@@ -35,7 +35,7 @@ func OggAudio(raw []byte, limit uint32) bool {
 }
 
 // OggVideo matches a video ogg file.
-func OggVideo(raw []byte, limit uint32) bool {
+func OggVideo(f *File) bool {
 	return len(raw) >= 37 && (bytes.HasPrefix(raw[28:], []byte("\x80theora")) ||
 		bytes.HasPrefix(raw[28:], []byte("fishead\x00")) ||
 		bytes.HasPrefix(raw[28:], []byte("\x01video\x00\x00\x00"))) // OGM video

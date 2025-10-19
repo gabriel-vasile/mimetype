@@ -10,28 +10,28 @@ import (
 // NetPBM matches a Netpbm Portable BitMap ASCII/Binary file.
 //
 // See: https://en.wikipedia.org/wiki/Netpbm
-func NetPBM(raw []byte, _ uint32) bool {
+func NetPBM(f *File) bool {
 	return netp(raw, "P1\n", "P4\n")
 }
 
 // NetPGM matches a Netpbm Portable GrayMap ASCII/Binary file.
 //
 // See: https://en.wikipedia.org/wiki/Netpbm
-func NetPGM(raw []byte, _ uint32) bool {
+func NetPGM(f *File) bool {
 	return netp(raw, "P2\n", "P5\n")
 }
 
 // NetPPM matches a Netpbm Portable PixMap ASCII/Binary file.
 //
 // See: https://en.wikipedia.org/wiki/Netpbm
-func NetPPM(raw []byte, _ uint32) bool {
+func NetPPM(f *File) bool {
 	return netp(raw, "P3\n", "P6\n")
 }
 
 // NetPAM matches a Netpbm Portable Arbitrary Map file.
 //
 // See: https://en.wikipedia.org/wiki/Netpbm
-func NetPAM(raw []byte, _ uint32) bool {
+func NetPAM(f *File) bool {
 	if !bytes.HasPrefix(raw, []byte("P7\n")) {
 		return false
 	}

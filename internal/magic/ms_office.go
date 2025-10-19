@@ -6,7 +6,7 @@ import (
 )
 
 // Xlsx matches a Microsoft Excel 2007 file.
-func Xlsx(raw []byte, limit uint32) bool {
+func Xlsx(f *File) bool {
 	return msoxml(raw, zipEntries{{
 		name: []byte("xl/"),
 		dir:  true,
@@ -14,7 +14,7 @@ func Xlsx(raw []byte, limit uint32) bool {
 }
 
 // Docx matches a Microsoft Word 2007 file.
-func Docx(raw []byte, limit uint32) bool {
+func Docx(f *File) bool {
 	return msoxml(raw, zipEntries{{
 		name: []byte("word/"),
 		dir:  true,
@@ -22,7 +22,7 @@ func Docx(raw []byte, limit uint32) bool {
 }
 
 // Pptx matches a Microsoft PowerPoint 2007 file.
-func Pptx(raw []byte, limit uint32) bool {
+func Pptx(f *File) bool {
 	return msoxml(raw, zipEntries{{
 		name: []byte("ppt/"),
 		dir:  true,
@@ -30,7 +30,7 @@ func Pptx(raw []byte, limit uint32) bool {
 }
 
 // Visio matches a Microsoft Visio 2013+ file.
-func Visio(raw []byte, limit uint32) bool {
+func Visio(f *File) bool {
 	return msoxml(raw, zipEntries{{
 		name: []byte("visio/"),
 		dir:  true,
@@ -40,13 +40,13 @@ func Visio(raw []byte, limit uint32) bool {
 // Ole matches an Open Linking and Embedding file.
 //
 // https://en.wikipedia.org/wiki/Object_Linking_and_Embedding
-func Ole(raw []byte, limit uint32) bool {
+func Ole(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1})
 }
 
 // Doc matches a Microsoft Word 97-2003 file.
 // See: https://github.com/decalage2/oletools/blob/412ee36ae45e70f42123e835871bac956d958461/oletools/common/clsid.py
-func Doc(raw []byte, _ uint32) bool {
+func Doc(f *File) bool {
 	clsids := [][]byte{
 		// Microsoft Word 97-2003 Document (Word.Document.8)
 		{0x06, 0x09, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
@@ -66,7 +66,7 @@ func Doc(raw []byte, _ uint32) bool {
 }
 
 // Ppt matches a Microsoft PowerPoint 97-2003 file or a PowerPoint 95 presentation.
-func Ppt(raw []byte, limit uint32) bool {
+func Ppt(f *File) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
 	if matchOleClsid(raw, []byte{
@@ -104,7 +104,7 @@ func Ppt(raw []byte, limit uint32) bool {
 }
 
 // Xls matches a Microsoft Excel 97-2003 file.
-func Xls(raw []byte, limit uint32) bool {
+func Xls(f *File) bool {
 	// Root CLSID test is the safest way to detect identify OLE, however, the format
 	// often places the root CLSID at the end of the file.
 	if matchOleClsid(raw, []byte{
@@ -139,7 +139,7 @@ func Xls(raw []byte, limit uint32) bool {
 }
 
 // Pub matches a Microsoft Publisher file.
-func Pub(raw []byte, limit uint32) bool {
+func Pub(f *File) bool {
 	return matchOleClsid(raw, []byte{
 		0x01, 0x12, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
@@ -147,7 +147,7 @@ func Pub(raw []byte, limit uint32) bool {
 }
 
 // Msg matches a Microsoft Outlook email file.
-func Msg(raw []byte, limit uint32) bool {
+func Msg(f *File) bool {
 	return matchOleClsid(raw, []byte{
 		0x0B, 0x0D, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
@@ -156,7 +156,7 @@ func Msg(raw []byte, limit uint32) bool {
 
 // Msi matches a Microsoft Windows Installer file.
 // http://fileformats.archiveteam.org/wiki/Microsoft_Compound_File
-func Msi(raw []byte, limit uint32) bool {
+func Msi(f *File) bool {
 	return matchOleClsid(raw, []byte{
 		0x84, 0x10, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
@@ -164,7 +164,7 @@ func Msi(raw []byte, limit uint32) bool {
 }
 
 // One matches a Microsoft OneNote file.
-func One(raw []byte, limit uint32) bool {
+func One(f *File) bool {
 	return bytes.HasPrefix(raw, []byte{
 		0xe4, 0x52, 0x5c, 0x7b, 0x8c, 0xd8, 0xa7, 0x4d,
 		0xae, 0xb1, 0x53, 0x78, 0xd0, 0x29, 0x96, 0xd3,
@@ -200,7 +200,7 @@ func matchOleClsid(in []byte, clsid []byte) bool {
 }
 
 // WPD matches a WordPerfect document.
-func WPD(raw []byte, _ uint32) bool {
+func WPD(f *File) bool {
 	if len(raw) < 10 {
 		return false
 	}
