@@ -109,7 +109,9 @@ a,"b`,
 	{"flac", "\x66\x4C\x61\x43\x00\x00\x00\x22", "audio/flac", one},
 	{"flv", "\x46\x4C\x56\x01", "video/x-flv", one},
 	{"gbr", offset(20, "GIMP"), "image/x-gimp-gbr", one},
-	{"geojson", `{"type":"Feature"}`, "application/geo+json", one},
+	// none for benchmark because geojson detector requires the JSON detector to
+	// have previously run.
+	{"geojson", `{"type":"Feature"}`, "application/geo+json", none},
 	{"geojson with space", `{ "type" : "Feature" }`, "application/geo+json", none},
 	{"gltf1", `{"asset":{"version":"1.0"}}`, "model/gltf+json", none},
 	{"gltf2", `{"asset":{"version":"2.0"}}`, "model/gltf+json", none},
