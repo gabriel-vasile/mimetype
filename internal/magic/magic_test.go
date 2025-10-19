@@ -247,8 +247,7 @@ func TestShebangCheck(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := shebang(tt.flags, tt.sig)
-			result := d([]byte(tt.input), 0)
+			result := shebang([]byte(tt.input), tt.flags, tt.sig)
 			if result != tt.expected {
 				t.Errorf("shebang(%q, %q) = %v, want %v", tt.sig, tt.input, result, tt.expected)
 			}
