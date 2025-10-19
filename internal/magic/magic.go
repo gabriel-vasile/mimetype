@@ -55,8 +55,7 @@ func ciCheck(sig, raw []byte) bool {
 }
 
 // xml returns true if any of the provided XML signatures matches the raw input.
-func xml(raw []byte, sigs ...xmlSig) bool {
-	b := scan.Bytes(raw)
+func xml(b scan.Bytes, sigs ...xmlSig) bool {
 	b.TrimLWS()
 	if len(b) == 0 {
 		return false
@@ -83,8 +82,7 @@ func xmlCheck(sig xmlSig, raw []byte) bool {
 }
 
 // markup returns true is any of the HTML signatures matches the raw input.
-func markup(raw []byte, sigs ...[]byte) bool {
-	b := scan.Bytes(raw)
+func markup(b scan.Bytes, sigs ...[]byte) bool {
 	if bytes.HasPrefix(b, []byte{0xEF, 0xBB, 0xBF}) {
 		// We skip the UTF-8 BOM if present to ensure we correctly
 		// process any leading whitespace. The presence of the BOM
@@ -148,8 +146,7 @@ func ftyp(raw []byte, sigs ...[]byte) bool {
 //	#! /usr/bin/env php
 //
 // /usr/bin/env is the interpreter, php is the first and only argument.
-func shebang(raw []byte, matchFlags scan.Flags, sigs ...[]byte) bool {
-	b := scan.Bytes(raw)
+func shebang(b scan.Bytes, matchFlags scan.Flags, sigs ...[]byte) bool {
 	line := b.Line()
 	if len(line) < 2 || line[0] != '#' || line[1] != '!' {
 		return false
@@ -157,9 +154,7 @@ func shebang(raw []byte, matchFlags scan.Flags, sigs ...[]byte) bool {
 	line = line[2:]
 	line.TrimLWS()
 	for _, s := range sigs {
-		// Make a copy of line because code inside this loop mutates the line
-		l := line
-		if l.Match(s, matchFlags) != -1 {
+		if line.Match(s, matchFlags) != -1 {
 			return true
 		}
 	}
