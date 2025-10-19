@@ -3,7 +3,6 @@ package magic
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
@@ -137,15 +136,6 @@ func ftyp(raw []byte, sigs ...[]byte) bool {
 		}
 	}
 	return false
-}
-
-func newXMLSig(localName, xmlns string) xmlSig {
-	ret := xmlSig{xmlns: []byte(xmlns)}
-	if localName != "" {
-		ret.localName = []byte(fmt.Sprintf("<%s", localName))
-	}
-
-	return ret
 }
 
 // A valid shebang starts with the "#!" characters,
