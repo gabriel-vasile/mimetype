@@ -774,7 +774,7 @@ func TestCurrPathBounded(t *testing.T) {
 	}
 }
 
-var sample = []byte(` { "type": "Feature", "fruit": "Apple", "size": "Large", "color": "Red" } `)
+var sample = []byte(`{"type":"Feature","fruit":[{},{"dummy":"data","another field":[false,null]},true,false],"size":"Large","color":"Red"}`)
 
 func BenchmarkParse(b *testing.B) {
 	b.ReportAllocs()
