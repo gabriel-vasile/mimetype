@@ -41,93 +41,90 @@ func XML(raw []byte, _ uint32) bool {
 // Owl2 matches an Owl ontology file.
 func Owl2(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<Ontology"), []byte(`xmlns="http://www.w3.org/2002/07/owl#"`)},
+		newXMLSig([]byte("<Ontology"), []byte(`xmlns="http://www.w3.org/2002/07/owl#"`)),
 	)
 }
 
 // Rss matches a Rich Site Summary file.
 func Rss(raw []byte, _ uint32) bool {
-	return xml(raw,
-		xmlSig{[]byte("<rss"), []byte{}},
-	)
+	return xml(raw, newXMLSig([]byte("<rss")))
 }
 
 // Atom matches an Atom Syndication Format file.
 func Atom(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<feed"), []byte(`xmlns="http://www.w3.org/2005/Atom"`)},
+		newXMLSig([]byte("<feed"), []byte(`xmlns="http://www.w3.org/2005/Atom"`)),
 	)
 }
 
 // Kml matches a Keyhole Markup Language file.
 func Kml(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<kml"), []byte(`xmlns="http://www.opengis.net/kml/2.2"`)},
-		xmlSig{[]byte("<kml"), []byte(`xmlns="http://earth.google.com/kml/2.0"`)},
-		xmlSig{[]byte("<kml"), []byte(`xmlns="http://earth.google.com/kml/2.1"`)},
-		xmlSig{[]byte("<kml"), []byte(`xmlns="http://earth.google.com/kml/2.2"`)},
-	)
+		newXMLSig([]byte("<kml"),
+			[]byte(`xmlns="http://www.opengis.net/kml/2.2"`),
+			[]byte(`xmlns="http://earth.google.com/kml/2.0"`),
+			[]byte(`xmlns="http://earth.google.com/kml/2.1"`),
+			[]byte(`xmlns="http://earth.google.com/kml/2.2"`),
+		))
 }
 
 // Xliff matches a XML Localization Interchange File Format file.
 func Xliff(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<xliff"), []byte(`xmlns="urn:oasis:names:tc:xliff:document:1.2"`)},
+		newXMLSig([]byte("<xliff"), []byte(`xmlns="urn:oasis:names:tc:xliff:document:1.2"`)),
 	)
 }
 
 // Collada matches a COLLAborative Design Activity file.
 func Collada(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<COLLADA"), []byte(`xmlns="http://www.collada.org/2005/11/COLLADASchema"`)},
+		newXMLSig([]byte("<COLLADA"), []byte(`xmlns="http://www.collada.org/2005/11/COLLADASchema"`)),
 	)
 }
 
 // Gml matches a Geography Markup Language file.
 func Gml(raw []byte, _ uint32) bool {
-	return xml(raw,
-		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml"`)},
-		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml/3.2"`)},
-		xmlSig{[]byte{}, []byte(`xmlns:gml="http://www.opengis.net/gml/3.3/exr"`)},
-	)
+	return xml(raw, newXMLSig(nil, []byte(`xmlns:gml="http://www.opengis.net/gml"`))) ||
+		xml(raw, newXMLSig(nil, []byte(`xmlns:gml="http://www.opengis.net/gml/3.2"`))) ||
+		xml(raw, newXMLSig(nil, []byte(`xmlns:gml="http://www.opengis.net/gml/3.3/exr"`)))
 }
 
 // Gpx matches a GPS Exchange Format file.
 func Gpx(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<gpx"), []byte(`xmlns="http://www.topografix.com/GPX/1/1"`)},
+		newXMLSig([]byte("<gpx"), []byte(`xmlns="http://www.topografix.com/GPX/1/1"`)),
 	)
 }
 
 // Tcx matches a Training Center XML file.
 func Tcx(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<TrainingCenterDatabase"), []byte(`xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`)},
+		newXMLSig([]byte("<TrainingCenterDatabase"), []byte(`xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"`)),
 	)
 }
 
 // X3d matches an Extensible 3D Graphics file.
 func X3d(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<X3D"), []byte(`xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`)},
+		newXMLSig([]byte("<X3D"), []byte(`xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"`)),
 	)
 }
 
 // Amf matches an Additive Manufacturing XML file.
 func Amf(raw []byte, _ uint32) bool {
-	return xml(raw, xmlSig{[]byte("<amf"), []byte{}})
+	return xml(raw, newXMLSig([]byte("<amf")))
 }
 
 // Threemf matches a 3D Manufacturing Format file.
 func Threemf(raw []byte, _ uint32) bool {
 	return xml(raw,
-		xmlSig{[]byte("<model"), []byte(`xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`)},
+		newXMLSig([]byte("<model"), []byte(`xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"`)),
 	)
 }
 
 // Xfdf matches a XML Forms Data Format file.
 func Xfdf(raw []byte, _ uint32) bool {
-	return xml(raw, xmlSig{[]byte("<xfdf"), []byte(`xmlns="http://ns.adobe.com/xfdf/"`)})
+	return xml(raw, newXMLSig([]byte("<xfdf"), []byte(`xmlns="http://ns.adobe.com/xfdf/"`)))
 }
 
 // VCard matches a Virtual Contact File.

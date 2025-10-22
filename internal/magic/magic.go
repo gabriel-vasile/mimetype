@@ -16,10 +16,17 @@ type (
 	xmlSig   struct {
 		// the local name of the root tag
 		localName []byte
-		// the namespace of the XML document
-		xmlns []byte
+		// the namespaces of the XML document
+		xmlns [][]byte
 	}
 )
+
+func newXMLSig(localName []byte, xmlns ...[]byte) xmlSig {
+	return xmlSig{
+		localName: localName,
+		xmlns:     xmlns,
+	}
+}
 
 // offset returns true if the provided signature can be
 // found at offset in the raw input.
@@ -55,30 +62,34 @@ func ciCheck(sig, raw []byte) bool {
 }
 
 // xml returns true if any of the provided XML signatures matches the raw input.
-func xml(b scan.Bytes, sigs ...xmlSig) bool {
+func xml(b scan.Bytes, sig xmlSig) bool {
 	b.TrimLWS()
 	if len(b) == 0 {
 		return false
 	}
-	for _, s := range sigs {
-		if xmlCheck(s, b) {
-			return true
+	if len(sig.xmlns) == 0 {
+		return bytes.Index(b, sig.localName) > -1
+	}
+	if len(sig.localName) == 0 {
+		for _, ns := range sig.xmlns {
+			if bytes.Index(b, ns) != -1 {
+				return true
+			}
+		}
+		return false
+	}
+
+	localNameAt := bytes.Index(b, sig.localName)
+	if localNameAt == -1 {
+		return false
+	}
+	xmlnsAt := -1
+	for _, s := range sig.xmlns {
+		if xmlnsAt = bytes.Index(b, s); xmlnsAt != -1 {
+			break
 		}
 	}
-	return false
-}
-func xmlCheck(sig xmlSig, raw []byte) bool {
-	raw = raw[:min(len(raw), 512)]
-
-	if len(sig.localName) == 0 {
-		return bytes.Index(raw, sig.xmlns) > 0
-	}
-	if len(sig.xmlns) == 0 {
-		return bytes.Index(raw, sig.localName) > 0
-	}
-
-	localNameIndex := bytes.Index(raw, sig.localName)
-	return localNameIndex != -1 && localNameIndex < bytes.Index(raw, sig.xmlns)
+	return localNameAt < xmlnsAt
 }
 
 // markup returns true is any of the HTML signatures matches the raw input.
