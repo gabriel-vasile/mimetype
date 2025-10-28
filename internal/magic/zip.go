@@ -167,11 +167,11 @@ func msoxml(raw scan.Bytes, searchFor zipEntries, stopAfter int) bool {
 		// If the first is not one of the next usually expected entries,
 		// then abort this check.
 		if i == 0 {
-			if !bytes.Equal(f, []byte("[Content_Types].xml")) &&
-				!bytes.Equal(f, []byte("_rels/.rels")) &&
-				!bytes.Equal(f, []byte("docProps")) &&
-				!bytes.Equal(f, []byte("customXml")) &&
-				!bytes.Equal(f, []byte("[trash]")) {
+			if !bytes.Equal(f, []byte("[Content_Types].xml")) && // this is a file
+				!bytes.HasPrefix(f, []byte("_rels/")) && // these are directories
+				!bytes.HasPrefix(f, []byte("docProps/")) &&
+				!bytes.HasPrefix(f, []byte("customXml/")) &&
+				!bytes.HasPrefix(f, []byte("[trash]/")) {
 				return false
 			}
 		}
