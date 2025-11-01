@@ -794,3 +794,21 @@ func fromDisk(path string) string {
 	}
 	return string(data)
 }
+
+// Ensure the signatures of exposed APIs don't accidentally change.
+var (
+	_ func([]byte) *MIME             = Detect
+	_ func(io.Reader) (*MIME, error) = DetectReader
+	_ func(string) (*MIME, error)    = DetectFile
+	_ func(string, ...string) bool   = EqualsAny
+	_ func(uint32)                   = SetLimit
+	_ func(string) *MIME             = Lookup
+	m                                = &MIME{}
+	_ func() string                  = m.String
+	_ func() string                  = m.Extension
+	_ func() *MIME                   = m.Parent
+	_ func(string) bool              = m.Is
+
+	_ func(func([]byte, uint32) bool, string, string, ...string) = Extend
+	_ func(func([]byte, uint32) bool, string, string, ...string) = m.Extend
+)
