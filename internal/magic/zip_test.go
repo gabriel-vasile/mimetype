@@ -173,3 +173,39 @@ uncompressedZip: docx	xlsx	pptx	jar %d
 		})
 	}
 }
+
+func BenchmarkZip(b *testing.B) {
+	buf, err := createZip([]string{
+		"[Content_Types].xml",
+		"_rels/.rels",
+		"customXml/_rels/item1.xml",
+		"customXml/_rels/item2.xml.rels",
+		"customXml/_rels/item3.xml.rels",
+		"customXml/_rels/item4.xml.rels",
+		"customXml/item1.xml",
+		"customXml/item2.xml",
+		"customXml/item3.xml",
+		"customXml/itemProps1.xml",
+		"customXml/itemProps2.xml",
+		"customXml/itemProps3.xml",
+		"docProps/app.xml",
+		"docProps/core.xml",
+		"docProps/custom.xml",
+		"ppt/_rels/presentation.xml.rel",
+		"xl/_rels/presentation.xml.rel",
+		"word/_rels/presentation.xml.rel",
+		"doc.kml",
+	})
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ReportAllocs()
+	for b.Loop() {
+		Docx(buf.Bytes(), 0)
+		Xlsx(buf.Bytes(), 0)
+		Pptx(buf.Bytes(), 0)
+		Jar(buf.Bytes(), 0)
+		KMZ(buf.Bytes(), 0)
+	}
+}
