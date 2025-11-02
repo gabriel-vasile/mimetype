@@ -352,13 +352,20 @@ func GLTF(raw []byte, limit uint32) bool {
 	return jsonHelper(raw, limit, json.QueryGLTF, json.TokObject)
 }
 
-func jsonHelper(raw []byte, limit uint32, q string, wantTok int) bool {
-	if !json.LooksLikeObjectOrArray(raw) {
+func jsonHelper(raw scan.Bytes, limit uint32, q string, wantToks ...int) bool {
+	firstNonWS := raw.FirstNonWS()
+
+	hasTargetTok := false
+	for _, t := range wantToks {
+		hasTargetTok = hasTargetTok || (t&json.TokArray > 0 && firstNonWS == '[')
+		hasTargetTok = hasTargetTok || (t&json.TokObject > 0 && firstNonWS == '{')
+	}
+	if !hasTargetTok {
 		return false
 	}
 	lraw := len(raw)
-	parsed, inspected, firstToken, querySatisfied := json.Parse(q, raw)
-	if !querySatisfied || firstToken&wantTok == 0 {
+	parsed, inspected, _, querySatisfied := json.Parse(q, raw)
+	if !querySatisfied {
 		return false
 	}
 

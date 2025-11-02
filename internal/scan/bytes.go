@@ -35,6 +35,19 @@ func (b *Bytes) TrimRWS() {
 	}
 }
 
+// FirstNonWS returns the first non-whitespace character from b,
+// or 0x00 if no such character is found.
+func (b Bytes) FirstNonWS() byte {
+	for i := range b {
+		if ByteIsWS(b[i]) {
+			continue
+		}
+		return b[i]
+	}
+
+	return 0x00
+}
+
 // Peek one byte from b or 0x00 if b is empty.
 func (b *Bytes) Peek() byte {
 	if len(*b) > 0 {
