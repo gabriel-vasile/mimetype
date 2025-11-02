@@ -574,7 +574,7 @@ func BenchmarkOne(b *testing.B) {
 		// data is used for the positive case benchmark.
 		b.Run(tc.name, func(b *testing.B) {
 			b.ReportAllocs()
-			for n := 0; n < b.N; n++ {
+			for b.Loop() {
 				if !mtype.detector(data, defaultLimit) {
 					b.Fatalf("positive detection should never fail")
 				}
@@ -600,7 +600,7 @@ func BenchmarkAll(b *testing.B) {
 		data := []byte(tc.data)
 		b.Run(tc.name, func(b *testing.B) {
 			b.ReportAllocs()
-			for n := 0; n < b.N; n++ {
+			for b.Loop() {
 				// Benchmark both positive and negative.
 				Detect(data)
 				Detect(randData)
@@ -622,7 +622,7 @@ func BenchmarkAllTogether(b *testing.B) {
 	}
 	b.ResetTimer()
 	b.ReportAllocs()
-	for n := 0; n < b.N; n++ {
+	for b.Loop() {
 		for _, d := range datas {
 			Detect(d)
 			Detect(randData)

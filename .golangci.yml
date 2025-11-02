@@ -3,3 +3,7 @@ linters:
   exclusions:
     presets:
       - std-error-handling
+  settings:
+    govet:
+      disable:
+        - stdversion
