@@ -86,9 +86,8 @@ func Zip(raw []byte, limit uint32) bool {
 func Jar(raw []byte, limit uint32) bool {
 	return executableJar(raw) ||
 		zipHas(raw, zipEntries{{
-			name: []byte("META-INF/MANIFEST.MF"),
-		}, {
 			name: []byte("META-INF/"),
+			dir:  true,
 		}}, 1)
 }
 
@@ -127,11 +126,14 @@ type zipEntries []struct {
 
 func (z zipEntries) match(file []byte) bool {
 	for i := range z {
-		if z[i].dir && bytes.HasPrefix(file, z[i].name) {
-			return true
-		}
-		if bytes.Equal(file, z[i].name) {
-			return true
+		if z[i].dir {
+			if bytes.HasPrefix(file, z[i].name) {
+				return true
+			}
+		} else {
+			if bytes.Equal(file, z[i].name) {
+				return true
+			}
 		}
 	}
 	return false
