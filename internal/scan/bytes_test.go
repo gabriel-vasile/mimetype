@@ -142,6 +142,34 @@ func TestTrim(t *testing.T) {
 	}
 }
 
+func TestFirstNonWS(t *testing.T) {
+	tcases := []struct {
+		name  string
+		in    string
+		c  byte
+	}{{
+		"empty", "", 0x00,
+	}, {
+		"all ws", "   ", 0x00,
+	}, {
+		"first char", "a", 'a',
+	}, {
+		"second char", " a", 'a',
+	}, {
+		"space then nil", " \x00", 0x00,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			b := Bytes(tc.in)
+			c := b.FirstNonWS()
+			if c != tc.c {
+				t.Errorf("got: %x, want: %x", c, tc.c)
+			}
+		})
+	}
+}
+
 func TestAdvance(t *testing.T) {
 	tcases := []struct {
 		name     string

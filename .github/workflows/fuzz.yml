@@ -16,7 +16,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v6.0.0
       with:
-        go-version-file: 'go.mod'
+        go-version: 'stable'
     # 3m is chosen so that half of the 2000 free CI minutes offered by Github
     # will be used each month. The other half is reserved for tests in PRs.
     # TODO: Find a way to select all fuzz tests, without listing them individually.
