@@ -27,3 +27,6 @@ jobs:
     # Run the quick tests many times to try and find flakyness.
     - name: Run tests -count=1000
       run: go test -count=1000 -shuffle=on -short ./...
+    # Testing on 32 bit architecture to find overflow problems as found in #731.
+    - name: Run tests on 32 bit architecture
+      run: GOARCH=386 go test -count=1 -shuffle=on ./...

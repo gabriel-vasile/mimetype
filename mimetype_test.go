@@ -495,28 +495,28 @@ func TestConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(4)
 
-	n := 1000
+	n := uint32(1000)
 	Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 	go func() {
-		for i := 0; i < n; i++ {
+		for i := uint32(0); i < n; i++ {
 			Detect([]byte("text content"))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < n; i++ {
+		for i := uint32(0); i < n; i++ {
 			SetLimit(5000 + uint32(i))
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < n; i++ {
+		for i := uint32(0); i < n; i++ {
 			Lookup("text/plain")
 		}
 		wg.Done()
 	}()
 	go func() {
-		for i := 0; i < n; i++ {
+		for i := uint32(0); i < n; i++ {
 			Lookup("e").Extend(func([]byte, uint32) bool { return false }, "e", ".e")
 		}
 		wg.Done()

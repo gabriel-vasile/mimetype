@@ -106,10 +106,10 @@ func CRX(raw []byte, limit uint32) bool {
 	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
 		return false
 	}
-	pubkeyLen := binary.LittleEndian.Uint32(raw[8:12])
-	sigLen := binary.LittleEndian.Uint32(raw[12:16])
+	pubkeyLen := int64(binary.LittleEndian.Uint32(raw[8:12]))
+	sigLen := int64(binary.LittleEndian.Uint32(raw[12:16]))
 	zipOffset := minHeaderLen + pubkeyLen + sigLen
-	if uint32(len(raw)) < zipOffset {
+	if zipOffset < 0 || int64(len(raw)) < zipOffset {
 		return false
 	}
 	return Zip(raw[zipOffset:], limit)

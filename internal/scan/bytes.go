@@ -130,7 +130,7 @@ func (b *Bytes) Line() Bytes {
 // If b length is less than readLimit, it means we received an incomplete file
 // and proceed with dropping the last line.
 func (b *Bytes) DropLastLine(readLimit uint32) {
-	if readLimit == 0 || uint32(len(*b)) < readLimit {
+	if readLimit == 0 || uint64(len(*b)) < uint64(readLimit) {
 		return
 	}
 
