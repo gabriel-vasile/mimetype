@@ -637,6 +637,7 @@ func TestIndexOutOfRangePanic(t *testing.T) {
 	}
 	nodes := root.flatten()
 	testAtEachIndex := func(t *testing.T, in []byte) {
+		t.Helper()
 		for _, n := range nodes {
 			for i := 0; i < len(in); i++ {
 				n.detector(in[:i], 1<<10)

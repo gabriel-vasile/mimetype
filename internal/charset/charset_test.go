@@ -84,7 +84,7 @@ func TestFromHTML(t *testing.T) {
 	for _, tc := range fromHTMLTestCases {
 		t.Run(tc.in, func(t *testing.T) {
 			got := fromHTML([]byte(tc.in))
-			if string(got) != tc.out {
+			if got != tc.out {
 				t.Errorf("got: %s, want: %s", got, tc.out)
 			}
 		})
@@ -133,7 +133,7 @@ func TestFromXML(t *testing.T) {
 	for _, tc := range fromXMLTestCases {
 		t.Run(tc.in, func(t *testing.T) {
 			got := fromXML([]byte(tc.in))
-			if string(got) != tc.out {
+			if got != tc.out {
 				t.Errorf("got: %s, want: %s", got, tc.out)
 			}
 		})

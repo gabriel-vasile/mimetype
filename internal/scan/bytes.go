@@ -76,8 +76,8 @@ func (b *Bytes) PopN(n int) []byte {
 	return nil
 }
 
-// PopUntil will advance b until, but not including, the first occurence of stopAt
-// character. If no occurence is found, then it will advance until the end of b.
+// PopUntil will advance b until, but not including, the first occurrence of stopAt
+// character. If no occurrence is found, then it will advance until the end of b.
 // The returned Bytes is a slice of all the bytes that we're advanced over.
 func (b *Bytes) PopUntil(stopAt ...byte) Bytes {
 	if len(*b) == 0 {
@@ -90,7 +90,7 @@ func (b *Bytes) PopUntil(stopAt ...byte) Bytes {
 
 	prefix := (*b)[:i]
 	*b = (*b)[i:]
-	return Bytes(prefix)
+	return prefix
 }
 
 // ReadSlice is the same as PopUntil, but the returned value includes stopAt as well.
@@ -107,7 +107,7 @@ func (b *Bytes) ReadSlice(stopAt byte) Bytes {
 
 	prefix := (*b)[:i]
 	*b = (*b)[i:]
-	return Bytes(prefix)
+	return prefix
 }
 
 // Line returns the first line from b and advances b with the length of the
@@ -164,7 +164,7 @@ const (
 	FullWord
 )
 
-// Search for occurences of pattern p inside b at any index.
+// Search for occurrences of pattern p inside b at any index.
 // It returns the index where p was found in b and how many bytes were needed
 // for matching the pattern.
 func (b Bytes) Search(p []byte, flags Flags) (i int, l int) {
