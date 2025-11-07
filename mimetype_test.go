@@ -505,7 +505,7 @@ func TestConcurrent(t *testing.T) {
 	}()
 	go func() {
 		for i := uint32(0); i < n; i++ {
-			SetLimit(5000 + uint32(i))
+			SetLimit(5000 + i)
 		}
 		wg.Done()
 	}()
@@ -722,7 +722,7 @@ func TestExtend(t *testing.T) {
 
 			extend(func(raw []byte, limit uint32) bool { return false }, tt.mime, tt.ext)
 			m := Lookup(tt.mime)
-			if m == nil {
+			if m == nil { //nolint: staticcheck SA5011
 				t.Fatalf("mime %s not found", tt.mime)
 			}
 			if m.parent != tt.parent {
