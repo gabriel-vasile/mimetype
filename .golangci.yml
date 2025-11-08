@@ -11,7 +11,6 @@ linters:
     - gosec          # Detects security problems.
     # Keep all extras disabled for now to focus on the integer overflow problem.
     # TODO: enable these and other good linters
-    - copyloopvar    # Detects places where loop variables are copied.
     - dogsled        # Detects assignments with too many blank identifiers.
     - errcheck
     - errchkjson     # Detects unsupported types passed to json encoding functions and reports if checks for the returned error can be omitted.
