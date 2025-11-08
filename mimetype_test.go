@@ -722,7 +722,7 @@ func TestExtend(t *testing.T) {
 
 			extend(func(raw []byte, limit uint32) bool { return false }, tt.mime, tt.ext)
 			m := Lookup(tt.mime)
-			if m == nil { //nolint: staticcheck SA5011
+			if m == nil {
 				t.Fatalf("mime %s not found", tt.mime)
 			}
 			if m.parent != tt.parent {
