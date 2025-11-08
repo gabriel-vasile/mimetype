@@ -19,9 +19,9 @@ jobs:
       with:
         go-version: 'stable'
     - name: Run linters
-      uses: golangci/golangci-lint-action@v8
+      uses: golangci/golangci-lint-action@v9
       with:
-        version: "v2.4.0"
+        version: "latest"
     - name: Run tests
       run: go test -race -shuffle=on ./...
     # Run the quick tests many times to try and find flakyness.

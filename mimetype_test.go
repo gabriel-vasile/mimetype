@@ -505,7 +505,7 @@ func TestConcurrent(t *testing.T) {
 	}()
 	go func() {
 		for i := uint32(0); i < n; i++ {
-			SetLimit(5000 + uint32(i))
+			SetLimit(5000 + i)
 		}
 		wg.Done()
 	}()
@@ -637,6 +637,7 @@ func TestIndexOutOfRangePanic(t *testing.T) {
 	}
 	nodes := root.flatten()
 	testAtEachIndex := func(t *testing.T, in []byte) {
+		t.Helper()
 		for _, n := range nodes {
 			for i := 0; i < len(in); i++ {
 				n.detector(in[:i], 1<<10)

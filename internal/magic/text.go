@@ -376,7 +376,7 @@ func jsonHelper(raw scan.Bytes, limit uint32, q string, wantToks ...int) bool {
 
 	// If a section of the file was provided, check if all of it was inspected.
 	// In other words, check that if there was a problem parsing, that problem
-	// occured at the last byte in the input.
+	// occurred at the last byte in the input.
 	return inspected == lraw && lraw > 0
 }
 
