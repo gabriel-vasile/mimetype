@@ -98,6 +98,10 @@ func TestZeroZip(t *testing.T) {
 		files: []string{"META-INF/"},
 		jar:   true,
 	}, {
+		name:  "META-INF but not manifest first",
+		files: []string{"META-INF/com.github.org", "META-INF/"},
+		jar:   false,
+	}, {
 		name:  "manifest second file",
 		files: []string{"1", "META-INF/MANIFEST.MF"},
 		jar:   false,
