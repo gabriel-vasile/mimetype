@@ -12,7 +12,7 @@ jobs:
     steps:
     # Base for comparison is master branch.
     - name: Checkout code
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v5.0.1
       with:
         ref: master
     - name: Install Go
@@ -22,7 +22,7 @@ jobs:
     - run: go install golang.org/x/perf/cmd/benchstat@latest
     - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v5.0.1
     # Second run of benchmarks
     - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/curr
 

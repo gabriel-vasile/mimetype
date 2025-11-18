@@ -20,13 +20,13 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v5.0.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3.30.3
+        uses: github/codeql-action/init@v4.31.3
         with:
           languages: go
           queries: security-and-quality
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3.30.3
+        uses: github/codeql-action/analyze@v4.31.3
