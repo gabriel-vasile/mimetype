@@ -82,7 +82,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam, rfc822)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -287,4 +287,5 @@ var (
 	chm     = newMIME("application/vnd.ms-htmlhelp", ".chm", magic.CHM)
 	wpd     = newMIME("application/vnd.wordperfect", ".wpd", magic.WPD)
 	dxf     = newMIME("image/vnd.dxf", ".dxf", magic.DXF)
+	rfc822  = newMIME("message/rfc822", ".eml", magic.RFC822)
 )

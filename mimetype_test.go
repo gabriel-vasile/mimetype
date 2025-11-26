@@ -163,9 +163,9 @@ a,"b`,
 	{"js", "#!/bin/node ", "text/javascript", one},
 	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", all},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", none},
-	// json.{int,string}.txt contain a single JSON value. They are valid JSON
+	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
-	// the behaviour of the file utility and seems the correct thing to do.
+	// the behaviour of libmagic and seems the correct thing to do.
 	{"json.int.txt", "1", "text/plain; charset=utf-8", none},
 	{"json.float.txt", "1.5", "text/plain; charset=utf-8", none},
 	{"json.string.txt", `"some string"`, "text/plain; charset=utf-8", none},
@@ -258,6 +258,8 @@ ENDHDR`,
 	{"py3 with code", "#!/usr/bin/env -S python3\nprint(1)", "text/x-python", none},
 	{"qcp", "RIFF\xc0\xcf\x00\x00QLCMf", "audio/qcelp", one},
 	{"rar", "Rar!\x1a\x07\x01\x00", "application/x-rar-compressed", all},
+	{"rfc822", "Cc: cc@mail.com\nTo: to@mail.com", "message/rfc822", one},
+	{"rfc822 case insensitive", "Cc: cc@mail.com\nDeLiVeReD-To: to@mail.com", "message/rfc822", none},
 	{"rb", "#!/usr/local/bin/ruby", "text/x-ruby", one},
 	{"rmvb", ".RMF", "application/vnd.rn-realmedia-vbr", one},
 	{"rpm", "\xed\xab\xee\xdb", "application/x-rpm", one},
