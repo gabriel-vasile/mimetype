@@ -163,9 +163,9 @@ a,"b`,
 	{"js", "#!/bin/node ", "text/javascript", one},
 	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", all},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", none},
-	// json.{int,string}.txt contain a single JSON value. They are valid JSON
+	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
-	// the behaviour of the file utility and seems the correct thing to do.
+	// the behaviour of libmagic and seems the correct thing to do.
 	{"json.int.txt", "1", "text/plain; charset=utf-8", none},
 	{"json.float.txt", "1.5", "text/plain; charset=utf-8", none},
 	{"json.string.txt", `"some string"`, "text/plain; charset=utf-8", none},

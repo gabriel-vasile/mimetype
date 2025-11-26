@@ -283,7 +283,7 @@ func Shell(raw []byte, _ uint32) bool {
 // Text matches a plain text file.
 //
 // TODO: This function does not parse BOM-less UTF16 and UTF32 files. Not really
-// sure it should. Linux file utility also requires a BOM for UTF16 and UTF32.
+// sure it should. libmagic also requires a BOM for UTF16 and UTF32.
 func Text(raw []byte, _ uint32) bool {
 	// First look for BOM.
 	if cset := charset.FromBOM(raw); cset != "" {
