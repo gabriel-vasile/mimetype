@@ -35,3 +35,32 @@ func BenchmarkJSONPathological(b *testing.B) {
 		NdJSON(hugeObject, 0)
 	}
 }
+
+func TestRFC822(t *testing.T) {
+	testcases := []struct {
+		name     string
+		in       string
+		expected bool
+	}{{
+		"empty", "", false,
+	}, {
+		"one hint", "Cc: cc@mail.com", false,
+	}, {
+		"two identical hints", "Cc: cc@mail.com\nCc: cc@mail.com", true,
+	}, {
+		"two different hints", "Cc: cc@mail.com\nTo: to@mail.com", true,
+	}, {
+		"junk at start", "junk\nCc: cc@mail.com\nTo: to@mail.com", false,
+	}, {
+		"junk later", "Cc: cc@mail.com\njunk To: to@mail.com", false,
+	}}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := RFC822([]byte(tc.in), 0)
+			if tc.expected != got {
+				t.Errorf("expected: %t, got: %t", tc.expected, got)
+			}
+		})
+	}
+}

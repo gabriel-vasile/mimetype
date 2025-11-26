@@ -543,3 +543,57 @@ func Vtt(raw []byte, limit uint32) bool {
 	return bytes.Equal(raw, []byte{0xEF, 0xBB, 0xBF, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) || // UTF-8 BOM and "WEBVTT"
 		bytes.Equal(raw, []byte{0x57, 0x45, 0x42, 0x56, 0x54, 0x54}) // "WEBVTT"
 }
+
+type rfc822Hint struct {
+	h          []byte
+	matchFlags scan.Flags
+}
+
+// The hints come from libmagic, but the implementation is bit different. libmagic
+// only checks if the file starts with the hint, while we additionally look for
+// a secondary hint in the first few lines of input.
+func RFC822(raw []byte, limit uint32) bool {
+	b := scan.Bytes(raw)
+
+	// Keep hints here to avoid instantiating them several times in lineHasRFC822Hint.
+	// The alternative is to make them a package level var, but then they'd go
+	// on the heap.
+	// Some of the hints are IgnoreCase, some not. I selected based on what libmagic
+	// does and based on personal observations from sample files.
+	hints := []rfc822Hint{
+		{[]byte("From: "), 0},
+		{[]byte("To: "), 0},
+		{[]byte("CC: "), scan.IgnoreCase},
+		{[]byte("Date: "), 0},
+		{[]byte("Subject: "), 0},
+		{[]byte("Received: "), 0},
+		{[]byte("Relay-Version: "), 0},
+		{[]byte("#! rnews"), 0},
+		{[]byte("N#! rnews"), 0},
+		{[]byte("Forward to"), 0},
+		{[]byte("Pipe to"), 0},
+		{[]byte("DELIVERED-TO: "), scan.IgnoreCase},
+		{[]byte("RETURN-PATH: "), scan.IgnoreCase},
+		{[]byte("Content-Type: "), 0},
+		{[]byte("Content-Transfer-Encoding: "), 0},
+	}
+	if !lineHasRFC822Hint(b.Line(), hints) {
+		return false
+	}
+	for i := 0; i < 20; i++ {
+		if lineHasRFC822Hint(b.Line(), hints) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func lineHasRFC822Hint(b scan.Bytes, hints []rfc822Hint) bool {
+	for _, h := range hints {
+		if b.Match(h.h, h.matchFlags) > -1 {
+			return true
+		}
+	}
+	return false
+}
