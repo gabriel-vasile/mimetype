@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v6.0.0
     - name: Install Go
-      uses: actions/setup-go@v6.0.0
+      uses: actions/setup-go@v6.1.0
       with:
         go-version: 'stable'
     - name: Run linters
