@@ -209,3 +209,13 @@ func tarChksum(b []byte) (unsigned, signed int64) {
 	}
 	return unsigned, signed
 }
+
+// Zlib matches zlib compressed files.
+func Zlib(raw []byte, _ uint32) bool {
+	// https://www.ietf.org/rfc/rfc6713.txt
+	// This check has one fault: ASCII code can satisfy it; for ex: []byte("x ")
+	zlib := len(raw) > 1 &&
+		raw[0] == 'x' && binary.BigEndian.Uint16(raw)%31 == 0
+	// Check that the file is not a regular text to avoid false positives.
+	return zlib && !Text(raw, 0)
+}
