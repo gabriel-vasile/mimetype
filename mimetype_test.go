@@ -333,6 +333,8 @@ ENDHDR`,
 	{"xml withbr", "\x0D\x0A<?xml ", "text/xml; charset=utf-8", none},
 	{"xz", "\xfd7zXZ\x00", "application/x-xz", one},
 	{"zip", "PK\x03\x04", "application/zip", all},
+	// The word Hi compressed with zlib: echo Hi | pigz -z | od -A n -t x1
+	{"zlib", "\x78\x5e\xf3\xc8\xe4\x02\x00\x01\xb7\x00\xbc", "application/zlib", one},
 	{"zst", "(\xb5/\xfd", "application/zstd", all},
 	{"zst skippable frame", "\x50\x2A\x4D\x18", "application/zstd", none},
 }

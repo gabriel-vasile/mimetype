@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib,
+	oneNote, chm, wpd, dxf, grib, zlib,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -289,4 +289,5 @@ var (
 	dxf     = newMIME("image/vnd.dxf", ".dxf", magic.DXF)
 	rfc822  = newMIME("message/rfc822", ".eml", magic.RFC822)
 	grib    = newMIME("application/grib", ".grb", magic.GRIB)
+	zlib    = newMIME("application/zlib", "", magic.Zlib)
 )
