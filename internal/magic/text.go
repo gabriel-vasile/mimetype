@@ -387,7 +387,6 @@ func NdJSON(raw []byte, limit uint32) bool {
 	lCount, objOrArr := 0, 0
 
 	s := scan.Bytes(raw)
-	s.DropLastLine(limit)
 	var l scan.Bytes
 	for len(s) != 0 {
 		l = s.Line()
