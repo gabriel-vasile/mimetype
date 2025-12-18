@@ -209,6 +209,25 @@ a,"b`,
 	{"msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", one},
 	{"ndjson", `{"key":"val"}` + "\n" + `{"key":"val"}`, "application/x-ndjson", one},
 	{"ndjson spaces", `{ "key" : "val" }` + "\n" + ` { "key" : "val" }`, "application/x-ndjson", one},
+	{
+		"ndjson with before&after lines",
+		`
+		{"key":"val"}
+		{"key":"val"}
+`,
+		"application/x-ndjson",
+		none,
+	},
+	{
+		// Empty lines should not be counted as ndjson.
+		"json with before&after lines",
+		`
+		{"key":"val"}
+		{"key":"val"}
+`,
+		"application/x-ndjson",
+		none,
+	},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", one},
 	{"elfobject", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00", "application/x-object", one},
 	{"odf", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula", one},
@@ -776,6 +795,24 @@ func TestInputIsNotMutated(t *testing.T) {
 			}
 		})
 	}
+}
+
+// For #744
+func TestNDJSONCutOnSecondLine(t *testing.T) {
+	data := []byte(`{"key": "this json line has 43 characters"}
+{"key": "this json line has 43 characters"}`)
+	SetLimit(uint32(len(data))) //nolint:gosec
+	mtype := Detect(data)
+	if !mtype.Is("application/x-ndjson") {
+		t.Errorf("expected nd-json two lines of JSON; got: %s", mtype)
+	}
+
+	SetLimit(43 + 43/2)
+	mtype = Detect(data)
+	if !mtype.Is("application/x-ndjson") {
+		t.Errorf("expected nd-json for one and a half lines of JSON; got: %s", mtype)
+	}
+	SetLimit(defaultLimit)
 }
 
 const (
