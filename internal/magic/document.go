@@ -98,3 +98,13 @@ func Lotus123(raw []byte, _ uint32) bool {
 func CHM(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte("ITSF\003\000\000\000\x60\000\000\000"))
 }
+
+// Inf matches an OS/2 .inf file.
+func Inf(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("HSP\x01\x9b\x00"))
+}
+
+// Hlp matches an OS/2 .hlp file.
+func Hlp(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("HSP\x10\x9b\x00"))
+}
