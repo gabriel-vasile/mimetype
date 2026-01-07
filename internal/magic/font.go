@@ -17,7 +17,7 @@ func Woff2(raw []byte, _ uint32) bool {
 
 // Otf matches an OpenType font file.
 func Otf(raw []byte, _ uint32) bool {
-	return bytes.HasPrefix(raw, []byte{0x4F, 0x54, 0x54, 0x4F, 0x00})
+	return bytes.HasPrefix(raw, []byte("OTTO")) && hasSFNTTable(raw)
 }
 
 // Ttf matches a TrueType font file.
@@ -25,6 +25,11 @@ func Ttf(raw []byte, limit uint32) bool {
 	if !bytes.HasPrefix(raw, []byte{0x00, 0x01, 0x00, 0x00}) {
 		return false
 	}
+	return hasSFNTTable(raw)
+}
+
+func hasSFNTTable(raw []byte) bool {
+	// 49 possible tables as explained below
 	if len(raw) < 16 || binary.BigEndian.Uint16(raw[4:]) >= 49 {
 		return false
 	}
