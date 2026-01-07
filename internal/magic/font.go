@@ -45,6 +45,8 @@ func Ttf(raw []byte, limit uint32) bool {
 		"morx", "name", "opbd", "OS/2", "post", "prep", "prop", "sbix", "trak",
 		"vhea", "vmtx", "xref", "Zapf",
 	}
+	// TODO: benchmark these strings comparisons. They are 4 bytes, so another
+	// option is to compare them as ints. Probably less readable that way.
 	for _, t := range possibleTables {
 		if string(raw[12:16]) == t {
 			return true
