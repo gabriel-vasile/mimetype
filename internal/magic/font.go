@@ -17,7 +17,11 @@ func Woff2(raw []byte, _ uint32) bool {
 
 // Otf matches an OpenType font file.
 func Otf(raw []byte, _ uint32) bool {
-	return bytes.HasPrefix(raw, []byte("OTTO")) && hasSFNTTable(raw)
+	// After OTTO an little endian int16 specifies the number of tables.
+	// Since the number of tables cannot exceed 256, the first byte of the
+	// int16 is always 0. PUID: fmt/520
+	return len(raw) > 48 && bytes.HasPrefix(raw, []byte("OTTO\x00")) &&
+		bytes.Contains(raw[12:48], []byte("CFF "))
 }
 
 // Ttf matches a TrueType font file.
@@ -48,7 +52,7 @@ func hasSFNTTable(raw []byte) bool {
 		"gcid", "glyf", "gvar", "hdmx", "head", "hhea", "hmtx", "hvgl", "hvpm",
 		"just", "kern", "kerx", "lcar", "loca", "ltag", "maxp", "meta", "mort",
 		"morx", "name", "opbd", "OS/2", "post", "prep", "prop", "sbix", "trak",
-		"vhea", "vmtx", "xref", "Zapf",
+		"vhea", "vmtx", "xref", "Zapf", "DSIG",
 	}
 	// TODO: benchmark these strings comparisons. They are 4 bytes, so another
 	// option is to compare them as ints. Probably less readable that way.
