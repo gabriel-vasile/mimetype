@@ -738,7 +738,7 @@ func TestStack(t *testing.T) {
 	}
 
 	join := func(bs [][]byte) string {
-		ret := []string{}
+		ret := make([]string, 0, len(bs))
 		for _, b := range bs {
 			ret = append(ret, string(b))
 		}
