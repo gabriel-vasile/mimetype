@@ -651,7 +651,7 @@ func BenchmarkAllTogether(b *testing.B) {
 	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
-	datas := make([]byte, 0, len(testcases))
+	datas := make([][]byte, 0, len(testcases))
 	for _, tc := range testcases {
 		datas = append(datas, []byte(tc.data))
 	}
