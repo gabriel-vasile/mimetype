@@ -250,7 +250,7 @@ a,"b`,
 	{"ogg", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbc\x81_\x00\x00\x00\x00\xd0\xfbP\x84\x01@fishead\x00\x03", "video/ogg", one},
 	{"ogg spx oga", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\xc7w\xaa\x15\x00\x00\x00\x00V&\x88\x89\x01PSpeex   1", "audio/ogg", one},
 	{"one", "\xe4\x52\x5c\x7b\x8c\xd8\xa7\x4d\xae\xb1\x53\x78\xd0\x29\x96\xd3", "application/onenote", one},
-	{"otf", "OTTO\x00", "font/otf", one},
+	{"otf", "OTTO\x00\x0c\x00\x80\x00\x03\x00\x40\x43\x46\x46 " + offset(36, ""), "font/otf", one},
 	{"otg", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xd1Y\xa8N\xdf%\xad\xe94\x00\x00\x004\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.graphics-template", "application/vnd.oasis.opendocument.graphics-template", one},
 	{"otp", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xc4X\xa8N\xef\n\x14:8\x00\x00\x008\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.presentation-template", "application/vnd.oasis.opendocument.presentation-template", one},
 	{"ots", "PK\x03\x04\x14\x00\x00\x08\x00\x00\x1bV\xa8N{\x96\xa3N7\x00\x00\x007\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.spreadsheet-template", "application/vnd.oasis.opendocument.spreadsheet-template", one},
@@ -328,7 +328,7 @@ ENDHDR`,
 	{"tiff", "II*\x00", "image/tiff", one},
 	{"tsv", "a\t\"b\"\tc\n1\t2\t3", "text/tab-separated-values", all},
 	{"ttc", "ttcf\x00\x01\x00\x00", "font/collection", one},
-	{"ttf", "\x00\x01\x00\x00", "font/ttf", one},
+	{"ttf", "\x00\x01\x00\x00\x00\x0f\x00\x80\x00\x03\x00\x70\x4f\x53\x2f\x32", "font/ttf", one},
 	{"tzfile", fromDisk("tzfile"), "application/tzif", one},
 	{"utf16bebom txt", "\xfe\xff\x00\x74\x00\x68\x00\x69\x00\x73", "text/plain; charset=utf-16be", none},
 	{"utf16lebom txt", "\xff\xfe\x74\x00\x68\x00\x69\x00\x73\x00", "text/plain; charset=utf-16le", none},
@@ -651,7 +651,7 @@ func BenchmarkAllTogether(b *testing.B) {
 	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
 		b.Fatal(err)
 	}
-	datas := [][]byte{}
+	datas := make([][]byte, 0, len(testcases))
 	for _, tc := range testcases {
 		datas = append(datas, []byte(tc.data))
 	}
