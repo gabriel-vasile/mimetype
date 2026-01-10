@@ -45,19 +45,52 @@ func hasSFNTTable(raw []byte) bool {
 	// 1. https://developer.apple.com/fonts/TrueType-Reference-Manual/index.html
 	// 2. https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6.html
 	// Page 1. has 48 tables. Page 2. has 49 tables. The diff is the gcid table.
-	// Take a permissive approach,
-	possibleTables := []string{
-		"acnt", "ankr", "avar", "bdat", "bhed", "bloc", "bsln", "cmap", "cvar",
-		"cvt ", "EBSC", "fdsc", "feat", "fmtx", "fond", "fpgm", "fvar", "gasp",
-		"gcid", "glyf", "gvar", "hdmx", "head", "hhea", "hmtx", "hvgl", "hvpm",
-		"just", "kern", "kerx", "lcar", "loca", "ltag", "maxp", "meta", "mort",
-		"morx", "name", "opbd", "OS/2", "post", "prep", "prop", "sbix", "trak",
-		"vhea", "vmtx", "xref", "Zapf", "DSIG",
+	// Take a permissive approach.
+	possibleTables := []uint32{
+		0x61636e74, // "acnt"
+		0x616e6b72, // "ankr"
+		0x61766172, // "avar"
+		0x62646174, // "bdat"
+		0x62686564, // "bhed"
+		0x626c6f63, // "bloc"
+		0x62736c6e, // "bsln"
+		0x636d6170, // "cmap"
+		0x63766172, // "cvar"
+		0x63767420, // "cvt "
+		0x45425343, // "EBSC"
+		0x66647363, // "fdsc"
+		0x66656174, // "feat"
+		0x666d7478, // "fmtx"
+		0x666f6e64, // "fond"
+		0x6670676d, // "fpgm"
+		0x66766172, // "fvar"
+		0x67617370, // "gasp"
+		0x67636964, // "gcid"
+		0x676c7966, // "glyf"
+		0x67766172, // "gvar"
+		0x68646d78, // "hdmx"
+		0x68656164, // "head"
+		0x68686561, // "hhea"
+		0x686d7478, // "hmtx"
+		0x6876676c, // "hvgl"
+		0x6876706d, // "hvpm"
+		0x6a757374, // "just"
+		0x6b65726e, // "kern"
+		0x6b657278, // "kerx"
+		0x6c636172, // "lcar"
+		0x6c6f6361, // "loca"
+		0x6c746167, // "ltag"
+		0x6d617870, // "maxp"
+		0x6d657461, // "meta"
+		0x6d6f7274, // "mort"
+		0x6d6f7278, // "morx"
+		0x6e616d65, // "name"
+		0x6f706264, // "opbd"
+		0x4f532f32, // "OS/2"
 	}
-	// TODO: benchmark these strings comparisons. They are 4 bytes, so another
-	// option is to compare them as ints. Probably less readable that way.
+	ourTable := binary.BigEndian.Uint32(raw[12:16])
 	for _, t := range possibleTables {
-		if string(raw[12:16]) == t {
+		if ourTable == t {
 			return true
 		}
 	}
