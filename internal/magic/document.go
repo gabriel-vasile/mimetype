@@ -114,9 +114,9 @@ func Hlp(raw []byte, _ uint32) bool {
 // FrameMaker matches an Adobe FrameMaker file.
 func FrameMaker(raw []byte, _ uint32) bool {
 	b := scan.Bytes(raw)
-	if !(bytes.HasPrefix(b, []byte("<MakerFile")) ||
-		bytes.HasPrefix(b, []byte("<MakerDictionary")) ||
-		b.Match([]byte("<BOOKFILE"), scan.IgnoreCase) != -1) {
+	if !bytes.HasPrefix(b, []byte("<MakerFile")) &&
+		!bytes.HasPrefix(b, []byte("<MakerDictionary")) &&
+		b.Match([]byte("<BOOKFILE"), scan.IgnoreCase) == -1 {
 		return false
 	}
 
