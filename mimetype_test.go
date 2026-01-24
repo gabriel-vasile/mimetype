@@ -61,6 +61,7 @@ var testcases = []testcase{
 	{"bmp\x7C", "BM            \x7C\x00\x00\x00", "image/bmp", none},
 	{"bmp\x6C", "BM            \x6C\x00\x00\x00", "image/bmp", none},
 	{"bpg", "\x42\x50\x47\xFB", "image/bpg", one},
+	{"bufr", "BUFR   \x03", "application/bufr", one},
 	{"bz2", "\x42\x5A\x68", "application/x-bzip2", one},
 	{"cab", "MSCF\x00\x00\x00\x00", "application/vnd.ms-cab-compressed", one},
 	{"cab.is", "ISc(\x00\x00\x00\x01", "application/x-installshield", one},
