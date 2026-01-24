@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -293,4 +293,5 @@ var (
 	inf     = newMIME("application/x-os2-inf", ".inf", magic.Inf)
 	hlp     = newMIME("application/x-os2-hlp", ".hlp", magic.Hlp)
 	fm      = newMIME("application/vnd.framemaker", ".fm", magic.FrameMaker)
+	bufr    = newMIME("application/bufr", ".bufr", magic.BUFR)
 )
