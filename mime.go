@@ -2,6 +2,7 @@ package mimetype
 
 import (
 	"mime"
+	stdmime "mime"
 	"slices"
 	"strings"
 
@@ -196,6 +197,7 @@ func (m *MIME) lookup(mime string) *MIME {
 // The sub-format will be detected if all the detectors in the parent chain return true.
 // The extension should include the leading dot, as in ".html".
 func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
+	mime, _, _ = stdmime.ParseMediaType(mime)
 	c := &MIME{
 		mime:      mime,
 		extension: extension,
