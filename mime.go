@@ -1,7 +1,6 @@
 package mimetype
 
 import (
-	"mime"
 	stdmime "mime"
 	"slices"
 	"strings"
@@ -53,8 +52,8 @@ func (m *MIME) Parent() *MIME {
 func (m *MIME) Is(expectedMIME string) bool {
 	// Parsing is needed because some detected MIME types contain parameters
 	// that need to be stripped for the comparison.
-	expectedMIME, _, _ = mime.ParseMediaType(expectedMIME)
-	found, _, _ := mime.ParseMediaType(m.mime)
+	expectedMIME, _, _ = stdmime.ParseMediaType(expectedMIME)
+	found, _, _ := stdmime.ParseMediaType(m.mime)
 
 	if expectedMIME == found {
 		return true
