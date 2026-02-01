@@ -233,13 +233,18 @@ a,"b`,
 		none,
 	},
 	{
-		// Empty lines should not be counted as ndjson.
-		"json with before&after lines",
+		"empty lines should not be counted for ndjson",
 		`
 		{"key":"val"}
-		{"key":"val"}
 `,
-		"application/x-ndjson",
+		"application/json",
+		none,
+	},
+	{
+		"a json spread on multiple lines is not ndjson",
+		`{"key"
+		:"val"}`,
+		"application/json",
 		none,
 	},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", one},
