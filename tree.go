@@ -174,7 +174,7 @@ var (
 	aMp4 = newMIME("audio/mp4", ".mp4", magic.AMp4).
 		alias("audio/x-mp4a")
 	m4a = newMIME("audio/x-m4a", ".m4a", magic.M4a)
-	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3u).
+	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3U).
 		alias("audio/mpegurl", "application/x-mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", magic.M4v)
 	mj2  = newMIME("video/mj2", ".mj2", magic.Mj2)
