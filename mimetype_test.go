@@ -748,6 +748,7 @@ func TestExtend(t *testing.T) {
 		{"foo", ".foo", nil},
 		{"bar", ".bar", root},
 		{"baz", ".baz", zip},
+		{" UperCaseWithWhiteSpace/a+B; key=val   ", ".upercase", nil},
 	}
 
 	for _, tt := range data {
