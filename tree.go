@@ -175,7 +175,7 @@ var (
 		alias("audio/x-mp4a")
 	m4a = newMIME("audio/x-m4a", ".m4a", magic.M4a)
 	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3u).
-		alias("audio/mpegurl")
+		alias("audio/mpegurl", "application/x-mpegurl")
 	m4v  = newMIME("video/x-m4v", ".m4v", magic.M4v)
 	mj2  = newMIME("video/mj2", ".mj2", magic.Mj2)
 	dvb  = newMIME("video/vnd.dvb.file", ".dvb", magic.Dvb)

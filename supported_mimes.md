@@ -99,7 +99,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.asf** | **video/x-ms-asf** <br> video/asf, video/x-ms-wmv | asf>root
 **.aac** | **audio/aac** | aac>root
 **.voc** | **audio/x-unknown** | voc>root
-**.m3u** | **application/vnd.apple.mpegurl** <br> audio/mpegurl | m3u>root
+**.m3u** | **application/vnd.apple.mpegurl** <br> audio/mpegurl, application/x-mpegurl | m3u>root
 **.rmvb** | **application/vnd.rn-realmedia-vbr** | rmvb>root
 **.gz** | **application/gzip** <br> application/x-gzip, application/x-gunzip, application/gzipped, application/gzip-compressed, application/x-gzip-compressed, gzip/document | gz>root
 **.class** | **application/x-java-applet** | class>root
