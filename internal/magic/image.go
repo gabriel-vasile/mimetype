@@ -211,3 +211,41 @@ func DXF(raw []byte, _ uint32) bool {
 		bytes.HasPrefix(raw, []byte("0\x0ASECTION\x0A")) ||
 		bytes.HasPrefix(raw, []byte("0\x0D\x0ASECTION\x0D\x0A"))
 }
+
+func Wbmp(raw []byte, _ uint32) bool {
+	if len(raw) < 4 {
+		return false
+	}
+
+	if raw[0] != 0x00 || raw[1] != 0x00 {
+		return false
+	}
+
+	i := 2
+
+	// width
+	for {
+		if i >= len(raw) {
+			return false
+		}
+		b := raw[i]
+		i++
+		if b&0x80 == 0 {
+			break
+		}
+	}
+
+	// height
+	for {
+		if i >= len(raw) {
+			return false
+		}
+		b := raw[i]
+		i++
+		if b&0x80 == 0 {
+			break
+		}
+	}
+
+	return true
+}

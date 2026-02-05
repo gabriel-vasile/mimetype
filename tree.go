@@ -18,7 +18,7 @@ import (
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
-	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
+	jpm, jxs, gif, webp, wbmp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
 	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
 	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
@@ -140,6 +140,7 @@ var (
 	bpg  = newMIME("image/bpg", ".bpg", magic.Bpg)
 	gif  = newMIME("image/gif", ".gif", magic.Gif)
 	webp = newMIME("image/webp", ".webp", magic.Webp)
+	wbmp = newMIME("image/vnd.wap.wbmp", ".wbmp", magic.Wbmp)
 	tiff = newMIME("image/tiff", ".tiff", magic.Tiff)
 	bmp  = newMIME("image/bmp", ".bmp", magic.Bmp).
 		alias("image/x-bmp", "image/x-ms-bmp")
