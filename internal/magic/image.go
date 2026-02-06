@@ -212,40 +212,65 @@ func DXF(raw []byte, _ uint32) bool {
 		bytes.HasPrefix(raw, []byte("0\x0D\x0ASECTION\x0D\x0A"))
 }
 
+// WBMP format: type (1 byte, fixed 0x00) + fixheader (1 byte, fixed 0x00) +
+// width (variable length) + height (variable length) + image data (1-bit).
 func Wbmp(raw []byte, _ uint32) bool {
-	if len(raw) < 4 {
+	if len(raw) < 4 || !bytes.HasPrefix(raw, []byte{0x00, 0x00}) {
 		return false
 	}
 
-	if raw[0] != 0x00 || raw[1] != 0x00 {
+	// Decode variable-length width and height fields.
+	width, offset, ok := decodeWbmpVar(raw, 2)
+	if !ok || width == 0 || width > 50000 {
 		return false
 	}
 
-	i := 2
-
-	// width
-	for {
-		if i >= len(raw) {
-			return false
-		}
-		b := raw[i]
-		i++
-		if b&0x80 == 0 {
-			break
-		}
+	height, offset, ok := decodeWbmpVar(raw, offset)
+	if !ok || height == 0 || height > 50000 {
+		return false
 	}
 
-	// height
-	for {
-		if i >= len(raw) {
-			return false
-		}
-		b := raw[i]
-		i++
-		if b&0x80 == 0 {
-			break
-		}
+	// WBMP is 1-bit per pixel, so data size is (width+7)/8 * height bytes.
+	headerSize := uint32(offset)
+	expectedDataSize := ((width + 7) / 8) * height
+	expectedTotalSize := headerSize + expectedDataSize
+	fileSize := uint32(len(raw))
+
+	// Must contain at least some image data, not just header.
+	if fileSize <= headerSize {
+		return false
 	}
 
+	// If we have the full file, validate size with tolerance for trailing metadata.
+	if fileSize >= expectedTotalSize {
+		tolerance := expectedDataSize / 10
+		if tolerance < 100 {
+			tolerance = 100
+		}
+		return fileSize <= expectedTotalSize+tolerance
+	}
+
+	// File is truncated (smaller than expected) - accept if dimensions pass validation.
 	return true
+}
+
+// decodeWbmpVar decodes a WBMP variable-length integer starting at offset.
+// Returns: (value, nextOffset, ok). Maximum 5 bytes to prevent overflow.
+func decodeWbmpVar(raw []byte, offset int) (uint32, int, bool) {
+	value := uint32(0)
+	start := offset
+
+	for {
+		if offset >= len(raw) || offset-start > 5 {
+			return 0, 0, false
+		}
+		b := raw[offset]
+		offset++
+		value = (value << 7) | uint32(b&0x7F)
+		if b&0x80 == 0 {
+			break
+		}
+	}
+
+	return value, offset, true
 }
