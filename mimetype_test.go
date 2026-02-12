@@ -44,6 +44,8 @@ var testcases = []testcase{
 	{"amf", `<?xml version="1.0"?><amf>`, "application/x-amf", one},
 	{"amr", "\x23\x21\x41\x4D\x52", "audio/amr", one},
 	{"ape", "\x4D\x41\x43\x20\x96\x0F\x00\x00\x34\x00\x00\x00\x18\x00\x00\x00\x90\xE3", "audio/ape", one},
+	{"apk with META-INF/com/android/build/gradle/app-metadata.properties", fromDisk("app-metadata.apk"), "application/vnd.android.package-archive", one},
+	{"apk with zipflinger virtual entry", fromDisk("zipflinger.apk"), "application/vnd.android.package-archive", one},
 	{"apng", "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A" + offset(29, "acTL"), "image/vnd.mozilla.apng", all},
 	{"asf", "\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", "video/x-ms-asf", one},
 	{"atom", `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom">`, "application/atom+xml", one},

@@ -151,6 +151,15 @@ func (b *Bytes) Uint16() (uint16, bool) {
 	return v, true
 }
 
+func (b *Bytes) Uint32() (uint32, bool) {
+	if len(*b) < 4 {
+		return 0, false
+	}
+	v := binary.LittleEndian.Uint32(*b)
+	*b = (*b)[4:]
+	return v, true
+}
+
 type Flags int
 
 const (
