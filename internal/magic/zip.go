@@ -232,50 +232,50 @@ func (i *zipIterator) skipZipflingerEntry() (skipped bool) {
 
 	n := bytes.Index(i.b, zipLocalFileHeader)
 	if n == -1 {
-		return
+		return false
 	}
 	if !i.b.Advance(0x08) {
-		return
+		return false
 	}
 
 	// Check compression method
 	if cm, ok := i.b.Uint16(); !ok || cm != 0 {
-		return
+		return false
 	}
 
 	// Advance up to the CRC32 field
 	if !i.b.Advance(0x04) {
-		return
+		return false
 	}
 
 	// Check CRC32
 	if crc32, ok := i.b.Uint32(); !ok || crc32 != 0 {
-		return
+		return false
 	}
 
 	// Check compressed size
 	if compressedSize, ok := i.b.Uint32(); !ok || compressedSize != 0 {
-		return
+		return false
 	}
 
 	// Check uncompressed size
 	if uncompressedSize, ok := i.b.Uint32(); !ok || uncompressedSize != 0 {
-		return
+		return false
 	}
 
 	// Check for empty file name
 	if l, ok := i.b.Uint16(); !ok || l != 0 {
-		return
+		return false
 	}
 
 	// Reached a zipflinger virtual entry: skip extra data
 	l, ok := i.b.Uint16()
 	if !ok {
-		return
+		return false
 	}
 
 	if !i.b.Advance(int(l)) {
-		return
+		return false
 	}
 	return true
 }
