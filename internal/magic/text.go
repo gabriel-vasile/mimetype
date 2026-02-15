@@ -139,6 +139,14 @@ func VCard(raw []byte, _ uint32) bool {
 func ICalendar(raw []byte, _ uint32) bool {
 	return ciPrefix(raw, []byte("BEGIN:VCALENDAR\n"), []byte("BEGIN:VCALENDAR\r\n"))
 }
+
+const (
+	snone  = 0
+	scws   = scan.CompactWS
+	sfw    = scan.FullWord
+	scwsfw = scan.CompactWS | scan.FullWord
+)
+
 func phpPageF(raw []byte, _ uint32) bool {
 	return ciPrefix(raw,
 		[]byte("<?PHP"),
@@ -149,66 +157,61 @@ func phpPageF(raw []byte, _ uint32) bool {
 }
 func phpScriptF(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS,
-		[]byte("/usr/local/bin/php"),
-		[]byte("/usr/bin/php"),
-		[]byte("/usr/bin/env php"),
-		[]byte("/usr/bin/env -S php"),
+		shebangSig{[]byte("/usr/local/bin/php"), snone},
+		shebangSig{[]byte("/usr/bin/php"), snone},
+		shebangSig{[]byte("/usr/bin/env php"), scws},
+		shebangSig{[]byte("/usr/bin/env -S php"), scws},
 	)
 }
 
 // Js matches a Javascript file.
 func Js(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS,
-		[]byte("/bin/node"),
-		[]byte("/usr/bin/node"),
-		[]byte("/bin/nodejs"),
-		[]byte("/usr/bin/nodejs"),
-		[]byte("/usr/bin/env node"),
-		[]byte("/usr/bin/env -S node"),
-		[]byte("/usr/bin/env nodejs"),
-		[]byte("/usr/bin/env -S nodejs"),
+		shebangSig{[]byte("/bin/node"), snone},
+		shebangSig{[]byte("/usr/bin/node"), snone},
+		shebangSig{[]byte("/bin/nodejs"), snone},
+		shebangSig{[]byte("/usr/bin/nodejs"), snone},
+		shebangSig{[]byte("/usr/bin/env node"), scws},
+		shebangSig{[]byte("/usr/bin/env -S node"), scws},
+		shebangSig{[]byte("/usr/bin/env nodejs"), scws},
+		shebangSig{[]byte("/usr/bin/env -S nodejs"), scws},
 	)
 }
 
 // Lua matches a Lua programming language file.
 func Lua(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS|scan.FullWord,
-		[]byte("/usr/bin/lua"),
-		[]byte("/usr/local/bin/lua"),
-		[]byte("/usr/bin/env lua"),
-		[]byte("/usr/bin/env -S lua"),
+		shebangSig{[]byte("/usr/bin/lua"), sfw},
+		shebangSig{[]byte("/usr/local/bin/lua"), sfw},
+		shebangSig{[]byte("/usr/bin/env lua"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S lua"), scwsfw},
 	)
 }
 
 // Perl matches a Perl programming language file.
 func Perl(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS|scan.FullWord,
-		[]byte("/usr/bin/perl"),
-		[]byte("/usr/bin/env perl"),
-		[]byte("/usr/bin/env -S perl"),
+		shebangSig{[]byte("/usr/bin/perl"), sfw},
+		shebangSig{[]byte("/usr/bin/env perl"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S perl"), scwsfw},
 	)
 }
 
 // Python matches a Python programming language file.
 func Python(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS,
-		[]byte("/usr/bin/python"),
-		[]byte("/usr/local/bin/python"),
-		[]byte("/usr/bin/env python"),
-		[]byte("/usr/bin/env -S python"),
-		[]byte("/usr/bin/python2"),
-		[]byte("/usr/local/bin/python2"),
-		[]byte("/usr/bin/env python2"),
-		[]byte("/usr/bin/env -S python2"),
-		[]byte("/usr/bin/python3"),
-		[]byte("/usr/local/bin/python3"),
-		[]byte("/usr/bin/env python3"),
-		[]byte("/usr/bin/env -S python3"),
+		shebangSig{[]byte("/usr/bin/python"), snone},
+		shebangSig{[]byte("/usr/local/bin/python"), snone},
+		shebangSig{[]byte("/usr/bin/env python"), scws},
+		shebangSig{[]byte("/usr/bin/env -S python"), scws},
+		shebangSig{[]byte("/usr/bin/python2"), snone},
+		shebangSig{[]byte("/usr/local/bin/python2"), snone},
+		shebangSig{[]byte("/usr/bin/env python2"), scws},
+		shebangSig{[]byte("/usr/bin/env -S python2"), scws},
+		shebangSig{[]byte("/usr/bin/python3"), snone},
+		shebangSig{[]byte("/usr/local/bin/python3"), snone},
+		shebangSig{[]byte("/usr/bin/env python3"), scws},
+		shebangSig{[]byte("/usr/bin/env -S python3"), scws},
 	)
 
 }
@@ -216,30 +219,28 @@ func Python(raw []byte, _ uint32) bool {
 // Ruby matches a Ruby programming language file.
 func Ruby(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS,
-		[]byte("/usr/bin/ruby"),
-		[]byte("/usr/local/bin/ruby"),
-		[]byte("/usr/bin/env ruby"),
-		[]byte("/usr/bin/env -S ruby"),
+		shebangSig{[]byte("/usr/bin/ruby"), snone},
+		shebangSig{[]byte("/usr/local/bin/ruby"), snone},
+		shebangSig{[]byte("/usr/bin/env ruby"), scws},
+		shebangSig{[]byte("/usr/bin/env -S ruby"), scws},
 	)
 }
 
 // Tcl matches a Tcl programming language file.
 func Tcl(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS,
-		[]byte("/usr/bin/tcl"),
-		[]byte("/usr/local/bin/tcl"),
-		[]byte("/usr/bin/env tcl"),
-		[]byte("/usr/bin/env -S tcl"),
-		[]byte("/usr/bin/tclsh"),
-		[]byte("/usr/local/bin/tclsh"),
-		[]byte("/usr/bin/env tclsh"),
-		[]byte("/usr/bin/env -S tclsh"),
-		[]byte("/usr/bin/wish"),
-		[]byte("/usr/local/bin/wish"),
-		[]byte("/usr/bin/env wish"),
-		[]byte("/usr/bin/env -S wish"),
+		shebangSig{[]byte("/usr/bin/tcl"), snone},
+		shebangSig{[]byte("/usr/local/bin/tcl"), snone},
+		shebangSig{[]byte("/usr/bin/env tcl"), scws},
+		shebangSig{[]byte("/usr/bin/env -S tcl"), scws},
+		shebangSig{[]byte("/usr/bin/tclsh"), snone},
+		shebangSig{[]byte("/usr/local/bin/tclsh"), snone},
+		shebangSig{[]byte("/usr/bin/env tclsh"), scws},
+		shebangSig{[]byte("/usr/bin/env -S tclsh"), scws},
+		shebangSig{[]byte("/usr/bin/wish"), snone},
+		shebangSig{[]byte("/usr/local/bin/wish"), snone},
+		shebangSig{[]byte("/usr/bin/env wish"), scws},
+		shebangSig{[]byte("/usr/bin/env -S wish"), scws},
 	)
 }
 
@@ -251,32 +252,31 @@ func Rtf(raw []byte, _ uint32) bool {
 // Shell matches a shell script file.
 func Shell(raw []byte, _ uint32) bool {
 	return shebang(raw,
-		scan.CompactWS|scan.FullWord,
-		[]byte("/bin/sh"),
-		[]byte("/bin/bash"),
-		[]byte("/usr/local/bin/bash"),
-		[]byte("/usr/bin/env bash"),
-		[]byte("/usr/bin/env -S bash"),
-		[]byte("/bin/csh"),
-		[]byte("/usr/local/bin/csh"),
-		[]byte("/usr/bin/env csh"),
-		[]byte("/usr/bin/env -S csh"),
-		[]byte("/bin/dash"),
-		[]byte("/usr/local/bin/dash"),
-		[]byte("/usr/bin/env dash"),
-		[]byte("/usr/bin/env -S dash"),
-		[]byte("/bin/ksh"),
-		[]byte("/usr/local/bin/ksh"),
-		[]byte("/usr/bin/env ksh"),
-		[]byte("/usr/bin/env -S ksh"),
-		[]byte("/bin/tcsh"),
-		[]byte("/usr/local/bin/tcsh"),
-		[]byte("/usr/bin/env tcsh"),
-		[]byte("/usr/bin/env -S tcsh"),
-		[]byte("/bin/zsh"),
-		[]byte("/usr/local/bin/zsh"),
-		[]byte("/usr/bin/env zsh"),
-		[]byte("/usr/bin/env -S zsh"),
+		shebangSig{[]byte("/bin/sh"), sfw},
+		shebangSig{[]byte("/bin/bash"), sfw},
+		shebangSig{[]byte("/usr/local/bin/bash"), sfw},
+		shebangSig{[]byte("/usr/bin/env bash"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S bash"), scwsfw},
+		shebangSig{[]byte("/bin/csh"), sfw},
+		shebangSig{[]byte("/usr/local/bin/csh"), sfw},
+		shebangSig{[]byte("/usr/bin/env csh"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S csh"), scwsfw},
+		shebangSig{[]byte("/bin/dash"), sfw},
+		shebangSig{[]byte("/usr/local/bin/dash"), sfw},
+		shebangSig{[]byte("/usr/bin/env dash"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S dash"), scwsfw},
+		shebangSig{[]byte("/bin/ksh"), sfw},
+		shebangSig{[]byte("/usr/local/bin/ksh"), sfw},
+		shebangSig{[]byte("/usr/bin/env ksh"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S ksh"), scwsfw},
+		shebangSig{[]byte("/bin/tcsh"), sfw},
+		shebangSig{[]byte("/usr/local/bin/tcsh"), sfw},
+		shebangSig{[]byte("/usr/bin/env tcsh"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S tcsh"), scwsfw},
+		shebangSig{[]byte("/bin/zsh"), sfw},
+		shebangSig{[]byte("/usr/local/bin/zsh"), sfw},
+		shebangSig{[]byte("/usr/bin/env zsh"), scwsfw},
+		shebangSig{[]byte("/usr/bin/env -S zsh"), scwsfw},
 	)
 }
 
