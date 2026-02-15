@@ -144,9 +144,9 @@ func TestTrim(t *testing.T) {
 
 func TestFirstNonWS(t *testing.T) {
 	tcases := []struct {
-		name  string
-		in    string
-		c  byte
+		name string
+		in   string
+		c    byte
 	}{{
 		"empty", "", 0x00,
 	}, {
@@ -479,6 +479,12 @@ var matchTestcases = []struct {
 	"success fw", "abc ", "abc", FullWord, 3,
 }, {
 	"fail fw", "abcd", "abc", FullWord, -1,
+}, { // #762
+	"fw+ic", "abc ", "ABC", FullWord | IgnoreCase, 3,
+}, {
+	"fw+cws", "a  bc d", "a bc", FullWord | CompactWS, 5,
+}, {
+	"fw+ic+cws", "a  bc d", "A BC", FullWord | IgnoreCase | CompactWS, 5,
 }}
 
 func TestMatch(t *testing.T) {

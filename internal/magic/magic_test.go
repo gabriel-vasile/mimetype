@@ -30,10 +30,10 @@ func TestShebangCheck(t *testing.T) {
 			expected: true,
 		},
 		{
-			name:     "valid bash shebang with multiple spaces",
-			sig:      []byte("/bin/bash"),
-			input:    "#!   /bin/bash",
-			flags:    scan.CompactWS,
+			name:     "valid bash shebang with multiple spaces", // #762
+			sig:      []byte("/bin/env bash"),
+			input:    "#!   /bin/env  bash",
+			flags:    scan.CompactWS | scan.FullWord,
 			expected: true,
 		},
 		{
@@ -241,6 +241,13 @@ func TestShebangCheck(t *testing.T) {
 			sig:      []byte("/BIN/BASH"),
 			input:    "#!/bin/bash",
 			flags:    scan.CompactWS,
+			expected: false,
+		},
+		{
+			name:     "shebang split in multiple lines",
+			sig:      []byte("/bin/env bash"),
+			input:    "#!/bin/env\nbash",
+			flags:    scan.CompactWS | scan.FullWord,
 			expected: false,
 		},
 	}
