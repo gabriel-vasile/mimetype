@@ -214,10 +214,8 @@ func (b Bytes) Match(p []byte, flags Flags) int {
 	if l == 0 {
 		return -1
 	}
-	// If no flags, or scanning for full word at the end of pattern then
-	// do a fast HasPrefix check.
-	// For other flags it's not possible to use HasPrefix.
-	if flags == 0 || flags&FullWord > 0 {
+	// Some cases we can handle with a simple bytes.HasPrefix.
+	if flags == 0 || flags == FullWord {
 		if bytes.HasPrefix(b, p) {
 			b = b[len(p):]
 			p = p[len(p):]
