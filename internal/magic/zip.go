@@ -284,8 +284,10 @@ func (i *zipIterator) skipZipflingerEntry() (skipped bool) {
 // The source of signatures is https://github.com/file/file/blob/1778642b8ba3d947a779a36fcd81f8e807220a19/magic/Magdir/archive#L1820-L1887
 func APK(raw []byte, _ uint32) bool {
 	iter := zipIterator{raw}
-	for iter.skipZipflingerEntry() {
-		// Keep skipping as many zipflinger entries as found.
+
+	// If a Zipflinger Virtual Entry is detected, then the data is considered APK
+	if iter.skipZipflingerEntry() {
+		return true
 	}
 
 	return zipHas(iter.b, zipEntries{{
