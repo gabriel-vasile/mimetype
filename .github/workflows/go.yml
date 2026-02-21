@@ -30,3 +30,21 @@ jobs:
     # Testing on 32 bit architecture to find overflow problems as found in #731.
     - name: Run tests on 32 bit architecture
       run: GOARCH=386 go test -count=1 -shuffle=on ./...
+
+    # mimetype does not have many unit tests for the internal/magic package but
+    # the behaviour is tested at the root package. Bellow script accounts for that.
+    # https://github.com/golang/go/issues/6909#issuecomment-232878416
+    - name: Generate coverage
+      run: |
+        export PKGS=$(go list ./...)
+        export PKGS_DELIM=$(echo "$PKGS" | paste -sd "," -)
+        go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg $PKGS_DELIM {{.ImportPath}}{{end}}' $PKGS | xargs -I {} bash -c {}
+        go install github.com/wadey/gocovmerge@b5bfa59
+        gocovmerge `ls *.coverprofile` > cover.out
+        rm *.coverprofile
+    - uses: codecov/codecov-action@v5
+      with:
+        fail_ci_if_error: true
+        files: cover.out
+        token: ${{ secrets.CODECOV_TOKEN }}
+        verbose: true # optional (default = false)
