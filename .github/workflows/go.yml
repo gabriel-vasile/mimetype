@@ -48,3 +48,4 @@ jobs:
         files: cover.out
         token: ${{ secrets.CODECOV_TOKEN }}
         verbose: true # optional (default = false)
+        comment: false
