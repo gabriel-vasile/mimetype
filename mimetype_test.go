@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"testing/iotest"
 )
 
 // testcases are used for correctness and benchmarks.
@@ -394,17 +395,31 @@ func TestDetect(t *testing.T) {
 	}
 }
 
-func TestDetectBreakReader(t *testing.T) {
-	for _, tc := range testcases {
-		t.Run(tc.name, func(t *testing.T) {
-			br := &breakReader{
-				r:         strings.NewReader(tc.data),
-				breakSize: 3,
-			}
-			if mtype, err := DetectReader(br); err != nil {
+func TestDetectWonkyReaders(t *testing.T) {
+	wonkyReaders := map[string]func(io.Reader) io.Reader{
+		"DataErrReader": iotest.DataErrReader,
+		"HalfReader":    iotest.HalfReader,
+		"OneByteReader": iotest.OneByteReader,
+	}
+
+	data := []byte(`
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  </head>
+
+  <body>
+  </body>
+</html>`)
+
+	for name, reader := range wonkyReaders {
+		t.Run(name, func(t *testing.T) {
+			wr := reader(bytes.NewReader(data))
+			if mtype, err := DetectReader(wr); err != nil {
 				t.Errorf("Unexpected error: %s", err)
-			} else if mtype.String() != tc.expectedMIME {
-				t.Errorf("Expected: %s != Detected: %s", tc.expectedMIME, mtype.String())
+			} else if expect := "text/html; charset=utf-8"; mtype.String() != expect {
+				t.Errorf("Expected: %s != Detected: %s", expect, mtype.String())
 			}
 		})
 	}
@@ -470,29 +485,6 @@ func TestEqualsAny(t *testing.T) {
 			t.Errorf("Equality test failed for %+v", tc)
 		}
 	}
-}
-
-// breakReader breaks the string every breakSize characters.
-// It is like:
-//
-//	<html><h
-//	ead><tit
-//	le>html<
-//	...
-type breakReader struct {
-	r         io.Reader
-	breakSize int
-}
-
-func (b *breakReader) Read(p []byte) (int, error) {
-	if len(p) > b.breakSize {
-		p = p[:b.breakSize]
-	}
-	n, err := io.ReadFull(b.r, p)
-	if err == io.ErrUnexpectedEOF {
-		return n, io.EOF
-	}
-	return n, err
 }
 
 func TestFaultyInput(t *testing.T) {
