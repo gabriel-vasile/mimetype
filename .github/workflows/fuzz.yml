@@ -14,7 +14,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6.0.2
     - name: Install Go
-      uses: actions/setup-go@v6.2.0
+      uses: actions/setup-go@v6.3.0
       with:
         go-version: 'stable'
     # 3m is chosen so that half of the 2000 free CI minutes offered by Github
