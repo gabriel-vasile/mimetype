@@ -42,7 +42,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.oga** | **audio/ogg** | oga>ogg>root
 **.ogv** | **video/ogg** | ogv>ogg>root
 **.png** | **image/png** | png>root
-**.png** | **image/vnd.mozilla.apng** | png>png>root
+**.apng** | **image/apng** <br> image/vnd.mozilla.apng | apng>png>root
 **.jpg** | **image/jpeg** | jpg>root
 **.jxl** | **image/jxl** | jxl>root
 **.jp2** | **image/jp2** | jp2>root
