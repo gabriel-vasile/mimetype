@@ -18,7 +18,7 @@ func Png(raw []byte, _ uint32) bool {
 // https://wiki.mozilla.org/APNG_Specification
 func Apng(raw []byte, _ uint32) bool {
 	b := scan.Bytes(raw)
-	b.Advance(8) // the first 8 bytes matches by regular png
+	b.Advance(8) // the first 8 bytes matched by regular png
 
 	// PNG chunks are composed of:
 	// 4 bytes: length in big endian
