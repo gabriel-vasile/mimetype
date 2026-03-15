@@ -130,6 +130,14 @@ func Xfdf(raw []byte, _ uint32) bool {
 	return xml(raw, xmlSig{[]byte("<xfdf"), []byte(`xmlns="http://ns.adobe.com/xfdf/"`)})
 }
 
+// CDXXML matches a CycloneDX XML BOM file.
+// https://cyclonedx.org/docs/1.7/xml/
+func CDXXML(raw []byte, _ uint32) bool {
+	// xmlns is missing the version suffix because there are too many past versions
+	// and probably future versions to come.
+	return xml(raw, xmlSig{[]byte("<bom"), []byte(`xmlns="http://cyclonedx.org/schema/bom/`)})
+}
+
 // VCard matches a Virtual Contact File.
 func VCard(raw []byte, _ uint32) bool {
 	return ciPrefix(raw, []byte("BEGIN:VCARD\n"), []byte("BEGIN:VCARD\r\n"))
@@ -350,6 +358,12 @@ func HAR(raw []byte, limit uint32) bool {
 // [IANA glTF entry]: https://www.iana.org/assignments/media-types/model/gltf+json
 func GLTF(raw []byte, limit uint32) bool {
 	return jsonHelper(raw, limit, json.QueryGLTF, json.TokObject)
+}
+
+// CDXJSON matches a CycloneDX JSON BOM file.
+// https://cyclonedx.org/docs/1.7/json/
+func CDXJSON(raw []byte, limit uint32) bool {
+	return jsonHelper(raw, limit, json.QueryCDX, json.TokObject)
 }
 
 // jsonHelper parses raw and tries to match the q query against it. wantToks
