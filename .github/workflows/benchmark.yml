@@ -21,7 +21,8 @@ jobs:
         go-version: 'stable'
     - run: |
         go install golang.org/x/perf/cmd/benchstat@latest
-        go install github.com/aclements/perflock/cmd/perflock@latest
+        GOBIN=$PWD go install github.com/aclements/perflock/cmd/perflock@latest
+        sudo install ./perflock /usr/bin/perflock
         sudo -b perflock -daemon
     - run: perflock go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
