@@ -160,6 +160,15 @@ func (b *Bytes) Uint32() (uint32, bool) {
 	return v, true
 }
 
+func (b *Bytes) Uint32be() (uint32, bool) {
+	if len(*b) < 4 {
+		return 0, false
+	}
+	v := binary.BigEndian.Uint32(*b)
+	*b = (*b)[4:]
+	return v, true
+}
+
 type Flags int
 
 const (

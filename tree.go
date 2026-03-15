@@ -128,12 +128,13 @@ var (
 	amf     = newMIME("application/x-amf", ".amf", magic.Amf)
 	threemf = newMIME("application/vnd.ms-package.3dmanufacturing-3dmodel+xml", ".3mf", magic.Threemf)
 	png     = newMIME("image/png", ".png", magic.Png, apng)
-	apng    = newMIME("image/vnd.mozilla.apng", ".png", magic.Apng)
-	jpg     = newMIME("image/jpeg", ".jpg", magic.Jpg)
-	jxl     = newMIME("image/jxl", ".jxl", magic.Jxl)
-	jp2     = newMIME("image/jp2", ".jp2", magic.Jp2)
-	jpx     = newMIME("image/jpx", ".jpf", magic.Jpx)
-	jpm     = newMIME("image/jpm", ".jpm", magic.Jpm).
+	apng    = newMIME("image/apng", ".apng", magic.Apng).
+		alias("image/vnd.mozilla.apng")
+	jpg = newMIME("image/jpeg", ".jpg", magic.Jpg)
+	jxl = newMIME("image/jxl", ".jxl", magic.Jxl)
+	jp2 = newMIME("image/jp2", ".jp2", magic.Jp2)
+	jpx = newMIME("image/jpx", ".jpf", magic.Jpx)
+	jpm = newMIME("image/jpm", ".jpm", magic.Jpm).
 		alias("video/jpm")
 	jxs  = newMIME("image/jxs", ".jxs", magic.Jxs)
 	xpm  = newMIME("image/x-xpixmap", ".xpm", magic.Xpm)
