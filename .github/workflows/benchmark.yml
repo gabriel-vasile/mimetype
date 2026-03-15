@@ -19,11 +19,14 @@ jobs:
       uses: actions/setup-go@v6.2.0
       with:
         go-version: 'stable'
-    - run: go install golang.org/x/perf/cmd/benchstat@latest
-    - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/prev
+    - run: |
+      go install golang.org/x/perf/cmd/benchstat@latest
+      go install github.com/aclements/perflock/cmd/perflock@latest
+      sudo -b perflock -daemon
+    - run: perflock go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/prev
     - name: Checkout code
       uses: actions/checkout@v6.0.2
     # Second run of benchmarks
-    - run: go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/curr
+    - run: perflock go test -run=none -bench=. -count=7 -benchtime=200ms -timeout=1h ./... > /tmp/curr
 
     - run: benchstat /tmp/prev /tmp/curr
