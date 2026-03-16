@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -105,6 +105,7 @@ var (
 	perl   = newMIME("text/x-perl", ".pl", magic.Perl)
 	python = newMIME("text/x-python", ".py", magic.Python).
 		alias("text/x-script.python", "application/x-python")
+	pyc  = newMIME("application/x-bytecode.python", ".pyc", magic.Pyc)
 	ruby = newMIME("text/x-ruby", ".rb", magic.Ruby).
 		alias("application/x-ruby")
 	shell = newMIME("text/x-shellscript", ".sh", magic.Shell).

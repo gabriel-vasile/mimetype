@@ -229,3 +229,53 @@ func TzIf(raw []byte, limit uint32) bool {
 	// Version has to be NUL (0x00), '2' (0x32) or '3' (0x33).
 	return raw[4] == 0x00 || raw[4] == 0x32 || raw[4] == 0x33
 }
+
+// Pyc matches a Python compiled file.
+// The signatures are sourced from libmagic v5.47
+func Pyc(raw []byte, limit uint32) bool {
+	if len(raw) < 8 {
+		return false
+	}
+
+	// python 1.0 through 3.7 signatures, magic/Magdir/python:13:190
+	pycMagic := []uint32{
+		0x02099900, 0x03099900, 0x892e0d0a, 0x04170d0a, 0x994e0d0a, 0xfcc40d0a,
+		0xfdc40d0a, 0x87c60d0a, 0x88c60d0a, 0x2aeb0d0a, 0x2beb0d0a, 0x2ded0d0a,
+		0x2eed0d0a, 0x3bf20d0a, 0x3cf20d0a, 0x45f20d0a, 0x59f20d0a, 0x63f20d0a,
+		0x6df20d0a, 0x6ef20d0a, 0x77f20d0a, 0x81f20d0a, 0x8bf20d0a, 0x8cf20d0a,
+		0x95f20d0a, 0x9ff20d0a, 0xa9f20d0a, 0xb3f20d0a, 0xb4f20d0a, 0xc7f20d0a,
+		0xd1f20d0a, 0xd2f20d0a, 0xdbf20d0a, 0xe5f20d0a, 0xeff20d0a, 0xf9f20d0a,
+		0x03f30d0a, 0x04f30d0a, 0x0af30d0a, 0xb80b0d0a, 0xc20b0d0a, 0xcc0b0d0a,
+		0xd60b0d0a, 0xe00b0d0a, 0xea0b0d0a, 0xf40b0d0a, 0xf50b0d0a, 0xff0b0d0a,
+		0x090c0d0a, 0x130c0d0a, 0x1d0c0d0a, 0x1f0c0d0a, 0x270c0d0a, 0x3b0c0d0a,
+		0x450c0d0a, 0x4f0c0d0a, 0x580c0d0a, 0x620c0d0a, 0x6c0c0d0a, 0x760c0d0a,
+		0x800c0d0a, 0x8a0c0d0a, 0x940c0d0a, 0x9e0c0d0a, 0xb20c0d0a, 0xbc0c0d0a,
+		0xc60c0d0a, 0xd00c0d0a, 0xda0c0d0a, 0xe40c0d0a, 0xee0c0d0a, 0xf80c0d0a,
+		0x020d0d0a, 0x0c0d0d0a, 0x160d0d0a, 0x170d0d0a, 0x200d0d0a, 0x210d0d0a,
+		0x2a0d0d0a, 0x2b0d0d0a, 0x2c0d0d0a, 0x2d0d0d0a, 0x2f0d0d0a, 0x300d0d0a,
+		0x310d0d0a, 0x320d0d0a, 0x330d0d0a, 0x3e0d0d0a, 0x3f0d0d0a,
+	}
+
+	n := binary.BigEndian.Uint32(raw)
+
+	for _, m := range pycMagic {
+		if m == n {
+			return true
+		}
+	}
+
+	if raw[2] == 0x0d && raw[3] == 0x0a {
+		// Only two bits of flag field are currently used.
+		if l := binary.LittleEndian.Uint32(raw[4:]); l > 3 {
+			return false
+		}
+		if raw[1] == 0x0d || raw[1] == 0x0e {
+			return true
+		}
+		// PyPy magic numbers, magic/Magdir/python:233
+		n := binary.LittleEndian.Uint16(raw)
+		return n == 240 || n == 256 || n == 336 || n == 384 || n == 416
+	}
+
+	return false
+}
