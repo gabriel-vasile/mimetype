@@ -788,7 +788,7 @@ func TestIs(t *testing.T) {
 		n:        "Application/xml",
 		expected: true,
 	}, {
-		name: "alias does not matches because aliases are not converted to lower case",
+		name: "alias does not match because aliases are not converted to lower case",
 		m: &MIME{
 			mime:      "text/xml",
 			aliases:   []string{"Application/xml"},
