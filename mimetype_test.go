@@ -700,27 +700,32 @@ func TestIndexOutOfRangePanic(t *testing.T) {
 // parse each alias when testing for equality, we must ensure they are
 // registered with no parameters.
 func TestMIMEFormat(t *testing.T) {
+	// Conventially, media types should be lower case, but exceptions exists.
+	// However, when testing equality, their lower case values should be used,
+	// regardless if they originally are lower or upper case.
+	// Up until now, all media types we registered have been lower case and
+	// without optional params. That helps to keep MIME.Is function simple.
+	// But, in the case we will add a MIME breaking the rule, we should know.
+	// That's the purpose of this test.
+	testNormalised := func(ms []string) {
+		for _, m := range ms {
+			normalised, _, err := mime.ParseMediaType(m)
+			if err != nil {
+				t.Errorf("error parsing %s: %s", m, err)
+			}
+			if m != normalised {
+				t.Errorf("registered MIME should be normalised: %s", m)
+			}
+		}
+	}
 	for _, n := range root.flatten() {
 		// All extensions must be dot prefixed so they are compatible
 		// with the stdlib mime package.
 		if n.Extension() != "" && !strings.HasPrefix(n.Extension(), ".") {
-			t.Fatalf("extension %s should be dot prefixed", n.Extension())
+			t.Errorf("extension %s should be dot prefixed", n.Extension())
 		}
-		// All MIMEs must be correctly formatted.
-		_, _, err := mime.ParseMediaType(n.String())
-		if err != nil {
-			t.Fatalf("error parsing node MIME: %s", err)
-		}
-		// Aliases must have no optional MIME parameters.
-		for _, a := range n.aliases {
-			parsed, params, err := mime.ParseMediaType(a)
-			if err != nil {
-				t.Fatalf("error parsing node alias MIME: %s", err)
-			}
-			if parsed != a || len(params) > 0 {
-				t.Fatalf("node alias MIME should have no optional params; alias: %s, params: %v", a, params)
-			}
-		}
+
+		testNormalised(append(n.aliases, n.String()))
 	}
 }
 
@@ -739,6 +744,78 @@ func TestLookup(t *testing.T) {
 		t.Run(fmt.Sprintf("lookup %s", tt.mime), func(t *testing.T) {
 			if m := Lookup(tt.mime); m != tt.m {
 				t.Fatalf("failed to lookup: %s", tt.mime)
+			}
+		})
+	}
+}
+
+func TestIs(t *testing.T) {
+	tcases := []struct {
+		name     string
+		m        *MIME
+		n        string
+		expected bool
+	}{{
+		name: "mime matches",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "text/xml",
+		expected: true,
+	}, {
+		name: "alias matches",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "application/xml",
+		expected: true,
+	}, {
+		name: "mime matches because both m.mime and n are converted to lower case",
+		m: &MIME{
+			mime:      "Text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "tEXT/XML",
+		expected: true,
+	}, {
+		name: "alias matches because n is converted to lower case",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "Application/xml",
+		expected: true,
+	}, {
+		name: "alias does not match because aliases are not converted to lower case",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"Application/xml"},
+			extension: ".xml",
+		},
+		n:        "Application/xml",
+		expected: false,
+	}, {
+		name: "empty string does not match anything",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "",
+		expected: false,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.m.Is(tc.n)
+			if got != tc.expected {
+				t.Errorf("expected: %t, got: %t", tc.expected, got)
 			}
 		})
 	}
