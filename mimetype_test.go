@@ -796,6 +796,15 @@ func TestIs(t *testing.T) {
 		},
 		n:        "Application/xml",
 		expected: false,
+	}, {
+		name: "empty string does not match anything",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "",
+		expected: false,
 	}}
 
 	for _, tc := range tcases {
