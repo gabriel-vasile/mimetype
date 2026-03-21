@@ -261,3 +261,45 @@ func TestShebangCheck(t *testing.T) {
 		})
 	}
 }
+
+// func makemp3() []byte {
+// 	ret := append([]byte{}, bytes.Repeat([]byte{0x00}, 100)...)
+//
+// 	for i := 0; i < 31; i++ {
+// 		ret = append(ret, 0xff, 0xe3, 0x11)
+// 		ret = append(ret, bytes.Repeat([]byte{0x00}, 1000)...)
+// 	}
+// 	// fmt.Println(ret)
+// 	return ret
+// }
+//
+// var mp3 = makemp3()
+//
+// func BenchmarkMp31(b *testing.B) {
+// 	for b.Loop() {
+// 		if !mp3v1(mp3) {
+// 			b.Fatal("nu e bine")
+// 		}
+// 	}
+// }
+// func BenchmarkMp32(b *testing.B) {
+// 	for b.Loop() {
+// 		if !mp3v2(mp3, []byte{0xff, 0xfb}) &&
+// 			!mp3v2(mp3, []byte{0xff, 0xf3}) &&
+// 			!mp3v2(mp3, []byte{0xff, 0xfa}) &&
+// 			!mp3v2(mp3, []byte{0xff, 0xf2}) &&
+// 			!mp3v2(mp3, []byte{0xff, 0xe3}) {
+// 			b.Fatal("nu e bine2")
+// 		}
+// 	}
+// }
+//
+// func TestMp32(b *testing.T) {
+// 	if !mp3v2(mp3, []byte{0xff, 0xfb}) &&
+// 		!mp3v2(mp3, []byte{0xff, 0xf3}) &&
+// 		!mp3v2(mp3, []byte{0xff, 0xfa}) &&
+// 		!mp3v2(mp3, []byte{0xff, 0xf2}) &&
+// 		!mp3v2(mp3, []byte{0xff, 0xe3}) {
+// 		b.Fatal("nu e bine2")
+// 	}
+// }

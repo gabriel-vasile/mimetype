@@ -3,6 +3,8 @@ package magic
 import (
 	"bytes"
 	"encoding/binary"
+
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 // Flac matches a Free Lossless Audio Codec file.
@@ -53,6 +55,7 @@ func AAC(raw []byte, _ uint32) bool {
 
 // Mp3 matches an mp3 file.
 func Mp3(raw []byte, limit uint32) bool {
+	return mp3PRONOM(raw)
 	if len(raw) < 3 {
 		return false
 	}
@@ -76,7 +79,49 @@ func Mp3(raw []byte, limit uint32) bool {
 		return true
 	}
 
-	return false
+	return mp3PRONOM(raw)
+}
+
+// mp3PRONOM implements the BOF signatures from
+// https://www.nationalarchives.gov.uk/PRONOM/Format/proFormatSearch.aspx?status=detailReport&id=687&strPageToDisplay=signatures
+func mp3PRONOM(b scan.Bytes) bool {
+	for i := 0; i < 31; i++ {
+		// 1439 is the maximum spacing between frames.
+		ff := bytes.IndexByte(b[:min(len(b), 1439)], 0xff)
+		if ff == -1 {
+			return false
+		}
+
+		b.Advance(ff + 1)
+		c := b.PopN(2)
+		if len(c) != 2 {
+			return false
+		}
+		if c[0] != 0xfb && c[0] != 0xf3 && c[0] != 0xfa && c[0] != 0xf2 && c[0] != 0xe3 {
+			return false
+		}
+		if c[1] < 0x10 || c[1] > 0xeb {
+			return false
+		}
+	}
+	return true
+}
+
+func mp3v2(b scan.Bytes, ff []byte) bool {
+	for i := 0; i < 3; i++ {
+		ff := bytes.Index(b, ff)
+		if ff == -1 {
+			return false
+		}
+
+		b.Advance(ff + 2)
+		c := b.Pop()
+		if c < 0x10 || c > 0xeb {
+			return false
+		}
+		b.Advance(min(46, len(b)))
+	}
+	return true
 }
 
 // Wav matches a Waveform Audio File Format file.
