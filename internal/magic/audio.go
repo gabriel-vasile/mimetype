@@ -51,19 +51,43 @@ func AAC(raw []byte, _ uint32) bool {
 	return len(raw) > 1 && ((raw[0] == 0xFF && raw[1] == 0xF1) || (raw[0] == 0xFF && raw[1] == 0xF9))
 }
 
-// Mp3 matches an mp3 file.
-func Mp3(raw []byte, limit uint32) bool {
+// MP3 matches an mp3 file.
+func MP3(raw []byte, limit uint32) bool {
 	if len(raw) < 3 {
 		return false
 	}
 
-	if bytes.HasPrefix(raw, []byte("ID3")) {
+	// http://lclevy.free.fr/mo3/
+	// Not sure what to do about mo3 files, they contain MPEG audio layer 3 frames,
+	// just like mp3 and are playable as mp3s, but it's a different format and
+	// there is no assigned media type for it.
+	// For now just exclude them from passing as mp3s.
+	if bytes.HasPrefix(raw, []byte("MO3")) {
+		return false
+	}
+
+	// From PRONOM:
+	// Macromedia licensed the MP3 technology in 1995 to use in their Shockwave
+	// product. .swa or Shockwave Audio was originally added as a free plugin
+	// (Xtras) to SoundEdit 16 to export AIFF files to .swa.
+	// There is no media type assigned for .swa.
+	// For now just exclude them from passing as mp3s.
+	if bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x01, 0x40, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00}) {
+		return false
+	}
+
+	// TODO: ID3v2 can be used for other formats, not just mp3.
+	// libmagic parses the ID3v2 header, skips to real content and detects again.
+	// Should we do the same?
+	if bytes.HasPrefix(raw, []byte("ID3\x02\x00")) ||
+		bytes.HasPrefix(raw, []byte("ID3\x03\x00")) ||
+		bytes.HasPrefix(raw, []byte("ID3\x04\x00")) {
 		// MP3s with an ID3v2 tag will start with "ID3"
 		// ID3v1 tags, however appear at the end of the file.
 		return true
 	}
 
-	// Match MP3 files without tags
+	// Match MP3 files without tags.
 	switch binary.BigEndian.Uint16(raw[:2]) & 0xFFFE {
 	case 0xFFFA:
 		// MPEG ADTS, layer III, v1
@@ -76,7 +100,7 @@ func Mp3(raw []byte, limit uint32) bool {
 		return true
 	}
 
-	return false
+	return mp3WithLeadingPadding(raw)
 }
 
 // Wav matches a Waveform Audio File Format file.
