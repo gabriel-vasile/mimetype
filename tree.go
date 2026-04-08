@@ -19,7 +19,10 @@ var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
 	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
-	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
+	// Keep mp3 after mp4 (mpeg) because mp4 files can contain just audio, in
+	// which case mp3 will catch them. Example file:
+	// tika/tika-parsers/tika-parsers-standard/tika-parsers-standard-modules/tika-parser-audiovideo-module/src/test/resources/test-documents/testMP4AudioOnly.mp4
+	flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, mp3, quickTime, mp4, webM,
 	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
@@ -160,7 +163,7 @@ var (
 	heifSeq = newMIME("image/heif-sequence", ".heif", magic.HeifSequence)
 	hdr     = newMIME("image/vnd.radiance", ".hdr", magic.Hdr)
 	avif    = newMIME("image/avif", ".avif", magic.AVIF)
-	mp3     = newMIME("audio/mpeg", ".mp3", magic.Mp3).
+	mp3     = newMIME("audio/mpeg", ".mp3", magic.MP3).
 		alias("audio/x-mpeg", "audio/mp3")
 	flac = newMIME("audio/flac", ".flac", magic.Flac)
 	midi = newMIME("audio/midi", ".midi", magic.Midi).

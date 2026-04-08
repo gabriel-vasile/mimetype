@@ -67,7 +67,6 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.bmp** | **image/bmp** <br> image/x-bmp, image/x-ms-bmp | bmp>root
 **.123** | **application/vnd.lotus-1-2-3** | 123>root
 **.ico** | **image/x-icon** | ico>root
-**.mp3** | **audio/mpeg** <br> audio/x-mpeg, audio/mp3 | mp3>root
 **.flac** | **audio/flac** | flac>root
 **.midi** | **audio/midi** <br> audio/mid, audio/sp-midi, audio/x-mid, audio/x-midi | midi>root
 **.ape** | **audio/ape** | ape>root
@@ -77,6 +76,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.aiff** | **audio/aiff** <br> audio/x-aiff | aiff>root
 **.au** | **audio/basic** | au>root
 **.mpeg** | **video/mpeg** | mpeg>root
+**.mp3** | **audio/mpeg** <br> audio/x-mpeg, audio/mp3 | mp3>root
 **.mov** | **video/quicktime** | mov>root
 **.mp4** | **video/mp4** | mp4>root
 **.avif** | **image/avif** | avif>mp4>root
