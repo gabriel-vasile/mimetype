@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6.0.2
     - name: Install Go
-      uses: actions/setup-go@v6.2.0
+      uses: actions/setup-go@v6.4.0
       with:
         go-version: 'stable'
     - name: Run linters
@@ -42,7 +42,7 @@ jobs:
         go install github.com/wadey/gocovmerge@b5bfa59
         gocovmerge `ls *.coverprofile` > cover.out
         rm *.coverprofile
-    - uses: codecov/codecov-action@v5
+    - uses: codecov/codecov-action@v6
       with:
         fail_ci_if_error: true
         files: cover.out
