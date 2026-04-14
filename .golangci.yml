@@ -31,6 +31,7 @@ linters:
     - unused
     - usestdlibvars  # Detects the possibility to use variables/constants from the Go standard library.
     - usetesting     # Reports uses of functions with replacement inside the testing package.
+    - asciicheck     # https://daniel.haxx.se/blog/2025/05/16/detecting-malicious-unicode/
   settings:
     govet:
       disable:
