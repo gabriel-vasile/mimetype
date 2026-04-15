@@ -20,8 +20,8 @@ jobs:
       with:
         go-version: 'stable'
     - run: |
-        go install golang.org/x/perf/cmd/benchstat@latest
-        GOBIN=$PWD go install github.com/aclements/perflock/cmd/perflock@latest
+        go install golang.org/x/perf/cmd/benchstat@v0.0.0-20260409210113-8e83ce0f7b1c
+        GOBIN=$PWD go install github.com/aclements/perflock/cmd/perflock@b67f3f23152ff6883a38504154abc9ce4f20a442
         sudo install ./perflock /usr/bin/perflock
         sudo -b perflock -daemon
     - run: perflock go test -run=none -bench=. -count=6 -benchtime=200ms -timeout=1h ./... > /tmp/prev

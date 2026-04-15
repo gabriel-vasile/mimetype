@@ -39,7 +39,7 @@ jobs:
         export PKGS=$(go list ./...)
         export PKGS_DELIM=$(echo "$PKGS" | paste -sd "," -)
         go list -f '{{if or (len .TestGoFiles) (len .XTestGoFiles)}}go test -covermode count -coverprofile {{.Name}}_{{len .Imports}}_{{len .Deps}}.coverprofile -coverpkg $PKGS_DELIM {{.ImportPath}}{{end}}' $PKGS | xargs -I {} bash -c {}
-        go install github.com/wadey/gocovmerge@b5bfa59
+        go install github.com/wadey/gocovmerge@b5bfa59ec0adc420475f97f89b58045c721d761c
         gocovmerge `ls *.coverprofile` > cover.out
         rm *.coverprofile
     - uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
