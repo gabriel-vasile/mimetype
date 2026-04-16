@@ -57,9 +57,11 @@ func Mp3(raw []byte, limit uint32) bool {
 		return false
 	}
 
-	if bytes.HasPrefix(raw, []byte("ID3")) {
-		// MP3s with an ID3v2 tag will start with "ID3"
-		// ID3v1 tags, however appear at the end of the file.
+	// Any ID3v2 is reported as MP3. Not entirely correct, but the mimesniff
+	// standard says so. https://mimesniff.spec.whatwg.org/#matching-an-audio-or-video-type-pattern
+	// Despite the standard only checking for "ID3", we do more validations to
+	// avoid false positives.
+	if id3v2(raw) {
 		return true
 	}
 
@@ -77,6 +79,34 @@ func Mp3(raw []byte, limit uint32) bool {
 	}
 
 	return false
+}
+
+// Based on https://id3.org/Developer%20Information.
+func id3v2(raw []byte) bool {
+	if len(raw) < 10 || !bytes.HasPrefix(raw, []byte("ID3")) {
+		return false
+	}
+	if raw[3] < 2 || raw[3] > 4 { // Version: ID3v2.2 - ID3v2.4.
+		return false
+	}
+	if raw[4] != 0 { // Revision is 0 for all versions.
+		return false
+	}
+
+	// v2.2 uses 2 bits, v2.3 uses 3 bits and v2.4 uses 4.
+	// For all versions least significant 4 bits should be 0
+	if raw[5]&0b1111 != 0 {
+		return false
+	}
+
+	// Size bytes are synchsafe: most significant bit always 0.
+	if raw[6]&0x80 != 0 || raw[7]&0x80 != 0 || raw[8]&0x80 != 0 || raw[9]&0x80 != 0 {
+		return false
+	}
+
+	size := uint32(raw[6])<<21 | uint32(raw[7])<<14 | uint32(raw[8])<<7 | uint32(raw[9])
+	// Disallow too big frames, let's say 10MB.
+	return size > 0 && size < 10*1024*1024
 }
 
 // Wav matches a Waveform Audio File Format file.
