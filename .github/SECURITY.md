@@ -28,6 +28,7 @@ These are the most common risk areas we think about when working on `mimetype`.
 Measures:
 
 1. `2FA` authentication enabled for maintainers.
+2. `OIDC` authentication is used for GitHub Actions instead of long lived access tokens.
 
 ## Malware in dependencies
 
