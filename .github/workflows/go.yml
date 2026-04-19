@@ -48,4 +48,4 @@ jobs:
       with:
         fail_ci_if_error: true
         files: cover.out
-        token: ${{ secrets.CODECOV_TOKEN }}
+        use_oidc: true
