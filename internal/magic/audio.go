@@ -123,6 +123,20 @@ func Aiff(raw []byte, limit uint32) bool {
 		bytes.Equal(raw[8:12], []byte{0x41, 0x49, 0x46, 0x46})
 }
 
+// Aifc matches an Audio Interchange File Format Compressed file.
+func Aifc(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		bytes.Equal(raw[8:12], []byte("AIFC"))
+}
+
+// Maud matches an MAUD audio file.
+func Maud(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		bytes.Equal(raw[8:12], []byte("MAUD"))
+}
+
 // Qcp matches a Qualcomm Pure Voice file.
 func Qcp(raw []byte, limit uint32) bool {
 	return len(raw) > 12 &&
@@ -135,6 +149,13 @@ func EightSVX(raw []byte, _ uint32) bool {
 	return len(raw) > 12 &&
 		bytes.Equal(raw[:4], []byte("FORM")) &&
 		bytes.Equal(raw[8:12], []byte("8SVX"))
+}
+
+// SixteenSV matches a 16-bit sampled voice file.
+func SixteenSV(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		bytes.Equal(raw[8:12], []byte("16SV"))
 }
 
 // Sid matches a Commodore 64 SID music file.
