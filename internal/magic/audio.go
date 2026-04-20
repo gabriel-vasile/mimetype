@@ -129,3 +129,61 @@ func Qcp(raw []byte, limit uint32) bool {
 		bytes.Equal(raw[:4], []byte("RIFF")) &&
 		bytes.Equal(raw[8:12], []byte("QLCM"))
 }
+
+// EightSVX matches an 8-bit Sampled Voice file.
+func EightSVX(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		bytes.Equal(raw[8:12], []byte("8SVX"))
+}
+
+// Sid matches a Commodore 64 SID music file.
+func Sid(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("PSID")) ||
+		bytes.HasPrefix(raw, []byte("RSID"))
+}
+
+// XM matches a FastTracker II Extended Module file.
+func XM(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("Extended Module: "))
+}
+
+// Mod matches a ProTracker Module file.
+func Mod(raw []byte, _ uint32) bool {
+	if len(raw) < 1084 {
+		return false
+	}
+
+	// ProTracker and compatible modules have a signature at offset 1080.
+	sig := raw[1080:1084]
+	return bytes.Equal(sig, []byte("M.K.")) || // 4 channels
+		bytes.Equal(sig, []byte("M!K!")) || // 4 channels
+		bytes.Equal(sig, []byte("FLT4")) || // 4 channels
+		bytes.Equal(sig, []byte("FLT8")) || // 8 channels
+		bytes.Equal(sig, []byte("4CHN")) || // 4 channels
+		bytes.Equal(sig, []byte("6CHN")) || // 6 channels
+		bytes.Equal(sig, []byte("8CHN")) || // 8 channels
+		bytes.Equal(sig, []byte("16CH")) || // 16 channels
+		bytes.Equal(sig, []byte("32CH")) // 32 channels
+}
+
+// S3M matches a ScreamTracker 3 Module file.
+func S3M(raw []byte, _ uint32) bool {
+	return len(raw) > 48 && bytes.Equal(raw[44:48], []byte("SCRM"))
+}
+
+// IT matches an Impulse Tracker Module file.
+func IT(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("IMPM"))
+}
+
+// Med matches an OctaMED tracker module.
+func Med(raw []byte, _ uint32) bool {
+	return len(raw) > 3 && bytes.HasPrefix(raw, []byte("MMD")) &&
+		(raw[3] >= '0' && raw[3] <= '3')
+}
+
+// Ahx matches an AHX (Abyss' Highest Experience) tracker module.
+func Ahx(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("THX\x00"))
+}

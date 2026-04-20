@@ -279,3 +279,8 @@ func Pyc(raw []byte, limit uint32) bool {
 
 	return false
 }
+
+// AmigaExecutable matches an Amiga Hunk executable file.
+func AmigaExecutable(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x03, 0xF3})
+}
