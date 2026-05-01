@@ -613,3 +613,39 @@ func lineHasRFC822Hint(b scan.Bytes, hints []rfc822Hint) bool {
 	}
 	return false
 }
+
+func GEDCOM(raw []byte, limit uint32) bool {
+	// Skip if empty
+	if len(raw) == 0 {
+		return false
+	}
+
+	// GEDCOM header fits within first 4KB
+	searchLimit := min(len(raw), 4096)
+	raw = raw[:searchLimit]
+
+	b := scan.Bytes(raw)
+
+	// Skip BOM if present: UTF-8, UTF-16BE, UTF-16LE
+	for _, bom := range [][]byte{
+		{0xEF, 0xBB, 0xBF}, // UTF-8
+		{0xFE, 0xFF},       // UTF-16BE
+		{0xFF, 0xFE},       // UTF-16LE
+	} {
+		if bytes.HasPrefix(b, bom) {
+			b.Advance(len(bom))
+			break // Only one BOM can exist at the start
+		}
+	}
+
+	b.TrimLWS()
+
+	firstLine := b.Line()
+	if !bytes.Equal(firstLine, []byte("0 HEAD")) {
+		return false
+	}
+
+	// "1 GEDC" is mandatory in the header
+	idx, _ := b.Search([]byte("1 GEDC"), scan.CompactWS)
+	return idx != -1
+}

@@ -384,6 +384,7 @@ ENDHDR`,
 	{"zlib", "\x78\x5e\xf3\xc8\xe4\x02\x00\x01\xb7\x00\xbc", "application/zlib", one},
 	{"zst", "(\xb5/\xfd", "application/zstd", all},
 	{"zst skippable frame", "\x50\x2A\x4D\x18", "application/zstd", none},
+	{"gedcom", fromDisk("ged.ged"), "text/vnd.familysearch.gedcom", none},
 }
 
 func TestDetect(t *testing.T) {
