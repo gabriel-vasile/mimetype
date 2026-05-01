@@ -237,3 +237,17 @@ func DXF(raw []byte, _ uint32) bool {
 		bytes.HasPrefix(raw, []byte("0\x0ASECTION\x0A")) ||
 		bytes.HasPrefix(raw, []byte("0\x0D\x0ASECTION\x0D\x0A"))
 }
+
+// ILBM matches an InterLeaved Bitmap or Packed Bitmap file.
+func ILBM(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		(bytes.Equal(raw[8:12], []byte("ILBM")) ||
+			bytes.Equal(raw[8:12], []byte("PBM ")))
+}
+
+// Koala matches a Koala Painter image file.
+func Koala(raw []byte, _ uint32) bool {
+	return len(raw) == 10003 &&
+		raw[0] == 0x00 && raw[1] == 0x60
+}

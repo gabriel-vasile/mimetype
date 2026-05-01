@@ -18,11 +18,11 @@ import (
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
-	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
-	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
-	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
-	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
-	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
+	jpm, jxs, gif, webp, exe, elf, amigaExe, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
+	mp3, flac, midi, ape, musePack, amr, wav, aiff, aifc, au, eightSVX, sixteenSV, maud, sid, xm, s3m, mod, med, ahx, mpeg, quickTime, mp4, anim, ilbm, koala, webM,
+	avi, flv, mkv, asf, aac, voc, it, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
+	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, lha, adf, dms, bpg, cbor,
+	msa, st, lzx, sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
 	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc,
 	// Keep text last because it is the slowest check.
@@ -139,13 +139,16 @@ var (
 	jpx = newMIME("image/jpx", ".jpf", magic.Jpx)
 	jpm = newMIME("image/jpm", ".jpm", magic.Jpm).
 		alias("video/jpm")
-	jxs  = newMIME("image/jxs", ".jxs", magic.Jxs)
-	xpm  = newMIME("image/x-xpixmap", ".xpm", magic.Xpm)
-	bpg  = newMIME("image/bpg", ".bpg", magic.Bpg)
-	gif  = newMIME("image/gif", ".gif", magic.Gif)
-	webp = newMIME("image/webp", ".webp", magic.Webp)
-	tiff = newMIME("image/tiff", ".tiff", magic.Tiff)
-	bmp  = newMIME("image/bmp", ".bmp", magic.Bmp).
+	jxs   = newMIME("image/jxs", ".jxs", magic.Jxs)
+	xpm   = newMIME("image/x-xpixmap", ".xpm", magic.Xpm)
+	bpg   = newMIME("image/bpg", ".bpg", magic.Bpg)
+	gif   = newMIME("image/gif", ".gif", magic.Gif)
+	webp  = newMIME("image/webp", ".webp", magic.Webp)
+	anim  = newMIME("video/x-anim", ".anim", magic.Anim)
+	ilbm  = newMIME("image/x-ilbm", ".ilbm", magic.ILBM).alias("image/ilbm")
+	koala = newMIME("image/x-koala-painter", ".kla", magic.Koala).alias("image/x-koala")
+	tiff  = newMIME("image/tiff", ".tiff", magic.Tiff)
+	bmp   = newMIME("image/bmp", ".bmp", magic.Bmp).
 		alias("image/x-bmp", "image/x-ms-bmp")
 	// lotus check must be done before ico because some ico detection is a bit
 	// relaxed and some lotus files are wrongfully identified as ico otherwise.
@@ -167,16 +170,27 @@ var (
 		alias("audio/mid", "audio/sp-midi", "audio/x-mid", "audio/x-midi")
 	ape      = newMIME("audio/ape", ".ape", magic.Ape)
 	musePack = newMIME("audio/musepack", ".mpc", magic.MusePack)
-	wav      = newMIME("audio/wav", ".wav", magic.Wav).
-			alias("audio/x-wav", "audio/vnd.wave", "audio/wave")
-	aiff = newMIME("audio/aiff", ".aiff", magic.Aiff).alias("audio/x-aiff")
-	au   = newMIME("audio/basic", ".au", magic.Au)
-	amr  = newMIME("audio/amr", ".amr", magic.Amr).
-		alias("audio/amr-nb")
-	aac  = newMIME("audio/aac", ".aac", magic.AAC)
-	voc  = newMIME("audio/x-unknown", ".voc", magic.Voc)
-	aMp4 = newMIME("audio/mp4", ".mp4", magic.AMp4).
-		alias("audio/x-mp4a")
+	amr      = newMIME("audio/amr", ".amr", magic.Amr).
+			alias("audio/amr-nb")
+	wav = newMIME("audio/wav", ".wav", magic.Wav).
+		alias("audio/x-wav", "audio/vnd.wave", "audio/wave")
+	aiff      = newMIME("audio/aiff", ".aiff", magic.Aiff).alias("audio/x-aiff")
+	aifc      = newMIME("audio/x-aifc", ".aifc", magic.Aifc).alias("audio/x-aiffc")
+	au        = newMIME("audio/basic", ".au", magic.Au)
+	eightSVX  = newMIME("audio/x-8svx", ".8svx", magic.EightSVX).alias("audio/8svx")
+	sixteenSV = newMIME("audio/x-16sv", ".16sv", magic.SixteenSV)
+	maud      = newMIME("audio/x-maud", ".maud", magic.Maud)
+	sid       = newMIME("audio/prs.sid", ".sid", magic.Sid).alias("audio/sid")
+	aac       = newMIME("audio/aac", ".aac", magic.AAC)
+	xm        = newMIME("audio/x-xm", ".xm", magic.XM)
+	s3m       = newMIME("audio/x-s3m", ".s3m", magic.S3M)
+	mod       = newMIME("audio/x-mod", ".mod", magic.Mod)
+	it        = newMIME("audio/x-it", ".it", magic.IT)
+	med       = newMIME("audio/x-med", ".med", magic.Med)
+	ahx       = newMIME("audio/x-ahx", ".ahx", magic.Ahx)
+	voc       = newMIME("audio/x-unknown", ".voc", magic.Voc)
+	aMp4      = newMIME("audio/mp4", ".mp4", magic.AMp4).
+			alias("audio/x-mp4a")
 	m4a = newMIME("audio/x-m4a", ".m4a", magic.M4a)
 	m3u = newMIME("application/vnd.apple.mpegurl", ".m3u", magic.M3U).
 		alias("audio/mpegurl", "application/x-mpegurl")
@@ -205,23 +219,24 @@ var (
 	crx   = newMIME("application/x-chrome-extension", ".crx", magic.CRX)
 	ttf   = newMIME("font/ttf", ".ttf", magic.Ttf).
 		alias("font/sfnt", "application/x-font-ttf", "application/font-sfnt")
-	woff    = newMIME("font/woff", ".woff", magic.Woff)
-	woff2   = newMIME("font/woff2", ".woff2", magic.Woff2)
-	otf     = newMIME("font/otf", ".otf", magic.Otf)
-	ttc     = newMIME("font/collection", ".ttc", magic.Ttc)
-	eot     = newMIME("application/vnd.ms-fontobject", ".eot", magic.Eot)
-	wasm    = newMIME("application/wasm", ".wasm", magic.Wasm)
-	shp     = newMIME("application/vnd.shp", ".shp", magic.Shp)
-	shx     = newMIME("application/vnd.shx", ".shx", magic.Shx, shp)
-	dbf     = newMIME("application/x-dbf", ".dbf", magic.Dbf)
-	exe     = newMIME("application/vnd.microsoft.portable-executable", ".exe", magic.Exe)
-	elf     = newMIME("application/x-elf", "", magic.Elf, elfObj, elfExe, elfLib, elfDump)
-	elfObj  = newMIME("application/x-object", "", magic.ElfObj)
-	elfExe  = newMIME("application/x-executable", "", magic.ElfExe)
-	elfLib  = newMIME("application/x-sharedlib", ".so", magic.ElfLib)
-	elfDump = newMIME("application/x-coredump", "", magic.ElfDump)
-	ar      = newMIME("application/x-archive", ".a", magic.Ar, deb).
-		alias("application/x-unix-archive")
+	woff     = newMIME("font/woff", ".woff", magic.Woff)
+	woff2    = newMIME("font/woff2", ".woff2", magic.Woff2)
+	otf      = newMIME("font/otf", ".otf", magic.Otf)
+	ttc      = newMIME("font/collection", ".ttc", magic.Ttc)
+	eot      = newMIME("application/vnd.ms-fontobject", ".eot", magic.Eot)
+	wasm     = newMIME("application/wasm", ".wasm", magic.Wasm)
+	shp      = newMIME("application/vnd.shp", ".shp", magic.Shp)
+	shx      = newMIME("application/vnd.shx", ".shx", magic.Shx, shp)
+	dbf      = newMIME("application/x-dbf", ".dbf", magic.Dbf)
+	exe      = newMIME("application/vnd.microsoft.portable-executable", ".exe", magic.Exe)
+	elf      = newMIME("application/x-elf", "", magic.Elf, elfObj, elfExe, elfLib, elfDump)
+	amigaExe = newMIME("application/x-amiga-executable", "", magic.AmigaExecutable)
+	elfObj   = newMIME("application/x-object", "", magic.ElfObj)
+	elfExe   = newMIME("application/x-executable", "", magic.ElfExe)
+	elfLib   = newMIME("application/x-sharedlib", ".so", magic.ElfLib)
+	elfDump  = newMIME("application/x-coredump", "", magic.ElfDump)
+	ar       = newMIME("application/x-archive", ".a", magic.Ar, deb).
+			alias("application/x-unix-archive")
 	deb = newMIME("application/vnd.debian.binary-package", ".deb", magic.Deb)
 	rpm = newMIME("application/x-rpm", ".rpm", magic.RPM)
 	dcm = newMIME("application/dicom", ".dcm", magic.Dcm)
@@ -248,9 +263,16 @@ var (
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", magic.Sxc)
 	rar = newMIME("application/x-rar-compressed", ".rar", magic.RAR).
 		alias("application/x-rar")
-	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
-	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
-	lit     = newMIME("application/x-ms-reader", ".lit", magic.Lit)
+	djvu = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
+	mobi = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
+	lit  = newMIME("application/x-ms-reader", ".lit", magic.Lit)
+	lha  = newMIME("application/x-lzh-compressed", ".lzh", magic.Lha).
+		alias("application/x-lha")
+	adf     = newMIME("application/x-amiga-disk-format", ".adf", magic.Adf)
+	msa     = newMIME("application/x-magic-shadow-archiver", ".msa", magic.Msa)
+	st      = newMIME("application/x-atari-disk-image", ".st", magic.St)
+	lzx     = newMIME("application/x-lzx", ".lzx", magic.Lzx)
+	dms     = newMIME("application/x-dms", ".dms", magic.DMS)
 	sqlite3 = newMIME("application/vnd.sqlite3", ".sqlite", magic.Sqlite).
 		alias("application/x-sqlite3")
 	dwg = newMIME("image/vnd.dwg", ".dwg", magic.Dwg).

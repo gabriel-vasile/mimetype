@@ -89,3 +89,10 @@ func Avi(raw []byte, limit uint32) bool {
 		bytes.Equal(raw[:4], []byte("RIFF")) &&
 		bytes.Equal(raw[8:16], []byte("AVI LIST"))
 }
+
+// Anim matches an ANIM animation file.
+func Anim(raw []byte, _ uint32) bool {
+	return len(raw) > 12 &&
+		bytes.Equal(raw[:4], []byte("FORM")) &&
+		bytes.Equal(raw[8:12], []byte("ANIM"))
+}

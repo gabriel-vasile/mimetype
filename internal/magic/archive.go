@@ -219,3 +219,38 @@ func Zlib(raw []byte, _ uint32) bool {
 	// Check that the file is not a regular text to avoid false positives.
 	return zlib && !Text(raw, 0)
 }
+
+// Lha matches an LHA archive file.
+func Lha(raw []byte, _ uint32) bool {
+	return len(raw) > 7 &&
+		raw[2] == '-' && raw[6] == '-' &&
+		raw[3] == 'l' && (raw[4] == 'h' || raw[4] == 'z')
+}
+
+// Adf matches an Amiga Disk File.
+func Adf(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("DOS")) &&
+		len(raw) >= 4 && raw[3] < 6
+}
+
+// DMS matches a Disk Masher System archive file.
+func DMS(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("DMS!"))
+}
+
+// Msa matches a Magic Shadow Archiver file.
+func Msa(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte{0x0E, 0x0F})
+}
+
+// St matches an Atari ST disk image.
+func St(raw []byte, _ uint32) bool {
+	return len(raw) > 16 &&
+		raw[11] == 0x02 && raw[12] == 0x00 && // 512 Bytes pro Sektor (Big Endian)
+		raw[14] == 0x00 && raw[15] == 0x01 // 1 reservierter Sektor (Bootsector)
+}
+
+// Lzx matches an LZX archive (Amiga).
+func Lzx(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("LZX"))
+}
