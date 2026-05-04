@@ -130,12 +130,12 @@ func TestExtractFrame(t *testing.T) {
 		data: func() []byte {
 			f1 := buildFrame(3, 1, 9, 0)
 			f2 := buildFrame(0, 0, 0, 0)
-			var out []byte
 			frame1 := make([]byte, bytesToHeader(f1).frameBytes())
-			copy(frame1, f1)
-			out = append(out, frame1...)
 			frame2 := make([]byte, frameSize)
+			copy(frame1, f1)
 			copy(frame2, f2)
+			out := make([]byte, 0, len(frame1)+len(frame2))
+			out = append(out, frame1...)
 			out = append(out, frame2...)
 			return out
 		}(),
@@ -146,12 +146,12 @@ func TestExtractFrame(t *testing.T) {
 		data: func() []byte {
 			f1 := buildFrame(3, 1, 9, 0)
 			f2 := buildFrame(2, 1, 9, 0)
-			var out []byte
 			frame1 := make([]byte, bytesToHeader(f1).frameBytes())
-			copy(frame1, f1)
-			out = append(out, frame1...)
 			frame2 := make([]byte, bytesToHeader(f2).frameBytes())
+			copy(frame1, f1)
 			copy(frame2, f2)
+			out := make([]byte, 0, len(frame1)+len(frame2))
+			out = append(out, frame1...)
 			out = append(out, frame2...)
 			return out
 		}(),
