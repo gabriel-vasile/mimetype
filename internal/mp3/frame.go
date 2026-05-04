@@ -1,6 +1,8 @@
 package mp3
 
-// minFreeFormatFrameBytes is the smallest frame size we accept as valid.
+import "bytes"
+
+// minFrameBytes is the smallest frame size we accept as valid.
 // The MP3 spec's smallest non-free-format frame is MPEG-2 Layer III at
 // 8 kbps / 24 kHz = 24 bytes; anything below that cannot physically hold a
 // header plus the layer's side information and is almost certainly a false sync.
@@ -14,16 +16,16 @@ const minTruncatedSyncMatches = 2
 func ExtractFrame(b []byte) (start, size int) {
 	limit := min(len(b), 2048+headerSize)
 	for i := 0; i < limit-headerSize; i++ {
+		j := bytes.IndexByte(b[i:limit-headerSize], 0xFF)
+		if j < 0 {
+			break
+		}
+		i += j
 		hdr := header{b[i], b[i+1], b[i+2], b[i+3]}
 		if !hdr.valid() {
 			continue
 		}
 		frameBytes := hdr.frameBytes()
-		// Is this check needed? frameBytes should never be less than
-		// minFrameBytes because the header is valid at this point.
-		if frameBytes < minFrameBytes {
-			continue
-		}
 		frameAndPad := frameBytes + hdr.padding()
 
 		validHere := frameBytes > 0 && i+frameAndPad <= len(b) && matchFrame(b[i:])
@@ -89,8 +91,7 @@ func (h header) valid() bool {
 }
 
 // compatibleWith reports whether two headers describe frames belonging to the
-// same MP3 stream — same MPEG version, layer, sample-rate index and
-// free-format flag.
+// same MP3 stream — same MPEG version, layer, sample-rate index.
 func (h header) compatibleWith(o header) bool {
 	return o.valid() &&
 		(h[1]^o[1])&0xFE == 0 &&
