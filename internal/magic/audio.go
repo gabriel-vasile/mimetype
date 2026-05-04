@@ -53,8 +53,8 @@ func AAC(raw []byte, _ uint32) bool {
 	return len(raw) > 1 && ((raw[0] == 0xFF && raw[1] == 0xF1) || (raw[0] == 0xFF && raw[1] == 0xF9))
 }
 
-// Mp3 matches an mp3 file.
-func Mp3(raw []byte, limit uint32) bool {
+// MP3 matches a .mp3 file.
+func MP3(raw []byte, limit uint32) bool {
 	if len(raw) < 3 {
 		return false
 	}

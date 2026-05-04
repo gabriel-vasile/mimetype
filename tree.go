@@ -164,7 +164,7 @@ var (
 	heifSeq = newMIME("image/heif-sequence", ".heif", magic.HeifSequence)
 	hdr     = newMIME("image/vnd.radiance", ".hdr", magic.Hdr)
 	avif    = newMIME("image/avif", ".avif", magic.AVIF)
-	mp3     = newMIME("audio/mpeg", ".mp3", magic.Mp3).
+	mp3     = newMIME("audio/mpeg", ".mp3", magic.MP3).
 		alias("audio/x-mpeg", "audio/mp3")
 	flac = newMIME("audio/flac", ".flac", magic.Flac)
 	midi = newMIME("audio/midi", ".midi", magic.Midi).
