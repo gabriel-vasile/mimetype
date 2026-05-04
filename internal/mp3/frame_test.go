@@ -25,12 +25,11 @@ func bytesToHeader(b []byte) header {
 	return header{b[0], b[1], b[2], b[3]}
 }
 
-// buildValidMPEG1Layer3Frame builds a known-good MPEG1 Layer3 frame header.
-// MPEG1=3, Layer3=1, bitrate index 9 (128kbps), sample rate index 0 (44100Hz)
-// A real MPEG1 Layer3 frame at 128kbps/44100Hz is 417 bytes.
-// We use a smaller size for test brevity; the function only checks
-// the header of each frame, not the audio payload.
-func buildValidMPEG1Layer3Frame() []byte {
+// buildValidMP3Header builds a known-good MPEG2.5 Layer3 frame header.
+// MPEG2.5 (version=0), Layer3, bitrate index 1 (8 kbps), sample rate index 2
+// (8000 Hz). That yields 72-byte frames, which is small enough to keep tests
+// fast while exercising real frame-size arithmetic.
+func buildValidMP3Header() []byte {
 	return buildFrame(0, 1, 1, 2)
 }
 
@@ -58,9 +57,9 @@ func repeatFrames(header []byte, frameSize, count int, rng bool) []byte {
 }
 
 func TestExtractFrame(t *testing.T) {
-	validHeader := buildValidMPEG1Layer3Frame()
+	validHeader := buildValidMP3Header()
+	frameSize := bytesToHeader(validHeader).frameBytes()
 
-	const frameSize = 72
 	// Matches how many bytes the implementation searches for.
 	const mp3MaxSearch = 2048
 
@@ -218,7 +217,7 @@ func TestExtractFrame(t *testing.T) {
 }
 
 func BenchmarkExtractFrame(b *testing.B) {
-	validHeader := buildValidMPEG1Layer3Frame()
+	validHeader := buildValidMP3Header()
 	frameSize := bytesToHeader(validHeader).frameBytes()
 
 	b.Run("repeatFrames", func(b *testing.B) {
@@ -254,7 +253,7 @@ func FuzzExtractFrame(f *testing.F) {
 	// Only fuzz the header of the frame, because the body is treated as arbitrary
 	// data that does not influence anything.
 	// We're not seeding the first byte of the header because it is always 0xFF.
-	h := buildValidMPEG1Layer3Frame()
+	h := buildValidMP3Header()
 	f.Add(h[1], h[2], h[3], h[1], h[2], h[3], h[1], h[2], h[3])
 
 	frame1, frame2, frame3 := make([]byte, 1441), make([]byte, 1441), make([]byte, 1441)

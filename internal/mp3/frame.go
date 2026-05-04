@@ -23,6 +23,8 @@ func ExtractFrame(b []byte) (start, size int) {
 		frameAndPad := frameBytes + hdr.padding()
 
 		validHere := frameBytes > 0 && i+frameAndPad <= len(b) && matchFrame(b[i:])
+		// When the buffer is exactly one frame, matchFrame cannot look ahead for
+		// a subsequent header to confirm the stream. Trust the validated header.
 		exact := i == 0 && frameAndPad == len(b)
 		if validHere || exact {
 			return i, frameAndPad
@@ -37,10 +39,8 @@ func matchFrame(buf []byte) bool {
 	// maxFrameSyncMatches limits how many valid frames we look at.
 	const maxFrameSyncMatches = 10
 	hdr := header{buf[0], buf[1], buf[2], buf[3]}
-	i := 0
+	i := hdr.frameBytes() + hdr.padding()
 	for nmatch := 0; nmatch < maxFrameSyncMatches; nmatch++ {
-		next := header{buf[i], buf[i+1], buf[i+2], buf[i+3]}
-		i += next.frameBytes() + next.padding()
 		if i+headerSize > len(buf) {
 			return nmatch >= minTruncatedSyncMatches
 		}
@@ -48,6 +48,7 @@ func matchFrame(buf []byte) bool {
 		if !hdr.compatibleWith(cmp) {
 			return false
 		}
+		i += cmp.frameBytes() + cmp.padding()
 	}
 	return true
 }
