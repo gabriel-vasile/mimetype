@@ -44,12 +44,12 @@ func repeatFrames(header []byte, frameSize, count int, rng bool) []byte {
 	for i := 0; i < count; i++ {
 		frame := make([]byte, frameSize)
 		if rng {
-			r.Read(frame)
+			_, _ = r.Read(frame)
 		}
 		copy(frame[:4], header)
 		if rng {
 			prepend := make([]byte, frameSize)
-			r.Read(prepend)
+			_, _ = r.Read(prepend)
 			out = append(out, prepend...)
 		}
 		out = append(out, frame...)
@@ -267,7 +267,7 @@ func FuzzExtractFrame(f *testing.F) {
 	}
 
 	// Allocate data only once.
-	data := make([]byte, 3*1441)
+	data := make([]byte, 0, 3*1441)
 	f.Fuzz(func(t *testing.T, h11, h12, h13, h21, h22, h23, h31, h32, h33 byte) {
 		head1 := bytesToHeader([]byte{0xFF, h11, h12, h13})
 		if !head1.valid() {

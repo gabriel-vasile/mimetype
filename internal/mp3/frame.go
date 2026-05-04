@@ -2,12 +2,6 @@ package mp3
 
 import "bytes"
 
-// minFrameBytes is the smallest frame size we accept as valid.
-// The MP3 spec's smallest non-free-format frame is MPEG-2 Layer III at
-// 8 kbps / 24 kHz = 24 bytes; anything below that cannot physically hold a
-// header plus the layer's side information and is almost certainly a false sync.
-const minFrameBytes = 24
-
 // minTruncatedSyncMatches is the minimum number of confirmed successive
 // header matches required to accept a candidate frame when the buffer ends
 // before maxFrameSyncMatches confirmations can be performed.
