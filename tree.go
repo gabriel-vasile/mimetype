@@ -19,12 +19,16 @@ var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
 	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
 	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
-	mp3, flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
+	flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
 	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
 	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc,
+	// MP3 is late because it does a linear search in the input. That means
+	// containers that embed an MP3, for example: an mp4 file, or a zip without
+	// compression, would pass as MP3s.
+	mp3,
 	// Keep text last because it is the slowest check.
 	text,
 )
@@ -160,7 +164,7 @@ var (
 	heifSeq = newMIME("image/heif-sequence", ".heif", magic.HeifSequence)
 	hdr     = newMIME("image/vnd.radiance", ".hdr", magic.Hdr)
 	avif    = newMIME("image/avif", ".avif", magic.AVIF)
-	mp3     = newMIME("audio/mpeg", ".mp3", magic.Mp3).
+	mp3     = newMIME("audio/mpeg", ".mp3", magic.MP3).
 		alias("audio/x-mpeg", "audio/mp3")
 	flac = newMIME("audio/flac", ".flac", magic.Flac)
 	midi = newMIME("audio/midi", ".midi", magic.Midi).
