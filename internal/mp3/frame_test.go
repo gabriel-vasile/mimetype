@@ -58,8 +58,8 @@ func repeatFrames(header []byte, frameSize, count int, rng bool) []byte {
 
 func TestExtractFrame(t *testing.T) {
 	validHeader := buildValidMP3Header()
-	frameSize := bytesToHeader(validHeader).frameBytes()
 
+	frameSize := 72
 	// Matches how many bytes the implementation searches for.
 	const mp3MaxSearch = 2048
 
