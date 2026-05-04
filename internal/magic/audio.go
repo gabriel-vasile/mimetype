@@ -3,6 +3,8 @@ package magic
 import (
 	"bytes"
 	"encoding/binary"
+
+	"github.com/gabriel-vasile/mimetype/internal/mp3"
 )
 
 // Flac matches a Free Lossless Audio Codec file.
@@ -65,20 +67,41 @@ func Mp3(raw []byte, limit uint32) bool {
 		return true
 	}
 
-	// Match MP3 files without tags
+	// If no ID3v2 tag found, then we will look for MP3 frames, but:
+	// a. Layer III files are a lot more prevalent than Layer I and II.
+	// b. Layer I frame header has looser constraints than the others: many files
+	// with regularly repeating 0xFFFF bytes can be misidentified as MP3.
+	// c. MP3 files are composed of individual frames and those frames can have
+	// leading garbage bytes: if we want to find all valid MP3s, we have to do a
+	// linear search. #775, #310
+	// d. There are file formats that contain MP3s inside: .mo3 and .swa
+	//
+	// Given a, b, c and d, this code:
+	// - initially tries to match by first two bytes in header
+	// - checks for .mo3 and .swa and disqualifies them
+	// - does linear search for Layer III
 	switch binary.BigEndian.Uint16(raw[:2]) & 0xFFFE {
-	case 0xFFFA:
-		// MPEG ADTS, layer III, v1
-		return true
-	case 0xFFF2:
-		// MPEG ADTS, layer III, v2
-		return true
-	case 0xFFE2:
-		// MPEG ADTS, layer III, v2.5
+	case 0xFFFA, 0xFFF2, 0xFFE2, // layer III: v1, v2, v2.5
+		0xFFFC, 0xFFF4, // layer II: v1, v2
+		0xFFF5: // layer I: v2
 		return true
 	}
+	// http://lclevy.free.fr/mo3/
+	if bytes.HasPrefix(raw, []byte("MO3")) {
+		return false
+	}
 
-	return false
+	// From PRONOM:
+	// Macromedia licensed the MP3 technology in 1995 to use in their Shockwave
+	// product. .swa or Shockwave Audio was originally added as a free plugin
+	// (Xtras) to SoundEdit 16 to export AIFF files to .swa.
+	// There is no media type assigned for .swa.
+	if bytes.HasPrefix(raw, []byte{0x00, 0x00, 0x01, 0x40, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00}) {
+		return false
+	}
+
+	_, size := mp3.ExtractFrame(raw)
+	return size > 0
 }
 
 // Based on https://id3.org/Developer%20Information.

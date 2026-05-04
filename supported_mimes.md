@@ -67,7 +67,6 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.bmp** | **image/bmp** <br> image/x-bmp, image/x-ms-bmp | bmp>root
 **.123** | **application/vnd.lotus-1-2-3** | 123>root
 **.ico** | **image/x-icon** | ico>root
-**.mp3** | **audio/mpeg** <br> audio/x-mpeg, audio/mp3 | mp3>root
 **.flac** | **audio/flac** | flac>root
 **.midi** | **audio/midi** <br> audio/mid, audio/sp-midi, audio/x-mid, audio/x-midi | midi>root
 **.ape** | **audio/ape** | ape>root
@@ -159,6 +158,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.fm** | **application/vnd.framemaker** | fm>root
 **.bufr** | **application/bufr** | bufr>root
 **.pyc** | **application/x-bytecode.python** | pyc>root
+**.mp3** | **audio/mpeg** <br> audio/x-mpeg, audio/mp3 | mp3>root
 **.txt** | **text/plain** | txt>root
 **.svg** | **image/svg+xml** | svg>txt>root
 **.html** | **text/html** | html>txt>root

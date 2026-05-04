@@ -33,3 +33,4 @@ jobs:
     - run: go test -fuzztime=3m -fuzz=Meta            ./internal/charset
     - run: go test -fuzztime=3m -fuzz=GetAnAttribute  ./internal/markup
     - run: go test -fuzztime=3m -fuzz=GetAValue       ./internal/markup
+    - run: go test -fuzztime=3m -fuzz=ExtractFrame    ./internal/mp3
