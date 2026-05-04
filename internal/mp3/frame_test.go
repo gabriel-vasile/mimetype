@@ -221,8 +221,8 @@ func BenchmarkExtractFrame(b *testing.B) {
 	validHeader := buildValidMPEG1Layer3Frame()
 	frameSize := bytesToHeader(validHeader).frameBytes()
 
-	b.ReportAllocs()
 	b.Run("repeatFrames", func(b *testing.B) {
+		b.ReportAllocs()
 		data := repeatFrames(validHeader, frameSize, 4, false)
 		data = append(data, repeatFrames(validHeader, frameSize, 4, true)...)
 		b.ResetTimer()
@@ -232,6 +232,7 @@ func BenchmarkExtractFrame(b *testing.B) {
 	})
 
 	b.Run("random data", func(b *testing.B) {
+		b.ReportAllocs()
 		largeData := make([]byte, 4096)
 		r := rand.NewChaCha8([32]byte{})
 		if _, err := r.Read(largeData); err != nil {
