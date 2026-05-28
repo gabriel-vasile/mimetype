@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "gabriel-vasile"
+    groups:
+      gomod:
+        patterns:
+          - "*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "gabriel-vasile"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
