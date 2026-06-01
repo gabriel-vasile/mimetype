@@ -69,7 +69,11 @@ var (
 	jar   = newMIME("application/java-archive", ".jar", magic.Jar).
 		alias("application/jar", "application/jar-archive", "application/x-java-archive")
 	apk = newMIME("application/vnd.android.package-archive", ".apk", magic.APK)
-	ole = newMIME("application/x-ole-storage", "", magic.Ole, msi, msg, xls, pub, ppt, doc)
+	// doc/msi/msg/pub identify themselves by their authoritative root CLSID, so
+	// they must be tried before ppt, whose last-resort byte heuristics also match
+	// generic OLE compound files (e.g. a Word document whose first sector starts
+	// with the FATSECT marker 0xFFFFFFFD).
+	ole = newMIME("application/x-ole-storage", "", magic.Ole, msi, msg, xls, pub, doc, ppt)
 	msi = newMIME("application/x-ms-installer", ".msi", magic.Msi).
 		alias("application/x-windows-installer", "application/x-msi")
 	doc = newMIME("application/msword", ".doc", magic.Doc).
