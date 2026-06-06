@@ -3,6 +3,7 @@ package magic
 import (
 	"bytes"
 	"encoding/binary"
+	"slices"
 )
 
 // Woff matches a Web Open Font Format file.
@@ -89,12 +90,7 @@ func hasSFNTTable(raw []byte) bool {
 		0x4f532f32, // "OS/2"
 	}
 	ourTable := binary.BigEndian.Uint32(raw[12:16])
-	for _, t := range possibleTables {
-		if ourTable == t {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(possibleTables, ourTable)
 }
 
 // Eot matches an Embedded OpenType font file.

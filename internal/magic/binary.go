@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"debug/macho"
 	"encoding/binary"
+	"slices"
 )
 
 // Lnk matches Microsoft lnk binary format.
@@ -117,13 +118,7 @@ func Dbf(raw []byte, limit uint32) bool {
 		0x02, 0x03, 0x04, 0x05, 0x30, 0x31, 0x32, 0x42, 0x62, 0x7B, 0x82,
 		0x83, 0x87, 0x8A, 0x8B, 0x8E, 0xB3, 0xCB, 0xE5, 0xF5, 0xF4, 0xFB,
 	}
-	for _, b := range dbfTypes {
-		if raw[0] == b {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(dbfTypes, raw[0])
 }
 
 // ElfObj matches an object file.
@@ -258,10 +253,8 @@ func Pyc(raw []byte, limit uint32) bool {
 
 	n := binary.BigEndian.Uint32(raw)
 
-	for _, m := range pycMagic {
-		if m == n {
-			return true
-		}
+	if slices.Contains(pycMagic, n) {
+		return true
 	}
 
 	if raw[2] == 0x0d && raw[3] == 0x0a {
