@@ -12,10 +12,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # for uploads to codecov
     steps:
     - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
         persist-credentials: false
     - name: Install Go
@@ -23,7 +23,7 @@ jobs:
       with:
         go-version: 'stable'
     - name: Run linters
-      uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
+      uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9.2.1
       with:
         version: "latest"
     - name: Run tests
@@ -46,7 +46,7 @@ jobs:
         go install github.com/wadey/gocovmerge@b5bfa59ec0adc420475f97f89b58045c721d761c
         gocovmerge `ls *.coverprofile` > cover.out
         rm *.coverprofile
-    - uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+    - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         fail_ci_if_error: true
         files: cover.out
