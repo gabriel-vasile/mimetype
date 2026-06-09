@@ -129,7 +129,7 @@ func (m *MIME) flatten() []*MIME {
 // hierarchy returns an easy to read list of ancestors for m.
 // For example, application/json would return json>txt>root.
 func (m *MIME) hierarchy() string {
-	h := ""
+	var h strings.Builder
 	for m := m; m != nil; m = m.Parent() {
 		e := strings.TrimPrefix(m.Extension(), ".")
 		if e == "" {
@@ -142,9 +142,9 @@ func (m *MIME) hierarchy() string {
 				e = "root"
 			}
 		}
-		h += ">" + e
+		h.WriteString(">" + e)
 	}
-	return strings.TrimPrefix(h, ">")
+	return strings.TrimPrefix(h.String(), ">")
 }
 
 // clone creates a new MIME with the provided optional MIME parameters.
