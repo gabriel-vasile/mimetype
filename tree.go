@@ -86,7 +86,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam, rfc822)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, ssv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam, rfc822)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml, cdxxml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -94,6 +94,7 @@ var (
 	har     = newMIME("application/json", ".har", magic.HAR)
 	csv     = newMIME("text/csv", ".csv", magic.CSV)
 	tsv     = newMIME("text/tab-separated-values", ".tsv", magic.TSV)
+	ssv     = newMIME("text/semicolon-separated-values", ".ssv", magic.SSV)
 	geoJSON = newMIME("application/geo+json", ".geojson", magic.GeoJSON)
 	ndJSON  = newMIME("application/x-ndjson", ".ndjson", magic.NdJSON)
 	cdxJSON = newMIME("application/vnd.cyclonedx+json", ".json", magic.CDXJSON)
