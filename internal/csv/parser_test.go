@@ -225,9 +225,11 @@ func BenchmarkCSVOurParser(b *testing.B) {
 	b.ReportAllocs()
 	// Reuse a single reader to prevent allocs inside the benchmark function.
 	r := scan.Bytes(sample)
-	p := NewParser(',', '#', &r)
+	rr := r[:]
+	p := NewParser(',', '#', &rr)
 	for b.Loop() {
-		p.s = &r
+		rr = r[:]
+		p.s = &rr
 		for {
 			_, _, hasMore := p.CountFields(false)
 			if !hasMore {
