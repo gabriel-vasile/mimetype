@@ -15,7 +15,7 @@ func TSV(raw []byte, limit uint32) bool {
 	return sv(raw, '\t', limit)
 }
 
-// SSV matches a tab-separated values file.
+// SSV matches a semicolon-separated values file.
 func SSV(raw []byte, limit uint32) bool {
 	return sv(raw, ';', limit)
 }
