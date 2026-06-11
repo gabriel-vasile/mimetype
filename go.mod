@@ -1,4 +1,4 @@
-module github.com/gabriel-vasile/mimetype
+module github.com/sparklayer-io/mimetype
 
 go 1.21
 
