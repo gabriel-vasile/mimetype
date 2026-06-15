@@ -183,6 +183,10 @@ a,"b`,
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", one},
 	{"js", "#!/bin/node ", "text/javascript", one},
 	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", all},
+	{"json multiple lines", `{"a":"b",
+	"c":[{"a":"b"},
+	1,true,false,
+	"abc"]}`, "application/json", none},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", none},
 	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -250,6 +254,20 @@ a,"b`,
 		`{"key"
 		:"val"}`,
 		"application/json",
+		none,
+	},
+	{
+		"a json object spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`, // Notice how this line is a valid json value (a string)
+		"text/plain; charset=utf-8",
+		none,
+	},
+	{
+		"a json array spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`,
+		"text/plain; charset=utf-8",
 		none,
 	},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", one},
