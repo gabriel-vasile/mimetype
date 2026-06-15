@@ -34,3 +34,4 @@ jobs:
     - run: go test -fuzztime=3m -fuzz=GetAnAttribute  ./internal/markup
     - run: go test -fuzztime=3m -fuzz=GetAValue       ./internal/markup
     - run: go test -fuzztime=3m -fuzz=ExtractFrame    ./internal/mp3
+    - run: go test -fuzztime=3m -fuzz=Detect          ./internal/cdf

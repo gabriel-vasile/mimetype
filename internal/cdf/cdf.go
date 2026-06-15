@@ -400,11 +400,13 @@ func parseDir(b []byte) []dirEntry {
 		}
 		nb := make([]byte, 0, 32) // names are at most 32 UTF-16 code units
 		for j := 0; j < nameLen/2; j++ {
-			u := binary.LittleEndian.Uint16(raw[2*j:])
-			if u == 0 {
+			// Names are ASCII; keep the low byte of each little-endian UTF-16
+			// code unit and stop at the first NUL.
+			lo, hi := raw[2*j], raw[2*j+1]
+			if lo == 0 && hi == 0 {
 				break
 			}
-			nb = append(nb, byte(u))
+			nb = append(nb, lo)
 		}
 		d := dirEntry{
 			// TODO: avoid allocation and instead compare on read-only slices of data.
@@ -572,7 +574,7 @@ type sectionKey struct {
 // equivalent of sectioninfo[] in libmagic. Used as a fallback when no
 // SummaryInformation stream is present.
 var sectionTypes = map[sectionKey]CDFType{
-	// libmagic uses application/encrypted, but that is not a registed media type.
+	// libmagic uses application/encrypted, but that is not a registered media type.
 	// For now, we skip identifying that and fall-back on CDFTypeGeneric
 	// {"EncryptedPackage", dirTypeUserStream}:              CDFTypeEncrypted,
 	// {"EncryptedSummary", dirTypeUserStream}:              CDFTypeEncrypted,
