@@ -407,8 +407,16 @@ func NdJSON(raw []byte, limit uint32) bool {
 	var l scan.Bytes
 	for len(s) != 0 {
 		l = s.Line()
-		_, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
-		if len(l) != inspected {
+		parsed, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
+		// Only the last line may be truncated by the read limit; for it, it is
+		// enough that the parser inspected all of it. Every other line must be a
+		// complete, valid JSON document, otherwise a single JSON document spread
+		// over multiple lines would be mistaken for NDJSON. #803
+		if len(s) == 0 {
+			if inspected != len(l) {
+				return false
+			}
+		} else if parsed != len(l) {
 			return false
 		}
 		if firstToken == json.TokArray || firstToken == json.TokObject {
