@@ -108,11 +108,30 @@ type cdf struct {
 	secSize         int
 	shortSecSize    int
 	minStdStream    uint32
-	sat             []int32
+	satBytes        []byte // sector allocation table, kept as raw little-endian int32s
 	ssat            []int32
 	dir             []dirEntry
 	sst             []byte // short-stream pool (root storage's stream)
+	sstBuilt        bool   // whether sst was already loaded (it is loaded lazily)
+	rootStreamFirst int32  // first sector of the root storage short-stream pool
+	rootStreamSize  uint32 // size of the root storage short-stream pool
 	rootStorageUUID []byte
+}
+
+// shortStream returns the root storage short-stream pool, loading it on first
+// use. Detection often finishes (e.g. via the root CLSID or a long-stream
+// summary) without ever reading a short stream, so building this eagerly would
+// be wasted work.
+func (c *cdf) shortStream() []byte {
+	if !c.sstBuilt {
+		c.sstBuilt = true
+		if c.rootStreamFirst >= 0 {
+			if sst, err := c.readLong(c.rootStreamFirst, c.rootStreamSize); err == nil {
+				c.sst = sst
+			}
+		}
+	}
+	return c.sst
 }
 
 // parse reads the entire on-disk structure required for type detection.
@@ -156,14 +175,16 @@ func parse(raw []byte) (*cdf, error) {
 	}
 	c.dir = parseDir(dirBytes)
 
+	c.rootStreamFirst = -1
 	for _, d := range c.dir {
 		if d.typ != dirTypeRootStorage || d.streamFirst < 0 {
 			continue
 		}
 		c.rootStorageUUID = d.storageUUID
-		if sst, err := c.readLong(d.streamFirst, d.size); err == nil {
-			c.sst = sst
-		}
+		// Record where the short-stream pool lives; it is loaded lazily by
+		// shortStream the first time a short stream is actually read.
+		c.rootStreamFirst = d.streamFirst
+		c.rootStreamSize = d.size
 		break
 	}
 	return c, nil
@@ -194,6 +215,13 @@ func appendInt32s(dst []int32, b []byte) []int32 {
 func readSecID(b []byte) int32 {
 	return int32(binary.LittleEndian.Uint32(b)) //nolint:gosec // intentional two's-complement reinterpretation
 }
+
+// satLen is the number of sector ids in the SAT.
+func (c *cdf) satLen() int { return len(c.satBytes) / 4 }
+
+// satAt returns the i-th sector id from the SAT. Callers must ensure
+// i < satLen().
+func (c *cdf) satAt(i int32) int32 { return readSecID(c.satBytes[4*i:]) }
 
 // errTruncated is returned when a sector starts past the end of the input.
 // Callers treat this as a graceful stop rather than a hard failure so that
@@ -228,16 +256,27 @@ func (c *cdf) sectorIDs(secid int32) ([]int32, error) {
 // If the input is truncated, the SAT is built from whatever sectors are
 // available and no error is returned.
 func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) error {
-	// A valid SAT has exactly one entry per long sector, so it can never hold
-	// more than len(data)/4 ids. Capping at that bound keeps malformed inputs
-	// with cyclic master-SAT chains from amplifying into unbounded allocations.
-	maxIDs := len(c.data) / 4
-	// A full SAT sector holds secSize/4 ids; preallocating that avoids a regrow
+	// Common case: the whole SAT lives in a single sector referenced by the
+	// first master-SAT entry, with no extension blocks. Point straight at that
+	// sector's bytes inside the input, avoiding any allocation.
+	if firstMSAT < 0 && len(masterSAT) > 0 && masterSAT[0] >= 0 &&
+		(len(masterSAT) == 1 || masterSAT[1] < 0) {
+		if buf, err := c.sector(masterSAT[0]); err == nil {
+			c.satBytes = buf
+			return nil
+		}
+	}
+
+	// The SAT has exactly one entry per long sector, so its byte length can
+	// never exceed len(data). Capping at that bound keeps malformed inputs with
+	// cyclic master-SAT chains from amplifying into unbounded allocations.
+	maxBytes := len(c.data)
+	// A full SAT sector holds secSize bytes; preallocating that avoids a regrow
 	// in the common single-sector case.
-	sat := make([]int32, 0, c.secSize/4)
+	sat := make([]byte, 0, c.secSize)
 	for _, sec := range masterSAT {
 		if sec < 0 {
-			c.sat = sat
+			c.satBytes = sat
 			return nil
 		}
 		buf, err := c.sector(sec)
@@ -247,9 +286,9 @@ func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) error {
 		if err != nil {
 			return fmt.Errorf("cdf: SAT: %w", err)
 		}
-		sat = appendInt32s(sat, buf)
-		if len(sat) > maxIDs {
-			c.sat = sat
+		sat = append(sat, buf...)
+		if len(sat) > maxBytes {
+			c.satBytes = sat
 			return nil
 		}
 	}
@@ -265,34 +304,34 @@ func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) error {
 		}
 		for k := 0; k < perSec; k++ {
 			if k >= len(msa) {
-				c.sat = sat
+				c.satBytes = sat
 				return nil // master SAT sector truncated; use what we have
 			}
 			if msa[k] < 0 {
-				c.sat = sat
+				c.satBytes = sat
 				return nil
 			}
 			ids, err := c.sector(msa[k])
 			if errors.Is(err, errTruncated) {
-				c.sat = sat
+				c.satBytes = sat
 				return nil
 			}
 			if err != nil {
 				return fmt.Errorf("cdf: SAT: %w", err)
 			}
-			sat = appendInt32s(sat, ids)
-			if len(sat) > maxIDs {
-				c.sat = sat
+			sat = append(sat, ids...)
+			if len(sat) > maxBytes {
+				c.satBytes = sat
 				return nil
 			}
 		}
 		if perSec >= len(msa) {
-			c.sat = sat
+			c.satBytes = sat
 			return nil // no next-MSAT pointer available
 		}
 		mid = msa[perSec]
 	}
-	c.sat = sat
+	c.satBytes = sat
 	return nil
 }
 
@@ -303,7 +342,7 @@ func (c *cdf) collectIDs(sid int32) ([]int32, error) {
 	maxIDs := len(c.data) / 4
 	out := make([]int32, 0, c.secSize/4)
 	for sid >= 0 {
-		if int(sid) >= len(c.sat) {
+		if int(sid) >= c.satLen() {
 			break // SAT is truncated; stop collecting
 		}
 		buf, err := c.sector(sid)
@@ -317,7 +356,7 @@ func (c *cdf) collectIDs(sid int32) ([]int32, error) {
 		if len(out) > maxIDs {
 			break // cyclic SAT chain; stop allocating
 		}
-		sid = c.sat[sid]
+		sid = c.satAt(sid)
 	}
 	return out, nil
 }
@@ -326,10 +365,52 @@ func (c *cdf) collectIDs(sid int32) ([]int32, error) {
 // result is truncated to that many bytes. On truncation it returns whatever
 // sectors were readable rather than an error.
 func (c *cdf) readLong(sid int32, length uint32) ([]byte, error) {
+	// Fast path: when the chain is a single physically contiguous run of
+	// sectors (the common case for the directory and summary streams) the data
+	// is already laid out sequentially in the input, so return a sub-slice of
+	// it instead of allocating a buffer and copying every sector.
+	if sid >= 0 {
+		maxSec := len(c.data)/c.secSize + 1
+		n, s := 0, sid
+		contiguous := true
+		for s >= 0 {
+			if int(s) >= c.satLen() {
+				break // SAT truncated; what remains is still contiguous
+			}
+			n++
+			if n > maxSec {
+				contiguous = false // cyclic chain; let the slow path guard it
+				break
+			}
+			next := c.satAt(s)
+			if next >= 0 && next != s+1 {
+				contiguous = false
+				break
+			}
+			s = next
+		}
+		if contiguous {
+			off := c.secSize * (1 + int(sid))
+			if off >= len(c.data) {
+				return nil, nil
+			}
+			end := off + n*c.secSize
+			if end > len(c.data) {
+				end = len(c.data)
+			}
+			out := c.data[off:end]
+			if length > 0 && int(length) < len(out) {
+				out = out[:length]
+			}
+			return out, nil
+		}
+	}
+
+	// Slow path: gather a fragmented chain into a fresh buffer.
 	// TODO: anyway to avoid allocating and copying the bytes?
 	out := make([]byte, 0, c.secSize)
 	for sid >= 0 {
-		if int(sid) >= len(c.sat) {
+		if int(sid) >= c.satLen() {
 			break // SAT truncated; return what we have
 		}
 		buf, err := c.sector(sid)
@@ -343,7 +424,7 @@ func (c *cdf) readLong(sid int32, length uint32) ([]byte, error) {
 		if len(out) >= len(c.data) {
 			break // chain longer than the file: cyclic SAT, stop
 		}
-		sid = c.sat[sid]
+		sid = c.satAt(sid)
 	}
 	if length > 0 && int(length) < len(out) {
 		out = out[:length]
@@ -351,10 +432,11 @@ func (c *cdf) readLong(sid int32, length uint32) ([]byte, error) {
 	return out, nil
 }
 
-// readShort reads a short-sector chain at sid by indexing into c.sst.
-// On truncation it returns whatever short sectors were readable.
+// readShort reads a short-sector chain at sid by indexing into the short-stream
+// pool. On truncation it returns whatever short sectors were readable.
 func (c *cdf) readShort(sid int32, length uint32) ([]byte, error) {
-	if c.sst == nil {
+	sst := c.shortStream()
+	if sst == nil {
 		return nil, errors.New("cdf: short stream not loaded")
 	}
 	// TODO: anyway to avoid allocating and copying the bytes?
@@ -364,11 +446,11 @@ func (c *cdf) readShort(sid int32, length uint32) ([]byte, error) {
 			break // SSAT truncated; return what we have
 		}
 		off := int(sid) * c.shortSecSize
-		if off+c.shortSecSize > len(c.sst) {
+		if off+c.shortSecSize > len(sst) {
 			break // short-stream pool truncated
 		}
-		out = append(out, c.sst[off:off+c.shortSecSize]...)
-		if len(out) >= len(c.sst) {
+		out = append(out, sst[off:off+c.shortSecSize]...)
+		if len(out) >= len(sst) {
 			break // chain longer than the pool: cyclic SSAT, stop
 		}
 		sid = c.ssat[sid]
@@ -381,7 +463,7 @@ func (c *cdf) readShort(sid int32, length uint32) ([]byte, error) {
 
 // readChain dispatches to the long or short reader depending on stream size.
 func (c *cdf) readChain(sid int32, length uint32) ([]byte, error) {
-	if length < c.minStdStream && c.sst != nil {
+	if length < c.minStdStream && c.rootStreamFirst >= 0 {
 		return c.readShort(sid, length)
 	}
 	return c.readLong(sid, length)
