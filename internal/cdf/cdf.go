@@ -392,22 +392,22 @@ func (c *cdf) readLong(sid int32, length uint32) ([]byte, error) {
 				break
 			}
 			next := c.satAt(s)
-			if next >= 0 && next != s+1 {
+			if next >= 0 && int64(next) != int64(s)+1 {
 				contiguous = false
 				break
 			}
 			s = next
 		}
 		if contiguous {
-			off := c.secSize * (1 + int(sid))
-			if off >= len(c.data) {
+			off64 := int64(c.secSize) * (1 + int64(sid))
+			if off64 >= int64(len(c.data)) {
 				return nil, nil
 			}
-			end := off + n*c.secSize
-			if end > len(c.data) {
-				end = len(c.data)
+			end64 := off64 + int64(n)*int64(c.secSize)
+			if end64 > int64(len(c.data)) {
+				end64 = int64(len(c.data))
 			}
-			out := c.data[off:end]
+			out := c.data[off64:end64]
 			if length > 0 && int(length) < len(out) {
 				out = out[:length]
 			}

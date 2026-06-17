@@ -153,6 +153,10 @@ func TestDetectInvalidInput(t *testing.T) {
 	tooSmallSector := testHeader(testSecSize, 1, -2, 0, nil)
 	binary.LittleEndian.PutUint16(tooSmallSector[30:], 5) // 32 < dirEntrySize
 
+	// firstDirSec * secSize == 2^31 overflows int on 32bit arch and causes
+	// slice-bounds panic.
+	dirSecOverflow := testHeader(testSecSize, 1<<22-1, -2, 0, nil)
+
 	tests := []struct {
 		name string
 		data []byte
@@ -162,6 +166,7 @@ func TestDetectInvalidInput(t *testing.T) {
 		{"bad magic", make([]byte, 512)},
 		{"bad sector size", badSectorSize},
 		{"sector smaller than dir entry", tooSmallSector},
+		{"dir sector overflows int32", dirSecOverflow},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
