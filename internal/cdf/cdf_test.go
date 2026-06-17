@@ -514,7 +514,7 @@ func TestSummaryAppNameNoPanic(t *testing.T) {
 		want: "",
 	}} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := summaryAppName(tc.stream()); got != tc.want {
+			if got := string(summaryAppName(tc.stream())); got != tc.want {
 				t.Errorf("expected: %q, got: %q", tc.want, got)
 			}
 		})

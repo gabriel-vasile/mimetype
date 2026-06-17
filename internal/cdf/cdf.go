@@ -9,7 +9,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"strings"
+
+	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
 // ErrNotCDF is returned when the input is not a CDF (OLE2) file.
@@ -46,8 +47,9 @@ func (c *cdf) detect() CDFType {
 			return t
 		}
 	}
-	for _, d := range c.dir {
-		if t, ok := sectionTypes[sectionKey{d.name, d.typ}]; ok {
+	for i := range c.dir {
+		d := &c.dir[i]
+		if t, ok := lookupSection(d.nameBytes(), d.typ); ok {
 			return t
 		}
 	}
@@ -65,16 +67,17 @@ func (c *cdf) detectFromSummary(streamName string) (CDFType, bool) {
 	if !ok {
 		return CDFTypeGeneric, false
 	}
-	if app := summaryAppName(raw); app != "" {
+	if app := summaryAppName(raw); len(app) > 0 {
 		if t, ok := lookupSubstring(app, app2type); ok {
 			return t, true
 		}
 	}
-	for _, d := range c.dir {
-		if d.name == "" {
+	for i := range c.dir {
+		d := &c.dir[i]
+		if d.nameLen == 0 {
 			continue
 		}
-		if t, ok := lookupSubstring(d.name, name2type); ok {
+		if t, ok := lookupSubstring(d.nameBytes(), name2type); ok {
 			return t, true
 		}
 	}
@@ -92,15 +95,21 @@ const (
 	masterSATSize = 109 // first 109 SAT secids live in the file header
 )
 
-// dirEntry is a single CDF directory record. We pre-decode the UTF-16LE name
-// into a Go string at parse time so subsequent comparisons are trivial.
+// dirEntry is a single CDF directory record. The UTF-16LE name is pre-decoded
+// into an inline ASCII buffer at parse time, avoiding a per-entry heap
+// allocation while keeping comparisons trivial. CDF names are at most 32
+// UTF-16 code units, so 32 bytes always suffice.
 type dirEntry struct {
-	name        string
+	name        [32]byte
+	nameLen     uint8
 	typ         uint8
 	streamFirst int32
 	size        uint32
 	storageUUID []byte
 }
+
+// nameBytes returns the decoded ASCII name without copying.
+func (d *dirEntry) nameBytes() []byte { return d.name[:d.nameLen] }
 
 // cdf holds everything we need from a CDF file to do detection.
 type cdf struct {
@@ -470,7 +479,7 @@ func (c *cdf) readChain(sid int32, length uint32) ([]byte, error) {
 }
 
 // parseDir splits the directory stream into 128-byte entries, decoding each
-// UTF-16LE name into an ASCII Go string up to the first NUL.
+// UTF-16LE name into the entry's inline ASCII buffer up to the first NUL.
 func parseDir(b []byte) []dirEntry {
 	n := len(b) / dirEntrySize
 	out := make([]dirEntry, n)
@@ -480,7 +489,8 @@ func parseDir(b []byte) []dirEntry {
 		if nameLen > 64 {
 			nameLen = 64
 		}
-		nb := make([]byte, 0, 32) // names are at most 32 UTF-16 code units
+		d := &out[i]
+		k := uint8(0)
 		for j := 0; j < nameLen/2; j++ {
 			// Names are ASCII; keep the low byte of each little-endian UTF-16
 			// code unit and stop at the first NUL.
@@ -488,25 +498,23 @@ func parseDir(b []byte) []dirEntry {
 			if lo == 0 && hi == 0 {
 				break
 			}
-			nb = append(nb, lo)
+			d.name[k] = lo
+			k++
 		}
-		d := dirEntry{
-			// TODO: avoid allocation and instead compare on read-only slices of data.
-			name:        string(nb),
-			typ:         raw[66],
-			streamFirst: readSecID(raw[116:120]),
-			size:        binary.LittleEndian.Uint32(raw[120:]),
-		}
+		d.nameLen = k
+		d.typ = raw[66]
+		d.streamFirst = readSecID(raw[116:120])
+		d.size = binary.LittleEndian.Uint32(raw[120:])
 		d.storageUUID = raw[80:96]
-		out[i] = d
 	}
 	return out
 }
 
 // userStream finds a user stream by name and returns its bytes.
 func (c *cdf) userStream(name string) ([]byte, bool) {
-	for _, d := range c.dir {
-		if d.typ == dirTypeUserStream && d.name == name {
+	for i := range c.dir {
+		d := &c.dir[i]
+		if d.typ == dirTypeUserStream && string(d.nameBytes()) == name {
 			buf, err := c.readChain(d.streamFirst, d.size)
 			if err != nil {
 				return nil, false
@@ -529,22 +537,22 @@ const (
 )
 
 // summaryAppName parses a (Doc)SummaryInformation stream and returns the
-// value of property NameOfApplication (0x12) as printable ASCII, or "" if
+// value of property NameOfApplication (0x12) as printable ASCII, or nil if
 // not present or the stream is malformed. This is the only summary property
 // the detection logic ever consults.
-func summaryAppName(stream []byte) string {
+func summaryAppName(stream []byte) []byte {
 	if len(stream) < sectionDeclOffset+20 {
-		return ""
+		return nil
 	}
 	sdOff := binary.LittleEndian.Uint32(stream[sectionDeclOffset+16:])
 	if uint64(sdOff)+8 > uint64(len(stream)) {
-		return ""
+		return nil
 	}
 	section := stream[sdOff:]
 	shLen := binary.LittleEndian.Uint32(section[0:])
 	nProps := binary.LittleEndian.Uint32(section[4:])
 	if uint64(shLen) > uint64(len(section)) || nProps > 1<<16 || 8+8*nProps > shLen {
-		return ""
+		return nil
 	}
 	for i := uint32(0); i < nProps; i++ {
 		base := 8 + 8*i
@@ -554,11 +562,11 @@ func summaryAppName(stream []byte) string {
 		}
 		off := binary.LittleEndian.Uint32(section[base+4:])
 		if uint64(off)+8 > uint64(shLen) {
-			return ""
+			return nil
 		}
 		typ := binary.LittleEndian.Uint32(section[off:])
 		if typ&typeVector != 0 {
-			return ""
+			return nil
 		}
 		step := uint32(0)
 		switch typ & typeMask {
@@ -567,22 +575,22 @@ func summaryAppName(stream []byte) string {
 		case typeStringWide:
 			step = 2
 		default:
-			return ""
+			return nil
 		}
 		slen := binary.LittleEndian.Uint32(section[off+4:])
 		start := uint64(off) + 8
 		end := start + uint64(slen)*uint64(step)
 		if end > uint64(shLen) {
-			return ""
+			return nil
 		}
 		return printableLowBytes(section[start:end], int(step))
 	}
-	return ""
+	return nil
 }
 
 // printableLowBytes copies the printable low byte of each step-byte unit
 // in b, stopping at the first NUL.
-func printableLowBytes(b []byte, step int) string {
+func printableLowBytes(b []byte, step int) []byte {
 	out := make([]byte, 0, len(b)/step)
 	for i := 0; i+step <= len(b); i += step {
 		c := b[i]
@@ -593,46 +601,50 @@ func printableLowBytes(b []byte, step int) string {
 			out = append(out, c)
 		}
 	}
-	return string(out)
+	return out
 }
 
 // pattern is a case-insensitive substring → CDFType mapping. Entries are
-// tested in order; first match wins.
+// tested in order; first match wins. needle is stored upper-cased so it can be
+// matched case-insensitively by scan.Bytes.Search with scan.IgnoreCase.
 type pattern struct {
-	needle string
+	needle []byte
 	typ    CDFType
 }
 
 // app2type maps NameOfApplication values to CDFTypes.
-// Mirrors app2mime[] in libmagic.
+// Mirrors app2mime[] in libmagic. Needles are upper-cased for case-insensitive
+// matching via scan.IgnoreCase.
 var app2type = []pattern{
-	{"Word", CDFTypeDoc},
-	{"Excel", CDFTypeXls},
-	{"Powerpoint", CDFTypePpt},
-	{"Advanced Installer", CDFTypeInstaller},
-	{"InstallShield", CDFTypeInstaller},
-	{"Microsoft Patch Compiler", CDFTypeInstaller},
-	{"NAnt", CDFTypeInstaller},
-	{"Windows Installer", CDFTypeInstaller},
+	{[]byte("WORD"), CDFTypeDoc},
+	{[]byte("EXCEL"), CDFTypeXls},
+	{[]byte("POWERPOINT"), CDFTypePpt},
+	{[]byte("ADVANCED INSTALLER"), CDFTypeInstaller},
+	{[]byte("INSTALLSHIELD"), CDFTypeInstaller},
+	{[]byte("MICROSOFT PATCH COMPILER"), CDFTypeInstaller},
+	{[]byte("NANT"), CDFTypeInstaller},
+	{[]byte("WINDOWS INSTALLER"), CDFTypeInstaller},
 }
 
 // name2type maps directory entry names to CDFTypes.
-// Mirrors name2mime[] in libmagic.
+// Mirrors name2mime[] in libmagic. Needles are upper-cased for case-insensitive
+// matching via scan.IgnoreCase.
 var name2type = []pattern{
-	{"Book", CDFTypeXls},
-	{"Workbook", CDFTypeXls},
-	{"WordDocument", CDFTypeDoc},
-	{"PowerPoint", CDFTypePpt},
-	{"DigitalSignature", CDFTypeInstaller},
+	{[]byte("BOOK"), CDFTypeXls},
+	{[]byte("WORKBOOK"), CDFTypeXls},
+	{[]byte("WORDDOCUMENT"), CDFTypeDoc},
+	{[]byte("POWERPOINT"), CDFTypePpt},
+	{[]byte("DIGITALSIGNATURE"), CDFTypeInstaller},
 }
 
 // lookupSubstring returns the CDFType for the first entry in t whose needle
 // is a case-insensitive substring of v. Mirrors C's strcasestr semantics
-// under the C locale.
-func lookupSubstring(v string, t []pattern) (CDFType, bool) {
-	lv := strings.ToLower(v)
+// under the C locale. It allocates nothing: scan.IgnoreCase matches the
+// upper-cased needle against input of either case.
+func lookupSubstring(v []byte, t []pattern) (CDFType, bool) {
+	s := scan.Bytes(v)
 	for _, p := range t {
-		if strings.Contains(lv, strings.ToLower(p.needle)) {
+		if i, _ := s.Search(p.needle, scan.IgnoreCase); i != -1 {
 			return p.typ, true
 		}
 	}
@@ -646,26 +658,40 @@ var msiCLSID = []byte{
 	0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
 }
 
-// sectionKey is a (directory entry name, type) pair.
-type sectionKey struct {
+// section is a (directory entry name, type) → CDFType mapping.
+type section struct {
 	name string
 	typ  uint8
+	cdf  CDFType
 }
 
 // sectionTypes maps distinctive directory entries to CDFTypes — a flattened
 // equivalent of sectioninfo[] in libmagic. Used as a fallback when no
-// SummaryInformation stream is present.
-var sectionTypes = map[sectionKey]CDFType{
+// SummaryInformation stream is present. A slice (rather than a map) lets
+// lookupSection compare entry names without allocating a string key.
+var sectionTypes = []section{
 	// libmagic uses application/encrypted, but that is not a registered media type.
 	// For now, we skip identifying that and fall-back on CDFTypeGeneric
-	// {"EncryptedPackage", dirTypeUserStream}:              CDFTypeEncrypted,
-	// {"EncryptedSummary", dirTypeUserStream}:              CDFTypeEncrypted,
-	{"Book", dirTypeUserStream}:                          CDFTypeXls,
-	{"Workbook", dirTypeUserStream}:                      CDFTypeXls,
-	{"WordDocument", dirTypeUserStream}:                  CDFTypeDoc,
-	{"PowerPoint Document", dirTypeUserStream}:           CDFTypePpt,
-	{"__properties_version1.0", dirTypeUserStream}:       CDFTypeMsg,
-	{"__recip_version1.0_#00000000", dirTypeUserStorage}: CDFTypeMsg,
+	// {"EncryptedPackage", dirTypeUserStream, CDFTypeEncrypted},
+	// {"EncryptedSummary", dirTypeUserStream, CDFTypeEncrypted},
+	{"Book", dirTypeUserStream, CDFTypeXls},
+	{"Workbook", dirTypeUserStream, CDFTypeXls},
+	{"WordDocument", dirTypeUserStream, CDFTypeDoc},
+	{"PowerPoint Document", dirTypeUserStream, CDFTypePpt},
+	{"__properties_version1.0", dirTypeUserStream, CDFTypeMsg},
+	{"__recip_version1.0_#00000000", dirTypeUserStorage, CDFTypeMsg},
+}
+
+// lookupSection returns the CDFType for a directory entry whose name and type
+// match a sectionTypes entry exactly. The string(name) == comparison is
+// optimized by the compiler to avoid allocating.
+func lookupSection(name []byte, typ uint8) (CDFType, bool) {
+	for _, s := range sectionTypes {
+		if s.typ == typ && string(name) == s.name {
+			return s.cdf, true
+		}
+	}
+	return CDFTypeGeneric, false
 }
 
 func (c CDFType) String() string {
