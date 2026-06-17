@@ -409,7 +409,7 @@ func TestBuildSATTruncatedMSATNoPanic(t *testing.T) {
 			put32(data, tc.secSize, 0)
 
 			if cdf := Detect(data); cdf != CDFTypeGeneric {
-				t.Errorf("expected: %s, got: %s", CDFTypeGeneric, cdf)
+				t.Errorf("expected: %q, got: %q", CDFTypeGeneric, cdf)
 			}
 		})
 	}
@@ -444,7 +444,7 @@ func TestCyclicChainBounded(t *testing.T) {
 	put32(data, secSize+4, 1)
 
 	if cdf := Detect(data); cdf != CDFTypeGeneric {
-		t.Errorf("expected: %s, got: %s", CDFTypeGeneric, cdf)
+		t.Errorf("expected: %q, got: %q", CDFTypeGeneric, cdf)
 	}
 }
 
