@@ -153,14 +153,40 @@ type Flags int
 
 const (
 	// CompactWS will make one whitespace from pattern to match one or more spaces from input.
+	// CompactWS uses SIMD over input, but has O(n) for pattern.
 	CompactWS Flags = 1 << iota
 	// IgnoreCase will match lower case from pattern with lower case from input.
 	// IgnoreCase will match upper case from pattern with both lower and upper case from input.
 	// This flag is not really well named,
+	// IgnoreCase uses SIMD over input, but has O(n) for pattern.
 	IgnoreCase
 	// FullWord ensures the input ends with a full word (it's followed by spaces.)
 	FullWord
 )
+
+// indexFirstByte returns the first index in b where the byte p could match,
+// taking flags into account. Returns -1 if no such index exists.
+// Used by Search to skip non-matching positions using SIMD-backed functions.
+func indexFirstByte(b Bytes, p byte, flags Flags) int {
+	if flags&CompactWS > 0 && ByteIsWS(p) {
+		return bytes.IndexAny(b, "\t\n\x0c\r ")
+	}
+	if flags&IgnoreCase > 0 && isUpper(p) {
+		iU := bytes.IndexByte(b, p)
+		iL := bytes.IndexByte(b, p+('a'-'A'))
+		switch {
+		case iU == -1:
+			return iL
+		case iL == -1:
+			return iU
+		case iU < iL:
+			return iU
+		default:
+			return iL
+		}
+	}
+	return bytes.IndexByte(b, p)
+}
 
 // Search for occurrences of pattern p inside b at any index.
 // It returns the index where p was found in b and how many bytes were needed
@@ -181,13 +207,17 @@ func (b Bytes) Search(p []byte, flags Flags) (i int, l int) {
 		}
 	}
 
-	for i := range b {
-		if lb-i < lp {
+	rest := b
+	for len(rest) >= lp {
+		next := indexFirstByte(rest, p[0], flags)
+		if next == -1 {
 			return -1, 0
 		}
-		if l = b[i:].Match(p, flags); l != -1 {
-			return i, l
+		rest = rest[next:]
+		if l = rest.Match(p, flags); l != -1 {
+			return lb - len(rest), l
 		}
+		rest = rest[1:]
 	}
 
 	return -1, 0
@@ -216,6 +246,27 @@ func (b Bytes) Match(p []byte, flags Flags) int {
 		// If we finished all we were looking for from p.
 		if len(p) == 0 {
 			goto out
+		}
+		// Find the length of the leading "normal" run in p: bytes that need
+		// only exact matching (no case folding, no WS compaction). Use
+		// bytes.Equal for bulk comparison of these runs (SIMD-backed).
+		n := 0
+		for n < len(p) {
+			c := p[n]
+			if flags&IgnoreCase > 0 && isUpper(c) {
+				break
+			}
+			if flags&CompactWS > 0 && ByteIsWS(c) {
+				break
+			}
+			n++
+		}
+		if n > 0 {
+			if len(b) < n || !bytes.Equal(b[:n], p[:n]) {
+				return -1
+			}
+			b, p = b[n:], p[n:]
+			continue
 		}
 		if flags&IgnoreCase > 0 && isUpper(p[0]) {
 			if upper(b[0]) != p[0] {
