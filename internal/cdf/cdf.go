@@ -230,8 +230,14 @@ func (c *cdf) sector(secid int32) (_ []byte, ok bool) {
 	if off >= int64(len(c.data)) {
 		return nil, false
 	}
-	end := off + int64(c.secSize)
-	return c.data[off:min(end, int64(len(c.data)))], true
+	// The returned sector might be truncated,
+	// but we still return it as best effort.
+	end := min(off+int64(c.secSize), int64(len(c.data)))
+	// If not even one int32 fits, then fail.
+	if end-off < 4 {
+		return nil, false
+	}
+	return c.data[off:end], true
 }
 
 func (c *cdf) sectorIDs(secid int32) ([]int32, bool) {
