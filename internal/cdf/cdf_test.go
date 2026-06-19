@@ -157,6 +157,15 @@ func TestDetectInvalidInput(t *testing.T) {
 	// slice-bounds panic.
 	dirSecOverflow := testHeader(testSecSize, 1<<22-1, -2, 0, nil)
 
+	// secSize=4096, masterSAT[0]=0, firstSSAT=0. sector(0) is only 1 byte (file
+	// ends one byte into it), so collectIDs must not loop forever trying to read
+	// int32s from a sub-4-byte buffer.
+	secSize4K := 4096
+	truncatedSSAT := append(
+		padSector(secSize4K, testHeader(secSize4K, -2, 0, 0, []int32{0})),
+		0x00, // one-byte sector 0 — too small for even one int32
+	)
+
 	tests := []struct {
 		name string
 		data []byte
@@ -167,6 +176,7 @@ func TestDetectInvalidInput(t *testing.T) {
 		{"bad sector size", badSectorSize},
 		{"sector smaller than dir entry", tooSmallSector},
 		{"dir sector overflows int32", dirSecOverflow},
+		{"truncated sector in SSAT chain loops forever", truncatedSSAT},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
