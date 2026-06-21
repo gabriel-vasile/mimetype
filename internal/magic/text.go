@@ -585,6 +585,7 @@ func RFC822(raw []byte, limit uint32) bool {
 	// Some of the hints are IgnoreCase, some not. I selected based on what libmagic
 	// does and based on personal observations from sample files.
 	hints := []rfc822Hint{
+		// Enron dataset has Message-ID, Message-Id and Message-id.
 		{[]byte("Message-ID: "), scan.IgnoreCase},
 		{[]byte("From: "), 0},
 		{[]byte("To: "), 0},
