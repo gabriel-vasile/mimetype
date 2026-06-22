@@ -88,6 +88,13 @@ func hasSFNTTable(raw []byte) bool {
 		0x6e616d65, // "name"
 		0x6f706264, // "opbd"
 		0x4f532f32, // "OS/2"
+		// Layout tables https://learn.microsoft.com/en-us/typography/opentype/spec/chapter2
+		0x47535542, // "GSUB"
+		0x47504f53, // "GPOS"
+		0x42415345, // "BASE"
+		0x4a535446, // "JSTF"
+		0x47444546, // "GDEF"
+		0x4d415448, // "MATH"
 	}
 	ourTable := binary.BigEndian.Uint32(raw[12:16])
 	return slices.Contains(possibleTables, ourTable)
