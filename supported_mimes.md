@@ -115,7 +115,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.shp** | **application/vnd.shp** | shp>shx>root
 **.dbf** | **application/x-dbf** | dbf>root
 **.dcm** | **application/dicom** | dcm>root
-**.rar** | **application/x-rar-compressed** <br> application/x-rar | rar>root
+**.rar** | **application/vnd.rar** <br> application/x-rar-compressed, application/x-rar | rar>root
 **.djvu** | **image/vnd.djvu** | djvu>root
 **.mobi** | **application/x-mobipocket-ebook** | mobi>root
 **.lit** | **application/x-ms-reader** | lit>root
