@@ -183,6 +183,10 @@ a,"b`,
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", one},
 	{"js", "#!/bin/node ", "text/javascript", one},
 	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", all},
+	{"json multiple lines", `{"a":"b",
+	"c":[{"a":"b"},
+	1,true,false,
+	"abc"]}`, "application/json", none},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", none},
 	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -252,6 +256,20 @@ a,"b`,
 		"application/json",
 		none,
 	},
+	{
+		"a json object spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`, // Notice how this line is a valid json value (a string)
+		"text/plain; charset=utf-8",
+		none,
+	},
+	{
+		"a json array spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`,
+		"text/plain; charset=utf-8",
+		none,
+	},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", one},
 	{"elfobject", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00", "application/x-object", one},
 	{"odf", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula", one},
@@ -306,7 +324,7 @@ ENDHDR`,
 	{"pyc pypy3.7", "\xf0\x00\x0d\x0a\x00\x00\x00\x00", "application/x-bytecode.python", none},
 	{"pyc >3.14", "\x00\x0e\x0d\x0a\x00\x00\x00\x00", "application/x-bytecode.python", none},
 	{"qcp", "RIFF\xc0\xcf\x00\x00QLCMf", "audio/qcelp", one},
-	{"rar", "Rar!\x1a\x07\x01\x00", "application/x-rar-compressed", all},
+	{"rar", "Rar!\x1a\x07\x01\x00", "application/vnd.rar", one},
 	{"rfc822", "Cc: cc@mail.com\nTo: to@mail.com", "message/rfc822", one},
 	{"rfc822 case insensitive", "Cc: cc@mail.com\nDeLiVeReD-To: to@mail.com", "message/rfc822", none},
 	{"rb", "#!/usr/local/bin/ruby", "text/x-ruby", one},
