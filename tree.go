@@ -250,8 +250,8 @@ var (
 	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", magic.Odc).
 		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", magic.Sxc)
-	rar = newMIME("application/x-rar-compressed", ".rar", magic.RAR).
-		alias("application/x-rar")
+	rar = newMIME("application/vnd.rar", ".rar", magic.RAR).
+		alias("application/x-rar-compressed", "application/x-rar")
 	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
 	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
 	lit     = newMIME("application/x-ms-reader", ".lit", magic.Lit)
