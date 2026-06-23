@@ -24,7 +24,7 @@ jobs:
     - name: Locate fuzz cache
       run: echo "GOFUZZCACHE=$(go env GOCACHE)/fuzz" >> "$GITHUB_ENV"
     - name: Restore fuzz corpus
-      uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: ${{ env.GOFUZZCACHE }}
         # The key is unique per run so a fresh cache is always saved; restore-keys
@@ -51,7 +51,7 @@ jobs:
 
     - name: Save fuzz corpus
       if: always()
-      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: ${{ env.GOFUZZCACHE }}
         key: fuzz-${{ runner.os }}-${{ github.run_id }}
