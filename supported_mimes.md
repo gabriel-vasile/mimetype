@@ -179,7 +179,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.html** | **application/xhtml+xml** | html>xml>txt>root
 **.xml** | **application/vnd.cyclonedx+xml** | xml>xml>txt>root
 **.php** | **text/x-php** | php>txt>root
-**.js** | **text/javascript** <br> application/x-javascript, application/javascript | js>txt>root
+**.js** | **text/javascript** <br> application/javascript, application/ecmascript, application/x-ecmascript, application/x-javascript, text/ecmascript, text/javascript1.0, text/javascript1.1, text/javascript1.2, text/javascript1.3, text/javascript1.4, text/javascript1.5, text/jscript, text/livescript, text/x-ecmascript, text/x-javascript | js>txt>root
 **.lua** | **text/x-lua** | lua>txt>root
 **.pl** | **text/x-perl** | pl>txt>root
 **.py** | **text/x-python** <br> text/x-script.python, application/x-python | py>txt>root
