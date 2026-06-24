@@ -105,6 +105,7 @@ a,"b`,
 	{"djvuI", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00DJVI", "image/vnd.djvu", none},
 	{"djvuTHUM", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00THUM", "image/vnd.djvu", none},
 	{"doc", fromDisk("doc.doc"), "application/msword", all},
+	{"doc clsid beats ppt heuristic", oleWithRootClsid("\x06\x09\x02\x00\x00\x00\x00\x00\xc0\x00\x00\x00\x00\x00\x00\x46"), "application/msword", none},
 	{"docx", fromDisk("docx.docx"), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", all},
 	{"rpm 1", "\xed\xab\xee\xdb", "application/x-rpm", one},
 	{"rpm 2", "drpm", "application/x-rpm", none},
@@ -952,6 +953,22 @@ func fromDisk(path string) string {
 		panic(err)
 	}
 	return string(data)
+}
+
+// oleWithRootClsid builds the minimal Microsoft Compound File (OLE) needed for
+// detection: the magic prefix, a v3 layout (sector length 512) whose directory
+// stream starts at sector 0, and the given 16 byte root storage CLSID located
+// 80 bytes into that directory entry (offset 592). The bytes at offset 512 are
+// the FATSECT marker 0xFFFFFFFD followed by zeros, the generic compound file
+// pattern that the .ppt last-resort heuristic also matches. The buffer is thus
+// ambiguous and only the root CLSID disambiguates it.
+func oleWithRootClsid(clsid string) string {
+	const sector = 512
+	buf := make([]byte, sector+80+16+1) // len must exceed clsidOffset(592)+16
+	copy(buf, "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1")
+	copy(buf[sector:], "\xFD\xFF\xFF\xFF")
+	copy(buf[sector+80:], clsid)
+	return string(buf)
 }
 
 // Ensure the signatures of exposed APIs don't accidentally change.

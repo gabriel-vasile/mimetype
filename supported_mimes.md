@@ -33,8 +33,8 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.msg** | **application/vnd.ms-outlook** | msg>x-ole-storage>root
 **.xls** | **application/vnd.ms-excel** <br> application/msexcel | xls>x-ole-storage>root
 **.pub** | **application/vnd.ms-publisher** | pub>x-ole-storage>root
-**.ppt** | **application/vnd.ms-powerpoint** <br> application/mspowerpoint | ppt>x-ole-storage>root
 **.doc** | **application/msword** <br> application/vnd.ms-word | doc>x-ole-storage>root
+**.ppt** | **application/vnd.ms-powerpoint** <br> application/mspowerpoint | ppt>x-ole-storage>root
 **.ps** | **application/postscript** | ps>root
 **.psd** | **image/vnd.adobe.photoshop** <br> image/x-psd, application/photoshop | psd>root
 **.p7s** | **application/pkcs7-signature** | p7s>root
