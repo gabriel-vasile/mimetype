@@ -508,6 +508,22 @@ func FuzzMatch(f *testing.F) {
 	})
 }
 
+func (f Flags) String() string {
+	ret := []string{}
+	switch {
+	case f&CompactWS != 0:
+		ret = append(ret, "CompactWS")
+	case f&IgnoreCase != 0:
+		ret = append(ret, "IgnoreCase")
+	case f&FullWord != 0:
+		ret = append(ret, "FullWord")
+	}
+	if len(ret) != 0 {
+		return strings.Join(ret, "|")
+	}
+	return "NoFlag"
+}
+
 func BenchmarkMatch(b *testing.B) {
 	r := rand.New(rand.NewSource(0))
 	randData := make([]byte, 1024)
@@ -521,9 +537,21 @@ func BenchmarkMatch(b *testing.B) {
 		IgnoreCase,
 		FullWord,
 	} {
-		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
+		b.Run(fmt.Sprintf("needle=haystack%s", f), func(b *testing.B) {
 			for b.Loop() {
 				Bytes(randData).Match(randData, f)
+			}
+		})
+	}
+	for _, f := range []Flags{
+		0,
+		CompactWS,
+		IgnoreCase,
+		FullWord,
+	} {
+		b.Run(fmt.Sprintf("needle=10bytes%s", f), func(b *testing.B) {
+			for b.Loop() {
+				Bytes(randData).Match(randData[len(randData)-10:], f)
 			}
 		})
 	}
