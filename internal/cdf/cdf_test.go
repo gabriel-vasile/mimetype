@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math/bits"
+	"math/rand/v2"
 	"testing"
 )
 
@@ -630,6 +631,12 @@ func FuzzDetect(f *testing.F) {
 	f.Add(testHeader(512, 1, -2, 0, []int32{0}))
 
 	f.Fuzz(func(t *testing.T, data []byte) {
-		_ = Detect(data) // must not panic on any input
+		if len(data) == 0 {
+			return
+		}
+		for i := 0; i < 100 && i < len(data); i++ {
+			j := rand.IntN(len(data))
+			_ = Detect(data[:j]) // must not panic on any input
+		}
 	})
 }

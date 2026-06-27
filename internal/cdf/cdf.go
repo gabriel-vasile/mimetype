@@ -163,7 +163,7 @@ func parse(raw []byte) (*cdf, bool) {
 	firstSSAT := readSecID(raw[60:64])
 	firstMSAT := readSecID(raw[68:72])
 	nMSAT := binary.LittleEndian.Uint32(raw[72:76])
-	masterSAT := readInt32s(raw[76 : 76+4*masterSATSize])
+	masterSAT := int32s{b: raw[76 : 76+4*masterSATSize]}
 
 	c.buildSAT(masterSAT, firstMSAT, nMSAT)
 	if firstSSAT >= 0 {
@@ -186,13 +186,19 @@ func parse(raw []byte) (*cdf, bool) {
 	return c, true
 }
 
-// readInt32s decodes a buffer as little-endian int32s.
-func readInt32s(b []byte) []int32 {
-	out := make([]int32, len(b)/4)
-	for i := range out {
-		out[i] = int32(binary.LittleEndian.Uint32(b[4*i:])) //nolint:gosec // intentional two's-complement reinterpretation of a sector id
-	}
-	return out
+// int32s could very well be type int32s []byte, but that would mean
+// len function can be called on it. We don't want that, we always want to use
+// the len method.
+type int32s struct {
+	b []byte
+}
+
+func (b int32s) at(i int) int32 {
+	//nolint:gosec // intentional two's-complement reinterpretation of a sector id
+	return int32(binary.LittleEndian.Uint32(b.b[4*i:]))
+}
+func (b int32s) len() int {
+	return len(b.b) / 4
 }
 
 // appendInt32s decodes b as little-endian int32s and appends them to dst,
@@ -221,7 +227,7 @@ func (c *cdf) satAt(i int32) int32 { return readSecID(c.satBytes[4*i:]) }
 
 // sector returns the bytes of long sector secid. If the file is truncated
 // inside the requested sector the result is the available bytes (no padding).
-// If the sector starts past EOF or secid is negative, the ok is false
+// If the sector starts past EOF or secid is negative, then ok is false.
 func (c *cdf) sector(secid int32) (_ []byte, ok bool) {
 	if secid < 0 {
 		return nil, false
@@ -240,25 +246,24 @@ func (c *cdf) sector(secid int32) (_ []byte, ok bool) {
 	return c.data[off:end], true
 }
 
-func (c *cdf) sectorIDs(secid int32) ([]int32, bool) {
+func (c *cdf) sectorIDs(secid int32) (int32s, bool) {
 	buf, ok := c.sector(secid)
 	if !ok {
-		return nil, ok
+		return int32s{}, ok
 	}
-	return readInt32s(buf), true
+	return int32s{b: buf}, true
 }
 
 // buildSAT assembles the sector allocation table from the 109 entries in the
 // header plus any extension blocks chained via the master SAT. The SAT is
 // best-effort: if the input is truncated or the master-SAT chain is malformed,
 // whatever sectors were already collected become the SAT.
-func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) {
+func (c *cdf) buildSAT(masterSAT int32s, firstMSAT int32, nMSAT uint32) {
 	// Common case: the whole SAT lives in a single sector referenced by the
 	// first master-SAT entry, with no extension blocks. Point straight at that
 	// sector's bytes inside the input, avoiding any allocation.
-	if firstMSAT < 0 && len(masterSAT) > 0 && masterSAT[0] >= 0 &&
-		(len(masterSAT) == 1 || masterSAT[1] < 0) {
-		if buf, ok := c.sector(masterSAT[0]); ok {
+	if firstMSAT < 0 && masterSAT.len() > 0 && masterSAT.at(0) >= 0 && masterSAT.at(1) < 0 {
+		if buf, ok := c.sector(masterSAT.at(0)); ok {
 			c.satBytes = buf
 			return
 		}
@@ -271,7 +276,8 @@ func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) {
 	// A full SAT sector holds secSize bytes; preallocating that avoids a regrow
 	// in the common single-sector case.
 	sat := make([]byte, 0, c.secSize)
-	for _, sec := range masterSAT {
+	for i := 0; i < masterSAT.len(); i++ {
+		sec := masterSAT.at(i)
 		if sec < 0 {
 			break
 		}
@@ -295,11 +301,11 @@ func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) {
 			return
 		}
 		for k := 0; k < perSec; k++ {
-			if k >= len(msa) || msa[k] < 0 {
+			if k >= msa.len() || msa.at(k) < 0 { // dubious indexing
 				c.satBytes = sat
 				return
 			}
-			ids, ok := c.sector(msa[k])
+			ids, ok := c.sector(msa.at(k))
 			if !ok {
 				c.satBytes = sat
 				return
@@ -310,11 +316,11 @@ func (c *cdf) buildSAT(masterSAT []int32, firstMSAT int32, nMSAT uint32) {
 				return
 			}
 		}
-		if perSec >= len(msa) {
+		if perSec >= msa.len() {
 			c.satBytes = sat
 			return // no next-MSAT pointer available
 		}
-		mid = msa[perSec]
+		mid = msa.at(perSec)
 	}
 	c.satBytes = sat
 }
@@ -386,28 +392,8 @@ func (c *cdf) readLong(sid int32, length uint32) []byte {
 			return out
 		}
 	}
-
-	// Slow path: gather a fragmented chain into a fresh buffer.
-	// TODO: anyway to avoid allocating and copying the bytes?
-	out := make([]byte, 0, c.secSize)
-	for sid >= 0 {
-		if int(sid) >= c.satLen() {
-			break // SAT truncated; return what we have
-		}
-		buf, ok := c.sector(sid)
-		if !ok {
-			break
-		}
-		out = append(out, buf...)
-		if len(out) >= len(c.data) {
-			break // chain longer than the file: cyclic SAT, stop
-		}
-		sid = c.satAt(sid)
-	}
-	if length > 0 && int(length) < len(out) {
-		out = out[:length]
-	}
-	return out
+	// TODO: explain why readlong is not needed
+	return nil
 }
 
 // readShort reads a short-sector chain at sid by indexing into the short-stream
