@@ -32,7 +32,7 @@ jobs:
         key: fuzz-${{ runner.os }}-${{ github.run_id }}
         restore-keys: |
           fuzz-${{ runner.os }}-
-    # 3m is chosen so that half of the 2000 free CI minutes offered by Github
+    # 2m is chosen so that half of the 2000 free CI minutes offered by Github
     # will be used each month. The other half is reserved for tests in PRs.
     # TODO: Find a way to select all fuzz tests, without listing them individually.
     - run: go test -fuzztime=2m -fuzz=Mimetype        ./
