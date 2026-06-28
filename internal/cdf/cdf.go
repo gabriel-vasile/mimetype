@@ -2,6 +2,7 @@
 // by src/readcdf.c from libmagic. One difference is this implementation is
 // permissive of truncated inputs. See readLimit in mimetype.go for the
 // reason why truncated inputs need to be handled.
+// http://sc.openoffice.org/compdocfileformat.pdf
 package cdf
 
 import (
