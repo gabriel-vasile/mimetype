@@ -378,6 +378,116 @@ func TestDetectShortStreamSummary(t *testing.T) {
 	}
 }
 
+// TestDetectShortStreamMultiSectorSSAT verifies that detection still succeeds
+// when the short-stream we care about lives outside the first SSAT sector.
+// With secSize=512 each SSAT sector holds 128 entries, so placing the summary
+// at short-sector id 128 forces the lookup to descend into the second SSAT
+// sector. Any per-sector bound (e.g. ssatLen() returning secSize/4) would
+// wrongly reject sid=128 and cause detection to fall back to CDFTypeGeneric.
+func TestDetectShortStreamMultiSectorSSAT(t *testing.T) {
+	const (
+		shortSecSz = 64
+		perSec     = testSecSize / 4 // 128 SSAT entries per long sector
+		sstSectors = 17              // SST must reach short-sector 128 (offset 8192)
+		firstSST   = int32(2)
+		lastSST    = firstSST + sstSectors - 1
+		ssatSecA   = lastSST + 1
+		ssatSecB   = ssatSecA + 1
+		sidB0      = int32(perSec) // first short-sector id in the second SSAT sector
+	)
+	summary := summaryStream("Microsoft Office Word", false)
+	if len(summary) > 2*shortSecSz {
+		t.Fatalf("summary len %d, want <= %d so it fits in 2 short sectors", len(summary), 2*shortSecSz)
+	}
+
+	dir := dirEntryBytes("Root Entry", dirTypeRootStorage, firstSST, uint32(sstSectors*testSecSize), nil)
+	dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, sidB0, uint32(len(summary)), nil)...)
+
+	// SAT layout: SAT itself, dir, chained SST sectors, two SSAT sectors.
+	sat := make([]int32, perSec)
+	for i := range sat {
+		sat[i] = -1
+	}
+	sat[0] = -3
+	sat[1] = -2
+	for s := firstSST; s < lastSST; s++ {
+		sat[s] = s + 1
+	}
+	sat[lastSST] = -2
+	sat[ssatSecA] = ssatSecB
+	sat[ssatSecB] = -2
+
+	data := testHeader(testSecSize, 1, ssatSecA, 4096, []int32{0})
+	data = append(data, idSector(testSecSize, sat...)...)
+	data = append(data, padSector(testSecSize, dir)...)
+
+	// Short-stream pool: 17 long sectors. Place the summary at short-sid 128,
+	// which lives at byte offset 128*64 = 8192 inside the pool.
+	sst := make([]byte, sstSectors*testSecSize)
+	copy(sst[int(sidB0)*shortSecSz:], summary)
+	data = append(data, sst...)
+
+	// First SSAT sector: nothing useful (all entries free).
+	data = append(data, idSector(testSecSize)...)
+
+	// Second SSAT sector: chain short-sector 128 → 129 → end, so a correct
+	// reader can recover the summary stream from the pool.
+	nShort := int32((len(summary) + shortSecSz - 1) / shortSecSz)
+	ssatB := make([]int32, perSec)
+	for i := range ssatB {
+		ssatB[i] = -1
+	}
+	for i := int32(0); i < nShort-1; i++ {
+		ssatB[i] = sidB0 + i + 1
+	}
+	ssatB[nShort-1] = -2
+	data = append(data, idSector(testSecSize, ssatB...)...)
+
+	if got := Detect(data); got != CDFTypeDoc {
+		t.Errorf("Detect() = %v, want CDFTypeDoc (short stream in 2nd SSAT sector)", got)
+	}
+}
+
+// makeFragmentedDirCDF builds a CDF whose directory stream spans two
+// physically non-contiguous long sectors. Layout:
+//
+//	sector 0: SAT
+//	sector 1: directory part 1 (contains Root Entry)
+//	sector 2: filler (free sector; SAT entry is -1)
+//	sector 3: directory part 2 (contains a WordDocument entry)
+//
+// The directory chain in the SAT is 1 → 3 → -2, so the second dir sector is
+// only reachable via a fragmented walk. Detection must return CDFTypeDoc,
+// which only happens if readLong follows the fragmented chain.
+func makeFragmentedDirCDF(secSize int) []byte {
+	dir1 := dirEntryBytes("Root Entry", dirTypeRootStorage, -1, 0, nil)
+	dir2 := dirEntryBytes("WordDocument", dirTypeUserStream, -1, 0, nil)
+
+	data := padSector(secSize, testHeader(secSize, 1, -1, 4096, []int32{0}))
+	data = append(data, idSector(secSize, -3, 3, -1, -2)...) // sector 0: SAT
+	data = append(data, padSector(secSize, dir1)...)         // sector 1: dir part 1
+	data = append(data, padSector(secSize, nil)...)          // sector 2: filler
+	data = append(data, padSector(secSize, dir2)...)         // sector 3: dir part 2
+	return data
+}
+
+// TestDetectFragmentedDirChain verifies that detection still works when the
+// directory stream is split across non-contiguous long sectors — a layout
+// real-world CDF writers (MSI builders, edited Office documents) commonly
+// produce. The distinctive entry (WordDocument) lives in the second dir
+// sector, so a readLong implementation that only handles contiguous chains
+// will miss it and incorrectly return CDFTypeGeneric.
+func TestDetectFragmentedDirChain(t *testing.T) {
+	for _, secSize := range testSecSizes {
+		t.Run(fmt.Sprintf("sec%d", secSize), func(t *testing.T) {
+			data := makeFragmentedDirCDF(secSize)
+			if got := Detect(data); got != CDFTypeDoc {
+				t.Errorf("Detect() = %v, want CDFTypeDoc (fragmented dir chain)", got)
+			}
+		})
+	}
+}
+
 func put16(b []byte, off int, v uint16) { binary.LittleEndian.PutUint16(b[off:], v) }
 func put32(b []byte, off int, v uint32) { binary.LittleEndian.PutUint32(b[off:], v) }
 
@@ -577,6 +687,29 @@ func BenchmarkDetect(b *testing.B) {
 			return makeCDF(secSize, nil, "", nil,
 				entrySpec{"Contents", dirTypeUserStream})
 		},
+	}, {
+		name: "ShortStreamSummary",
+		build: func(secSize int) []byte {
+			summary := summaryStream("Microsoft Office Word", false)
+			dir := dirEntryBytes("Root Entry", dirTypeRootStorage, 2, uint32(secSize), nil)
+			dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, 0, uint32(len(summary)), nil)...)
+			// sector 0: SAT, sector 1: dir, sector 2: short-stream pool, sector 3: SSAT.
+			data := testHeader(secSize, 1, 3, 4096, []int32{0})
+			data = append(data, idSector(secSize, -3, -2, -2, -2)...)
+			data = append(data, padSector(secSize, dir)...)
+			data = append(data, padSector(secSize, summary)...)
+			nShort := int32((len(summary) + 63) / 64)
+			ssat := make([]int32, nShort)
+			for i := int32(0); i < nShort-1; i++ {
+				ssat[i] = i + 1
+			}
+			ssat[nShort-1] = -2
+			data = append(data, idSector(secSize, ssat...)...)
+			return data
+		},
+	}, {
+		name:  "FragmentedDir",
+		build: makeFragmentedDirCDF,
 	}}
 
 	for _, secSize := range testSecSizes {
