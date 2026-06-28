@@ -36,6 +36,69 @@ func Detect(raw []byte) CDFType {
 	return c.detect()
 }
 
+// cdf holds everything we need from a CDF file to do detection.
+type cdf struct {
+	data            []byte
+	secSize         int
+	shortSecSize    int
+	minStdStream    uint32
+	satSecs         int32s // list of SAT sector ids; usually a sub-slice of raw input
+	satEntries      int    // number of valid SAT entries reachable through satSecs
+	firstSSAT       int32
+	dirRaw          []byte // directory stream bytes (entries are decoded on demand)
+	sst             []byte // short-stream pool (root storage's stream)
+	sstBuilt        bool   // whether sst was already loaded (it is loaded lazily)
+	rootStreamFirst int32  // first sector of the root storage short-stream pool
+	rootStreamSize  uint32 // size of the root storage short-stream pool
+	rootStorageUUID []byte
+}
+
+// parse reads the entire on-disk structure required for type detection. It
+// returns true on success and false if the header does not look like a CDF file.
+// Truncated or partially malformed bodies are tolerated: sector reads degrade
+// to whatever could be collected so detection can still succeed from partial data.
+func parse(raw []byte, c *cdf) bool {
+	if len(raw) < 512 || binary.LittleEndian.Uint64(raw) != cdfMagic {
+		return false
+	}
+	secP2 := binary.LittleEndian.Uint16(raw[30:32])
+	shortP2 := binary.LittleEndian.Uint16(raw[32:34])
+	if secP2 > 20 || shortP2 > 20 {
+		return false
+	}
+	c.data = raw
+	c.secSize = 1 << secP2
+	c.shortSecSize = 1 << shortP2
+	c.minStdStream = binary.LittleEndian.Uint32(raw[56:60])
+	if c.secSize < dirEntrySize {
+		return false
+	}
+	firstDirSec := readSecID(raw[48:52])
+	c.firstSSAT = readSecID(raw[60:64])
+	firstMSAT := readSecID(raw[68:72])
+	nMSAT := binary.LittleEndian.Uint32(raw[72:76])
+	masterSAT := int32s{b: raw[76 : 76+4*masterSATSize]}
+
+	c.buildSAT(masterSAT, firstMSAT, nMSAT)
+	c.dirRaw = c.readLong(firstDirSec, 0)
+
+	c.rootStreamFirst = -1
+	var d dirEntry
+	for i, n := 0, c.dirLen(); i < n; i++ {
+		c.dirAt(i, &d)
+		if d.typ != dirTypeRootStorage || d.streamFirst < 0 {
+			continue
+		}
+		c.rootStorageUUID = d.storageUUID[:]
+		// Record where the short-stream pool lives; it is loaded lazily by
+		// shortStream the first time a short stream is actually read.
+		c.rootStreamFirst = d.streamFirst
+		c.rootStreamSize = d.size
+		break
+	}
+	return true
+}
+
 func (c *cdf) detect() CDFType {
 	for _, name := range []string{"\x05SummaryInformation", "\x05DocumentSummaryInformation"} {
 		if t, ok := c.detectFromSummary(name); ok {
@@ -108,23 +171,6 @@ type dirEntry struct {
 // nameBytes returns the decoded ASCII name without copying.
 func (d *dirEntry) nameBytes() []byte { return d.name[:d.nameLen] }
 
-// cdf holds everything we need from a CDF file to do detection.
-type cdf struct {
-	data            []byte
-	secSize         int
-	shortSecSize    int
-	minStdStream    uint32
-	satSecs         int32s // list of SAT sector ids; usually a sub-slice of raw input
-	satEntries      int    // number of valid SAT entries reachable through satSecs
-	firstSSAT       int32
-	dirRaw          []byte // directory stream bytes (entries are decoded on demand)
-	sst             []byte // short-stream pool (root storage's stream)
-	sstBuilt        bool   // whether sst was already loaded (it is loaded lazily)
-	rootStreamFirst int32  // first sector of the root storage short-stream pool
-	rootStreamSize  uint32 // size of the root storage short-stream pool
-	rootStorageUUID []byte
-}
-
 func (c *cdf) ssatAt(i int32) int32 {
 	for sid := c.firstSSAT; sid >= 0; {
 		if int(sid) >= c.satLen() {
@@ -158,52 +204,7 @@ func (c *cdf) shortStream() []byte {
 	return c.sst
 }
 
-// parse reads the entire on-disk structure required for type detection. It
-// returns true on success and false if the header does not look like a CDF file.
-// Truncated or partially malformed bodies are tolerated: sector reads degrade
-// to whatever could be collected so detection can still succeed from partial data.
-func parse(raw []byte, c *cdf) bool {
-	if len(raw) < 512 || binary.LittleEndian.Uint64(raw) != cdfMagic {
-		return false
-	}
-	secP2 := binary.LittleEndian.Uint16(raw[30:32])
-	shortP2 := binary.LittleEndian.Uint16(raw[32:34])
-	if secP2 > 20 || shortP2 > 20 {
-		return false
-	}
-	c.data = raw
-	c.secSize = 1 << secP2
-	c.shortSecSize = 1 << shortP2
-	c.minStdStream = binary.LittleEndian.Uint32(raw[56:60])
-	if c.secSize < dirEntrySize {
-		return false
-	}
-	firstDirSec := readSecID(raw[48:52])
-	c.firstSSAT = readSecID(raw[60:64])
-	firstMSAT := readSecID(raw[68:72])
-	nMSAT := binary.LittleEndian.Uint32(raw[72:76])
-	masterSAT := int32s{b: raw[76 : 76+4*masterSATSize]}
-
-	c.buildSAT(masterSAT, firstMSAT, nMSAT)
-	c.dirRaw = c.readLong(firstDirSec, 0)
-
-	c.rootStreamFirst = -1
-	var d dirEntry
-	for i, n := 0, c.dirLen(); i < n; i++ {
-		c.dirAt(i, &d)
-		if d.typ != dirTypeRootStorage || d.streamFirst < 0 {
-			continue
-		}
-		c.rootStorageUUID = d.storageUUID[:]
-		// Record where the short-stream pool lives; it is loaded lazily by
-		// shortStream the first time a short stream is actually read.
-		c.rootStreamFirst = d.streamFirst
-		c.rootStreamSize = d.size
-		break
-	}
-	return true
-}
-
+// int32s works like a slice of LE int32 and is backed by a slice of bytes.
 // int32s could very well be type int32s []byte, but that would mean
 // len function can be called on it. We don't want that, we always want to use
 // the len method.
