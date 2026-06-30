@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, pcap,
 	// MP3 is late because it does a linear search in the input. That means
 	// containers that embed an MP3, for example: an mp4 file, or a zip without
 	// compression, would pass as MP3s.
@@ -302,4 +302,5 @@ var (
 	hlp     = newMIME("application/x-os2-hlp", ".hlp", magic.Hlp)
 	fm      = newMIME("application/vnd.framemaker", ".fm", magic.FrameMaker)
 	bufr    = newMIME("application/bufr", ".bufr", magic.BUFR)
+	pcap    = newMIME("application/vnd.tcpdump.pcap", ".pcap", magic.Pcap)
 )

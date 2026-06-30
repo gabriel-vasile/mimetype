@@ -272,3 +272,15 @@ func Pyc(raw []byte, limit uint32) bool {
 
 	return false
 }
+
+// Pcap identifies "libpcap" capture files.
+// https://www.tcpdump.org/manpages/pcap-savefile.5.html
+func Pcap(raw []byte, _ uint32) bool {
+	if len(raw) < 4 {
+		return false
+	}
+	be := binary.BigEndian.Uint32(raw)
+	le := binary.LittleEndian.Uint32(raw)
+	return be == 0xa1b2c3d4 || be == 0xa1b23c4d ||
+		le == 0xa1b2c3d4 || le == 0xa1b23c4d
+}
