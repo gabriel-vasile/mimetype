@@ -15,6 +15,11 @@ func TSV(raw []byte, limit uint32) bool {
 	return sv(raw, '\t', limit)
 }
 
+// SSV matches a semicolon-separated values file.
+func SSV(raw []byte, limit uint32) bool {
+	return sv(raw, ';', limit)
+}
+
 func sv(in []byte, comma byte, limit uint32) bool {
 	s := scan.Bytes(in)
 	r := csv.NewParser(comma, '#', &s)
