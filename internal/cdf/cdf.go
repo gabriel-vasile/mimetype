@@ -383,10 +383,7 @@ func (c *cdf) readLong(sid int32, length uint32) []byte {
 			if off64 >= int64(len(c.data)) {
 				return nil
 			}
-			end64 := off64 + int64(n)*int64(c.secSize)
-			if end64 > int64(len(c.data)) {
-				end64 = int64(len(c.data))
-			}
+			end64 := min(off64+int64(n)*int64(c.secSize), int64(len(c.data)))
 			out := c.data[off64:end64]
 			if length > 0 && int(length) < len(out) {
 				out = out[:length]
@@ -464,10 +461,7 @@ func (c *cdf) dirLen() int { return len(c.dirRaw) / dirEntrySize }
 // stopping at the first NUL.
 func (c *cdf) dirAt(i int, out *dirEntry) {
 	raw := c.dirRaw[i*dirEntrySize:]
-	nameLen := int(binary.LittleEndian.Uint16(raw[64:]))
-	if nameLen > 64 {
-		nameLen = 64
-	}
+	nameLen := min(int(binary.LittleEndian.Uint16(raw[64:])), 64)
 	k := uint8(0)
 	for j := 0; j < nameLen/2; j++ {
 		// Names are ASCII; keep the low byte of each little-endian UTF-16
