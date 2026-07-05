@@ -12,22 +12,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v6.0.2
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      with:
+        persist-credentials: false
     - name: Install Go
-      uses: actions/setup-go@v6.2.0
+      uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
       with:
         go-version: 'stable'
-    # 3m is chosen so that half of the 2000 free CI minutes offered by Github
+    # Cache interesting fuzzing inputs so subsequential fuzz runs
+    # don't start from zero.
+    - name: Locate fuzz cache
+      run: echo "GOFUZZCACHE=$(go env GOCACHE)/fuzz" >> "$GITHUB_ENV"
+    - name: Restore fuzz corpus
+      uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      with:
+        path: ${{ env.GOFUZZCACHE }}
+        # The key is unique per run so a fresh cache is always saved; restore-keys
+        # falls back to the most recent corpus from a previous run.
+        key: fuzz-${{ runner.os }}-${{ github.run_id }}
+        restore-keys: |
+          fuzz-${{ runner.os }}-
+    # 2m is chosen so that half of the 2000 free CI minutes offered by Github
     # will be used each month. The other half is reserved for tests in PRs.
     # TODO: Find a way to select all fuzz tests, without listing them individually.
-    - run: go test -fuzztime=3m -fuzz=Mimetype        ./
-    - run: go test -fuzztime=3m -fuzz=Search          ./internal/scan
-    - run: go test -fuzztime=3m -fuzz=Match           ./internal/scan
-    - run: go test -fuzztime=3m -fuzz=Json            ./internal/json
-    - run: go test -fuzztime=3m -fuzz=Parser          ./internal/csv
-    - run: go test -fuzztime=3m -fuzz=Plain           ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=XML             ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=HTML            ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=Meta            ./internal/charset
-    - run: go test -fuzztime=3m -fuzz=GetAnAttribute  ./internal/markup
-    - run: go test -fuzztime=3m -fuzz=GetAValue       ./internal/markup
+    - run: go test -fuzztime=2m -fuzz=Mimetype        ./
+    - run: go test -fuzztime=2m -fuzz=Search          ./internal/scan
+    - run: go test -fuzztime=2m -fuzz=Match           ./internal/scan
+    - run: go test -fuzztime=2m -fuzz=Json            ./internal/json
+    - run: go test -fuzztime=2m -fuzz=Parser          ./internal/csv
+    - run: go test -fuzztime=2m -fuzz=Plain           ./internal/charset
+    - run: go test -fuzztime=2m -fuzz=XML             ./internal/charset
+    - run: go test -fuzztime=2m -fuzz=HTML            ./internal/charset
+    - run: go test -fuzztime=2m -fuzz=Meta            ./internal/charset
+    - run: go test -fuzztime=2m -fuzz=GetAnAttribute  ./internal/markup
+    - run: go test -fuzztime=2m -fuzz=GetAValue       ./internal/markup
+    - run: go test -fuzztime=2m -fuzz=ExtractFrame    ./internal/mp3
+    - run: go test -fuzztime=2m -fuzz=Detect          ./internal/cdf
+
+    - name: Save fuzz corpus
+      if: always()
+      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      with:
+        path: ${{ env.GOFUZZCACHE }}
+        key: fuzz-${{ runner.os }}-${{ github.run_id }}

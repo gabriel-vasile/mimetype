@@ -47,7 +47,7 @@ var testcases = []testcase{
 	{"ape", "\x4D\x41\x43\x20\x96\x0F\x00\x00\x34\x00\x00\x00\x18\x00\x00\x00\x90\xE3", "audio/ape", one},
 	{"apk app-metadata.properties", fromDisk("app-metadata.apk"), "application/vnd.android.package-archive", one},
 	{"apk zipflinger", fromDisk("zipflinger.apk"), "application/vnd.android.package-archive", one},
-	{"apng", "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A" + offset(29, "acTL"), "image/vnd.mozilla.apng", all},
+	{"apng", "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\xe0\x00\x00\x01\x90\b\x06\x00\x00\x00v\xf6\xb3T\x00\x00\x00\bacTL", "image/apng", all},
 	{"asf", "\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", "video/x-ms-asf", one},
 	{"atom", `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom">`, "application/atom+xml", one},
 	{"au", "\x2E\x73\x6E\x64", "audio/basic", one},
@@ -68,6 +68,12 @@ var testcases = []testcase{
 	{"bz2", "\x42\x5A\x68", "application/x-bzip2", one},
 	{"cab", "MSCF\x00\x00\x00\x00", "application/vnd.ms-cab-compressed", one},
 	{"cab.is", "ISc(\x00\x00\x00\x01", "application/x-installshield", one},
+	{"cdf-doc", fromDisk("doc.doc"), "application/msword", all},
+	{"cdf-xls", fromDisk("xls.xls"), "application/vnd.ms-excel", one},
+	{"cdf-msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", one},
+	{"cdf-msi", fromDisk("msi.msi"), "application/x-ms-installer", all},
+	{"cdf-ppt", fromDisk("ppt.ppt"), "application/vnd.ms-powerpoint", all},
+	{"cdf-pub", fromDisk("pub.pub"), "application/vnd.ms-publisher", one},
 	{"chm", "ITSF\003\000\000\000\x60\000\000\000", "application/vnd.ms-htmlhelp", one},
 	{"class", "\xCA\xFE\xBA\xBE\x00\x00\x00\xFF", "application/x-java-applet", one},
 	{
@@ -94,6 +100,8 @@ a,"b`,
 	{"cpio 1", "070701", "application/x-cpio", none},
 	{"cpio 2", "070702", "application/x-cpio", none},
 	{"cpio bin", "\xC7\x71____", "application/x-cpio", none},
+	{"cyclonedx json", `{"bomFormat": "CycloneDX", "specVersion": "1.2"}`, "application/vnd.cyclonedx+json", one},
+	{"cyclonedx xml", `<?xml version="1.0"?> <bom xmlns="http://cyclonedx.org/schema/bom/1.1">`, "application/vnd.cyclonedx+xml", one},
 	{"dae", `<?xml version="1.0"?><COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema">`, "model/vnd.collada+xml", one},
 	{"dbf", "\x03\x5f\x07\x1a\x96\x0f\x00\x00\xc1\x00\xa3\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x6f\x73\x6d\x5f\x69\x64\x00\x00\x00\x00\x00\x43\x00\x00\x00\x00\x0a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x63\x6f\x64\x65", "application/x-dbf", one},
 	{"dcm", offset(128, "\x44\x49\x43\x4D"), "application/dicom", one},
@@ -102,7 +110,6 @@ a,"b`,
 	{"djvuM", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00DJVM", "image/vnd.djvu", none},
 	{"djvuI", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00DJVI", "image/vnd.djvu", none},
 	{"djvuTHUM", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00THUM", "image/vnd.djvu", none},
-	{"doc", fromDisk("doc.doc"), "application/msword", all},
 	{"docx", fromDisk("docx.docx"), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", all},
 	{"rpm 1", "\xed\xab\xee\xdb", "application/x-rpm", one},
 	{"rpm 2", "drpm", "application/x-rpm", none},
@@ -181,6 +188,10 @@ a,"b`,
 	{"xpm", "\x2F\x2A\x20\x58\x50\x4D\x20\x2A\x2F", "image/x-xpixmap", one},
 	{"js", "#!/bin/node ", "text/javascript", one},
 	{"json", `{"a":"b", "c":[{"a":"b"},1,true,false,"abc"]}`, "application/json", all},
+	{"json multiple lines", `{"a":"b",
+	"c":[{"a":"b"},
+	1,true,false,
+	"abc"]}`, "application/json", none},
 	{"json issue#239", "{\x0A\x09\x09\"key\":\"val\"}\x0A", "application/json", none},
 	// json.{int,float,string}.txt contain a single JSON value. They are valid JSON
 	// documents but they should not be detected as application/json. This mimics
@@ -210,10 +221,10 @@ a,"b`,
 	{"lnk", "\x4C\x00\x00\x00\x01\x14\x02\x00", "application/x-ms-shortcut", one},
 	{"mdb", offset(4, "Standard Jet DB"), "application/x-msaccess", one},
 	{"midi", "\x4D\x54\x68\x64", "audio/midi", one},
-	{"mkv", "\x1a\x45\xdf\xa3\x01\x00\x00\x00\x00\x00\x00\x23\x42\x86\x81\x01\x42\xf7\x81\x01\x42\xf2\x81\x04\x42\xf3\x81\x08\x42\x82\x88\x6d\x61\x74\x72\x6f\x73\x6b\x61", "video/x-matroska", one},
+	{"mkv", "\x1a\x45\xdf\xa3\x01\x00\x00\x00\x00\x00\x00\x23\x42\x86\x81\x01\x42\xf7\x81\x01\x42\xf2\x81\x04\x42\xf3\x81\x08\x42\x82\x88\x6d\x61\x74\x72\x6f\x73\x6b\x61", "video/matroska", one},
 	{"mobi", offset(60, "BOOKMOBI"), "application/x-mobipocket-ebook", one},
 	{"mov", "\x00\x00\x00\x14\x66\x74\x79\x70\x71\x74\x20\x20", "video/quicktime", one},
-	{"mp3", "\x49\x44\x33\x03", "audio/mpeg", all},
+	{"mp3", "ID3\x04\x00\x00\x00\x00\x00\x01", "audio/mpeg", all},
 	{"mp3 v1 notag", "\xff\xfb\xc8\x00", "audio/mpeg", none},
 	{"mp3 v2.5 notag", "\xff\xe3\x18\xc4", "audio/mpeg", none},
 	{"mp3 v2 notag", "\xff\xf3\x82\xc4", "audio/mpeg", none},
@@ -222,8 +233,6 @@ a,"b`,
 	{"mpeg", "\x00\x00\x01\xba", "video/mpeg", one},
 	{"mqv", "\x00\x00\x00\x18ftypmqt ", "video/quicktime", none},
 	{"mrc", "00057     2200037   4500245001900000\x1e", "application/marc", one},
-	{"msi", fromDisk("msi.msi"), "application/x-ms-installer", all},
-	{"msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", one},
 	{"ndjson", `{"key":"val"}` + "\n" + `{"key":"val"}`, "application/x-ndjson", one},
 	{"ndjson spaces", `{ "key" : "val" }` + "\n" + ` { "key" : "val" }`, "application/x-ndjson", one},
 	{
@@ -250,6 +259,20 @@ a,"b`,
 		"application/json",
 		none,
 	},
+	{
+		"a json object spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`, // Notice how this line is a valid json value (a string)
+		"text/plain; charset=utf-8",
+		none,
+	},
+	{
+		"a json array spread on multiple lines second line valid json", // #803
+		`{"key":
+		"val"`,
+		"text/plain; charset=utf-8",
+		none,
+	},
 	{"nes", "NES\x1a", "application/vnd.nintendo.snes.rom", one},
 	{"elfobject", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00", "application/x-object", one},
 	{"odf", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xb1Z\xa8N\x07\x8a\xa8[*\x00\x00\x00*\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.formula", "application/vnd.oasis.opendocument.formula", one},
@@ -270,11 +293,11 @@ a,"b`,
 	{"odc", "PK\x03\x04\x14\x00\x00\x08\x00\x00zp2R\xab\xb8\xb2l(\x00\x00\x00(\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.chart", "application/vnd.oasis.opendocument.chart", one},
 	{"owl", `<?xml version="1.0"?><Ontology xmlns="http://www.w3.org/2002/07/owl#">`, "application/owl+xml", one},
 	{"pat", "\x00\x00\x00\x1c\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x03GPAT", "image/x-gimp-pat", one},
+	{"pcap", "\xd4\xc3\xb2\xa1", "application/vnd.tcpdump.pcap", none},
 	{"pdf", "%PDF-", "application/pdf", all},
 	{"php", "#!/usr/bin/env php", "text/x-php", one},
 	{"pl", "#!/usr/bin/perl", "text/x-perl", one},
 	{"png", "\x89PNG\x0d\x0a\x1a\x0a", "image/png", all},
-	{"ppt", fromDisk("ppt.ppt"), "application/vnd.ms-powerpoint", all},
 	{"pptx", fromDisk("pptx.pptx"), "application/vnd.openxmlformats-officedocument.presentationml.presentation", all},
 	{"pbm", "P1\n# comment\n\n6 10", "image/x-portable-bitmap", one},
 	{"pgm", "P2\n# comment\n\n6 10", "image/x-portable-graymap", one},
@@ -295,12 +318,15 @@ ENDHDR`,
 	{"psd", "8BPS", "image/vnd.adobe.photoshop", all},
 	{"p7s_pem", "-----BEGIN PKCS7", "application/pkcs7-signature", one},
 	{"p7s_der", "\x30\x82\x01\x26\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0\x82\x01\x17\x30", "application/pkcs7-signature", one},
-	{"pub", fromDisk("pub.pub"), "application/vnd.ms-publisher", one},
 	{"py", "#!/usr/bin/python", "text/x-python", one},
 	{"py3", "#!/usr/bin/env python3", "text/x-python", one},
 	{"py3 with code", "#!/usr/bin/env -S python3\nprint(1)", "text/x-python", none},
+	{"pyc 1.0", "\x02\x09\x99\x00\x00\x00\x00\x00", "application/x-bytecode.python", none},
+	{"pyc 3.7", "\x3f\x0d\x0d\x0a\x00\x00\x00\x00", "application/x-bytecode.python", none},
+	{"pyc pypy3.7", "\xf0\x00\x0d\x0a\x00\x00\x00\x00", "application/x-bytecode.python", none},
+	{"pyc >3.14", "\x00\x0e\x0d\x0a\x00\x00\x00\x00", "application/x-bytecode.python", none},
 	{"qcp", "RIFF\xc0\xcf\x00\x00QLCMf", "audio/qcelp", one},
-	{"rar", "Rar!\x1a\x07\x01\x00", "application/x-rar-compressed", all},
+	{"rar", "Rar!\x1a\x07\x01\x00", "application/vnd.rar", one},
 	{"rfc822", "Cc: cc@mail.com\nTo: to@mail.com", "message/rfc822", one},
 	{"rfc822 case insensitive", "Cc: cc@mail.com\nDeLiVeReD-To: to@mail.com", "message/rfc822", none},
 	{"rb", "#!/usr/local/bin/ruby", "text/x-ruby", one},
@@ -368,7 +394,6 @@ ENDHDR`,
 	{"xhtml1", `<?xml version="1.0"?><!DOCTYPE html`, "application/xhtml+xml", one},
 	{"xhtml2", `<?xml version="1.0"?><HtMl 	XMLNS=`, "application/xhtml+xml", none},
 	{"xlf", `<?xml version="1.0"?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2">`, "application/x-xliff+xml", one},
-	{"xls", fromDisk("xls.xls"), "application/vnd.ms-excel", one},
 	{"xlsx", fromDisk("xlsx.xlsx"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", all},
 	{"xml", "<?xml ", "text/xml; charset=utf-8", all},
 	{"xml withbr", "\x0D\x0A<?xml ", "text/xml; charset=utf-8", none},
@@ -694,27 +719,32 @@ func TestIndexOutOfRangePanic(t *testing.T) {
 // parse each alias when testing for equality, we must ensure they are
 // registered with no parameters.
 func TestMIMEFormat(t *testing.T) {
+	// Conventially, media types should be lower case, but exceptions exists.
+	// However, when testing equality, their lower case values should be used,
+	// regardless if they originally are lower or upper case.
+	// Up until now, all media types we registered have been lower case and
+	// without optional params. That helps to keep MIME.Is function simple.
+	// But, in the case we will add a MIME breaking the rule, we should know.
+	// That's the purpose of this test.
+	testNormalised := func(ms []string) {
+		for _, m := range ms {
+			normalised, _, err := mime.ParseMediaType(m)
+			if err != nil {
+				t.Errorf("error parsing %s: %s", m, err)
+			}
+			if m != normalised {
+				t.Errorf("registered MIME should be normalised: %s", m)
+			}
+		}
+	}
 	for _, n := range root.flatten() {
 		// All extensions must be dot prefixed so they are compatible
 		// with the stdlib mime package.
 		if n.Extension() != "" && !strings.HasPrefix(n.Extension(), ".") {
-			t.Fatalf("extension %s should be dot prefixed", n.Extension())
+			t.Errorf("extension %s should be dot prefixed", n.Extension())
 		}
-		// All MIMEs must be correctly formatted.
-		_, _, err := mime.ParseMediaType(n.String())
-		if err != nil {
-			t.Fatalf("error parsing node MIME: %s", err)
-		}
-		// Aliases must have no optional MIME parameters.
-		for _, a := range n.aliases {
-			parsed, params, err := mime.ParseMediaType(a)
-			if err != nil {
-				t.Fatalf("error parsing node alias MIME: %s", err)
-			}
-			if parsed != a || len(params) > 0 {
-				t.Fatalf("node alias MIME should have no optional params; alias: %s, params: %v", a, params)
-			}
-		}
+
+		testNormalised(append(n.aliases, n.String()))
 	}
 }
 
@@ -733,6 +763,78 @@ func TestLookup(t *testing.T) {
 		t.Run(fmt.Sprintf("lookup %s", tt.mime), func(t *testing.T) {
 			if m := Lookup(tt.mime); m != tt.m {
 				t.Fatalf("failed to lookup: %s", tt.mime)
+			}
+		})
+	}
+}
+
+func TestIs(t *testing.T) {
+	tcases := []struct {
+		name     string
+		m        *MIME
+		n        string
+		expected bool
+	}{{
+		name: "mime matches",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "text/xml",
+		expected: true,
+	}, {
+		name: "alias matches",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "application/xml",
+		expected: true,
+	}, {
+		name: "mime matches because both m.mime and n are converted to lower case",
+		m: &MIME{
+			mime:      "Text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "tEXT/XML",
+		expected: true,
+	}, {
+		name: "alias matches because n is converted to lower case",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "Application/xml",
+		expected: true,
+	}, {
+		name: "alias does not match because aliases are not converted to lower case",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"Application/xml"},
+			extension: ".xml",
+		},
+		n:        "Application/xml",
+		expected: false,
+	}, {
+		name: "empty string does not match anything",
+		m: &MIME{
+			mime:      "text/xml",
+			aliases:   []string{"application/xml"},
+			extension: ".xml",
+		},
+		n:        "",
+		expected: false,
+	}}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.m.Is(tc.n)
+			if got != tc.expected {
+				t.Errorf("expected: %t, got: %t", tc.expected, got)
 			}
 		})
 	}

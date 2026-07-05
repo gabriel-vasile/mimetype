@@ -473,58 +473,68 @@ func TestConsumeArray(t *testing.T) {
 
 func TestQueryObject(t *testing.T) {
 	tCases := []struct {
+		name         string
 		json         string
 		query        query
 		expectedFind bool
 	}{{
+		name: "empty path",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("")},
 		},
 		expectedFind: false,
 	}, {
+		name: "path not matching after",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("fool")},
 		},
 		expectedFind: false,
 	}, {
+		name: "path not matching before",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("afoo")},
 		},
 		expectedFind: false,
 	}, {
+		name: "empty segment followed by valid segment",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte(""), []byte("foo")},
 		},
 		expectedFind: false,
 	}, {
+		name: "inversed segments",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("bar"), []byte("foo")},
 		},
 		expectedFind: false,
 	}, {
+		name: "foo is value, not path",
 		json: `{"foo": {"bar": "foo"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("bar"), []byte("foo")},
 		},
 		expectedFind: false,
 	}, {
+		name: "not matching because it's array",
 		json: `[{"foo": {"bar": "baz"}}]`,
 		query: query{
 			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
 		},
 		expectedFind: false,
 	}, {
+		name: "match without value",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
 		},
 		expectedFind: true,
 	}, {
+		name: "match with value",
 		json: `{"foo": {"bar": "baz"}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
@@ -532,6 +542,7 @@ func TestQueryObject(t *testing.T) {
 		},
 		expectedFind: true,
 	}, {
+		name: "no match because path is offset with one foo",
 		json: `{"foo": {"foo": {"bar": "baz"}}}`,
 		query: query{
 			SearchPath: [][]byte{[]byte("foo"), []byte("bar")},
@@ -541,7 +552,7 @@ func TestQueryObject(t *testing.T) {
 	}}
 
 	for _, tt := range tCases {
-		t.Run(tt.json, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			p := &parserState{}
 			p.consumeAny([]byte(tt.json), []query{tt.query}, 0)
 			if tt.expectedFind != p.querySatisfied {
