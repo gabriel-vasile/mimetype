@@ -200,7 +200,8 @@ var (
 	avi = newMIME("video/x-msvideo", ".avi", magic.Avi).
 		alias("video/avi", "video/msvideo")
 	flv = newMIME("video/x-flv", ".flv", magic.Flv)
-	mkv = newMIME("video/x-matroska", ".mkv", magic.Mkv)
+	mkv = newMIME("video/matroska", ".mkv", magic.Mkv).
+		alias("video/x-matroska")
 	asf = newMIME("video/x-ms-asf", ".asf", magic.Asf).
 		alias("video/asf", "video/x-ms-wmv")
 	rmvb  = newMIME("application/vnd.rn-realmedia-vbr", ".rmvb", magic.Rmvb)
