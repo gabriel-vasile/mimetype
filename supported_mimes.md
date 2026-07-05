@@ -94,7 +94,7 @@ Extension | MIME type <br> Aliases | Hierarchy
 **.webm** | **video/webm** <br> audio/webm | webm>root
 **.avi** | **video/x-msvideo** <br> video/avi, video/msvideo | avi>root
 **.flv** | **video/x-flv** | flv>root
-**.mkv** | **video/x-matroska** | mkv>root
+**.mkv** | **video/matroska** <br> video/x-matroska | mkv>root
 **.asf** | **video/x-ms-asf** <br> video/asf, video/x-ms-wmv | asf>root
 **.aac** | **audio/aac** | aac>root
 **.voc** | **audio/x-unknown** | voc>root
