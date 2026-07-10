@@ -228,7 +228,7 @@ func (b Bytes) Match(p []byte, flags Flags) int {
 				return -1
 			}
 			b = b[1:]
-			if !ByteIsWS(p[0]) {
+			if len(p) > 0 && !ByteIsWS(p[0]) {
 				b.TrimLWS()
 			}
 		} else {
