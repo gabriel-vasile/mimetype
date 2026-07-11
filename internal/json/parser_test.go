@@ -821,6 +821,7 @@ func FuzzJson(f *testing.F) {
 	for _, p := range positives {
 		f.Add([]byte(p.json), true)
 	}
+	queryTypes := []string{QueryNone, QueryGeo, QueryHAR, QueryGLTF, QueryCDX}
 	p := &parserState{}
 	f.Fuzz(func(t *testing.T, data []byte, reset bool) {
 		if reset {
@@ -831,5 +832,9 @@ func FuzzJson(f *testing.F) {
 		p.consumeArray(data, nil, 1)
 		p.consumeObject(data, nil, 1)
 		p.consumeAny(data, nil, 1)
+		// Exercise the query matching logic through the public entry point.
+		for _, q := range queryTypes {
+			Parse(q, data)
+		}
 	})
 }

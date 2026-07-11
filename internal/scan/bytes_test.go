@@ -525,6 +525,7 @@ func BenchmarkMatch(b *testing.B) {
 		FullWord,
 	} {
 		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
+			b.ReportAllocs()
 			for b.Loop() {
 				Bytes(randData).Match(randData, f)
 			}
