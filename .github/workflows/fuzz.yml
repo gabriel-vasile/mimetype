@@ -32,22 +32,17 @@ jobs:
         key: fuzz-${{ runner.os }}-${{ github.run_id }}
         restore-keys: |
           fuzz-${{ runner.os }}-
-    # 2m is chosen so that half of the 2000 free CI minutes offered by Github
-    # will be used each month. The other half is reserved for tests in PRs.
-    # TODO: Find a way to select all fuzz tests, without listing them individually.
-    - run: go test -fuzztime=2m -fuzz=Mimetype        ./
-    - run: go test -fuzztime=2m -fuzz=Search          ./internal/scan
-    - run: go test -fuzztime=2m -fuzz=Match           ./internal/scan
-    - run: go test -fuzztime=2m -fuzz=Json            ./internal/json
-    - run: go test -fuzztime=2m -fuzz=Parser          ./internal/csv
-    - run: go test -fuzztime=2m -fuzz=Plain           ./internal/charset
-    - run: go test -fuzztime=2m -fuzz=XML             ./internal/charset
-    - run: go test -fuzztime=2m -fuzz=HTML            ./internal/charset
-    - run: go test -fuzztime=2m -fuzz=Meta            ./internal/charset
-    - run: go test -fuzztime=2m -fuzz=GetAnAttribute  ./internal/markup
-    - run: go test -fuzztime=2m -fuzz=GetAValue       ./internal/markup
-    - run: go test -fuzztime=2m -fuzz=ExtractFrame    ./internal/mp3
-    - run: go test -fuzztime=2m -fuzz=Detect          ./internal/cdf
+    # 2m per target is chosen so that roughly half of the 2000 free CI minutes
+    # offered by Github will be used each month. The other half is reserved for
+    # tests in PRs. Keep an eye on the total run time when adding fuzz targets.
+    - name: Run all fuzz tests
+      run: |
+        for pkg in $(go list ./...); do
+          for target in $(go test -list '^Fuzz' "$pkg" | grep '^Fuzz' || true); do
+            echo "=== fuzzing $target in $pkg ==="
+            go test -fuzztime=2m -fuzz="^${target}\$" "$pkg"
+          done
+        done
 
     - name: Save fuzz corpus
       if: always()

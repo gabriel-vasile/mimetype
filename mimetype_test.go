@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"math"
 	"math/rand"
 	"mime"
 	"os"
@@ -880,16 +879,20 @@ func TestExtend(t *testing.T) {
 // search for panics.
 func FuzzMimetype(f *testing.F) {
 	for _, tc := range testcases {
-		if len(tc.data) < 100 && tc.bench == one {
-			f.Add([]byte(tc.data))
+		if tc.bench == one || tc.bench == all {
+			f.Add([]byte(tc.data), true)
 		}
 	}
 	// First node is root. Remove it because it matches any input.
 	detectors := root.flatten()[1:]
-	f.Fuzz(func(t *testing.T, data []byte) {
+	f.Fuzz(func(t *testing.T, data []byte, truncate bool) {
 		matched := false
+		limit := uint32(0)
+		if truncate {
+			limit = uint32(len(data)) //nolint:gosec
+		}
 		for _, d := range detectors {
-			if d.detector(data, math.MaxUint32) {
+			if d.detector(data, limit) {
 				matched = true
 			}
 		}
