@@ -7,6 +7,12 @@ linters:
   exclusions:
     presets:
       - std-error-handling
+    rules:
+      # Test fixtures construct CDF binary blobs from known small constants, so
+      # gosec's integer-overflow checks (G115) add no value there.
+      - path: internal/cdf/cdf_test\.go
+        linters:
+          - gosec
   enable:
     - gosec          # Detects security problems.
     # Keep all extras disabled for now to focus on the integer overflow problem.

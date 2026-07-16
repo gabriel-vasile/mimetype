@@ -122,26 +122,6 @@ func (b *Bytes) Line() Bytes {
 	return line
 }
 
-// DropLastLine drops the last incomplete line from b.
-//
-// mimetype limits itself to ReadLimit bytes when performing a detection.
-// This means, for file formats like CSV for NDJSON, the last line of the input
-// can be an incomplete line.
-// If b length is less than readLimit, it means we received an incomplete file
-// and proceed with dropping the last line.
-func (b *Bytes) DropLastLine(readLimit uint32) {
-	if readLimit == 0 || uint64(len(*b)) < uint64(readLimit) {
-		return
-	}
-
-	for i := len(*b) - 1; i > 0; i-- {
-		if (*b)[i] == '\n' {
-			*b = (*b)[:i]
-			return
-		}
-	}
-}
-
 func (b *Bytes) Uint16() (uint16, bool) {
 	if len(*b) < 2 {
 		return 0, false
@@ -248,7 +228,7 @@ func (b Bytes) Match(p []byte, flags Flags) int {
 				return -1
 			}
 			b = b[1:]
-			if !ByteIsWS(p[0]) {
+			if len(p) > 0 && !ByteIsWS(p[0]) {
 				b.TrimLWS()
 			}
 		} else {

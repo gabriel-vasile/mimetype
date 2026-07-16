@@ -407,8 +407,16 @@ func NdJSON(raw []byte, limit uint32) bool {
 	var l scan.Bytes
 	for len(s) != 0 {
 		l = s.Line()
-		_, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
-		if len(l) != inspected {
+		parsed, inspected, firstToken, _ := json.Parse(json.QueryNone, l)
+		// Only the last line may be truncated by the read limit; for it, it is
+		// enough that the parser inspected all of it. Every other line must be a
+		// complete, valid JSON document, otherwise a single JSON document spread
+		// over multiple lines would be mistaken for NDJSON. #803
+		if len(s) == 0 {
+			if inspected != len(l) {
+				return false
+			}
+		} else if parsed != len(l) {
 			return false
 		}
 		if firstToken == json.TokArray || firstToken == json.TokObject {
@@ -577,6 +585,8 @@ func RFC822(raw []byte, limit uint32) bool {
 	// Some of the hints are IgnoreCase, some not. I selected based on what libmagic
 	// does and based on personal observations from sample files.
 	hints := []rfc822Hint{
+		// Enron dataset has Message-ID, Message-Id and Message-id.
+		{[]byte("Message-ID: "), scan.IgnoreCase},
 		{[]byte("From: "), 0},
 		{[]byte("To: "), 0},
 		{[]byte("CC: "), scan.IgnoreCase},
