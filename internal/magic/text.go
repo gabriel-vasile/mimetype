@@ -646,6 +646,11 @@ func GEDCOM(raw []byte, limit uint32) bool {
 	}
 
 	// "1 GEDC" is mandatory in the header
-	idx, _ := b.Search([]byte("1 GEDC"), scan.CompactWS)
-	return idx != -1
+	for i := 0; i < 10; i++ {
+		line := b.Line()
+		if bytes.Equal(line, []byte("1 GEDC")) {
+			return true
+		}
+	}
+	return false
 }
