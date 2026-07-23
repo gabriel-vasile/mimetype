@@ -46,8 +46,8 @@ func (m *MIME) Extension() string {
 // Each MIME type has a non-nil parent, except for the root MIME type.
 //
 // For example, the application/json and text/html MIME types have text/plain as
-// their parent because they are text files who happen to contain JSON or HTML.
-// Another example is the ZIP format, which is used as container
+// their parent because they are text files that happen to contain JSON or HTML.
+// Another example is the ZIP format, which is used as a container
 // for Microsoft Office files, EPUB files, JAR files, and others.
 func (m *MIME) Parent() *MIME {
 	return m.parent
@@ -146,7 +146,12 @@ func (m *MIME) hierarchy() string {
 			// There are some MIME without extensions. When generating the hierarchy,
 			// it would be confusing to use empty string as extension.
 			// Use the subtype instead; ex: application/x-executable -> x-executable.
-			e = strings.Split(m.String(), "/")[1]
+			parts := strings.SplitN(m.String(), "/", 2)
+			if len(parts) == 2 {
+				e = parts[1]
+			} else {
+				e = m.String()
+			}
 			if m.Is("application/octet-stream") {
 				// for octet-stream use root, because it's short and used in many places
 				e = "root"
