@@ -106,3 +106,10 @@ shows which file formats are most often misidentified and can help prioritise.
 When submitting a PR for detection of a new file format, please make sure to
 add a record to the list of testcases in [mimetype_test.go](mimetype_test.go).
 For complex files a record can be added in the [testdata](testdata) directory.
+Code contributions must respect following rules:
+ - code must be test covered
+ - code must be formatted using the `gofmt` tool
+ - exported names must be documented
+
+**Important**: By submitting a pull request, you agree to allow the project
+owner to license your work under the same license as that used by the project.
