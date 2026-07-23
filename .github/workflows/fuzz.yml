@@ -39,8 +39,10 @@ jobs:
       run: |
         for pkg in $(go list ./...); do
           for target in $(go test -list '^Fuzz' "$pkg" | grep '^Fuzz' || true); do
-            echo "=== fuzzing $target in $pkg ==="
-            go test -fuzztime=2m -fuzz="^${target}\$" "$pkg"
+            echo "=== fuzzing $target in $pkg for 64bit ==="
+            go test -fuzztime=1m30s -fuzz="^${target}\$" "$pkg"
+            echo "=== fuzzing $target in $pkg for 32bit ==="
+            GOARCH=386 go test -fuzztime=30s -fuzz="^${target}\$" "$pkg"
           done
         done
 
