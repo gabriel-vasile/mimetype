@@ -772,7 +772,9 @@ func FuzzDetect(f *testing.F) {
 		h := fnv.New64a()
 		h.Write(data)
 		rng := rand.New(rand.NewPCG(h.Sum64(), 0))
-		for i := 0; i < 100 && i < len(data); i++ {
+		// Truncate the data at random offsets. Truncating on each offset is
+		// too expensive.
+		for i := 0; i < 100; i++ {
 			j := rng.IntN(len(data))
 			_ = Detect(data[:j]) // must not panic on any input
 		}
