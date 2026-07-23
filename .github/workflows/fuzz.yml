@@ -1,7 +1,7 @@
 name: Fuzz
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 3 */3 * *"
   workflow_dispatch:
 
 permissions:
@@ -40,9 +40,9 @@ jobs:
         for pkg in $(go list ./...); do
           for target in $(go test -list '^Fuzz' "$pkg" | grep '^Fuzz' || true); do
             echo "=== fuzzing $target in $pkg for 64bit ==="
-            go test -fuzztime=1m30s -fuzz="^${target}\$" "$pkg"
+            go test -fuzztime=3m -fuzz="^${target}\$" "$pkg"
             echo "=== fuzzing $target in $pkg for 32bit ==="
-            GOARCH=386 go test -fuzztime=30s -fuzz="^${target}\$" "$pkg"
+            GOARCH=386 go test -fuzztime=1m -fuzz="^${target}\$" "$pkg"
           done
         done
 
