@@ -3,6 +3,7 @@ package cdf
 import (
 	"encoding/binary"
 	"fmt"
+	"hash/fnv"
 	"math/bits"
 	"math/rand/v2"
 	"testing"
@@ -767,8 +768,12 @@ func FuzzDetect(f *testing.F) {
 		if len(data) == 0 {
 			return
 		}
+		// Seed the rng from input so the truncation points are deterministic.
+		h := fnv.New64a()
+		h.Write(data)
+		rng := rand.New(rand.NewPCG(h.Sum64(), 0))
 		for i := 0; i < 100 && i < len(data); i++ {
-			j := rand.IntN(len(data))
+			j := rng.IntN(len(data))
 			_ = Detect(data[:j]) // must not panic on any input
 		}
 	})
