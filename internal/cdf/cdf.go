@@ -385,7 +385,7 @@ func (c *cdf) readLong(sid int32, length uint32) []byte {
 			}
 			end64 := min(off64+int64(n)*int64(c.secSize), int64(len(c.data)))
 			out := c.data[off64:end64]
-			if length > 0 && int(length) < len(out) {
+			if length > 0 && int64(length) < int64(len(out)) {
 				out = out[:length]
 			}
 			return out
@@ -412,7 +412,7 @@ func (c *cdf) readLong(sid int32, length uint32) []byte {
 		}
 		sid = c.satAt(sid)
 	}
-	if length > 0 && int(length) < len(out) {
+	if length > 0 && int64(length) < int64(len(out)) {
 		out = out[:length]
 	}
 	return out
@@ -429,17 +429,18 @@ func (c *cdf) readShort(sid int32, length uint32) []byte {
 	// TODO: anyway to avoid allocating and copying the bytes?
 	out := make([]byte, 0, c.shortSecSize)
 	for sid >= 0 {
-		off := int(sid) * c.shortSecSize
-		if off+c.shortSecSize > len(sst) {
+		off64 := int64(sid) * int64(c.shortSecSize)
+		if off64+int64(c.shortSecSize) > int64(len(sst)) {
 			break // short-stream pool truncated or sid out of range
 		}
+		off := int(off64)
 		out = append(out, sst[off:off+c.shortSecSize]...)
 		if len(out) >= len(sst) {
 			break // chain longer than the pool: cyclic SSAT, stop
 		}
 		sid = c.ssatAt(sid)
 	}
-	if length > 0 && int(length) < len(out) {
+	if length > 0 && int64(length) < int64(len(out)) {
 		out = out[:length]
 	}
 	return out

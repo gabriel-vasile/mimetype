@@ -46,7 +46,7 @@ func (m *MIME) Extension() string {
 // Each MIME type has a non-nil parent, except for the root MIME type.
 //
 // For example, the application/json and text/html MIME types have text/plain as
-// their parent because they are text files who happen to contain JSON or HTML.
+// their parent because they are text files that happen to contain JSON or HTML.
 // Another example is the ZIP format, which is used as container
 // for Microsoft Office files, EPUB files, JAR files, and others.
 func (m *MIME) Parent() *MIME {
