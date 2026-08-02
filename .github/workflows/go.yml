@@ -1,4 +1,4 @@
-name: Tests and linters
+name: Tests
 on:
   push:
     branches:
