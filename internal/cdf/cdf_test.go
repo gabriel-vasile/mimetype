@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"hash/fnv"
+	"io/ioutil"
 	"math/bits"
 	"math/rand/v2"
 	"testing"
@@ -72,10 +73,27 @@ func dirEntryBytes(name string, typ uint8, first int32, size uint32, uuid []byte
 	}
 	binary.LittleEndian.PutUint16(e[64:], uint16(2*(len(name)+1)))
 	e[66] = typ
+	binary.LittleEndian.PutUint32(e[68:], 0xFFFFFFFF) // left sibling: none
+	binary.LittleEndian.PutUint32(e[72:], 0xFFFFFFFF) // right sibling: none
+	binary.LittleEndian.PutUint32(e[76:], 0xFFFFFFFF) // child: none
 	copy(e[80:96], uuid)
 	binary.LittleEndian.PutUint32(e[116:], uint32(first))
 	binary.LittleEndian.PutUint32(e[120:], size)
 	return e
+}
+
+// linkDirTree links directory entries into the simplest valid tree: entry 0
+// (the root storage) points at entry 1 as its child and entries 1..n-1 are
+// chained through right-sibling pointers. This is what forEachRootChild walks.
+func linkDirTree(dir []byte) []byte {
+	n := len(dir) / dirEntrySize
+	if n > 1 {
+		binary.LittleEndian.PutUint32(dir[76:], 1) // root child = entry 1
+	}
+	for i := 1; i < n-1; i++ {
+		binary.LittleEndian.PutUint32(dir[i*dirEntrySize+72:], uint32(i+1)) //nolint:gosec // small positive index
+	}
+	return dir
 }
 
 // summaryStream builds a minimal (Doc)SummaryInformation property-set stream
@@ -136,6 +154,7 @@ func makeCDF(secSize int, rootUUID []byte, summaryName string, summary []byte, e
 	for _, e := range extras {
 		dir = append(dir, dirEntryBytes(e.name, e.typ, -2, 0, nil)...)
 	}
+	dir = linkDirTree(dir)
 	if len(dir) > secSize {
 		panic("directory larger than one sector")
 	}
@@ -186,6 +205,44 @@ func TestDetectInvalidInput(t *testing.T) {
 				t.Errorf("Detect() = %v, want CDFTypeGeneric", got)
 			}
 		})
+	}
+}
+
+// TestDetectEmbeddedObjectSummary verifies that detection reads the
+// document's own root-level SummaryInformation and not one belonging to an
+// embedded OLE object. The embedded (Excel) summary appears before the root
+// (Word) summary in flat directory order, so a scan that ignores the storage
+// hierarchy would misdetect the file as XLS.
+//
+// Directory layout: Root Entry → child ObjectPool (storage, holding the
+// embedded summary) → right sibling root summary.
+func TestDetectEmbeddedObjectSummary(t *testing.T) {
+	for _, secSize := range testSecSizes {
+		excel := summaryStream("Microsoft Excel", false)
+		word := summaryStream("Microsoft Office Word", false)
+		if len(excel) > secSize || len(word) > secSize {
+			t.Fatal("summary streams must fit in one sector")
+		}
+
+		dir := dirEntryBytes("Root Entry", dirTypeRootStorage, 2, uint32(secSize), nil)
+		dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, 3, uint32(len(excel)), nil)...)
+		dir = append(dir, dirEntryBytes("ObjectPool", dirTypeUserStorage, -2, 0, nil)...)
+		dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, 4, uint32(len(word)), nil)...)
+		binary.LittleEndian.PutUint32(dir[76:], 2)                // root child = ObjectPool
+		binary.LittleEndian.PutUint32(dir[2*dirEntrySize+76:], 1) // ObjectPool child = embedded summary
+		binary.LittleEndian.PutUint32(dir[2*dirEntrySize+72:], 3) // ObjectPool right sibling = root summary
+
+		// sector 0: SAT, 1: dir, 2: root pool, 3: excel summary, 4: word summary
+		data := padSector(secSize, testHeader(secSize, 1, -2, 0, []int32{0}))
+		data = append(data, idSector(secSize, -3, -2, -2, -2, -2)...)
+		data = append(data, padSector(secSize, dir)...)
+		data = append(data, make([]byte, secSize)...)
+		data = append(data, padSector(secSize, excel)...)
+		data = append(data, padSector(secSize, word)...)
+
+		if got := Detect(data); got != CDFTypeDoc {
+			t.Errorf("Detect(secSize=%d) = %v, want CDFTypeDoc", secSize, got)
+		}
 	}
 }
 
@@ -779,4 +836,9 @@ func FuzzDetect(f *testing.F) {
 			_ = Detect(data[:j]) // must not panic on any input
 		}
 	})
+}
+
+func TestAsd(t *testing.T) {
+	d, _ := ioutil.ReadFile("/home/gabriel/Downloads/file.DOC")
+	fmt.Println(Detect(d))
 }

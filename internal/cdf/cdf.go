@@ -51,6 +51,7 @@ type cdf struct {
 	sstBuilt        bool   // whether sst was already loaded (it is loaded lazily)
 	rootStreamFirst int32  // first sector of the root storage short-stream pool
 	rootStreamSize  uint32 // size of the root storage short-stream pool
+	rootChild       int32  // directory id of the root storage's child tree
 	rootStorageUUID []byte
 }
 
@@ -84,20 +85,65 @@ func parse(raw []byte, c *cdf) bool {
 	c.dirRaw = c.readLong(firstDirSec, 0)
 
 	c.rootStreamFirst = -1
+	c.rootChild = -1
 	var d dirEntry
 	for i, n := 0, c.dirLen(); i < n; i++ {
 		c.dirAt(i, &d)
-		if d.typ != dirTypeRootStorage || d.streamFirst < 0 {
+		if d.typ != dirTypeRootStorage {
 			continue
 		}
 		c.rootStorageUUID = d.storageUUID[:]
+		c.rootChild = d.child
 		// Record where the short-stream pool lives; it is loaded lazily by
 		// shortStream the first time a short stream is actually read.
-		c.rootStreamFirst = d.streamFirst
-		c.rootStreamSize = d.size
+		if d.streamFirst >= 0 {
+			c.rootStreamFirst = d.streamFirst
+			c.rootStreamSize = d.size
+		}
 		break
 	}
 	return true
+}
+
+// forEachRootChild calls visit for every directory entry that is a direct
+// child of the root storage, walking the red-black sibling tree hanging off
+// the root entry's child pointer. Restricting detection to root-level entries
+// matters: embedded OLE objects (e.g. an Excel sheet inside a Word document)
+// carry their own SummaryInformation streams deeper in the hierarchy, and a
+// flat directory scan can pick those up instead of the document's own.
+// If the tree is unusable (no valid root child) it degrades to a flat scan of
+// all entries so truncated or malformed files still get best-effort detection.
+// Iteration stops early when visit returns true.
+func (c *cdf) forEachRootChild(visit func(d *dirEntry) bool) {
+	n := c.dirLen()
+	var d dirEntry
+	if c.rootChild < 0 || int(c.rootChild) >= n {
+		for i := 0; i < n; i++ {
+			c.dirAt(i, &d)
+			if visit(&d) {
+				return
+			}
+		}
+		return
+	}
+	var stackArr [32]int32
+	stack := append(stackArr[:0], c.rootChild)
+	visited := 0
+	for len(stack) > 0 {
+		id := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if id < 0 || int(id) >= n {
+			continue
+		}
+		if visited++; visited > n {
+			return // cyclic sibling pointers in a malformed directory
+		}
+		c.dirAt(int(id), &d)
+		if visit(&d) {
+			return
+		}
+		stack = append(stack, d.left, d.right)
+	}
 }
 
 func (c *cdf) detect() CDFType {
@@ -106,14 +152,15 @@ func (c *cdf) detect() CDFType {
 			return t
 		}
 	}
-	var d dirEntry
-	for i, n := 0, c.dirLen(); i < n; i++ {
-		c.dirAt(i, &d)
-		if t, ok := lookupSection(d.nameBytes(), d.typ); ok {
-			return t
+	res := CDFTypeGeneric
+	c.forEachRootChild(func(d *dirEntry) bool {
+		t, ok := lookupSection(d.nameBytes(), d.typ)
+		if ok {
+			res = t
 		}
-	}
-	return CDFTypeGeneric
+		return ok
+	})
+	return res
 }
 
 // detectFromSummary inspects a (Doc)SummaryInformation stream and tries to
@@ -132,15 +179,18 @@ func (c *cdf) detectFromSummary(streamName string) (CDFType, bool) {
 			return t, true
 		}
 	}
-	for i, n := 0, c.dirLen(); i < n; i++ {
-		var d dirEntry
-		c.dirAt(i, &d)
+	res, found := CDFTypeGeneric, false
+	c.forEachRootChild(func(d *dirEntry) bool {
 		if d.nameLen == 0 {
-			continue
+			return false
 		}
 		if t, ok := lookupSubstring(d.nameBytes(), name2type); ok {
-			return t, true
+			res, found = t, true
 		}
+		return found
+	})
+	if found {
+		return res, true
 	}
 	return CDFTypeGeneric, true
 }
@@ -164,6 +214,9 @@ type dirEntry struct {
 	name        [32]byte
 	nameLen     uint8
 	typ         uint8
+	left        int32 // left sibling directory id
+	right       int32 // right sibling directory id
+	child       int32 // first child directory id (for storages)
 	streamFirst int32
 	size        uint32
 	storageUUID [16]byte
@@ -476,25 +529,29 @@ func (c *cdf) dirAt(i int, out *dirEntry) {
 	}
 	out.nameLen = k
 	out.typ = raw[66]
+	out.left = readSecID(raw[68:72])
+	out.right = readSecID(raw[72:76])
+	out.child = readSecID(raw[76:80])
 	out.streamFirst = readSecID(raw[116:120])
 	out.size = binary.LittleEndian.Uint32(raw[120:])
 	copy(out.storageUUID[:], raw[80:96])
 }
 
-// userStream finds a user stream by name and returns its bytes.
+// userStream finds a root-level user stream by name and returns its bytes.
 func (c *cdf) userStream(name string) ([]byte, bool) {
-	var d dirEntry
-	for i, n := 0, c.dirLen(); i < n; i++ {
-		c.dirAt(i, &d)
+	var buf []byte
+	found := false
+	c.forEachRootChild(func(d *dirEntry) bool {
 		if d.typ == dirTypeUserStream && string(d.nameBytes()) == name {
-			buf := c.readChain(d.streamFirst, d.size)
-			if buf == nil {
-				return nil, false
-			}
-			return buf, true
+			buf = c.readChain(d.streamFirst, d.size)
+			found = true
 		}
+		return found
+	})
+	if !found || buf == nil {
+		return nil, false
 	}
-	return nil, false
+	return buf, true
 }
 
 const (
