@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"hash/fnv"
-	"io/ioutil"
 	"math/bits"
 	"math/rand/v2"
 	"testing"
@@ -838,7 +837,7 @@ func FuzzDetect(f *testing.F) {
 	})
 }
 
-func TestAsd(t *testing.T) {
-	d, _ := ioutil.ReadFile("/home/gabriel/Downloads/file.DOC")
-	fmt.Println(Detect(d))
-}
+// func TestAsd(t *testing.T) {
+// 	d, _ := ioutil.ReadFile("/home/gabriel/Downloads/file.DOC")
+// 	fmt.Println(Detect(d))
+// }

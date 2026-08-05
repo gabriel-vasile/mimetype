@@ -105,45 +105,74 @@ func parse(raw []byte, c *cdf) bool {
 	return true
 }
 
-// forEachRootChild calls visit for every directory entry that is a direct
-// child of the root storage, walking the red-black sibling tree hanging off
-// the root entry's child pointer. Restricting detection to root-level entries
-// matters: embedded OLE objects (e.g. an Excel sheet inside a Word document)
-// carry their own SummaryInformation streams deeper in the hierarchy, and a
-// flat directory scan can pick those up instead of the document's own.
-// If the tree is unusable (no valid root child) it degrades to a flat scan of
-// all entries so truncated or malformed files still get best-effort detection.
-// Iteration stops early when visit returns true.
-func (c *cdf) forEachRootChild(visit func(d *dirEntry) bool) {
-	n := c.dirLen()
-	var d dirEntry
-	if c.rootChild < 0 || int(c.rootChild) >= n {
-		for i := 0; i < n; i++ {
-			c.dirAt(i, &d)
-			if visit(&d) {
-				return
-			}
-		}
-		return
+// rootChildIter iterates over the directory entries that are direct children
+// of the root storage, walking the red-black sibling tree hanging off the root
+// entry's child pointer. Restricting detection to root-level entries matters:
+// embedded OLE objects (e.g. an Excel sheet inside a Word document) carry
+// their own SummaryInformation streams deeper in the hierarchy, and a flat
+// directory scan can pick those up instead of the document's own.
+// If the tree is unusable (no valid root child) iteration degrades to a flat
+// scan of all entries so truncated or malformed files still get best-effort
+// detection. The iterator lives entirely on the caller's stack: it allocates
+// nothing and decodes each visited entry into its inline d field.
+type rootChildIter struct {
+	c       *cdf
+	d       dirEntry // entry decoded by the latest successful next call
+	n       int      // total directory entries
+	i       int      // next index for the flat fallback scan
+	flat    bool     // no usable tree; scan all entries instead
+	visited int      // entries visited so far; guards against cyclic trees
+	sp      int      // number of ids on stack
+	stack   [64]int32
+}
+
+// rootChildren returns an iterator over the root storage's direct children.
+// Usage: for it := c.rootChildren(); it.next(); { ... use it.d ... }
+func (c *cdf) rootChildren() rootChildIter {
+	it := rootChildIter{c: c, n: c.dirLen()}
+	if c.rootChild >= 0 && int(c.rootChild) < it.n {
+		it.stack[0] = c.rootChild
+		it.sp = 1
+	} else {
+		it.flat = true
 	}
-	var stackArr [32]int32
-	stack := append(stackArr[:0], c.rootChild)
-	visited := 0
-	for len(stack) > 0 {
-		id := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		if id < 0 || int(id) >= n {
+	return it
+}
+
+// next advances to the next entry, decoding it into it.d. It reports false
+// when iteration is done.
+func (it *rootChildIter) next() bool {
+	if it.flat {
+		if it.i >= it.n {
+			return false
+		}
+		it.c.dirAt(it.i, &it.d)
+		it.i++
+		return true
+	}
+	for it.sp > 0 {
+		it.sp--
+		id := it.stack[it.sp]
+		if id < 0 || int(id) >= it.n {
 			continue
 		}
-		if visited++; visited > n {
-			return // cyclic sibling pointers in a malformed directory
+		if it.visited++; it.visited > it.n {
+			return false // cyclic sibling pointers in a malformed directory
 		}
-		c.dirAt(int(id), &d)
-		if visit(&d) {
-			return
+		it.c.dirAt(int(id), &it.d)
+		// Push the siblings. A valid red-black tree of n entries is at most
+		// 2*log2(n) deep, so the fixed-size stack cannot overflow for any
+		// real directory; if a malformed tree overflows it, the excess
+		// branches are dropped and detection degrades gracefully.
+		for _, sib := range [2]int32{it.d.left, it.d.right} {
+			if sib >= 0 && it.sp < len(it.stack) {
+				it.stack[it.sp] = sib
+				it.sp++
+			}
 		}
-		stack = append(stack, d.left, d.right)
+		return true
 	}
+	return false
 }
 
 func (c *cdf) detect() CDFType {
@@ -152,15 +181,12 @@ func (c *cdf) detect() CDFType {
 			return t
 		}
 	}
-	res := CDFTypeGeneric
-	c.forEachRootChild(func(d *dirEntry) bool {
-		t, ok := lookupSection(d.nameBytes(), d.typ)
-		if ok {
-			res = t
+	for it := c.rootChildren(); it.next(); {
+		if t, ok := lookupSection(it.d.nameBytes(), it.d.typ); ok {
+			return t
 		}
-		return ok
-	})
-	return res
+	}
+	return CDFTypeGeneric
 }
 
 // detectFromSummary inspects a (Doc)SummaryInformation stream and tries to
@@ -179,18 +205,13 @@ func (c *cdf) detectFromSummary(streamName string) (CDFType, bool) {
 			return t, true
 		}
 	}
-	res, found := CDFTypeGeneric, false
-	c.forEachRootChild(func(d *dirEntry) bool {
-		if d.nameLen == 0 {
-			return false
+	for it := c.rootChildren(); it.next(); {
+		if it.d.nameLen == 0 {
+			continue
 		}
-		if t, ok := lookupSubstring(d.nameBytes(), name2type); ok {
-			res, found = t, true
+		if t, ok := lookupSubstring(it.d.nameBytes(), name2type); ok {
+			return t, true
 		}
-		return found
-	})
-	if found {
-		return res, true
 	}
 	return CDFTypeGeneric, true
 }
@@ -539,19 +560,16 @@ func (c *cdf) dirAt(i int, out *dirEntry) {
 
 // userStream finds a root-level user stream by name and returns its bytes.
 func (c *cdf) userStream(name string) ([]byte, bool) {
-	var buf []byte
-	found := false
-	c.forEachRootChild(func(d *dirEntry) bool {
-		if d.typ == dirTypeUserStream && string(d.nameBytes()) == name {
-			buf = c.readChain(d.streamFirst, d.size)
-			found = true
+	for it := c.rootChildren(); it.next(); {
+		if it.d.typ == dirTypeUserStream && string(it.d.nameBytes()) == name {
+			buf := c.readChain(it.d.streamFirst, it.d.size)
+			if buf == nil {
+				return nil, false
+			}
+			return buf, true
 		}
-		return found
-	})
-	if !found || buf == nil {
-		return nil, false
 	}
-	return buf, true
+	return nil, false
 }
 
 const (
