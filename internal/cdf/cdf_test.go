@@ -83,7 +83,7 @@ func dirEntryBytes(name string, typ uint8, first int32, size uint32, uuid []byte
 
 // linkDirTree links directory entries into the simplest valid tree: entry 0
 // (the root storage) points at entry 1 as its child and entries 1..n-1 are
-// chained through right-sibling pointers. This is what forEachRootChild walks.
+// chained through right-sibling pointers.
 func linkDirTree(dir []byte) []byte {
 	n := len(dir) / dirEntrySize
 	if n > 1 {
@@ -836,8 +836,3 @@ func FuzzDetect(f *testing.F) {
 		}
 	})
 }
-
-// func TestAsd(t *testing.T) {
-// 	d, _ := ioutil.ReadFile("/home/gabriel/Downloads/file.DOC")
-// 	fmt.Println(Detect(d))
-// }

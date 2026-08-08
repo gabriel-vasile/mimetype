@@ -52,7 +52,7 @@ type cdf struct {
 	rootStreamFirst int32  // first sector of the root storage short-stream pool
 	rootStreamSize  uint32 // size of the root storage short-stream pool
 	rootChild       int32  // directory id of the root storage's child tree
-	rootStorageUUID []byte
+	rootStorageUUID [16]byte
 }
 
 // parse reads the entire on-disk structure required for type detection. It
@@ -92,7 +92,7 @@ func parse(raw []byte, c *cdf) bool {
 		if d.typ != dirTypeRootStorage {
 			continue
 		}
-		c.rootStorageUUID = d.storageUUID[:]
+		copy(c.rootStorageUUID[:], d.storageUUID[:])
 		c.rootChild = d.child
 		// Record where the short-stream pool lives; it is loaded lazily by
 		// shortStream the first time a short stream is actually read.
@@ -193,7 +193,7 @@ func (c *cdf) detect() CDFType {
 // derive a CDFType from the root-storage CLSID, the property NameOfApplication,
 // and finally the names of sibling user streams.
 func (c *cdf) detectFromSummary(streamName string) (CDFType, bool) {
-	if c.rootStorageUUID != nil && bytes.Equal(c.rootStorageUUID, msiCLSID) {
+	if bytes.Equal(c.rootStorageUUID[:], msiCLSID) {
 		return CDFTypeInstaller, true
 	}
 	raw, ok := c.userStream(streamName)
