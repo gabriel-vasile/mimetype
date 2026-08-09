@@ -751,7 +751,7 @@ func BenchmarkDetect(b *testing.B) {
 			dir := dirEntryBytes("Root Entry", dirTypeRootStorage, 2, uint32(secSize), nil)
 			dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, 0, uint32(len(summary)), nil)...)
 			// sector 0: SAT, sector 1: dir, sector 2: short-stream pool, sector 3: SSAT.
-			data := testHeader(secSize, 1, 3, 4096, []int32{0})
+			data := padSector(secSize, testHeader(secSize, 1, 3, 4096, []int32{0}))
 			data = append(data, idSector(secSize, -3, -2, -2, -2)...)
 			data = append(data, padSector(secSize, dir)...)
 			data = append(data, padSector(secSize, summary)...)
