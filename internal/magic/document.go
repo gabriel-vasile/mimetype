@@ -83,6 +83,56 @@ func P7s(raw []byte, _ uint32) bool {
 	return false
 }
 
+// P12 matches a PKCS #12 / PFX file, the DER encoded archive commonly used to
+// bundle a private key together with its X.509 certificate chain (.p12, .pfx).
+// Per RFC 7292 the outer PFX is a SEQUENCE holding an INTEGER version of 3
+// followed by an authSafe ContentInfo whose contentType is the pkcs7 data
+// (…07 01) or signedData (…07 02) OID. That leading version integer is what
+// tells a PFX apart from a bare PKCS #7 structure.
+// https://www.rfc-editor.org/rfc/rfc7292
+func P12(raw []byte, _ uint32) bool {
+	// seqContent reports the offset at which a DER SEQUENCE's content begins,
+	// for the indefinite (0x80) and definite (0x81..0x84) long-length forms a
+	// PFX may use. The short form is not considered because a real archive is
+	// always large enough to need a multi-byte length.
+	seqContent := func(b []byte) (int, bool) {
+		if len(b) < 2 || b[0] != 0x30 || b[1] < 0x80 || b[1] > 0x84 {
+			return 0, false
+		}
+		return 2 + int(b[1]&0x7f), true
+	}
+
+	// Outer PFX SEQUENCE.
+	off, ok := seqContent(raw)
+	if !ok || off > len(raw) {
+		return false
+	}
+	// PFX version must be the INTEGER 3.
+	if !bytes.HasPrefix(raw[off:], []byte{0x02, 0x01, 0x03}) {
+		return false
+	}
+	off += 3
+	if off > len(raw) {
+		return false
+	}
+	// authSafe ContentInfo SEQUENCE.
+	inner, ok := seqContent(raw[off:])
+	if !ok {
+		return false
+	}
+	off += inner
+	if off > len(raw) {
+		return false
+	}
+	// contentType OID: 1.2.840.113549.1.7.{1,2} (pkcs7 data or signedData).
+	oid := []byte{0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x07}
+	if !bytes.HasPrefix(raw[off:], oid) {
+		return false
+	}
+	off += len(oid)
+	return off < len(raw) && (raw[off] == 0x01 || raw[off] == 0x02)
+}
+
 // Lotus123 matches a Lotus 1-2-3 spreadsheet document.
 func Lotus123(raw []byte, _ uint32) bool {
 	if len(raw) <= 20 {
