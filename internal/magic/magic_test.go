@@ -6,6 +6,18 @@ import (
 	"github.com/gabriel-vasile/mimetype/internal/scan"
 )
 
+func TestID3v2LargeTag(t *testing.T) {
+	hdr := []byte{'I', 'D', '3', 3, 0, 0, 0, 0, 0, 0}
+	size := uint32(10*1024*1024 + 1)
+	hdr[6] = byte((size >> 21) & 0x7F)
+	hdr[7] = byte((size >> 14) & 0x7F)
+	hdr[8] = byte((size >> 7) & 0x7F)
+	hdr[9] = byte(size & 0x7F)
+	if !MP3(hdr, 0) {
+		t.Fatal("ID3v2 tag larger than 10MB should still be detected as MP3")
+	}
+}
+
 func TestShebangCheck(t *testing.T) {
 	tests := []struct {
 		name     string

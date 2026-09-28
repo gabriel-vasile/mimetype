@@ -128,8 +128,9 @@ func id3v2(raw []byte) bool {
 	}
 
 	size := uint32(raw[6])<<21 | uint32(raw[7])<<14 | uint32(raw[8])<<7 | uint32(raw[9])
-	// Disallow too big frames, let's say 10MB.
-	return size > 0 && size < 10*1024*1024
+	// The synchsafe integer is already bounded to 28 bits (~256MB). A 10MB
+	// cap rejected legitimate files with large ID3v2 album art.
+	return size > 0
 }
 
 // iff checks for an Interchange File Format layout: 4-byte container tag,
