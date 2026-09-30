@@ -1027,16 +1027,18 @@ func offset(n int, s string) string {
 // their offsets. offsetsAndSigs alternates between an offset and a signature.
 // The result is at least size bytes long.
 func at(size int, offsetsAndSigs ...any) string {
+	for i := 0; i+1 < len(offsetsAndSigs); i += 2 {
+		off, sig := offsetsAndSigs[i].(int), offsetsAndSigs[i+1].(string)
+		size = max(size, off+len(sig))
+	}
 	b := make([]byte, size)
 	for i := 0; i+1 < len(offsetsAndSigs); i += 2 {
 		off, sig := offsetsAndSigs[i].(int), offsetsAndSigs[i+1].(string)
-		if len(b) < off+len(sig) {
-			b = append(b, make([]byte, off+len(sig)-len(b))...)
-		}
 		copy(b[off:], sig)
 	}
 	return string(b)
 }
+
 func fromDisk(path string) string {
 	data, err := os.ReadFile("testdata/" + path)
 	if err != nil {
