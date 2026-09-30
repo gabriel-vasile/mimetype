@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, iso9660, udf, nrg,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, pcap, iso9660, udf, nrg,
 	// MP3 is late because it does a linear search in the input. That means
 	// containers that embed an MP3, for example: an mp4 file, or a zip without
 	// compression, would pass as MP3s.
@@ -93,7 +93,7 @@ var (
 		alias("application/x-ogg")
 	oggAudio = newMIME("audio/ogg", ".oga", magic.OggAudio)
 	oggVideo = newMIME("video/ogg", ".ogv", magic.OggVideo)
-	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam, rfc822)
+	text     = newMIME("text/plain", ".txt", magic.Text, svg, html, xml, php, js, lua, perl, python, ruby, json, ndJSON, rtf, srt, tcl, csv, tsv, vCard, iCalendar, warc, vtt, shell, netpbm, netpgm, netppm, netpam, rfc822, gedcom)
 	xml      = newMIME("text/xml", ".xml", magic.XML, rss, atom, x3d, kml, xliff, collada, gml, gpx, tcx, amf, threemf, xfdf, owl2, xhtml, cdxxml).
 			alias("application/xml")
 	xhtml   = newMIME("application/xhtml+xml", ".html", magic.XHTML)
@@ -207,7 +207,8 @@ var (
 	avi = newMIME("video/x-msvideo", ".avi", magic.Avi).
 		alias("video/avi", "video/msvideo")
 	flv = newMIME("video/x-flv", ".flv", magic.Flv)
-	mkv = newMIME("video/x-matroska", ".mkv", magic.Mkv)
+	mkv = newMIME("video/matroska", ".mkv", magic.Mkv).
+		alias("video/x-matroska")
 	asf = newMIME("video/x-ms-asf", ".asf", magic.Asf).
 		alias("video/asf", "video/x-ms-wmv")
 	rmvb  = newMIME("application/vnd.rn-realmedia-vbr", ".rmvb", magic.Rmvb)
@@ -257,8 +258,8 @@ var (
 	odc = newMIME("application/vnd.oasis.opendocument.chart", ".odc", magic.Odc).
 		alias("application/x-vnd.oasis.opendocument.chart")
 	sxc = newMIME("application/vnd.sun.xml.calc", ".sxc", magic.Sxc)
-	rar = newMIME("application/x-rar-compressed", ".rar", magic.RAR).
-		alias("application/x-rar")
+	rar = newMIME("application/vnd.rar", ".rar", magic.RAR).
+		alias("application/x-rar-compressed", "application/x-rar")
 	djvu    = newMIME("image/vnd.djvu", ".djvu", magic.DjVu)
 	mobi    = newMIME("application/x-mobipocket-ebook", ".mobi", magic.Mobi)
 	lit     = newMIME("application/x-ms-reader", ".lit", magic.Lit)
@@ -309,4 +310,6 @@ var (
 	hlp     = newMIME("application/x-os2-hlp", ".hlp", magic.Hlp)
 	fm      = newMIME("application/vnd.framemaker", ".fm", magic.FrameMaker)
 	bufr    = newMIME("application/bufr", ".bufr", magic.BUFR)
+	gedcom  = newMIME("text/vnd.familysearch.gedcom", ".ged", magic.GEDCOM)
+	pcap    = newMIME("application/vnd.tcpdump.pcap", ".pcap", magic.Pcap)
 )

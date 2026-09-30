@@ -431,7 +431,7 @@ func FuzzSearch(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, haystack, needle []byte, flags int) {
 		b := Bytes(haystack)
-		b.Search(needle, Flags(flags)%CompactWS|IgnoreCase|FullWord)
+		b.Search(needle, Flags(flags)&(CompactWS|IgnoreCase|FullWord))
 	})
 }
 
@@ -485,6 +485,9 @@ var matchTestcases = []struct {
 	"fw+cws", "a  bc d", "a bc", FullWord | CompactWS, 5,
 }, {
 	"fw+ic+cws", "a  bc d", "A BC", FullWord | IgnoreCase | CompactWS, 5,
+}, {
+	// Pattern ending in whitespace used to panic with CompactWS.
+	"cws trailing ws in pattern", "a  ", "a ", CompactWS, 2,
 }}
 
 func TestMatch(t *testing.T) {
@@ -504,7 +507,7 @@ func FuzzMatch(f *testing.F) {
 		f.Add([]byte(tc.b), []byte(tc.p), int(tc.flags))
 	}
 	f.Fuzz(func(t *testing.T, b, p []byte, flags int) {
-		Bytes(b).Match(p, Flags(flags)%CompactWS|IgnoreCase|FullWord)
+		Bytes(b).Match(p, Flags(flags)&(CompactWS|IgnoreCase|FullWord))
 	})
 }
 
@@ -522,6 +525,7 @@ func BenchmarkMatch(b *testing.B) {
 		FullWord,
 	} {
 		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
+			b.ReportAllocs()
 			for b.Loop() {
 				Bytes(randData).Match(randData, f)
 			}

@@ -94,9 +94,13 @@ func FuzzFromHTML(f *testing.F) {
 	for _, tc := range fromHTMLTestCases {
 		f.Add([]byte(tc.in))
 	}
+	// Seed BOMs so the FromBOM path gets explored.
+	f.Add([]byte("\xef\xbb\xbf<meta charset=\"utf-8\">"))
+	f.Add([]byte("\xfe\xff\x00a"))
+	f.Add([]byte("\xff\xfea\x00"))
 
 	f.Fuzz(func(t *testing.T, d []byte) {
-		fromHTML(d)
+		FromHTML(d)
 	})
 }
 

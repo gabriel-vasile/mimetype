@@ -585,6 +585,8 @@ func RFC822(raw []byte, limit uint32) bool {
 	// Some of the hints are IgnoreCase, some not. I selected based on what libmagic
 	// does and based on personal observations from sample files.
 	hints := []rfc822Hint{
+		// Enron dataset has Message-ID, Message-Id and Message-id.
+		{[]byte("Message-ID: "), scan.IgnoreCase},
 		{[]byte("From: "), 0},
 		{[]byte("To: "), 0},
 		{[]byte("CC: "), scan.IgnoreCase},
@@ -616,6 +618,47 @@ func RFC822(raw []byte, limit uint32) bool {
 func lineHasRFC822Hint(b scan.Bytes, hints []rfc822Hint) bool {
 	for _, h := range hints {
 		if b.Match(h.h, h.matchFlags) > -1 {
+			return true
+		}
+	}
+	return false
+}
+
+func GEDCOM(raw []byte, limit uint32) bool {
+	// Skip if empty
+	if len(raw) == 0 {
+		return false
+	}
+
+	// GEDCOM header fits within first 4KB
+	searchLimit := min(len(raw), 4096)
+	raw = raw[:searchLimit]
+
+	b := scan.Bytes(raw)
+
+	// Skip BOM if present: UTF-8, UTF-16BE, UTF-16LE
+	for _, bom := range [][]byte{
+		{0xEF, 0xBB, 0xBF}, // UTF-8
+		{0xFE, 0xFF},       // UTF-16BE
+		{0xFF, 0xFE},       // UTF-16LE
+	} {
+		if bytes.HasPrefix(b, bom) {
+			b.Advance(len(bom))
+			break // Only one BOM can exist at the start
+		}
+	}
+
+	b.TrimLWS()
+
+	firstLine := b.Line()
+	if !bytes.Equal(firstLine, []byte("0 HEAD")) {
+		return false
+	}
+
+	// "1 GEDC" is mandatory in the header
+	for i := 0; i < 10; i++ {
+		line := b.Line()
+		if bytes.Equal(line, []byte("1 GEDC")) {
 			return true
 		}
 	}
