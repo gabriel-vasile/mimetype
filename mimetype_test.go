@@ -912,6 +912,77 @@ func TestInputIsNotMutated(t *testing.T) {
 	}
 }
 
+// Disc image signatures are located past the default limit so they are
+// tested separately with increased limits.
+func TestDiscImages(t *testing.T) {
+	defer SetLimit(defaultLimit)
+	iso := fromDisk("iso.iso")
+	udf := fromDisk("udf.iso")
+	nrg := fromDisk("nrg.nrg")
+	// Nero image of a UDF disc. Unlike libmagic, which only detects Nero
+	// images of ISO 9660 discs, mimetype detects these as NRG too.
+	udfNRG := fromDisk("udf.nrg")
+	isoMIME := "application/x-iso9660-image"
+	udfMIME := "application/x-udf-image"
+	tcs := []struct {
+		name     string
+		data     string
+		limit    uint32
+		expected string
+	}{
+		{"iso", iso, 0, isoMIME},
+		{"iso limit just enough", iso, 32774, isoMIME},
+		{"iso limit too small", iso, 32773, "application/octet-stream"},
+		{"iso default limit", iso, defaultLimit, "application/octet-stream"},
+		{"iso minimal", offset(32769, "CD001"), 0, isoMIME},
+		{"iso truncated signature", offset(32769, "CD00"), 0, "application/octet-stream"},
+		{"iso signature at wrong offset", offset(32768, "CD001"), 0, "application/octet-stream"},
+		{"iso with udf extended area", at(40000, 32769, "CD001", 36865, "BEA01"), 0, isoMIME},
+		{"udf", udf, 0, udfMIME},
+		{"udf limit just enough", udf, 34822, udfMIME},
+		{"udf limit too small", udf, 34821, "application/octet-stream"},
+		{"udf default limit", udf, defaultLimit, "application/octet-stream"},
+		{"udf 1.x 2048", at(0, 32769, "BEA01", 34817, "NSR02"), 0, udfMIME},
+		{"udf 2.x 2048", at(0, 32769, "BEA01", 34817, "NSR03"), 0, udfMIME},
+		{"udf 2.x 2048 limit just enough", at(0, 32769, "BEA01", 34817, "NSR03"), 34822, udfMIME},
+		{"udf 2.x 2048 limit too small", at(0, 32769, "BEA01", 34817, "NSR03"), 34821, "application/octet-stream"},
+		{"udf 2.x 4096", at(0, 32769, "BEA01", 36865, "NSR03"), 0, udfMIME},
+		{"udf 2.x 8192", at(0, 32769, "BEA01", 40961, "NSR03"), 0, udfMIME},
+		{"udf 2.x 16384", at(0, 32769, "BEA01", 49153, "NSR03"), 0, udfMIME},
+		{"udf 1.x 32768", at(0, 32769, "BEA01", 65537, "NSR02"), 0, udfMIME},
+		{"udf unknown NSR version", at(0, 32769, "BEA01", 34817, "NSR04"), 0, "application/octet-stream"},
+		// First NSR0 found decides the result, same as libmagic.
+		{"udf unknown NSR version before valid", at(0, 32769, "BEA01", 34817, "NSR04", 36865, "NSR03"), 0, "application/octet-stream"},
+		{"udf without NSR", at(70000, 32769, "BEA01"), 0, "application/octet-stream"},
+		{"nrg", nrg, 0, "application/x-nrg"},
+		{"nrg limit just enough", nrg, 339974, "application/x-nrg"},
+		{"nrg limit too small", nrg, 339973, "application/octet-stream"},
+		{"nrg default limit", nrg, defaultLimit, "application/octet-stream"},
+		{"nrg minimal", offset(339969, "CD001"), 0, "application/x-nrg"},
+		{"nrg of udf disc", udfNRG, 0, "application/x-nrg"},
+		{"nrg of udf disc limit just enough", udfNRG, 342022, "application/x-nrg"},
+		{"nrg of udf disc limit too small", udfNRG, 342021, "application/octet-stream"},
+		{"nrg of udf disc default limit", udfNRG, defaultLimit, "application/octet-stream"},
+		{"nrg of udf disc minimal", at(0, 339969, "BEA01", 342017, "NSR03"), 0, "application/x-nrg"},
+		{"nrg of udf disc unknown NSR version", at(0, 339969, "BEA01", 342017, "NSR04"), 0, "application/octet-stream"},
+	}
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			SetLimit(tc.limit)
+			if mtype := Detect([]byte(tc.data)); !mtype.Is(tc.expected) {
+				t.Errorf("Detect: expected: %s, got: %s", tc.expected, mtype)
+			}
+			mtype, err := DetectReader(strings.NewReader(tc.data))
+			if err != nil {
+				t.Fatalf("DetectReader: unexpected error: %s", err)
+			}
+			if !mtype.Is(tc.expected) {
+				t.Errorf("DetectReader: expected: %s, got: %s", tc.expected, mtype)
+			}
+		})
+	}
+}
+
 // For #744
 func TestNDJSONCutOnSecondLine(t *testing.T) {
 	data := []byte(`{"key": "this json line has 43 characters"}
@@ -945,6 +1016,21 @@ const (
 func offset(n int, s string) string {
 	prepend := make([]byte, n)
 	return string(prepend) + s
+}
+
+// at returns a string of NUL bytes with the provided signatures written at
+// their offsets. offsetsAndSigs alternates between an offset and a signature.
+// The result is at least size bytes long.
+func at(size int, offsetsAndSigs ...any) string {
+	b := make([]byte, size)
+	for i := 0; i+1 < len(offsetsAndSigs); i += 2 {
+		off, sig := offsetsAndSigs[i].(int), offsetsAndSigs[i+1].(string)
+		if len(b) < off+len(sig) {
+			b = append(b, make([]byte, off+len(sig)-len(b))...)
+		}
+		copy(b[off:], sig)
+	}
+	return string(b)
 }
 func fromDisk(path string) string {
 	data, err := os.ReadFile("testdata/" + path)

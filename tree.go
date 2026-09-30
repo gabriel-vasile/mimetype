@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, iso9660, udf, nrg,
 	// MP3 is late because it does a linear search in the input. That means
 	// containers that embed an MP3, for example: an mp4 file, or a zip without
 	// compression, would pass as MP3s.
@@ -56,6 +56,13 @@ var (
 	zip = newMIME("application/zip", ".zip", magic.Zip, docx, pptx, xlsx, epub, apk, jar, odt, ods, odp, odg, odf, odc, sxc, kmz, visio).
 		alias("application/x-zip", "application/x-zip-compressed")
 	tar = newMIME("application/x-tar", ".tar", magic.Tar)
+	// ISO 9660 image signature is located at offset 32769. It is only
+	// detected when the read limit is increased using SetLimit.
+	iso9660 = newMIME("application/x-iso9660-image", ".iso", magic.ISO9660).
+		alias("application/x-cd-image")
+	// UDF and NRG signatures are also located past the default read limit.
+	udf = newMIME("application/x-udf-image", ".iso", magic.UDF)
+	nrg = newMIME("application/x-nrg", ".nrg", magic.NRG)
 	xar = newMIME("application/x-xar", ".xar", magic.Xar)
 	bz2 = newMIME("application/x-bzip2", ".bz2", magic.Bz2)
 	pdf = newMIME("application/pdf", ".pdf", magic.PDF).
