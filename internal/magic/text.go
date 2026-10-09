@@ -297,6 +297,10 @@ func Text(raw []byte, _ uint32) bool {
 	if cset := charset.FromBOM(raw); cset != "" {
 		return true
 	}
+	// RTF documents produced by WordPad or Word can contain trailing null bytes or whitespace.
+	if Rtf(raw, 0) {
+		raw = bytes.TrimRight(raw, "\x00 \t\r\n\x0c")
+	}
 	// Binary data bytes as defined here: https://mimesniff.spec.whatwg.org/#binary-data-byte
 	for i := 0; i < min(len(raw), 4096); i++ {
 		b := raw[i]

@@ -333,6 +333,10 @@ ENDHDR`,
 	{"rpm", "\xed\xab\xee\xdb", "application/x-rpm", one},
 	{"rss", "\x3c\x3f\x78\x6d\x6c\x20\x76\x65\x72\x73\x69\x6f\x6e\x3d\x22\x31\x2e\x30\x22\x20\x65\x6e\x63\x6f\x64\x69\x6e\x67\x3d\x22\x55\x54\x46\x2d\x38\x22\x3f\x3e\x0a\x3c\x72\x73\x73", "application/rss+xml", one},
 	{"rtf", "{\\rtf", "text/rtf", one},
+	{"rtf with trailing null", "{\\rtf1\\ansi\\deff0 Hello World}\x00", "text/rtf", none},
+	{"rtf with trailing nulls and whitespace", "{\\rtf1\\ansi\\deff0 Hello World}\r\n\x00\x00 \t\r\n", "text/rtf", none},
+	{"rtf corrupted with middle null", "{\\rtf1\x00\\ansi Hello World}", "application/octet-stream", none},
+	{"text with trailing null", "Hello World\x00", "application/octet-stream", none},
 	{"sh", "#!/bin/sh", "text/x-shellscript", one},
 	{"shp", fromDisk("shp.shp"), "application/vnd.shp", one},
 	{"shx", "\x00\x00\x27\x0a", "application/vnd.shx", one},
@@ -934,6 +938,86 @@ func TestNDJSONCutOnSecondLine(t *testing.T) {
 	}
 	SetLimit(defaultLimit)
 }
+
+// For #760.
+func TestRTFTrailingNull(t *testing.T) {
+	testcases := []struct {
+		name         string
+		data         []byte
+		expectedMIME string
+	}{
+		{
+			name:         "rtf single trailing null",
+			data:         []byte("{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}Hello World}\x00"),
+			expectedMIME: "text/rtf",
+		},
+		{
+			name:         "rtf multiple trailing nulls",
+			data:         []byte("{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}Hello World}\x00\x00\x00"),
+			expectedMIME: "text/rtf",
+		},
+		{
+			name:         "rtf trailing newline then null",
+			data:         []byte("{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}Hello World}\r\n\x00"),
+			expectedMIME: "text/rtf",
+		},
+		{
+			name:         "rtf trailing null then newline",
+			data:         []byte("{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}Hello World}\x00\r\n"),
+			expectedMIME: "text/rtf",
+		},
+		{
+			name:         "rtf trailing whitespace and nulls mixed",
+			data:         []byte("{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}Hello World} \t\r\n\x00\x00 \r\n"),
+			expectedMIME: "text/rtf",
+		},
+		{
+			name:         "corrupted rtf with middle null",
+			data:         []byte("{\\rtf1\x00\\ansi\\deff0 Hello World}"),
+			expectedMIME: "application/octet-stream",
+		},
+		{
+			name:         "plain text trailing null",
+			data:         []byte("Hello World\x00"),
+			expectedMIME: "application/octet-stream",
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			mtype := Detect(tc.data)
+			if !mtype.Is(tc.expectedMIME) {
+				t.Fatalf("expected: %s, got: %s", tc.expectedMIME, mtype.String())
+			}
+
+			readerMtype, err := DetectReader(bytes.NewReader(tc.data))
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if !readerMtype.Is(tc.expectedMIME) {
+				t.Fatalf("reader expected: %s, got: %s", tc.expectedMIME, readerMtype.String())
+			}
+
+			if tc.expectedMIME == "text/rtf" {
+				if mtype.Extension() != ".rtf" {
+					t.Fatalf("expected .rtf extension, got: %s", mtype.Extension())
+				}
+				// Verify text/plain is in the hierarchy for textVsBinary.
+				hasTextParent := false
+				for p := mtype.Parent(); p != nil; p = p.Parent() {
+					if p.Is("text/plain") {
+						hasTextParent = true
+						break
+					}
+				}
+				if !hasTextParent {
+					t.Fatalf("expected text/plain ancestor for %s", mtype.String())
+				}
+			}
+		})
+	}
+}
+
 
 const (
 	// none means the testcase will not be benchmarked.
