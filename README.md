@@ -54,6 +54,18 @@ using magic numbers is slow, inaccurate, and non-standard. Most of the times
 protocols have methods for specifying such metadata; e.g., `Content-Type` header
 in HTTP and SMTP.
 
+## MIME types in configuration
+
+For JSON or YAML configuration, store the MIME type in a string field and
+resolve it with `mimetype.Lookup` after decoding. Check for a `nil` result to
+report an unsupported type instead of treating it as a detected MIME object.
+Keep the string field when encoding the configuration again; `mimetype.MIME`
+does not implement configuration marshaling or unmarshaling.
+
+The [runnable configuration example](example_config_test.go) shows a JSON
+configuration round trip and an unsupported type. This uses the existing
+registry without extending it or altering global detection state.
+
 ## FAQ
 Q: My file is in the list of [supported MIME types](supported_mimes.md) but
 it is not correctly detected. What should I do?
