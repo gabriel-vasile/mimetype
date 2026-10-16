@@ -66,6 +66,18 @@ func cdfOrClsid(raw []byte, want cdf.CDFType, clsids ...[]byte) bool {
 
 // Doc matches a Microsoft Word 97-2003 file.
 // See: https://github.com/decalage2/oletools/blob/412ee36ae45e70f42123e835871bac956d958461/oletools/common/clsid.py
+
+// cdfHeuristicOK reports whether loose sector-byte heuristics may still be
+// used after the authoritative CDF parser ran. When Detect already resolved a
+// concrete Office type other than want, heuristics must not override it —
+// several OLE sector markers (notably little-endian FATSECT 0xFFFFFFFD) also
+// match the legacy Excel/PowerPoint byte patterns and caused Word documents to
+// be reported as spreadsheets (see issue #848).
+func cdfHeuristicOK(raw []byte, want cdf.CDFType) bool {
+	got := cdf.Detect(raw)
+	return got == cdf.CDFTypeGeneric || got == want
+}
+
 func Doc(raw []byte, _ uint32) bool {
 	return cdfOrClsid(raw, cdf.CDFTypeDoc,
 		// Microsoft Word 97-2003 Document (Word.Document.8)
@@ -86,6 +98,9 @@ func Ppt(raw []byte, limit uint32) bool {
 			0xa9, 0x03, 0x00, 0xaa, 0x00, 0x51, 0x0e, 0xa3},
 	) {
 		return true
+	}
+	if !cdfHeuristicOK(raw, cdf.CDFTypePpt) {
+		return false
 	}
 
 	lin := len(raw)
@@ -114,6 +129,9 @@ func Xls(raw []byte, limit uint32) bool {
 		[]byte{0x20, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00},
 	) {
 		return true
+	}
+	if !cdfHeuristicOK(raw, cdf.CDFTypeXls) {
+		return false
 	}
 
 	lin := len(raw)
