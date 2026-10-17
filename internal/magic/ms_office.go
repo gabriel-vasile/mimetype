@@ -66,6 +66,18 @@ func cdfOrClsid(raw []byte, want cdf.CDFType, clsids ...[]byte) bool {
 
 // Doc matches a Microsoft Word 97-2003 file.
 // See: https://github.com/decalage2/oletools/blob/412ee36ae45e70f42123e835871bac956d958461/oletools/common/clsid.py
+
+// cdfHeuristicOK reports whether loose sector-byte heuristics may still be
+// used after the authoritative CDF parser ran. When Detect already resolved a
+// concrete Office type other than want, heuristics must not override it —
+// several OLE sector markers (notably little-endian FATSECT 0xFFFFFFFD) also
+// match the legacy Excel/PowerPoint byte patterns and caused Word documents to
+// be reported as spreadsheets (see issue #848).
+func cdfHeuristicOK(raw []byte, want cdf.CDFType) bool {
+	got := cdf.Detect(raw)
+	return got == cdf.CDFTypeGeneric || got == want
+}
+
 func Doc(raw []byte, _ uint32) bool {
 	return cdfOrClsid(raw, cdf.CDFTypeDoc,
 		// Microsoft Word 97-2003 Document (Word.Document.8)
@@ -80,12 +92,19 @@ func Doc(raw []byte, _ uint32) bool {
 // Ppt matches a Microsoft PowerPoint 97-2003 file or a PowerPoint 95 presentation.
 func Ppt(raw []byte, limit uint32) bool {
 	if cdfOrClsid(raw, cdf.CDFTypePpt,
-		[]byte{0x10, 0x8d, 0x81, 0x64, 0x9b, 0x4f, 0xcf, 0x11,
-			0x86, 0xea, 0x00, 0xaa, 0x00, 0xb9, 0x29, 0xe8},
-		[]byte{0x70, 0xae, 0x7b, 0xea, 0x3b, 0xfb, 0xcd, 0x11,
-			0xa9, 0x03, 0x00, 0xaa, 0x00, 0x51, 0x0e, 0xa3},
+		[]byte{
+			0x10, 0x8d, 0x81, 0x64, 0x9b, 0x4f, 0xcf, 0x11,
+			0x86, 0xea, 0x00, 0xaa, 0x00, 0xb9, 0x29, 0xe8,
+		},
+		[]byte{
+			0x70, 0xae, 0x7b, 0xea, 0x3b, 0xfb, 0xcd, 0x11,
+			0xa9, 0x03, 0x00, 0xaa, 0x00, 0x51, 0x0e, 0xa3,
+		},
 	) {
 		return true
+	}
+	if !cdfHeuristicOK(raw, cdf.CDFTypePpt) {
+		return false
 	}
 
 	lin := len(raw)
@@ -114,6 +133,9 @@ func Xls(raw []byte, limit uint32) bool {
 		[]byte{0x20, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00},
 	) {
 		return true
+	}
+	if !cdfHeuristicOK(raw, cdf.CDFTypeXls) {
+		return false
 	}
 
 	lin := len(raw)
@@ -150,8 +172,10 @@ func Pub(raw []byte, limit uint32) bool {
 // Msg matches a Microsoft Outlook email file.
 func Msg(raw []byte, limit uint32) bool {
 	return cdfOrClsid(raw, cdf.CDFTypeMsg,
-		[]byte{0x0B, 0x0D, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-			0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46},
+		[]byte{
+			0x0B, 0x0D, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46,
+		},
 	)
 }
 
