@@ -15,11 +15,11 @@ jobs:
       id-token: write # for uploads to codecov
     steps:
     - name: Checkout code
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
     - name: Install Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         go-version: 'stable'
     - name: Run linters
@@ -46,7 +46,7 @@ jobs:
         go install github.com/wadey/gocovmerge@b5bfa59ec0adc420475f97f89b58045c721d761c
         gocovmerge `ls *.coverprofile` > cover.out
         rm *.coverprofile
-    - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+    - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
       with:
         fail_ci_if_error: true
         files: cover.out
