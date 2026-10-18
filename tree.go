@@ -17,7 +17,7 @@ import (
 // are tried in order to find a more accurate MIME type.
 var root = newMIME("application/octet-stream", "",
 	func([]byte, uint32) bool { return true },
-	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, ogg, png, jpg, jxl, jp2, jpx,
+	xpm, sevenZ, zip, pdf, fdf, ole, ps, psd, p7s, p12, ogg, png, jpg, jxl, jp2, jpx,
 	jpm, jxs, gif, webp, exe, elf, ar, tar, xar, bz2, fits, tiff, bmp, lotus, ico,
 	flac, midi, ape, musePack, amr, wav, aiff, au, mpeg, quickTime, mp4, webM,
 	avi, flv, mkv, asf, aac, voc, m3u, rmvb, gzip, class, swf, crx, ttf, woff,
@@ -278,6 +278,8 @@ var (
 	cpio    = newMIME("application/x-cpio", ".cpio", magic.Cpio)
 	tzif    = newMIME("application/tzif", "", magic.TzIf)
 	p7s     = newMIME("application/pkcs7-signature", ".p7s", magic.P7s)
+	p12     = newMIME("application/pkcs12", ".p12", magic.P12).
+		alias("application/x-pkcs12", "application/x-pkcs12-certificates")
 	xcf     = newMIME("image/x-xcf", ".xcf", magic.Xcf)
 	pat     = newMIME("image/x-gimp-pat", ".pat", magic.Pat)
 	gbr     = newMIME("image/x-gimp-gbr", ".gbr", magic.Gbr)
