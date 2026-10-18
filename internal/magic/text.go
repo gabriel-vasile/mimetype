@@ -163,6 +163,7 @@ func phpPageF(raw []byte, _ uint32) bool {
 		[]byte("<? "),
 	)
 }
+
 func phpScriptF(raw []byte, _ uint32) bool {
 	return shebang(raw,
 		shebangSig{[]byte("/usr/local/bin/php"), snone},
@@ -221,7 +222,6 @@ func Python(raw []byte, _ uint32) bool {
 		shebangSig{[]byte("/usr/bin/env python3"), scws},
 		shebangSig{[]byte("/usr/bin/env -S python3"), scws},
 	)
-
 }
 
 // Ruby matches a Ruby programming language file.
@@ -254,7 +254,10 @@ func Tcl(raw []byte, _ uint32) bool {
 
 // Rtf matches a Rich Text Format file.
 func Rtf(raw []byte, _ uint32) bool {
-	return bytes.HasPrefix(raw, []byte("{\\rtf"))
+	// sourced from:
+	// https://github.com/file/file/blob/4ee5ca8fb938c3168bcededd0ce7c2e03daea485/magic/Magdir/rtf#L11
+	return (len(raw) > 5 && bytes.HasPrefix(raw, []byte("{\\rtf")) && raw[5] != 0xab && raw[5] != '\\') ||
+		bytes.HasPrefix(raw, []byte("{\\urtf"))
 }
 
 // Shell matches a shell script file.
