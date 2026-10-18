@@ -207,12 +207,16 @@ func (m *MIME) lookup(mime string) *MIME {
 // The extension should include the leading dot, as in ".html".
 func (m *MIME) Extend(detector func(raw []byte, limit uint32) bool, mime, extension string, aliases ...string) {
 	mime, _, _ = stdmime.ParseMediaType(mime)
+	normalisedAliases := make([]string, len(aliases))
+	for i, alias := range aliases {
+		normalisedAliases[i], _, _ = stdmime.ParseMediaType(alias)
+	}
 	c := &MIME{
 		mime:      mime,
 		extension: extension,
 		detector:  detector,
 		parent:    m,
-		aliases:   aliases,
+		aliases:   normalisedAliases,
 	}
 
 	mu.Lock()
