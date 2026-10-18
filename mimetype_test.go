@@ -68,6 +68,7 @@ var testcases = []testcase{
 	{"cab", "MSCF\x00\x00\x00\x00", "application/vnd.ms-cab-compressed", one},
 	{"cab.is", "ISc(\x00\x00\x00\x01", "application/x-installshield", one},
 	{"cdf-doc", fromDisk("doc.doc"), "application/msword", all},
+	{"cdf-doc-cyrillic-xls-heuristic", fromDisk("doc-cyrillic-xls-heuristic.doc"), "application/msword", all},
 	{"cdf-xls", fromDisk("xls.xls"), "application/vnd.ms-excel", one},
 	{"cdf-msg", fromDisk("msg.msg"), "application/vnd.ms-outlook", one},
 	{"cdf-msi", fromDisk("msi.msi"), "application/x-ms-installer", all},
