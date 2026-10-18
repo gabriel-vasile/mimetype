@@ -219,3 +219,48 @@ func Zlib(raw []byte, _ uint32) bool {
 	// Check that the file is not a regular text to avoid false positives.
 	return zlib && !Text(raw, 0)
 }
+
+// ISO9660 matches an ISO 9660 CD-ROM filesystem image.
+// The first 16 sectors of 2048 bytes (32KiB) are the system area and are not
+// used by ISO 9660. They can hold anything, ex: an MBR for hybrid images.
+// The volume descriptor set starts after the system area, at sector 16, and
+// every volume descriptor has the "CD001" standard identifier at offset 1.
+// Detection follows libmagic, which checks for "CD001" at offset 32769.
+// Detection needs a limit of at least 32774 bytes, which is higher than
+// the default limit; use SetLimit to increase it.
+func ISO9660(raw []byte, _ uint32) bool {
+	return offset(raw, []byte("CD001"), 16*2048+1)
+}
+
+// UDF matches a Universal Disk Format filesystem image.
+// Detection follows libmagic: an extended area descriptor "BEA01" at offset
+// 32769, followed by an "NSR02" or "NSR03" descriptor in the next block.
+// The block size is not known upfront so the first "NSR0" found among the
+// possible block sizes decides the result.
+// Detection needs a limit of at least 34822 bytes for 2048 byte blocks and up
+// to 65542 bytes for 32768 byte blocks.
+func UDF(raw []byte, _ uint32) bool {
+	const extendedArea = 16 * 2048
+	if !offset(raw, []byte("BEA01"), extendedArea+1) {
+		return false
+	}
+	for _, blockSize := range []int{2048, 4096, 8192, 16384, 32768} {
+		nsr := extendedArea + blockSize
+		if offset(raw, []byte("NSR0"), nsr+1) {
+			return len(raw) > nsr+5 && (raw[nsr+5] == '2' || raw[nsr+5] == '3')
+		}
+	}
+	return false
+}
+
+// NRG matches a Nero CD image in disc-at-once mode. These images have a 300KiB
+// header followed by an ISO 9660 or UDF filesystem.
+// libmagic only checks for ISO 9660 after the header. UDF is checked as well
+// because Nero images of UDF discs are common.
+// Detection needs a limit of at least 339974 bytes for ISO 9660 and 342022
+// bytes for UDF with 2048 byte blocks.
+func NRG(raw []byte, limit uint32) bool {
+	const header = 300 * 1024
+	return len(raw) > header &&
+		(ISO9660(raw[header:], limit) || UDF(raw[header:], limit))
+}
