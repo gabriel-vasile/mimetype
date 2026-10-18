@@ -7,6 +7,7 @@ import (
 	"math/bits"
 	"math/rand/v2"
 	"testing"
+	"time"
 )
 
 const testSecSize = 512
@@ -835,4 +836,88 @@ func FuzzDetect(f *testing.F) {
 			_ = Detect(data[:j]) // must not panic on any input
 		}
 	})
+}
+
+// buildQuadraticCDF builds the GHSA-jjmc-jx7j-hp68 proof-of-concept: an n-byte
+// OLE2 file crafted so that reading a single short stream costs O(n^2) CPU.
+//
+// It uses 128-byte sectors (secP2=7) and 1-byte short sectors (shortP2=0). SAT
+// sector 3 self-loops sector 6 (SAT[6]=6) so the short-stream pool read repeats
+// sector 6 until it fills ~n bytes. Sector 6 doubles as the SSAT: every entry
+// points at short-sector id x = n-2, so each ssatAt lookup walks the SSAT chain
+// ~x/32 times and readShort runs ~n iterations — Θ(n²/32) total.
+func buildQuadraticCDF(n int) []byte {
+	const secSize = 128
+	x := int32(n - 2) //nolint:gosec // n bounded by the caller
+	data := make([]byte, n)
+
+	// Header.
+	binary.LittleEndian.PutUint64(data, cdfMagic)
+	binary.LittleEndian.PutUint16(data[30:], 7)          // secP2: 128-byte sectors
+	binary.LittleEndian.PutUint16(data[32:], 0)          // shortP2: 1-byte short sectors
+	binary.LittleEndian.PutUint32(data[48:], 4)          // firstDirSec
+	binary.LittleEndian.PutUint32(data[56:], 4096)       // minStdStream
+	binary.LittleEndian.PutUint32(data[60:], 6)          // firstSSAT
+	binary.LittleEndian.PutUint32(data[68:], 0xFFFFFFFE) // firstMSAT: none
+	binary.LittleEndian.PutUint32(data[72:], 0)          // nMSAT
+	for i := 0; i < masterSATSize; i++ {
+		binary.LittleEndian.PutUint32(data[76+4*i:], 0xFFFFFFFF)
+	}
+	binary.LittleEndian.PutUint32(data[76:], 3) // masterSAT[0] = SAT sector 3
+
+	off := func(sec int) int { return secSize * (1 + sec) }
+
+	// SAT sector 3: directory chain 4->5->end, short pool sector 6 self-loops.
+	sat := off(3)
+	for i := 0; i < secSize/4; i++ {
+		binary.LittleEndian.PutUint32(data[sat+4*i:], 0xFFFFFFFF)
+	}
+	binary.LittleEndian.PutUint32(data[sat+4*4:], 5)          // SAT[4] = 5
+	binary.LittleEndian.PutUint32(data[sat+4*5:], 0xFFFFFFFE) // SAT[5] = ENDOFCHAIN
+	binary.LittleEndian.PutUint32(data[sat+4*6:], 6)          // SAT[6] = 6 (self-loop)
+
+	// Directory entry 0: Root Entry, short-stream pool at sector 6, child = 1.
+	root := dirEntryBytes("Root Entry", dirTypeRootStorage, 6, 0, nil)
+	binary.LittleEndian.PutUint32(root[76:], 1)
+	copy(data[off(4):], root)
+
+	// Directory entry 1: a user stream whose short-sector chain starts at x.
+	summary := dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, x, 1, nil)
+	copy(data[off(5):], summary)
+
+	// Sector 6: every SSAT slot points at short-sector id x.
+	ss := off(6)
+	for i := 0; i < secSize/4; i++ {
+		binary.LittleEndian.PutUint32(data[ss+4*i:], uint32(x)) //nolint:gosec // reinterpret id
+	}
+	return data
+}
+
+// TestDetectQuadraticSSAT checks that CDF detection finishes _fast_.
+// GHSA-jjmc-jx7j-hp68 showed that crafted inputs can make CDF detection run
+// quadratic with the size of the input. It might be bad idea to add this test
+// because of flakyness, but for now it's the easiest option.
+func TestDetectQuadraticSSAT(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+	const n = 1 << 18 // 256 KiB
+	data := buildQuadraticCDF(n)
+
+	done := make(chan CDFType, 1)
+	go func() { done <- Detect(data) }()
+
+	// Before the fix, 256KiB would take some 7s on my machine.
+	// AFter the fix, same input takes 40us.
+	// It'a big difference between the before and after so my bet is 1s
+	// will sit comfortable in-between, without creating flakyness.
+	const deadline = time.Second
+	select {
+	case got := <-done:
+		if got != CDFTypeGeneric {
+			t.Errorf("Detect() = %v, want CDFTypeGeneric", got)
+		}
+	case <-time.After(deadline):
+		t.Fatalf("Detect did not finish within %v on a %d-byte input: ", deadline, n)
+	}
 }
