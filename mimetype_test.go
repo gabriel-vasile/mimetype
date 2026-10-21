@@ -364,6 +364,8 @@ ENDHDR`,
 		"image/svg+xml",
 		none,
 	},
+	{"svg no xml header utf8 bom", "\xEF\xBB\xBF" + `<svg xmlns="http://www.w3.org/2000/svg"`, "image/svg+xml", none},
+	{"svg xml header utf8 bom", "\xEF\xBB\xBF" + `<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">`, "image/svg+xml", none},
 
 	{"swf", "CWS", "application/x-shockwave-flash", one},
 	{"tar", fromDisk("tar.tar"), "application/x-tar", all},
