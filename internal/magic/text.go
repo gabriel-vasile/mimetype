@@ -3,6 +3,7 @@ package magic
 import (
 	"bytes"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gabriel-vasile/mimetype/internal/charset"
 	"github.com/gabriel-vasile/mimetype/internal/json"
@@ -35,7 +36,66 @@ func HTML(raw []byte, _ uint32) bool {
 
 // XML matches an Extensible Markup Language file.
 func XML(raw []byte, _ uint32) bool {
-	return markup(raw, []byte("<?XML"))
+	return markup(raw, []byte("<?XML")) || xmlWithoutDeclaration(raw)
+}
+
+// xmlWithoutDeclaration matches an XML document that has no XML declaration,
+// but whose root element declares an XML namespace. The XML declaration is
+// optional, so documents like Peppol invoices frequently omit it.
+func xmlWithoutDeclaration(s scan.Bytes) bool {
+	if bytes.HasPrefix(s, []byte{0xEF, 0xBB, 0xBF}) {
+		// We skip the UTF-8 BOM if present to ensure we correctly
+		// process any leading whitespace. The presence of the BOM
+		// is taken into account during charset detection in charset.go.
+		s.Advance(3)
+	}
+	s.TrimLWS()
+	// Documents starting with a comment or a doctype never reach this point;
+	// they are matched as HTML before XML is tried.
+	if s.Pop() != '<' || !skipXMLName(&s) {
+		return false
+	}
+	// A namespace declaration on the root element is what tells XML apart from
+	// the other angle bracket languages that get reported as text/plain.
+	hasMore := true
+	for hasMore {
+		var aName []byte
+		aName, _, hasMore = mkup.GetAnAttribute(&s)
+		if bytes.Equal(aName, []byte("xmlns")) || bytes.HasPrefix(aName, []byte("xmlns:")) {
+			return true
+		}
+		// Whatever precedes the namespace declaration has to look like an
+		// attribute, otherwise the input is just text starting with a <.
+		if n := scan.Bytes(aName); !skipXMLName(&n) || len(n) != 0 {
+			return false
+		}
+	}
+	return false
+}
+
+// skipXMLName advances s over the XML name at its start and reports whether
+// it found one.
+func skipXMLName(s *scan.Bytes) bool {
+	if !isXMLNameStart(s.Peek()) {
+		return false
+	}
+	for isXMLNameStart(s.Peek()) || isXMLNameRest(s.Peek()) {
+		s.Advance(1)
+	}
+	return true
+}
+
+// isXMLNameStart reports whether b can start an XML name.
+func isXMLNameStart(b byte) bool {
+	return b == '_' || b == ':' ||
+		'a' <= b && b <= 'z' ||
+		'A' <= b && b <= 'Z' ||
+		b >= utf8.RuneSelf
+}
+
+// isXMLNameRest reports whether b can appear in an XML name, but not start one.
+func isXMLNameRest(b byte) bool {
+	return b == '-' || b == '.' || '0' <= b && b <= '9'
 }
 
 // Owl2 matches an Owl ontology file.
