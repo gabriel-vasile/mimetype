@@ -549,6 +549,45 @@ func TestQueryObject(t *testing.T) {
 			SearchVals: [][]byte{[]byte(`"baz"`)},
 		},
 		expectedFind: false,
+	}, {
+		name: "match after empty array sibling",
+		json: `{"bbox":[],"type":"Feature"}`,
+		query: query{
+			SearchPath: [][]byte{[]byte("type")},
+			SearchVals: [][]byte{[]byte(`"Feature"`)},
+		},
+		expectedFind: true,
+	}, {
+		name: "match after non-empty array sibling",
+		json: `{"bbox":[1,2],"type":"Feature"}`,
+		query: query{
+			SearchPath: [][]byte{[]byte("type")},
+			SearchVals: [][]byte{[]byte(`"Feature"`)},
+		},
+		expectedFind: true,
+	}, {
+		name: "match after nested non-empty array sibling",
+		json: `{"c":[[1],[[2,3]],{"x":[4]}],"type":"Feature"}`,
+		query: query{
+			SearchPath: [][]byte{[]byte("type")},
+			SearchVals: [][]byte{[]byte(`"Feature"`)},
+		},
+		expectedFind: true,
+	}, {
+		name: "nested match after non-empty array sibling",
+		json: `{"log":{"pages":[{"id":"a"}],"version":"1.2"}}`,
+		query: query{
+			SearchPath: [][]byte{[]byte("log"), []byte("version")},
+		},
+		expectedFind: true,
+	}, {
+		name: "no match inside array after non-empty array",
+		json: `{"a":[[1],{"type":"Feature"}]}`,
+		query: query{
+			SearchPath: [][]byte{[]byte("type")},
+			SearchVals: [][]byte{[]byte(`"Feature"`)},
+		},
+		expectedFind: false,
 	}}
 
 	for _, tt := range tCases {
@@ -740,6 +779,9 @@ func TestStack(t *testing.T) {
 		{"arrr", `[[`, "[§["},
 		{"arrrr", `[[[`, "[§[§["},
 		{"arrr popped once", `[[[]`, "[§["},
+		{"non-empty arr popped", `[[1]`, "["},
+		{"nested non-empty arr popped", `[[[1],2]`, "["},
+		{"obj key non-empty arr popped", `{"abc":[1,2]`, "abc"},
 		{"obj", `{`, ""},
 		{"obj key", `{"abc":1`, "abc"},
 		{"obj key twice", `{"abc":{"def":1`, "abc§def"},
@@ -761,6 +803,24 @@ func TestStack(t *testing.T) {
 			p.consumeAny([]byte(tt.data), []query{{}}, 0)
 			if got := join(p.currPath); got != tt.expected {
 				t.Errorf("expected: %s, got: %s", tt.expected, got)
+			}
+		})
+	}
+}
+
+func TestParseQueryAfterNonEmptyArray(t *testing.T) {
+	tCases := []struct {
+		queryType string
+		json      string
+	}{
+		{QueryGeo, `{"bbox":[1,2],"type":"Feature"}`},
+		{QueryHAR, `{"log":{"pages":[{"id":"p"}],"version":"1.2"}}`},
+		{QueryCDX, `{"tags":["a","b"],"bomFormat":"CycloneDX"}`},
+	}
+	for _, tt := range tCases {
+		t.Run(tt.queryType, func(t *testing.T) {
+			if _, _, _, ok := Parse(tt.queryType, []byte(tt.json)); !ok {
+				t.Errorf("query %s should be satisfied for %s", tt.queryType, tt.json)
 			}
 		})
 	}
