@@ -106,9 +106,15 @@ func CRX(raw []byte, limit uint32) bool {
 	if len(raw) < minHeaderLen || !bytes.HasPrefix(raw, []byte("Cr24")) {
 		return false
 	}
-	pubkeyLen := int64(binary.LittleEndian.Uint32(raw[8:12]))
-	sigLen := int64(binary.LittleEndian.Uint32(raw[12:16]))
-	zipOffset := minHeaderLen + pubkeyLen + sigLen
+	var zipOffset int64
+	if binary.LittleEndian.Uint32(raw[4:8]) == 3 {
+		// CRX3 has a single header length at raw[8:12]; the zip follows that header.
+		zipOffset = 12 + int64(binary.LittleEndian.Uint32(raw[8:12]))
+	} else {
+		pubkeyLen := int64(binary.LittleEndian.Uint32(raw[8:12]))
+		sigLen := int64(binary.LittleEndian.Uint32(raw[12:16]))
+		zipOffset = minHeaderLen + pubkeyLen + sigLen
+	}
 	if zipOffset < 0 || int64(len(raw)) < zipOffset {
 		return false
 	}

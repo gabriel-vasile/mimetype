@@ -83,6 +83,12 @@ var testcases = []testcase{
 		one,
 	},
 	{
+		"crx3",
+		"Cr24\x03\x00\x00\x00\x08\x00\x00\x00" + offset(8, "") + "\x50\x4B\x03\x04",
+		"application/x-chrome-extension",
+		one,
+	},
+	{
 		"csv",
 		`1,2
 "abc","def"
