@@ -981,6 +981,7 @@ func TestLongChainAllocs(t *testing.T) {
 		t.Run(fmt.Sprintf("cyclic=%v", cyclic), func(t *testing.T) {
 			data := buildLongChainCDF(n, cyclic)
 			res := testing.Benchmark(func(b *testing.B) {
+				b.Helper()
 				b.ReportAllocs()
 				for b.Loop() {
 					Detect(data)
