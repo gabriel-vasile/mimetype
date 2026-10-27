@@ -516,7 +516,7 @@ func TestDetectShortStreamMultiSectorSSAT(t *testing.T) {
 //
 // The directory chain in the SAT is 1 → 3 → -2, so the second dir sector is
 // only reachable via a fragmented walk. Detection must return CDFTypeDoc,
-// which only happens if readLong follows the fragmented chain.
+// which only happens if the directory chain is followed through the SAT.
 func makeFragmentedDirCDF(secSize int) []byte {
 	dir1 := dirEntryBytes("Root Entry", dirTypeRootStorage, -1, 0, nil)
 	dir2 := dirEntryBytes("WordDocument", dirTypeUserStream, -1, 0, nil)
@@ -533,7 +533,7 @@ func makeFragmentedDirCDF(secSize int) []byte {
 // directory stream is split across non-contiguous long sectors — a layout
 // real-world CDF writers (MSI builders, edited Office documents) commonly
 // produce. The distinctive entry (WordDocument) lives in the second dir
-// sector, so a readLong implementation that only handles contiguous chains
+// sector, so a directory reader that only handles contiguous chains
 // will miss it and incorrectly return CDFTypeGeneric.
 func TestDetectFragmentedDirChain(t *testing.T) {
 	for _, secSize := range testSecSizes {
@@ -919,5 +919,95 @@ func TestDetectQuadraticSSAT(t *testing.T) {
 		}
 	case <-time.After(deadline):
 		t.Fatalf("Detect did not finish within %v on a %d-byte input: ", deadline, n)
+	}
+}
+
+// buildLongChainCDF builds a CDF of n bytes with 512-byte sectors whose
+// directory and SummaryInformation stream both start at the same long-sector
+// chain. If cyclic, that chain is sector nSAT looping onto itself. Otherwise
+// it visits every data sector exactly once, but out of order (even sectors
+// first, then odd ones), so it is fragmented without being cyclic.
+func buildLongChainCDF(n int, cyclic bool) []byte {
+	const secSize = testSecSize
+	perSec := secSize / 4
+	nSec := n/secSize - 1 // sectors after the header
+	nSAT := (nSec + perSec - 1) / perSec
+	if nSAT > masterSATSize {
+		panic("input too big for header-only master SAT")
+	}
+	masterSAT := make([]int32, nSAT)
+	sat := make([]int32, nSAT*perSec)
+	for i := range sat {
+		sat[i] = -1
+	}
+	for i := range nSAT {
+		masterSAT[i] = int32(i) //nolint:gosec // small index
+		sat[i] = -3             // SAT sectors are marked as such
+	}
+	first := int32(nSAT) //nolint:gosec // small index
+	if cyclic {
+		sat[first] = first
+	} else {
+		var order []int32
+		for s := first; s < int32(nSec); s += 2 { //nolint:gosec // small index
+			order = append(order, s)
+		}
+		for s := first + 1; s < int32(nSec); s += 2 { //nolint:gosec // small index
+			order = append(order, s)
+		}
+		for i := 0; i < len(order)-1; i++ {
+			sat[order[i]] = order[i+1]
+		}
+		sat[order[len(order)-1]] = -2
+	}
+
+	data := make([]byte, n)
+	copy(data, testHeader(secSize, first, -2, 4096, masterSAT))
+	for i, id := range sat {
+		binary.LittleEndian.PutUint32(data[secSize+4*i:], uint32(id)) //nolint:gosec // reinterpret id
+	}
+	dir := dirEntryBytes("Root Entry", dirTypeRootStorage, -1, 0, nil)
+	dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, first, 0xFFFFFFFF, nil)...)
+	copy(data[secSize*(1+int(first)):], dir)
+	return data
+}
+
+// TestLongChainAllocs checks that the memory used by Detect does not grow with
+// the length of long-sector chains. Previously every chain was copied out of
+// the input, so a 4MiB crafted file made Detect allocate ~40MiB.
+func TestLongChainAllocs(t *testing.T) {
+	const n = 1 << 22 // 4 MiB
+	for _, cyclic := range []bool{true, false} {
+		t.Run(fmt.Sprintf("cyclic=%v", cyclic), func(t *testing.T) {
+			data := buildLongChainCDF(n, cyclic)
+			res := testing.Benchmark(func(b *testing.B) {
+				b.ReportAllocs()
+				for b.Loop() {
+					Detect(data)
+				}
+			})
+			if got := res.AllocedBytesPerOp(); got > n/16 {
+				t.Errorf("Detect allocated %d bytes for a %d-byte input, want at most %d", got, n, n/16)
+			}
+		})
+	}
+}
+
+// TestLongChainLinearTime guards against reading chains in a way that walks
+// them repeatedly, which would make detection quadratic in the input size.
+func TestLongChainLinearTime(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+	const n = 1 << 22 // 4 MiB
+	for _, cyclic := range []bool{true, false} {
+		data := buildLongChainCDF(n, cyclic)
+		done := make(chan struct{})
+		go func() { Detect(data); close(done) }()
+		select {
+		case <-done:
+		case <-time.After(time.Second):
+			t.Fatalf("Detect did not finish within 1s on a %d-byte input (cyclic=%v)", n, cyclic)
+		}
 	}
 }
