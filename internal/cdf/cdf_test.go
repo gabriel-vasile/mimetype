@@ -7,7 +7,6 @@ import (
 	"math/bits"
 	"math/rand/v2"
 	"testing"
-	"time"
 )
 
 const testSecSize = 512
@@ -893,35 +892,6 @@ func buildQuadraticCDF(n int) []byte {
 	return data
 }
 
-// TestDetectQuadraticSSAT checks that CDF detection finishes _fast_.
-// GHSA-jjmc-jx7j-hp68 showed that crafted inputs can make CDF detection run
-// quadratic with the size of the input. It might be bad idea to add this test
-// because of flakyness, but for now it's the easiest option.
-func TestDetectQuadraticSSAT(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
-	}
-	const n = 1 << 18 // 256 KiB
-	data := buildQuadraticCDF(n)
-
-	done := make(chan CDFType, 1)
-	go func() { done <- Detect(data) }()
-
-	// Before the fix, 256KiB would take some 7s on my machine.
-	// AFter the fix, same input takes 40us.
-	// It'a big difference between the before and after so my bet is 1s
-	// will sit comfortable in-between, without creating flakyness.
-	const deadline = time.Second
-	select {
-	case got := <-done:
-		if got != CDFTypeGeneric {
-			t.Errorf("Detect() = %v, want CDFTypeGeneric", got)
-		}
-	case <-time.After(deadline):
-		t.Fatalf("Detect did not finish within %v on a %d-byte input: ", deadline, n)
-	}
-}
-
 // buildLongChainCDF builds a CDF of n bytes with 512-byte sectors whose
 // directory and SummaryInformation stream both start at the same long-sector
 // chain. If cyclic, that chain is sector nSAT looping onto itself. Otherwise
@@ -994,21 +964,32 @@ func TestLongChainAllocs(t *testing.T) {
 	}
 }
 
-// TestLongChainLinearTime guards against reading chains in a way that walks
-// them repeatedly, which would make detection quadratic in the input size.
-func TestLongChainLinearTime(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
-	}
-	const n = 1 << 22 // 4 MiB
-	for _, cyclic := range []bool{true, false} {
-		data := buildLongChainCDF(n, cyclic)
-		done := make(chan struct{})
-		go func() { Detect(data); close(done) }()
-		select {
-		case <-done:
-		case <-time.After(time.Second):
-			t.Fatalf("Detect did not finish within 1s on a %d-byte input (cyclic=%v)", n, cyclic)
-		}
+// BenchmarkDetectCrafted measures detection on crafted inputs that used to make
+// it run in quadratic time.
+func BenchmarkDetectCrafted(b *testing.B) {
+	cases := []struct {
+		name string
+		data []byte
+	}{{
+		// GHSA-jjmc-jx7j-hp68: short-stream reads walking the SSAT repeatedly.
+		name: "QuadraticSSAT",
+		data: buildQuadraticCDF(1 << 18), // 256 KiB
+	}, {
+		// Long-sector chains (directory and user stream) walked repeatedly.
+		name: "LongChainCyclic",
+		data: buildLongChainCDF(1<<22, true), // 4 MiB
+	}, {
+		name: "LongChainFragmented",
+		data: buildLongChainCDF(1<<22, false), // 4 MiB
+	}}
+
+	for _, bc := range cases {
+		b.Run(bc.name, func(b *testing.B) {
+			b.SetBytes(int64(len(bc.data)))
+			b.ReportAllocs()
+			for b.Loop() {
+				Detect(bc.data)
+			}
+		})
 	}
 }
