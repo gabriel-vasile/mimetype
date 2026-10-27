@@ -6,6 +6,7 @@ import (
 	"hash/fnv"
 	"math/bits"
 	"math/rand/v2"
+	"runtime"
 	"testing"
 )
 
@@ -944,24 +945,32 @@ func buildLongChainCDF(n int, cyclic bool) []byte {
 
 // TestLongChainAllocs checks that the memory used by Detect does not grow with
 // the length of long-sector chains. Previously every chain was copied out of
-// the input, so a 4MiB crafted file made Detect allocate ~40MiB.
+// the input, so a 2MiB crafted file made Detect allocate ~20MiB.
 func TestLongChainAllocs(t *testing.T) {
-	const n = 1 << 22 // 4 MiB
+	const n = 1 << 21 // 2 MiB
 	for _, cyclic := range []bool{true, false} {
 		t.Run(fmt.Sprintf("cyclic=%v", cyclic), func(t *testing.T) {
 			data := buildLongChainCDF(n, cyclic)
-			res := testing.Benchmark(func(b *testing.B) {
-				b.Helper()
-				b.ReportAllocs()
-				for b.Loop() {
-					Detect(data)
-				}
-			})
-			if got := res.AllocedBytesPerOp(); got > n/16 {
+			if got := bytesPerRun(5, func() { Detect(data) }); got > n/16 {
 				t.Errorf("Detect allocated %d bytes for a %d-byte input, want at most %d", got, n, n/16)
 			}
 		})
 	}
+}
+
+// bytesPerRun returns the average number of bytes allocated by f over runs
+// calls. GOMAXPROCS is set to 1 so other goroutines are less likely to
+// allocate during the measurement.
+func bytesPerRun(runs int, f func()) uint64 {
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
+	f() // one warm-up
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	for range runs {
+		f()
+	}
+	runtime.ReadMemStats(&after)
+	return (after.TotalAlloc - before.TotalAlloc) / uint64(runs) //nolint:gosec // runs > 0
 }
 
 // BenchmarkDetectCrafted measures detection on crafted inputs that used to make
