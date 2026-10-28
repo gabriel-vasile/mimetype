@@ -100,6 +100,37 @@ func Zstd(raw []byte, limit uint32) bool {
 		(sig >= 0x184D2A50 && sig <= 0x184D2A5F)
 }
 
+// Lz4 matches an LZ4 compressed file.
+// https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md
+//
+// The skippable frames, 0x184D2A50 to 0x184D2A5F, are shared with Zstandard,
+// so they keep being reported as Zstd. file/file does not report them as LZ4
+// either.
+func Lz4(raw []byte, _ uint32) bool {
+	// Legacy frames carry no frame descriptor; the compressed blocks follow
+	// the magic directly. 0x184C2102 is lz4 v0.1-v0.9, 0x184C2103 is v1.0-v1.3.
+	if bytes.HasPrefix(raw, []byte{0x02, 0x21, 0x4C, 0x18}) ||
+		bytes.HasPrefix(raw, []byte{0x03, 0x21, 0x4C, 0x18}) {
+		return true
+	}
+	// 0x184D2204 is the current frame format, lz4 v1.4+. It is followed by a
+	// frame descriptor; decoders reject frames that do not respect it.
+	if len(raw) < 6 || !bytes.HasPrefix(raw, []byte{0x04, 0x22, 0x4D, 0x18}) {
+		return false
+	}
+	flg, bd := raw[4], raw[5]
+	// FLG bits 7-6 hold the version, which must be 01, and bit 1 is reserved.
+	if flg&0b11000010 != 0b01000000 {
+		return false
+	}
+	// BD bit 7 and bits 3-0 are reserved.
+	if bd&0b10001111 != 0 {
+		return false
+	}
+	// BD bits 6-4 hold the block maximum size; only 4 to 7 are defined.
+	return bd>>4 >= 4
+}
+
 // CRX matches a Chrome extension file: a zip archive prepended by a package header.
 func CRX(raw []byte, limit uint32) bool {
 	const minHeaderLen = 16
