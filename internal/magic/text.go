@@ -35,7 +35,11 @@ func HTML(raw []byte, _ uint32) bool {
 
 // XML matches an Extensible Markup Language file.
 func XML(raw []byte, _ uint32) bool {
-	return markup(raw, []byte("<?XML"))
+	return markup(raw, []byte("<?XML")) ||
+		// The XML declaration in UTF-16LE or UTF-16BE, after the BOM.
+		// https://www.w3.org/TR/xml/#sec-guessing-no-ext-info
+		bytes.HasPrefix(raw, []byte("\xFF\xFE<\x00?\x00x\x00m\x00l\x00")) ||
+		bytes.HasPrefix(raw, []byte("\xFE\xFF\x00<\x00?\x00x\x00m\x00l"))
 }
 
 // Owl2 matches an Owl ontology file.
