@@ -101,11 +101,10 @@ func Zstd(raw []byte, limit uint32) bool {
 }
 
 // Lz4 matches an LZ4 compressed file.
-// https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md
+// https://github.com/lz4/lz4/blob/f0491dba62f308c918ff29eb8246bf76b222e962/doc/lz4_Frame_format.md
 //
 // The skippable frames, 0x184D2A50 to 0x184D2A5F, are shared with Zstandard,
-// so they keep being reported as Zstd. file/file does not report them as LZ4
-// either.
+// so they keep being reported as Zstd.
 func Lz4(raw []byte, _ uint32) bool {
 	// Legacy frames carry no frame descriptor; the compressed blocks follow
 	// the magic directly. 0x184C2102 is lz4 v0.1-v0.9, 0x184C2103 is v1.0-v1.3.
