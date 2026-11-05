@@ -280,6 +280,7 @@ func (p *parserState) consumeArray(b []byte, qs []query, lvl int) (n int) {
 			continue
 		case ']':
 			p.ib++
+			p.popLastPath(qs)
 			return n + 1
 		default:
 			return 0
