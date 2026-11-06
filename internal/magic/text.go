@@ -433,6 +433,8 @@ func NdJSON(raw []byte, limit uint32) bool {
 
 // Svg matches a SVG file.
 func Svg(raw []byte, limit uint32) bool {
+	// Skip the UTF-8 BOM if present. XML documents are allowed to start with it.
+	raw = bytes.TrimPrefix(raw, []byte{0xEF, 0xBB, 0xBF})
 	return svgWithoutXMLDeclaration(raw) || svgWithXMLDeclaration(raw)
 }
 
