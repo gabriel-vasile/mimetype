@@ -24,7 +24,7 @@ var root = newMIME("application/octet-stream", "",
 	woff2, otf, ttc, eot, wasm, shx, dbf, dcm, rar, djvu, mobi, lit, bpg, cbor,
 	sqlite3, dwg, nes, lnk, macho, qcp, icns, hdr, mrc, mdb, accdb, zstd, cab,
 	rpm, xz, lzip, lz4, torrent, cpio, tzif, xcf, pat, gbr, glb, cabIS, jxr, parquet,
-	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, pcap,
+	oneNote, chm, wpd, dxf, grib, zlib, inf, hlp, fm, bufr, pyc, pcap, arrow,
 	// MP3 is late because it does a linear search in the input. That means
 	// containers that embed an MP3, for example: an mp4 file, or a zip without
 	// compression, would pass as MP3s.
@@ -290,6 +290,7 @@ var (
 	jxr     = newMIME("image/jxr", ".jxr", magic.Jxr).alias("image/vnd.ms-photo")
 	parquet = newMIME("application/vnd.apache.parquet", ".parquet", magic.Par1).
 		alias("application/x-parquet")
+	arrow   = newMIME("application/vnd.apache.arrow.file", ".arrow", magic.Arrow)
 	netpbm  = newMIME("image/x-portable-bitmap", ".pbm", magic.NetPBM)
 	netpgm  = newMIME("image/x-portable-graymap", ".pgm", magic.NetPGM)
 	netppm  = newMIME("image/x-portable-pixmap", ".ppm", magic.NetPPM)
