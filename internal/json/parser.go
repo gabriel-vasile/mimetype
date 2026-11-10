@@ -436,8 +436,11 @@ func (p *parserState) consumeAny(b []byte, qs []query, lvl int) (n int) {
 	if lvl == 0 {
 		p.firstToken = t
 	}
+	// A value that fails to parse consumes nothing. Returning the bytes read
+	// before the failure would make callers resume parsing in the middle of
+	// the broken value.
 	if rv <= 0 {
-		return n
+		return 0
 	}
 	n += rv
 	n += p.consumeSpace(b[n:])
