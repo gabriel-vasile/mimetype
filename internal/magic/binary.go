@@ -109,7 +109,13 @@ func Dbf(raw []byte, limit uint32) bool {
 	// Production MDX flag;
 	// 0x01 if a production .MDX file exists for this table;
 	// 0x00 if no .MDX file exists.
-	if raw[28] > 0x01 {
+	// Visual FoxPro tables (0x30 to 0x32) keep a set of flags here instead:
+	// 0x01 .cdx file, 0x02 memo field, 0x04 .dbc database.
+	maxFlags := byte(0x01)
+	if raw[0] >= 0x30 && raw[0] <= 0x32 {
+		maxFlags = 0x07
+	}
+	if raw[28] > maxFlags {
 		return false
 	}
 
