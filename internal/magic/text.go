@@ -505,7 +505,8 @@ func svgWithXMLDeclaration(s scan.Bytes) bool {
 
 // Srt matches a SubRip file.
 func Srt(raw []byte, _ uint32) bool {
-	s := scan.Bytes(raw)
+	// Subtitle Edit, among others, saves SRT files with a UTF-8 BOM.
+	s := scan.Bytes(bytes.TrimPrefix(raw, []byte{0xEF, 0xBB, 0xBF}))
 	line := s.Line()
 
 	// First line must be 1.

@@ -367,6 +367,7 @@ ENDHDR`,
 	{"so", "\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00", "application/x-sharedlib", all},
 	{"sqlite", "SQLite format 3\x00", "application/vnd.sqlite3", one},
 	{"srt", "1\n00:02:16,612 --\x3e 00:02:19,376\nS", "application/x-subrip", one},
+	{"srt utf8 bom", "\xEF\xBB\xBF1\r\n00:02:16,612 --\x3e 00:02:19,376\r\nS", "application/x-subrip", none},
 	{"svg no xml header", `<svg xmlns="http://www.w3.org/2000/svg"`, "image/svg+xml", all},
 	{
 		"svg xml header",
