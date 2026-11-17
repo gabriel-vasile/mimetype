@@ -181,69 +181,60 @@ func (p *parserState) consumeString(b []byte) (n int) {
 	return 0
 }
 
+// consumeNumber consumes a number as defined by the JSON grammar:
+// an optional minus, an integer part without leading zeros, an optional
+// fraction part and an optional exponent. The fraction and the exponent must
+// have at least one digit each.
+// It returns 0 if b does not start with a complete number. Bytes that can still
+// be part of a number are counted as inspected, so a number cut by the read
+// limit, like "1." or "1e", does not make a truncated JSON look invalid.
 func (p *parserState) consumeNumber(b []byte) (n int) {
-	got := false
-	var i int
-
-	if len(b) == 0 {
-		goto out
-	}
-	if b[0] == '-' {
-		b, i = b[1:], i+1
+	if len(b) > 0 && b[0] == '-' {
+		n++
 		p.ib++
 	}
-
-	for len(b) > 0 {
-		if !isDigit(b[0]) {
-			break
+	if len(b[n:]) == 0 || !isDigit(b[n]) {
+		return 0
+	}
+	if b[n] == '0' {
+		// A leading zero must be the whole integer part.
+		n++
+		p.ib++
+	} else {
+		n += p.consumeDigits(b[n:])
+	}
+	if len(b[n:]) > 0 && b[n] == '.' {
+		n++
+		p.ib++
+		d := p.consumeDigits(b[n:])
+		if d == 0 {
+			return 0
 		}
-		got = true
-		b, i = b[1:], i+1
+		n += d
+	}
+	if len(b[n:]) > 0 && (b[n] == 'e' || b[n] == 'E') {
+		n++
 		p.ib++
-	}
-	if len(b) == 0 {
-		goto out
-	}
-	if b[0] == '.' {
-		b, i = b[1:], i+1
-		p.ib++
-	}
-	for len(b) > 0 {
-		if !isDigit(b[0]) {
-			break
-		}
-		got = true
-		b, i = b[1:], i+1
-		p.ib++
-	}
-	if len(b) == 0 {
-		goto out
-	}
-	if got && (b[0] == 'e' || b[0] == 'E') {
-		b, i = b[1:], i+1
-		p.ib++
-		got = false
-		if len(b) == 0 {
-			goto out
-		}
-		if b[0] == '+' || b[0] == '-' {
-			b, i = b[1:], i+1
+		if len(b[n:]) > 0 && (b[n] == '+' || b[n] == '-') {
+			n++
 			p.ib++
 		}
-		for len(b) > 0 {
-			if !isDigit(b[0]) {
-				break
-			}
-			got = true
-			b, i = b[1:], i+1
-			p.ib++
+		d := p.consumeDigits(b[n:])
+		if d == 0 {
+			return 0
 		}
+		n += d
 	}
-out:
-	if got {
-		return i
+	return n
+}
+
+// consumeDigits consumes a run of decimal digits and returns its length.
+func (p *parserState) consumeDigits(b []byte) (n int) {
+	for n < len(b) && isDigit(b[n]) {
+		n++
+		p.ib++
 	}
-	return 0
+	return n
 }
 
 // openArray is used instead of an inline []byte{'['} to avoid mem alllocs.
