@@ -143,13 +143,36 @@ func (p *parserState) consumeConst(b, cnst []byte) int {
 	return len(cnst)
 }
 
+// stringSpecial marks the bytes that need a check inside a JSON string:
+// the quote, the backslash and the control characters, which JSON allows
+// only when escaped.
+var stringSpecial = func() (t [256]bool) {
+	for c := 0; c < 0x20; c++ {
+		t[c] = true
+	}
+	t['"'], t['\\'] = true, true
+	return t
+}()
+
 func (p *parserState) consumeString(b []byte) (n int) {
-	var c byte
-	for len(b[n:]) > 0 {
-		c, n = b[n], n+1
-		p.ib++
-		switch c {
+	for {
+		// Skip the bytes that need no check in one go.
+		i := n
+		for i < len(b) && !stringSpecial[b[i]] {
+			i++
+		}
+		p.ib += i - n
+		n = i
+		if n == len(b) {
+			return 0
+		}
+		switch b[n] {
+		case '"':
+			p.ib++
+			return n + 1
 		case '\\':
+			n++
+			p.ib++
 			if len(b[n:]) == 0 {
 				return 0
 			}
@@ -157,7 +180,6 @@ func (p *parserState) consumeString(b []byte) (n int) {
 			case '"', '\\', '/', 'b', 'f', 'n', 'r', 't':
 				n++
 				p.ib++
-				continue
 			case 'u':
 				n++
 				p.ib++
@@ -168,17 +190,15 @@ func (p *parserState) consumeString(b []byte) (n int) {
 					n++
 					p.ib++
 				}
-				continue
 			default:
 				return 0
 			}
-		case '"':
-			return n
 		default:
-			continue
+			// Control characters must be escaped inside JSON strings.
+			// Do not count it as inspected: no JSON can go on from here.
+			return 0
 		}
 	}
-	return 0
 }
 
 func (p *parserState) consumeNumber(b []byte) (n int) {
@@ -255,12 +275,18 @@ func (p *parserState) consumeArray(b []byte, qs []query, lvl int) (n int) {
 		return 0
 	}
 
+	// afterComma is true when the next value comes after a comma. Such a
+	// value cannot be missing: [1,] is not valid JSON.
+	afterComma := false
 	for n < len(b) {
 		n += p.consumeSpace(b[n:])
 		if len(b[n:]) == 0 {
 			return 0
 		}
 		if b[n] == ']' {
+			if afterComma {
+				return 0
+			}
 			p.ib++
 			p.popLastPath(qs)
 			return n + 1
@@ -277,6 +303,7 @@ func (p *parserState) consumeArray(b []byte, qs []query, lvl int) (n int) {
 		case ',':
 			n += 1
 			p.ib++
+			afterComma = true
 			continue
 		case ']':
 			p.ib++
@@ -313,12 +340,18 @@ func (p *parserState) popLastPath(qs []query) {
 }
 
 func (p *parserState) consumeObject(b []byte, qs []query, lvl int) (n int) {
+	// afterComma is true when the next member comes after a comma. Such a
+	// member cannot be missing: {"a":1,} is not valid JSON.
+	afterComma := false
 	for n < len(b) {
 		n += p.consumeSpace(b[n:])
 		if len(b[n:]) == 0 {
 			return 0
 		}
 		if b[n] == '}' {
+			if afterComma {
+				return 0
+			}
 			p.ib++
 			return n + 1
 		}
@@ -378,6 +411,7 @@ func (p *parserState) consumeObject(b []byte, qs []query, lvl int) (n int) {
 			p.popLastPath(qs)
 			n++
 			p.ib++
+			afterComma = true
 			continue
 		case '}':
 			p.popLastPath(qs)
