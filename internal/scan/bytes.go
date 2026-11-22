@@ -181,9 +181,25 @@ func (b Bytes) Search(p []byte, flags Flags) (i int, l int) {
 		}
 	}
 
+	// Do the first step of Match here, so most positions skip the call.
+	p0 := p[0]
+	fold := flags&IgnoreCase > 0 && isUpper(p0)
+	ws := !fold && flags&CompactWS > 0 && ByteIsWS(p0)
 	for i := range b {
 		if lb-i < lp {
 			return -1, 0
+		}
+		c := b[i]
+		if fold {
+			if upper(c) != p0 {
+				continue
+			}
+		} else if ws {
+			if !ByteIsWS(c) {
+				continue
+			}
+		} else if c != p0 {
+			continue
 		}
 		if l = b[i:].Match(p, flags); l != -1 {
 			return i, l
