@@ -78,13 +78,13 @@ var testcases = []testcase{
 	{"class", "\xCA\xFE\xBA\xBE\x00\x00\x00\xFF", "application/x-java-applet", one},
 	{
 		"crx",
-		"Cr24\x00\x00\x00\x00\x01\x00\x00\x00\x0F\x00\x00\x00" + offset(16, "") + "\x50\x4B\x03\x04",
+		"Cr24\x00\x00\x00\x00\x01\x00\x00\x00\x0F\x00\x00\x00" + zeroes(16) + "\x50\x4B\x03\x04",
 		"application/x-chrome-extension",
 		one,
 	},
 	{
 		"crx3",
-		"Cr24\x03\x00\x00\x00\x08\x00\x00\x00" + offset(8, "") + "\x50\x4B\x03\x04",
+		"Cr24\x03\x00\x00\x00\x08\x00\x00\x00" + zeroes(8) + "\x50\x4B\x03\x04",
 		"application/x-chrome-extension",
 		one,
 	},
@@ -109,7 +109,12 @@ a,"b`,
 	{"cyclonedx json", `{"bomFormat": "CycloneDX", "specVersion": "1.2"}`, "application/vnd.cyclonedx+json", one},
 	{"cyclonedx xml", `<?xml version="1.0"?> <bom xmlns="http://cyclonedx.org/schema/bom/1.1">`, "application/vnd.cyclonedx+xml", one},
 	{"dae", `<?xml version="1.0"?><COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema">`, "model/vnd.collada+xml", one},
-	{"dbf", "\x03\x5f\x07\x1a\x96\x0f\x00\x00\xc1\x00\xa3\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x6f\x73\x6d\x5f\x69\x64\x00\x00\x00\x00\x00\x43\x00\x00\x00\x00\x0a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x63\x6f\x64\x65", "application/x-dbf", one},
+	// Byte 0 is the dBase type, byte 2 and 3 are month/day, byte 28 is the flags byte.
+	{"dbf", "\x03\x00\x01\x01" + zeroes(24) + "\x00" + zeroes(39), "application/x-dbf", one},
+	{"dbf visual foxpro with memo", "\x30\x00\x01\x01" + zeroes(24) + "\x02" + zeroes(39), "application/x-dbf", one},
+	{"dbf visual foxpro with cdx, memo and dbc", "\x32\x00\x01\x01" + zeroes(24) + "\x07" + zeroes(39), "application/x-dbf", none},
+	{"dbf visual foxpro with unknown flag", "\x30\x00\x01\x01" + zeroes(24) + "\x08" + zeroes(39), "application/octet-stream", none},
+	{"dbf dbase with memo flag", "\x03\x00\x01\x01" + zeroes(24) + "\x02" + zeroes(39), "application/octet-stream", none},
 	{"dcm", offset(128, "\x44\x49\x43\x4D"), "application/dicom", one},
 	{"deb", "\x21\x3c\x61\x72\x63\x68\x3e\x0a\x64\x65\x62\x69\x61\x6e\x2d\x62\x69\x6e\x61\x72\x79", "application/vnd.debian.binary-package", all},
 	{"djvu", "\x41\x54\x26\x54\x46\x4F\x52\x4D\x00\x00\x00\x00DJVU", "image/vnd.djvu", one},
@@ -216,7 +221,7 @@ a,"b`,
 	{"kml 2.2", `<?xml version="1.0"?><kml xmlns="http://earth.google.com/kml/2.2">`, "application/vnd.google-earth.kml+xml", none},
 	{"kmz", "\x50\x4b\x03\x04\x14\x00\x00\x00\x08\x00\xe6\x6c\x04\x5b\xfd\xf4\xf2\x45\x41\x00\x00\x00\x43\x00\x00\x00\x07\x00\x1c\x00doc.kml", "application/vnd.google-earth.kmz", none},
 	{"lit", "ITOLITLS", "application/x-ms-reader", one},
-	{"lotus1", "\x00\x00\x02\x00456\x00" + offset(13, ""), "application/vnd.lotus-1-2-3", one},
+	{"lotus1", "\x00\x00\x02\x00456\x00" + zeroes(13), "application/vnd.lotus-1-2-3", one},
 	{"lotus2", "\x00\x00\x1a\x00" + offset(16, "\x01"), "application/vnd.lotus-1-2-3", one},
 	{"lua", "#!/usr/bin/lua", "text/x-lua", one},
 	{"lua space", "#! /usr/bin/lua", "text/x-lua", none},
@@ -308,7 +313,7 @@ a,"b`,
 	{"ogg", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x80\xbc\x81_\x00\x00\x00\x00\xd0\xfbP\x84\x01@fishead\x00\x03", "video/ogg", one},
 	{"ogg spx oga", "OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\xc7w\xaa\x15\x00\x00\x00\x00V&\x88\x89\x01PSpeex   1", "audio/ogg", one},
 	{"one", "\xe4\x52\x5c\x7b\x8c\xd8\xa7\x4d\xae\xb1\x53\x78\xd0\x29\x96\xd3", "application/onenote", one},
-	{"otf", "OTTO\x00\x0c\x00\x80\x00\x03\x00\x40\x43\x46\x46 " + offset(36, ""), "font/otf", one},
+	{"otf", "OTTO\x00\x0c\x00\x80\x00\x03\x00\x40\x43\x46\x46 " + zeroes(36), "font/otf", one},
 	{"otg", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xd1Y\xa8N\xdf%\xad\xe94\x00\x00\x004\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.graphics-template", "application/vnd.oasis.opendocument.graphics-template", one},
 	{"otp", "PK\x03\x04\x14\x00\x00\x08\x00\x00\xc4X\xa8N\xef\n\x14:8\x00\x00\x008\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.presentation-template", "application/vnd.oasis.opendocument.presentation-template", one},
 	{"ots", "PK\x03\x04\x14\x00\x00\x08\x00\x00\x1bV\xa8N{\x96\xa3N7\x00\x00\x007\x00\x00\x00\x08\x00\x00\x00mimetypeapplication/vnd.oasis.opendocument.spreadsheet-template", "application/vnd.oasis.opendocument.spreadsheet-template", one},
@@ -980,8 +985,12 @@ const (
 
 // offset prepends n nul bytes to s.
 func offset(n int, s string) string {
-	prepend := make([]byte, n)
-	return string(prepend) + s
+	return zeroes(n) + s
+}
+
+// zeroes returns a string of n 0x00 bytes.
+func zeroes(n int) string {
+	return string(make([]byte, n))
 }
 func fromDisk(path string) string {
 	data, err := os.ReadFile("testdata/" + path)
