@@ -46,10 +46,10 @@ type cdf struct {
 	satSecs         int32s // list of SAT sector ids; usually a sub-slice of raw input
 	satEntries      int    // number of valid SAT entries reachable through satSecs
 	firstSSAT       int32
-	ssatSecs        int32s // list of SSAT sector ids, precomputed from the firstSSAT chain
-	dirRaw          []byte // directory stream bytes (entries are decoded on demand)
-	sst             []byte // short-stream pool (root storage's stream)
-	sstBuilt        bool   // whether sst was already loaded (it is loaded lazily)
+	ssat            chain  // SSAT sectors, resolved once from the firstSSAT chain
+	dir             chain  // directory sectors (entries are decoded on demand)
+	pool            chain  // short-stream pool sectors (root storage's stream)
+	poolBuilt       bool   // whether pool was already resolved (it is resolved lazily)
 	rootStreamFirst int32  // first sector of the root storage short-stream pool
 	rootStreamSize  uint32 // size of the root storage short-stream pool
 	rootChild       int32  // directory id of the root storage's child tree
@@ -83,21 +83,20 @@ func parse(raw []byte, c *cdf) bool {
 	masterSAT := int32s{b: raw[76 : 76+4*masterSATSize]}
 
 	c.buildSAT(masterSAT, firstMSAT, nMSAT)
-	c.buildSSAT()
-	c.dirRaw = c.readLong(firstDirSec, 0)
+	c.ssat = c.chainOf(c.firstSSAT, len(c.data))
+	c.dir = c.chainOf(firstDirSec, len(c.data))
 
 	c.rootStreamFirst = -1
 	c.rootChild = -1
 	var d dirEntry
 	for i, n := 0, c.dirLen(); i < n; i++ {
-		c.dirAt(i, &d)
-		if d.typ != dirTypeRootStorage {
+		if !c.dirAt(i, &d) || d.typ != dirTypeRootStorage {
 			continue
 		}
 		copy(c.rootStorageUUID[:], d.storageUUID[:])
 		c.rootChild = d.child
-		// Record where the short-stream pool lives; it is loaded lazily by
-		// shortStream the first time a short stream is actually read.
+		// Record where the short-stream pool lives; it is resolved lazily by
+		// shortStreamPool the first time a short stream is actually read.
 		if d.streamFirst >= 0 {
 			c.rootStreamFirst = d.streamFirst
 			c.rootStreamSize = d.size
@@ -145,12 +144,13 @@ func (c *cdf) rootChildren() rootChildIter {
 // when iteration is done.
 func (it *rootChildIter) next() bool {
 	if it.flat {
-		if it.i >= it.n {
-			return false
+		for it.i < it.n {
+			it.i++
+			if it.c.dirAt(it.i-1, &it.d) {
+				return true
+			}
 		}
-		it.c.dirAt(it.i, &it.d)
-		it.i++
-		return true
+		return false
 	}
 	for it.sp > 0 {
 		it.sp--
@@ -161,7 +161,9 @@ func (it *rootChildIter) next() bool {
 		if it.visited++; it.visited > it.n {
 			return false // cyclic sibling pointers in a malformed directory
 		}
-		it.c.dirAt(int(id), &it.d)
+		if !it.c.dirAt(int(id), &it.d) {
+			continue // entry lies in a truncated sector
+		}
 		// Push the siblings. A valid red-black tree of n entries is at most
 		// 2*log2(n) deep, so the fixed-size stack cannot overflow for any
 		// real directory; if a malformed tree overflows it, the excess
@@ -248,70 +250,98 @@ type dirEntry struct {
 // nameBytes returns the decoded ASCII name without copying.
 func (d *dirEntry) nameBytes() []byte { return d.name[:d.nameLen] }
 
-// buildSSAT records the list of SSAT sector ids by walking the firstSSAT chain
-// through the SAT once. The SSAT contents are not materialized; ssatAt computes
-// the requested entry directly from c.data via ssatSecs, mirroring satSecs/satAt.
-// The walk is bounded by the number of sectors in the file so a cyclic SAT
-// (a self-looping sector) cannot spin forever.
-func (c *cdf) buildSSAT() {
-	maxIDs := len(c.data)/c.secSize + 1
-	buf := make([]byte, 0, 4*8)
-	var tmp [4]byte
-	for sid := c.firstSSAT; sid >= 0; {
-		if int(sid) >= c.satLen() {
-			break // SAT is truncated; stop collecting
-		}
-		if _, ok := c.sector(sid); !ok {
+// chain is a long-sector chain resolved into its list of sector ids. Records
+// inside the chain (directory entries, SSAT entries, short sectors) can then be
+// located in O(1) and sliced directly from the input, so stream bytes are never
+// copied. A chain is walked only once, when it is built. Lookups must never walk
+// it again or detection turns quadratic (GHSA-jjmc-jx7j-hp68).
+type chain struct {
+	first int32  // first sector id
+	n     int    // number of sectors in the chain
+	ids   int32s // sector ids; empty when the chain is contiguous
+}
+
+// at returns the id of the k-th sector of the chain. Callers must ensure k < n.
+func (ch chain) at(k int) int32 {
+	if ch.ids.len() == 0 {
+		return ch.first + int32(k) //nolint:gosec // k < n, and n sectors fit in the input
+	}
+	return ch.ids.at(k)
+}
+
+// chainOf resolves the chain starting at sid, collecting at most enough sectors
+// to cover maxBytes; that bound also stops cyclic chains. The walk ends at the
+// first sentinel id, at an id the SAT does not cover, or at a sector past EOF.
+// Sector ids are only stored when the chain is not physically contiguous, using
+// one exact-size allocation. Contiguous chains, the common case, allocate nothing.
+func (c *cdf) chainOf(sid int32, maxBytes int) chain {
+	maxN := maxBytes/c.secSize + 1
+	ch := chain{first: sid}
+	contiguous := true
+	for s := sid; s >= 0 && ch.n < maxN; ch.n++ {
+		if _, ok := c.sector(s); !ok || int(s) >= c.satLen() {
 			break
 		}
-		binary.LittleEndian.PutUint32(tmp[:], uint32(sid)) //nolint:gosec // reinterpret sector id
-		buf = append(buf, tmp[:]...)
-		if len(buf)/4 > maxIDs {
-			break // cyclic SAT chain; stop allocating
+		next := c.satAt(s)
+		if next >= 0 && int64(next) != int64(s)+1 {
+			contiguous = false
 		}
-		sid = c.satAt(sid)
+		s = next
 	}
-	c.ssatSecs = int32s{b: buf}
+	if contiguous {
+		return ch
+	}
+	buf := make([]byte, 4*ch.n)
+	for k, s := 0, sid; k < ch.n; k++ {
+		binary.LittleEndian.PutUint32(buf[4*k:], uint32(s)) //nolint:gosec // reinterpret sector id
+		s = c.satAt(s)
+	}
+	ch.ids = int32s{b: buf}
+	return ch
 }
 
-// ssatAt returns the i-th SSAT entry (a short-sector id) by indexing directly
-// into the precomputed ssatSecs, the same way satAt indexes satSecs. It returns
-// -1 when i is past the end of the SSAT or the backing sector is truncated.
+// record returns the idx-th record of size bytes stored in ch, sliced directly
+// from the input. size must be a power of two. It returns nil if the record is
+// past the end of the chain, lies in a truncated sector, or is larger than a
+// sector.
+func (c *cdf) record(ch chain, idx, size int) []byte {
+	perSec := c.secSize / size
+	if idx < 0 || perSec == 0 {
+		return nil
+	}
+	k, off := idx/perSec, idx%perSec*size
+	if k >= ch.n {
+		return nil
+	}
+	buf, ok := c.sector(ch.at(k))
+	if !ok || off+size > len(buf) {
+		return nil
+	}
+	return buf[off : off+size]
+}
+
+// ssatAt returns the i-th SSAT entry (a short-sector id). It returns -1 when i
+// is past the end of the SSAT or the backing sector is truncated.
 func (c *cdf) ssatAt(i int32) int32 {
-	if i < 0 {
+	b := c.record(c.ssat, int(i), 4)
+	if b == nil {
 		return -1
 	}
-	perSec := int32(c.secSize / 4) //nolint:gosec // secSize is a small power of two
-	secIdx := int(i / perSec)
-	if secIdx >= c.ssatSecs.len() {
-		return -1
-	}
-	sid := c.ssatSecs.at(secIdx)
-	buf, ok := c.sector(sid)
-	if !ok {
-		return -1
-	}
-	entryIdx := i % perSec
-	//nolint:gosec // anything divided by 4 fits int32
-	if entryIdx >= int32(len(buf)/4) {
-		return -1 // sector truncated short of this entry
-	}
-	//nolint:gosec // intentional two's-complement reinterpretation of a sector id
-	return int32(binary.LittleEndian.Uint32(buf[4*entryIdx:]))
+	return readSecID(b)
 }
 
-// shortStream returns the root storage short-stream pool, loading it on first
-// use. Detection often finishes (e.g. via the root CLSID or a long-stream
+// shortStreamPool returns the root storage short-stream pool, resolving it on
+// first use. Detection often finishes (e.g. via the root CLSID or a long-stream
 // summary) without ever reading a short stream, so building this eagerly would
 // be wasted work.
-func (c *cdf) shortStream() []byte {
-	if !c.sstBuilt {
-		c.sstBuilt = true
+func (c *cdf) shortStreamPool() chain {
+	if !c.poolBuilt {
+		c.poolBuilt = true
 		if c.rootStreamFirst >= 0 {
-			c.sst = c.readLong(c.rootStreamFirst, c.rootStreamSize)
+			c.pool = c.chainOf(c.rootStreamFirst, len(c.data))
 		}
 	}
-	return c.sst
+	return c.pool
 }
 
 // int32s works like a slice of LE int32 and is backed by a slice of bytes.
@@ -459,121 +489,85 @@ func (c *cdf) computeSATLen() int {
 	return total
 }
 
-// readLong reads a long-sector chain starting at sid. If length > 0 the
-// result is truncated to that many bytes. On truncation or any other failure
-// it returns whatever sectors were readable.
-func (c *cdf) readLong(sid int32, length uint32) []byte {
-	// Fast path: when the chain is a single physically contiguous run of
-	// sectors (the common case for the directory and summary streams) the data
-	// is already laid out sequentially in the input, so return a sub-slice of
-	// it instead of allocating a buffer and copying every sector.
-	if sid >= 0 {
-		maxSec := len(c.data)/c.secSize + 1
-		n, s := 0, sid
-		contiguous := true
-		for s >= 0 {
-			if int(s) >= c.satLen() {
-				break // SAT truncated; what remains is still contiguous
-			}
-			n++
-			if n > maxSec {
-				contiguous = false // cyclic chain; let the slow path guard it
-				break
-			}
-			next := c.satAt(s)
-			if next >= 0 && int64(next) != int64(s)+1 {
-				contiguous = false
-				break
-			}
-			s = next
-		}
-		if contiguous {
-			off64 := int64(c.secSize) * (1 + int64(sid))
-			if off64 >= int64(len(c.data)) {
-				return nil
-			}
-			end64 := min(off64+int64(n)*int64(c.secSize), int64(len(c.data)))
-			out := c.data[off64:end64]
-			if length > 0 && int64(length) < int64(len(out)) {
-				out = out[:length]
-			}
-			return out
-		}
-	}
+// maxStreamLen caps how many bytes of a user stream are copied out of the
+// input. Only (Doc)SummaryInformation streams are ever read and those are
+// small. If a property lies past the cap, detection falls back to stream names.
+const maxStreamLen = 1 << 16
 
-	// Slow path: gather a fragmented chain into a fresh buffer. Real-world
-	// writers (MSI builders, edited Office documents) routinely produce
-	// non-contiguous directory and stream chains, so this fallback is required
-	// for correct detection on those files.
-	maxBytes := len(c.data)
-	out := make([]byte, 0, c.secSize)
-	for sid >= 0 {
-		if int(sid) >= c.satLen() {
-			break // SAT truncated; return what we have
-		}
-		buf, ok := c.sector(sid)
-		if !ok {
-			break
-		}
-		out = append(out, buf...)
-		if len(out) >= maxBytes {
-			break // chain longer than the file: cyclic SAT, stop
-		}
-		sid = c.satAt(sid)
+// readLong reads at most limit bytes of the long-sector chain starting at sid.
+// On truncation or any other failure it returns whatever sectors were readable.
+func (c *cdf) readLong(sid int32, limit int) []byte {
+	ch := c.chainOf(sid, limit)
+	if ch.n == 0 {
+		return nil
 	}
-	if length > 0 && int64(length) < int64(len(out)) {
-		out = out[:length]
+	// Fast path: a physically contiguous chain (the common case) is already
+	// laid out sequentially in the input, so return a sub-slice of it.
+	if ch.ids.len() == 0 {
+		off := int64(c.secSize) * (1 + int64(sid))
+		end := min(off+int64(ch.n)*int64(c.secSize), int64(len(c.data)), off+int64(limit))
+		return c.data[off:end]
+	}
+	// Slow path: gather a fragmented chain into one exact-size buffer.
+	out := make([]byte, 0, min(limit, ch.n*c.secSize))
+	for k := 0; k < ch.n && len(out) < limit; k++ {
+		buf, _ := c.sector(ch.at(k))
+		out = append(out, buf[:min(len(buf), limit-len(out))]...)
 	}
 	return out
 }
 
-// readShort reads a short-sector chain at sid by indexing into the short-stream
-// pool. On truncation or if the pool is unavailable it returns whatever was
-// readable (possibly nil).
-func (c *cdf) readShort(sid int32, length uint32) []byte {
-	sst := c.shortStream()
-	if sst == nil {
+// readShort reads at most limit bytes of the short-sector chain at sid, taking
+// each short sector directly from the short-stream pool. On truncation it
+// returns whatever was readable; if the pool is unavailable it returns nil.
+func (c *cdf) readShort(sid int32, limit int) []byte {
+	pool := c.shortStreamPool()
+	if pool.n == 0 {
 		return nil
 	}
-	// TODO: anyway to avoid allocating and copying the bytes?
-	out := make([]byte, 0, c.shortSecSize)
-	for sid >= 0 {
-		off64 := int64(sid) * int64(c.shortSecSize)
-		if off64+int64(c.shortSecSize) > int64(len(sst)) {
+	out := make([]byte, 0, limit)
+	for sid >= 0 && len(out) < limit {
+		// The pool ends at the root storage's declared stream size.
+		end := (int64(sid) + 1) * int64(c.shortSecSize)
+		if c.rootStreamSize > 0 && end > int64(c.rootStreamSize) {
+			break
+		}
+		sec := c.record(pool, int(sid), c.shortSecSize)
+		if sec == nil {
 			break // short-stream pool truncated or sid out of range
 		}
-		off := int(off64)
-		out = append(out, sst[off:off+c.shortSecSize]...)
-		if length > 0 && int64(len(out)) >= int64(length) {
-			break // read enough to satisfy the stream's declared length
-		}
-		if len(out) >= len(sst) {
-			break // chain longer than the pool: cyclic SSAT, stop
-		}
+		out = append(out, sec[:min(len(sec), limit-len(out))]...)
 		sid = c.ssatAt(sid)
-	}
-	if length > 0 && int64(length) < int64(len(out)) {
-		out = out[:length]
 	}
 	return out
 }
 
 // readChain dispatches to the long or short reader depending on stream size.
+// The number of bytes read is capped at maxStreamLen. A length of 0 means the
+// size is unknown and the chain is read up to that cap.
 func (c *cdf) readChain(sid int32, length uint32) []byte {
-	if length < c.minStdStream && c.rootStreamFirst >= 0 {
-		return c.readShort(sid, length)
+	limit := min(maxStreamLen, len(c.data))
+	if length > 0 && int64(length) < int64(limit) {
+		limit = int(length)
 	}
-	return c.readLong(sid, length)
+	if length < c.minStdStream && c.rootStreamFirst >= 0 {
+		return c.readShort(sid, limit)
+	}
+	return c.readLong(sid, limit)
 }
 
-// dirLen returns the number of directory entries in dirRaw.
-func (c *cdf) dirLen() int { return len(c.dirRaw) / dirEntrySize }
+// dirLen returns the number of directory entries the directory chain can hold.
+// Entries in a truncated sector are reported as missing by dirAt.
+func (c *cdf) dirLen() int { return c.dir.n * (c.secSize / dirEntrySize) }
 
-// dirAt decodes the i-th directory entry into *out. Callers must ensure
-// i < dirLen(). The UTF-16LE name is decoded into out.name, ASCII-style,
-// stopping at the first NUL.
-func (c *cdf) dirAt(i int, out *dirEntry) {
-	raw := c.dirRaw[i*dirEntrySize:]
+// dirAt decodes the i-th directory entry into *out. It returns false when the
+// entry is not present in the input. The UTF-16LE name is decoded into
+// out.name, ASCII-style, stopping at the first NUL.
+func (c *cdf) dirAt(i int, out *dirEntry) bool {
+	raw := c.record(c.dir, i, dirEntrySize)
+	if raw == nil {
+		return false
+	}
 	nameLen := min(int(binary.LittleEndian.Uint16(raw[64:])), 64)
 	k := uint8(0)
 	for j := 0; j < nameLen/2; j++ {
@@ -594,6 +588,7 @@ func (c *cdf) dirAt(i int, out *dirEntry) {
 	out.streamFirst = readSecID(raw[116:120])
 	out.size = binary.LittleEndian.Uint32(raw[120:])
 	copy(out.storageUUID[:], raw[80:96])
+	return true
 }
 
 // userStream finds a root-level user stream by name and returns its bytes.
