@@ -426,6 +426,8 @@ ENDHDR`,
 	{"xlsx", fromDisk("xlsx.xlsx"), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", all},
 	{"xml", "<?xml ", "text/xml; charset=utf-8", all},
 	{"xml withbr", "\x0D\x0A<?xml ", "text/xml; charset=utf-8", none},
+	{"xml utf16lebom", "\xff\xfe<\x00?\x00x\x00m\x00l\x00 \x00", "text/xml; charset=utf-16le", none},
+	{"xml utf16bebom", "\xfe\xff\x00<\x00?\x00x\x00m\x00l\x00 ", "text/xml; charset=utf-16be", none},
 	{"xz", "\xfd7zXZ\x00", "application/x-xz", one},
 	{"zip", "PK\x03\x04", "application/zip", all},
 	// The word Hi compressed with zlib: echo Hi | pigz -z | od -A n -t x1
