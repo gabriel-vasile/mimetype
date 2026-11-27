@@ -49,6 +49,14 @@ func Par1(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte{0x50, 0x41, 0x52, 0x31})
 }
 
+// Arrow matches an Apache Arrow IPC file. The file format starts with the magic
+// string "ARROW1", padded to an 8 byte boundary. The Arrow streaming format has
+// no magic string, so it cannot be detected.
+// See: https://arrow.apache.org/docs/format/Columnar.html#ipc-file-format
+func Arrow(raw []byte, _ uint32) bool {
+	return bytes.HasPrefix(raw, []byte("ARROW1\x00\x00"))
+}
+
 // CBOR matches a Concise Binary Object Representation https://cbor.io/
 func CBOR(raw []byte, _ uint32) bool {
 	return bytes.HasPrefix(raw, []byte{0xD9, 0xD9, 0xF7})
