@@ -6,8 +6,8 @@ import (
 	"hash/fnv"
 	"math/bits"
 	"math/rand/v2"
+	"runtime"
 	"testing"
-	"time"
 )
 
 const testSecSize = 512
@@ -516,7 +516,7 @@ func TestDetectShortStreamMultiSectorSSAT(t *testing.T) {
 //
 // The directory chain in the SAT is 1 → 3 → -2, so the second dir sector is
 // only reachable via a fragmented walk. Detection must return CDFTypeDoc,
-// which only happens if readLong follows the fragmented chain.
+// which only happens if the directory chain is followed through the SAT.
 func makeFragmentedDirCDF(secSize int) []byte {
 	dir1 := dirEntryBytes("Root Entry", dirTypeRootStorage, -1, 0, nil)
 	dir2 := dirEntryBytes("WordDocument", dirTypeUserStream, -1, 0, nil)
@@ -533,7 +533,7 @@ func makeFragmentedDirCDF(secSize int) []byte {
 // directory stream is split across non-contiguous long sectors — a layout
 // real-world CDF writers (MSI builders, edited Office documents) commonly
 // produce. The distinctive entry (WordDocument) lives in the second dir
-// sector, so a readLong implementation that only handles contiguous chains
+// sector, so a directory reader that only handles contiguous chains
 // will miss it and incorrectly return CDFTypeGeneric.
 func TestDetectFragmentedDirChain(t *testing.T) {
 	for _, secSize := range testSecSizes {
@@ -893,31 +893,112 @@ func buildQuadraticCDF(n int) []byte {
 	return data
 }
 
-// TestDetectQuadraticSSAT checks that CDF detection finishes _fast_.
-// GHSA-jjmc-jx7j-hp68 showed that crafted inputs can make CDF detection run
-// quadratic with the size of the input. It might be bad idea to add this test
-// because of flakyness, but for now it's the easiest option.
-func TestDetectQuadraticSSAT(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
+// buildLongChainCDF builds a CDF of n bytes with 512-byte sectors whose
+// directory and SummaryInformation stream both start at the same long-sector
+// chain. If cyclic, that chain is sector nSAT looping onto itself. Otherwise
+// it visits every data sector exactly once, but out of order (even sectors
+// first, then odd ones), so it is fragmented without being cyclic.
+func buildLongChainCDF(n int, cyclic bool) []byte {
+	const secSize = testSecSize
+	perSec := secSize / 4
+	nSec := n/secSize - 1 // sectors after the header
+	nSAT := (nSec + perSec - 1) / perSec
+	if nSAT > masterSATSize {
+		panic("input too big for header-only master SAT")
 	}
-	const n = 1 << 18 // 256 KiB
-	data := buildQuadraticCDF(n)
-
-	done := make(chan CDFType, 1)
-	go func() { done <- Detect(data) }()
-
-	// Before the fix, 256KiB would take some 7s on my machine.
-	// AFter the fix, same input takes 40us.
-	// It'a big difference between the before and after so my bet is 1s
-	// will sit comfortable in-between, without creating flakyness.
-	const deadline = time.Second
-	select {
-	case got := <-done:
-		if got != CDFTypeGeneric {
-			t.Errorf("Detect() = %v, want CDFTypeGeneric", got)
+	masterSAT := make([]int32, nSAT)
+	sat := make([]int32, nSAT*perSec)
+	for i := range sat {
+		sat[i] = -1
+	}
+	for i := range nSAT {
+		masterSAT[i] = int32(i) //nolint:gosec // small index
+		sat[i] = -3             // SAT sectors are marked as such
+	}
+	first := int32(nSAT) //nolint:gosec // small index
+	if cyclic {
+		sat[first] = first
+	} else {
+		var order []int32
+		for s := first; s < int32(nSec); s += 2 { //nolint:gosec // small index
+			order = append(order, s)
 		}
-	case <-time.After(deadline):
-		t.Fatalf("Detect did not finish within %v on a %d-byte input: ", deadline, n)
+		for s := first + 1; s < int32(nSec); s += 2 { //nolint:gosec // small index
+			order = append(order, s)
+		}
+		for i := 0; i < len(order)-1; i++ {
+			sat[order[i]] = order[i+1]
+		}
+		sat[order[len(order)-1]] = -2
+	}
+
+	data := make([]byte, n)
+	copy(data, testHeader(secSize, first, -2, 4096, masterSAT))
+	for i, id := range sat {
+		binary.LittleEndian.PutUint32(data[secSize+4*i:], uint32(id)) //nolint:gosec // reinterpret id
+	}
+	dir := dirEntryBytes("Root Entry", dirTypeRootStorage, -1, 0, nil)
+	dir = append(dir, dirEntryBytes("\x05SummaryInformation", dirTypeUserStream, first, 0xFFFFFFFF, nil)...)
+	copy(data[secSize*(1+int(first)):], dir)
+	return data
+}
+
+// TestLongChainAllocs checks that the memory used by Detect does not grow with
+// the length of long-sector chains. Previously every chain was copied out of
+// the input, so a 2MiB crafted file made Detect allocate ~20MiB.
+func TestLongChainAllocs(t *testing.T) {
+	const n = 1 << 21 // 2 MiB
+	for _, cyclic := range []bool{true, false} {
+		t.Run(fmt.Sprintf("cyclic=%v", cyclic), func(t *testing.T) {
+			data := buildLongChainCDF(n, cyclic)
+			if got := bytesPerRun(5, func() { Detect(data) }); got > n/16 {
+				t.Errorf("Detect allocated %d bytes for a %d-byte input, want at most %d", got, n, n/16)
+			}
+		})
+	}
+}
+
+// bytesPerRun returns the average number of bytes allocated by f over runs
+// calls. GOMAXPROCS is set to 1 so other goroutines are less likely to
+// allocate during the measurement.
+func bytesPerRun(runs int, f func()) uint64 {
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
+	f() // one warm-up
+	var before, after runtime.MemStats
+	runtime.ReadMemStats(&before)
+	for range runs {
+		f()
+	}
+	runtime.ReadMemStats(&after)
+	return (after.TotalAlloc - before.TotalAlloc) / uint64(runs) //nolint:gosec // runs > 0
+}
+
+// BenchmarkDetectCrafted measures detection on crafted inputs that used to make
+// it run in quadratic time.
+func BenchmarkDetectCrafted(b *testing.B) {
+	cases := []struct {
+		name string
+		data []byte
+	}{{
+		// GHSA-jjmc-jx7j-hp68: short-stream reads walking the SSAT repeatedly.
+		name: "QuadraticSSAT",
+		data: buildQuadraticCDF(1 << 18), // 256 KiB
+	}, {
+		// Long-sector chains (directory and user stream) walked repeatedly.
+		name: "LongChainCyclic",
+		data: buildLongChainCDF(1<<22, true), // 4 MiB
+	}, {
+		name: "LongChainFragmented",
+		data: buildLongChainCDF(1<<22, false), // 4 MiB
+	}}
+
+	for _, bc := range cases {
+		b.Run(bc.name, func(b *testing.B) {
+			b.SetBytes(int64(len(bc.data)))
+			b.ReportAllocs()
+			for b.Loop() {
+				Detect(bc.data)
+			}
+		})
 	}
 }
