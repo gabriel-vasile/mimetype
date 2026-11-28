@@ -156,7 +156,8 @@ func Cpio(raw []byte, _ uint32) bool {
 	if len(raw) < 6 {
 		return false
 	}
-	return binary.LittleEndian.Uint16(raw) == 070707 || // binary cpio
+	return binary.LittleEndian.Uint16(raw) == 070707 || // little-endian binary cpio
+		binary.BigEndian.Uint16(raw) == 070707 || // big-endian binary cpio
 		bytes.HasPrefix(raw, []byte("070707")) || // portable ASCII cpios
 		bytes.HasPrefix(raw, []byte("070701")) ||
 		bytes.HasPrefix(raw, []byte("070702"))
