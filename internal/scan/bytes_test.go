@@ -532,3 +532,29 @@ func BenchmarkMatch(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkSearch(b *testing.B) {
+	r := rand.New(rand.NewSource(0))
+	randData := make([]byte, 1024)
+	if _, err := io.ReadFull(r, randData); err != io.ErrUnexpectedEOF && err != nil {
+		b.Fatal(err)
+	}
+	// A needle not present in randData, so Search scans the whole
+	// haystack and calls Match at (almost) every position.
+	needle := []byte("NEEDLE NOT PRESENT")
+	b.ReportAllocs()
+	for _, f := range []Flags{
+		0,
+		CompactWS,
+		IgnoreCase,
+		FullWord,
+		CompactWS | IgnoreCase | FullWord,
+	} {
+		b.Run(fmt.Sprintf("%d", f), func(b *testing.B) {
+			b.ReportAllocs()
+			for b.Loop() {
+				Bytes(randData).Search(needle, f)
+			}
+		})
+	}
+}
